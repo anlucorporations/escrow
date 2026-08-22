@@ -34,6 +34,7 @@ contract EscrowTest is Test {
         MockERC20 tokenC = new MockERC20("Token C", "TKC");
         escrow.addToken(address(tokenC));
         assertTrue(escrow.allowedTokens(address(tokenC)));
+        assertEq(escrow.getAllowedTokensCount(), 3);
     }
 
     function testAddTokenOnlyOwner() public {
@@ -41,6 +42,34 @@ contract EscrowTest is Test {
         vm.prank(user1);
         vm.expectRevert();
         escrow.addToken(address(tokenC));
+    }
+
+    function testRemoveToken() public {
+        escrow.removeToken(address(tokenB));
+        assertFalse(escrow.allowedTokens(address(tokenB)));
+        assertEq(escrow.getAllowedTokensCount(), 1);
+    }
+
+    function testRemoveTokenOnlyOwner() public {
+        vm.prank(user1);
+        vm.expectRevert();
+        escrow.removeToken(address(tokenB));
+    }
+
+    function testCannotCreateOperationWithRemovedToken() public {
+        escrow.removeToken(address(tokenB));
+
+        vm.startPrank(user1);
+        tokenA.approve(address(escrow), 100 ether);
+
+        vm.expectRevert("Token not allowed");
+        escrow.createOperation(
+            address(tokenA),
+            address(tokenB),
+            100 ether,
+            200 ether
+        );
+        vm.stopPrank();
     }
 
     function testCreateOperation() public {
@@ -170,5 +199,25 @@ contract EscrowTest is Test {
             200 ether
         );
         vm.stopPrank();
+    }
+
+    function testGetOperationsPaged() public {
+        vm.startPrank(user1);
+        tokenA.approve(address(escrow), 300 ether);
+        escrow.createOperation(address(tokenA), address(tokenB), 10 ether, 20 ether);
+        escrow.createOperation(address(tokenA), address(tokenB), 30 ether, 40 ether);
+        escrow.createOperation(address(tokenA), address(tokenB), 50 ether, 60 ether);
+        vm.stopPrank();
+
+        assertEq(escrow.getOperationsCount(), 3);
+
+        Escrow.Operation[] memory paged = escrow.getOperationsPaged(0, 2);
+        assertEq(paged.length, 2);
+        assertEq(paged[0].id, 1);
+        assertEq(paged[1].id, 2);
+
+        Escrow.Operation[] memory pagedNext = escrow.getOperationsPaged(2, 2);
+        assertEq(pagedNext.length, 1);
+        assertEq(pagedNext[0].id, 3);
     }
 }

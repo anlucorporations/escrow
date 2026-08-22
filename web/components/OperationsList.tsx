@@ -170,16 +170,21 @@ export function OperationsList() {
 
     try {
       const contract = new ethers.Contract(ESCROW_ADDRESS, ESCROW_ABI, provider)
-      let allOps: any[] = []
+      let rawOps: any[] = []
 
       try {
-        allOps = await contract.getAllOperations()
-      } catch (err) {
-        console.log('No operations yet or error fetching operations:', err)
-        allOps = []
+        rawOps = await contract.getOperationsPaged(0, 50)
+      } catch (pagedErr) {
+        console.log('getOperationsPaged fallback to getAllOperations:', pagedErr)
+        try {
+          rawOps = await contract.getAllOperations()
+        } catch (err) {
+          console.log('No operations yet or error fetching operations:', err)
+          rawOps = []
+        }
       }
 
-      const ops: Operation[] = allOps.map((op: any) => ({
+      const ops: Operation[] = rawOps.map((op: any) => ({
         id: op.id,
         user1: op.user1,
         tokenA: op.tokenA,
