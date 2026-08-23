@@ -327,7 +327,7 @@ export function FloatingToolDrawer({ onRegistrationChange }: FloatingToolDrawerP
                 )}
               </div>
 
-              {/* Perfil de Usuario On-Chain (Sustituye la navegación antigua) */}
+              {/* Perfil de Usuario On-Chain */}
               <div className="space-y-2 pt-2 border-t border-zinc-800">
                 <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
                   👤 Perfil de Usuario Registrado
@@ -370,10 +370,11 @@ export function FloatingToolDrawer({ onRegistrationChange }: FloatingToolDrawerP
         </div>
       )}
 
-      {/* Main Floating Tool Box Trigger Button */}
+      {/* Main Floating Tool Box Trigger Button (Muestra únicamente el icono cuando el cajón está cerrado) */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-3 px-5 py-3 rounded-full text-sm font-extrabold shadow-2xl transition-all duration-300 border backdrop-blur-md hover:scale-105 active:scale-95 ${
+        title={!isConnected ? "Conectar Wallet" : isRegistered === false ? "Inscribirse en Exchange" : `@${profileData?.username || 'Trader'}`}
+        className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 border backdrop-blur-md hover:scale-110 active:scale-95 ${
           !isConnected
             ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-400/30 shadow-blue-500/30'
             : isRegistered === false
@@ -382,38 +383,23 @@ export function FloatingToolDrawer({ onRegistrationChange }: FloatingToolDrawerP
         }`}
       >
         {!isConnected ? (
-          <>
-            <span className="text-lg">🧰</span>
-            <span>Conectar Wallet</span>
-          </>
+          <span className="text-2xl">🔌</span>
         ) : isRegistered === false ? (
           /* Estado 2: Billetera en marrón/amber con símbolo de aprobado (✓) */
-          <>
-            <div className="relative w-8 h-8 flex items-center justify-center rounded-xl bg-amber-900/60 border border-amber-600/50 text-amber-400 shadow-inner">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v9a2 2 0 002 2z" />
-              </svg>
-              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-amber-500 rounded-full flex items-center justify-center text-[9px] font-extrabold text-amber-950 shadow">✓</span>
-            </div>
-            <div className="text-left">
-              <span className="block text-xs font-bold text-amber-300">Inscribirse en Exchange</span>
-              <span className="block text-[10px] text-amber-500 font-mono">Wallet Conectada</span>
-            </div>
-          </>
+          <div className="relative w-9 h-9 flex items-center justify-center rounded-xl bg-amber-900/60 border border-amber-600/50 text-amber-400 shadow-inner">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v9a2 2 0 002 2z" />
+            </svg>
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 rounded-full flex items-center justify-center text-[10px] font-extrabold text-amber-950 shadow">✓</span>
+          </div>
         ) : (
           /* Estado 1: Escudo verde con símbolo de conexión (⚡) en su interior */
-          <>
-            <div className="relative w-8 h-8 flex items-center justify-center rounded-xl bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 shadow-inner">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-              <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 rounded-full ring-2 ring-zinc-950 flex items-center justify-center text-[8px] font-black text-zinc-950">⚡</span>
-            </div>
-            <div className="text-left">
-              <span className="block text-xs font-bold text-white">@{profileData?.username || 'Trader'}</span>
-              <span className="block text-[10px] text-emerald-400 font-mono">Inscrito On-Chain</span>
-            </div>
-          </>
+          <div className="relative w-9 h-9 flex items-center justify-center rounded-xl bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 shadow-inner">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-400 rounded-full ring-2 ring-zinc-950 flex items-center justify-center text-[9px] font-black text-zinc-950">⚡</span>
+          </div>
         )}
       </button>
     </div>
