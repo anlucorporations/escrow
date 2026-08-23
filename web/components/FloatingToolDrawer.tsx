@@ -87,7 +87,7 @@ export function FloatingToolDrawer({ activeTab, setActiveTab, onRegistrationChan
             const tokenContract = new ethers.Contract(addr, ERC20_ABI, provider)
             const [sym, bal] = await Promise.all([
               tokenContract.symbol().catch(() => addr.slice(0, 6)),
-              tokenContract.balanceOf(account).catch(() => 0n),
+              tokenContract.balanceOf(account).catch(() => BigInt(0)),
             ])
             return {
               address: addr,
