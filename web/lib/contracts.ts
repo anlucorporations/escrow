@@ -1,343 +1,137 @@
-export const ESCROW_ABI = [
+export const USER_REGISTRY_ADDRESS = '0xCD8a1C3ba11CF5ECfa6267617243239504a98d90' as const;
+export const EXCHANGE_ADDRESS = '0x82e01223d51Eb87e16A03E24687EDF0F294da6f1' as const;
+export const ESCROW_ADDRESS = EXCHANGE_ADDRESS;
+
+export const USER_REGISTRY_ABI = [
   {
-    "type": "constructor",
-    "inputs": [],
+    "type": "function",
+    "name": "registerUser",
+    "inputs": [{"name": "username", "type": "string"}],
+    "outputs": [],
     "stateMutability": "nonpayable"
   },
   {
     "type": "function",
-    "name": "addToken",
-    "inputs": [
+    "name": "isRegistered",
+    "inputs": [{"name": "wallet", "type": "address"}],
+    "outputs": [{"name": "", "type": "bool"}],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getUserProfile",
+    "inputs": [{"name": "wallet", "type": "address"}],
+    "outputs": [
       {
-        "name": "token",
-        "type": "address",
-        "internalType": "address"
+        "name": "",
+        "type": "tuple",
+        "components": [
+          {"name": "wallet", "type": "address"},
+          {"name": "username", "type": "string"},
+          {"name": "registeredAt", "type": "uint256"},
+          {"name": "isRegistered", "type": "bool"}
+        ]
       }
     ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "event",
+    "name": "UserRegistered",
+    "inputs": [
+      {"name": "wallet", "type": "address", "indexed": true},
+      {"name": "username", "type": "string", "indexed": false},
+      {"name": "registeredAt", "type": "uint256", "indexed": false}
+    ],
+    "anonymous": false
+  }
+] as const;
+
+export const EXCHANGE_ABI = [
+  {
+    "type": "constructor",
+    "inputs": [{"name": "_userRegistry", "type": "address"}],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "userRegistry",
+    "inputs": [],
+    "outputs": [{"name": "", "type": "address"}],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "addToken",
+    "inputs": [{"name": "token", "type": "address"}],
     "outputs": [],
     "stateMutability": "nonpayable"
   },
   {
     "type": "function",
     "name": "removeToken",
-    "inputs": [
-      {
-        "name": "token",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
+    "inputs": [{"name": "token", "type": "address"}],
     "outputs": [],
     "stateMutability": "nonpayable"
   },
   {
     "type": "function",
     "name": "allowedTokens",
-    "inputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
+    "inputs": [{"name": "", "type": "address"}],
+    "outputs": [{"name": "", "type": "bool"}],
     "stateMutability": "view"
   },
   {
     "type": "function",
     "name": "getAllowedTokens",
     "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address[]",
-        "internalType": "address[]"
-      }
-    ],
+    "outputs": [{"name": "", "type": "address[]"}],
     "stateMutability": "view"
   },
   {
     "type": "function",
-    "name": "getAllowedTokensCount",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "cancelOperation",
+    "name": "createOrder",
     "inputs": [
-      {
-        "name": "operationId",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
+      {"name": "giveToken", "type": "address"},
+      {"name": "takeToken", "type": "address"},
+      {"name": "giveAmount", "type": "uint256"},
+      {"name": "takeAmount", "type": "uint256"}
     ],
+    "outputs": [{"name": "", "type": "uint256"}],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "fillOrder",
+    "inputs": [{"name": "orderId", "type": "uint256"}],
     "outputs": [],
     "stateMutability": "nonpayable"
   },
   {
     "type": "function",
-    "name": "completeOperation",
-    "inputs": [
-      {
-        "name": "operationId",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
+    "name": "cancelOrder",
+    "inputs": [{"name": "orderId", "type": "uint256"}],
     "outputs": [],
     "stateMutability": "nonpayable"
   },
   {
     "type": "function",
-    "name": "createOperation",
-    "inputs": [
-      {
-        "name": "tokenA",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "tokenB",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "amountA",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "amountB",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "getNextOperationId",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getOperationsCount",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getOperationsPaged",
-    "inputs": [
-      {
-        "name": "offset",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "limit",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "tuple[]",
-        "internalType": "struct Escrow.Operation[]",
-        "components": [
-          {
-            "name": "id",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "user1",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "tokenA",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "tokenB",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "amountA",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "amountB",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "isActive",
-            "type": "bool",
-            "internalType": "bool"
-          },
-          {
-            "name": "closedAt",
-            "type": "uint256",
-            "internalType": "uint256"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getAllOperations",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "tuple[]",
-        "internalType": "struct Escrow.Operation[]",
-        "components": [
-          {
-            "name": "id",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "user1",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "tokenA",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "tokenB",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "amountA",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "amountB",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "isActive",
-            "type": "bool",
-            "internalType": "bool"
-          },
-          {
-            "name": "closedAt",
-            "type": "uint256",
-            "internalType": "uint256"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getOperation",
-    "inputs": [
-      {
-        "name": "operationId",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
+    "name": "getOrder",
+    "inputs": [{"name": "orderId", "type": "uint256"}],
     "outputs": [
       {
         "name": "",
         "type": "tuple",
-        "internalType": "struct Escrow.Operation",
         "components": [
-          {
-            "name": "id",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "user1",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "tokenA",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "tokenB",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "amountA",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "amountB",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "isActive",
-            "type": "bool",
-            "internalType": "bool"
-          },
-          {
-            "name": "closedAt",
-            "type": "uint256",
-            "internalType": "uint256"
-          }
+          {"name": "id", "type": "uint256"},
+          {"name": "maker", "type": "address"},
+          {"name": "giveToken", "type": "address"},
+          {"name": "takeToken", "type": "address"},
+          {"name": "giveAmount", "type": "uint256"},
+          {"name": "takeAmount", "type": "uint256"},
+          {"name": "status", "type": "uint8"},
+          {"name": "createdAt", "type": "uint256"},
+          {"name": "filledAt", "type": "uint256"}
         ]
       }
     ],
@@ -345,54 +139,49 @@ export const ESCROW_ABI = [
   },
   {
     "type": "function",
-    "name": "operations",
+    "name": "getOrdersPaged",
     "inputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
+      {"name": "offset", "type": "uint256"},
+      {"name": "limit", "type": "uint256"}
     ],
     "outputs": [
       {
-        "name": "id",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
+        "name": "",
+        "type": "tuple[]",
+        "components": [
+          {"name": "id", "type": "uint256"},
+          {"name": "maker", "type": "address"},
+          {"name": "giveToken", "type": "address"},
+          {"name": "takeToken", "type": "address"},
+          {"name": "giveAmount", "type": "uint256"},
+          {"name": "takeAmount", "type": "uint256"},
+          {"name": "status", "type": "uint8"},
+          {"name": "createdAt", "type": "uint256"},
+          {"name": "filledAt", "type": "uint256"}
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getOrdersByMaker",
+    "inputs": [{"name": "maker", "type": "address"}],
+    "outputs": [
       {
-        "name": "user1",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "tokenA",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "tokenB",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "amountA",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "amountB",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "isActive",
-        "type": "bool",
-        "internalType": "bool"
-      },
-      {
-        "name": "closedAt",
-        "type": "uint256",
-        "internalType": "uint256"
+        "name": "",
+        "type": "tuple[]",
+        "components": [
+          {"name": "id", "type": "uint256"},
+          {"name": "maker", "type": "address"},
+          {"name": "giveToken", "type": "address"},
+          {"name": "takeToken", "type": "address"},
+          {"name": "giveAmount", "type": "uint256"},
+          {"name": "takeAmount", "type": "uint256"},
+          {"name": "status", "type": "uint8"},
+          {"name": "createdAt", "type": "uint256"},
+          {"name": "filledAt", "type": "uint256"}
+        ]
       }
     ],
     "stateMutability": "view"
@@ -401,189 +190,44 @@ export const ESCROW_ABI = [
     "type": "function",
     "name": "owner",
     "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
+    "outputs": [{"name": "", "type": "address"}],
     "stateMutability": "view"
   },
   {
-    "type": "function",
-    "name": "renounceOwnership",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "transferOwnership",
-    "inputs": [
-      {
-        "name": "newOwner",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
     "type": "event",
-    "name": "OperationCancelled",
+    "name": "OrderCreated",
     "inputs": [
-      {
-        "name": "operationId",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
-      }
+      {"name": "orderId", "type": "uint256", "indexed": true},
+      {"name": "maker", "type": "address", "indexed": true},
+      {"name": "giveToken", "type": "address", "indexed": false},
+      {"name": "takeToken", "type": "address", "indexed": false},
+      {"name": "giveAmount", "type": "uint256", "indexed": false},
+      {"name": "takeAmount", "type": "uint256", "indexed": false},
+      {"name": "createdAt", "type": "uint256", "indexed": false}
     ],
     "anonymous": false
   },
   {
     "type": "event",
-    "name": "OperationCompleted",
+    "name": "OrderFilled",
     "inputs": [
-      {
-        "name": "operationId",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
-      },
-      {
-        "name": "user2",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "completedAt",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
+      {"name": "orderId", "type": "uint256", "indexed": true},
+      {"name": "taker", "type": "address", "indexed": true},
+      {"name": "filledAt", "type": "uint256", "indexed": false}
     ],
     "anonymous": false
   },
   {
     "type": "event",
-    "name": "OperationCreated",
+    "name": "OrderCancelled",
     "inputs": [
-      {
-        "name": "operationId",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
-      },
-      {
-        "name": "user1",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "tokenA",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
-      },
-      {
-        "name": "tokenB",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
-      },
-      {
-        "name": "amountA",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      },
-      {
-        "name": "amountB",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
+      {"name": "orderId", "type": "uint256", "indexed": true}
     ],
     "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "OwnershipTransferred",
-    "inputs": [
-      {
-        "name": "previousOwner",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "newOwner",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "TokenAdded",
-    "inputs": [
-      {
-        "name": "token",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "TokenRemoved",
-    "inputs": [
-      {
-        "name": "token",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "error",
-    "name": "OwnableInvalidOwner",
-    "inputs": [
-      {
-        "name": "owner",
-        "type": "address",
-        "internalType": "address"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "OwnableUnauthorizedAccount",
-    "inputs": [
-      {
-        "name": "account",
-        "type": "address",
-        "internalType": "address"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "ReentrancyGuardReentrantCall",
-    "inputs": []
   }
 ] as const;
+
+export const ESCROW_ABI = EXCHANGE_ABI;
 
 export const ERC20_ABI = [
   {
@@ -635,5 +279,3 @@ export const ERC20_ABI = [
     "stateMutability": "view"
   }
 ] as const;
-
-export const ESCROW_ADDRESS = '0xb6deb76f1418e6524e21fcc8d5d2e06bc317c5d3' as const;
