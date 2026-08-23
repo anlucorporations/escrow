@@ -40,6 +40,26 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
   const [isConnected, setIsConnected] = useState(false)
 
   const disconnect = useCallback(() => {
+    // Revocar el permiso eth_accounts en MetaMask (EIP-2255): la billetera
+    // queda realmente desconectada de la Dapp (y deja de aparecer como
+    // conectada en la UI de MetaMask), no solo se limpia el estado local.
+    if (typeof window !== 'undefined' && window.ethereum) {
+      try {
+        window.ethereum
+          .request({
+            method: 'wallet_revokePermissions',
+            params: [{ eth_accounts: {} }],
+          })
+          .catch((err: unknown) => {
+            // Algunos wallets no soportan wallet_revokePermissions;
+            // igualmente se limpia el estado local.
+            console.error('Error revoking wallet permissions:', err)
+          })
+      } catch (err) {
+        console.error('Error revoking wallet permissions:', err)
+      }
+    }
+
     setProvider(null)
     setSigner(null)
     setAccount(null)
