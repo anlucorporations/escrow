@@ -2,13 +2,26 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useEthereum } from '@/lib/ethereum'
-import { USER_REGISTRY_ADDRESS, USER_REGISTRY_ABI } from '@/lib/contracts'
+import { USER_REGISTRY_ADDRESS, USER_REGISTRY_ABI, EXCHANGE_ADDRESS, EXCHANGE_ABI, ERC20_ABI } from '@/lib/contracts'
 import { ethers } from 'ethers'
 
 interface FloatingToolDrawerProps {
   activeTab: 'trade' | 'create' | 'tokens'
   setActiveTab: (tab: 'trade' | 'create' | 'tokens') => void
   onRegistrationChange: () => void
+}
+
+interface TokenBalance {
+  address: string
+  symbol: string
+  balance: string
+}
+
+interface OrderMetrics {
+  activeOrdersCount: number
+  completedCount: number
+  disputedOrCancelledCount: number
+  totalOrdersCount: number
 }
 
 export function FloatingToolDrawer({ activeTab, setActiveTab, onRegistrationChange }: FloatingToolDrawerProps) {
@@ -20,6 +33,15 @@ export function FloatingToolDrawer({ activeTab, setActiveTab, onRegistrationChan
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+
+  // Metrics and Balances State
+  const [tokenBalances, setTokenBalances] = useState<TokenBalance[]>([])
+  const [metrics, setMetrics] = useState<OrderMetrics>({
+    activeOrdersCount: 0,
+    completedCount: 0,
+    disputedOrCancelledCount: 0,
+    totalOrdersCount: 0,
+  })
 
   const checkRegistrationStatus = useCallback(async () => {
     if (!provider || !account) {
@@ -45,9 +67,81 @@ export function FloatingToolDrawer({ activeTab, setActiveTab, onRegistrationChan
     }
   }, [provider, account, onRegistrationChange])
 
+  const loadMetricsAndBalances = useCallback(async () => {
+    if (!provider || !account || !isRegistered) return
+
+    try {
+      const exchangeContract = new ethers.Contract(EXCHANGE_ADDRESS, EXCHANGE_ABI, provider)
+
+      // 1. Fetch allowed tokens & balances
+      let allowedTokens: string[] = []
+      try {
+        allowedTokens = await exchangeContract.getAllowedTokens()
+      } catch {
+        allowedTokens = []
+      }
+
+      const balances = await Promise.all(
+        allowedTokens.map(async (addr: string) => {
+          try {
+            const tokenContract = new ethers.Contract(addr, ERC20_ABI, provider)
+            const [sym, bal] = await Promise.all([
+              tokenContract.symbol().catch(() => addr.slice(0, 6)),
+              tokenContract.balanceOf(account).catch(() => 0n),
+            ])
+            return {
+              address: addr,
+              symbol: sym,
+              balance: ethers.formatEther(bal),
+            }
+          } catch {
+            return { address: addr, symbol: addr.slice(0, 6), balance: '0.0' }
+          }
+        })
+      )
+      setTokenBalances(balances)
+
+      // 2. Fetch user's orders metrics
+      let userOrders: any[] = []
+      try {
+        userOrders = await exchangeContract.getOrdersByMaker(account)
+      } catch {
+        userOrders = []
+      }
+
+      let activeCount = 0
+      let completed = 0
+      let cancelledOrDisputed = 0
+
+      userOrders.forEach((o: any) => {
+        const st = Number(o.status)
+        if (st === 0) activeCount++
+        else if (st === 1) completed++
+        else if (st === 2) cancelledOrDisputed++
+      })
+
+      setMetrics({
+        activeOrdersCount: activeCount,
+        completedCount: completed,
+        disputedOrCancelledCount: cancelledOrDisputed,
+        totalOrdersCount: userOrders.length,
+      })
+    } catch (err) {
+      console.error('Error loading drawer metrics:', err)
+    }
+  }, [provider, account, isRegistered])
+
   useEffect(() => {
     checkRegistrationStatus()
   }, [checkRegistrationStatus])
+
+  useEffect(() => {
+    if (isOpen && isRegistered) {
+      loadMetricsAndBalances()
+      const interval = setInterval(loadMetricsAndBalances, 5000)
+      return () => clearInterval(interval)
+    }
+  }, [isOpen, isRegistered, loadMetricsAndBalances])
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -85,7 +179,7 @@ export function FloatingToolDrawer({ activeTab, setActiveTab, onRegistrationChan
     <div className="fixed bottom-6 right-6 z-50">
       {/* Popover Tool Drawer Window */}
       {isOpen && (
-        <div className="mb-3 w-80 sm:w-96 rounded-2xl bg-zinc-900 border border-zinc-800 text-white shadow-2xl p-5 backdrop-blur-xl animate-fade-in space-y-4">
+        <div className="mb-3 w-80 sm:w-96 rounded-2xl bg-zinc-900 border border-zinc-800 text-white shadow-2xl p-5 backdrop-blur-xl animate-fade-in space-y-4 max-h-[85vh] overflow-y-auto">
           <div className="flex justify-between items-center border-b border-zinc-800 pb-3">
             <div className="flex items-center gap-2 font-bold text-sm">
               <span className="text-xl">🧰</span> Cajón de Herramientas P2P
@@ -164,8 +258,9 @@ export function FloatingToolDrawer({ activeTab, setActiveTab, onRegistrationChan
               </div>
             </div>
           ) : (
-            /* Section 3: Registered Trader Tools & Navigation */
+            /* Section 3: Registered Trader Metrics & Tools */
             <div className="space-y-4 py-1">
+              {/* Profile Badge */}
               <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex justify-between items-center">
                 <div>
                   <span className="text-[10px] text-emerald-400 font-semibold uppercase tracking-wider block">Trader Inscrito</span>
@@ -174,8 +269,53 @@ export function FloatingToolDrawer({ activeTab, setActiveTab, onRegistrationChan
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
               </div>
 
+              {/* Indicador de Operaciones: Concretadas Felizmente vs En Disputa / Canceladas */}
               <div className="space-y-1.5">
-                <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">Navegación del Exchange</span>
+                <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
+                  📈 Indicador de Operaciones
+                </span>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center">
+                    <span className="text-[10px] text-emerald-400 uppercase block font-semibold">Concretadas</span>
+                    <span className="text-lg font-bold text-emerald-300">{metrics.completedCount}</span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-center">
+                    <span className="text-[10px] text-red-400 uppercase block font-semibold">En Disputa / Canc.</span>
+                    <span className="text-lg font-bold text-red-300">{metrics.disputedOrCancelledCount}</span>
+                  </div>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 flex justify-between items-center text-xs">
+                  <span className="text-blue-300 font-medium">⏳ Operaciones Activas:</span>
+                  <span className="font-bold text-blue-400">{metrics.activeOrdersCount} abiertas</span>
+                </div>
+              </div>
+
+              {/* Balances de Todos los Tokens */}
+              <div className="space-y-1.5">
+                <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
+                  🪙 Balances de Tokens (Wallet)
+                </span>
+                {tokenBalances.length === 0 ? (
+                  <p className="text-xs text-zinc-500 italic">No hay tokens cargados.</p>
+                ) : (
+                  <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                    {tokenBalances.map((tb) => (
+                      <div
+                        key={tb.address}
+                        className="p-2 rounded-lg bg-zinc-950/80 border border-zinc-800 flex justify-between items-center text-xs"
+                      >
+                        <span className="font-semibold text-zinc-300">{tb.symbol}</span>
+                        <span className="font-mono font-bold text-white">{parseFloat(tb.balance).toFixed(4)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Navegación del Exchange */}
+              <div className="space-y-1.5 pt-1">
+                <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">Navegación</span>
                 <button
                   onClick={() => {
                     setActiveTab('trade')
