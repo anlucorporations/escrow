@@ -2,12 +2,14 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { ConnectButton } from '@/components/ConnectButton'
 import { useEthereum } from '@/lib/ethereum'
 import { ESCROW_ADDRESS, ESCROW_ABI } from '@/lib/contracts'
 import { ethers } from 'ethers'
 
 export function Header() {
+  const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
   const { account, provider } = useEthereum()
@@ -31,6 +33,11 @@ export function Header() {
   useEffect(() => {
     checkAdmin()
   }, [account, provider])
+
+  // Hide top header navigation bar on landing page ('/')
+  if (pathname === '/') {
+    return null
+  }
 
   const navItems = [
     { label: 'Home', href: '/' },
