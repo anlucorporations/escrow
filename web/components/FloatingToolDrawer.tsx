@@ -71,7 +71,11 @@ export function FloatingToolDrawer({ activeTab, setActiveTab, onRegistrationChan
       }, 1500)
     } catch (err: any) {
       console.error('Registration error:', err)
-      setError(err.reason || err.message || 'Error en la transacción')
+      let msg = err.reason || err.message || 'Error en la transacción'
+      if (msg.includes('Failed to fetch') || msg.includes('-32603') || msg.includes('coalesce')) {
+        msg = 'Error de conexión RPC en MetaMask. Asegúrate de tener seleccionada la red Local Anvil (http://127.0.0.1:8545 - Chain ID 31337). Si el error persiste, en MetaMask ve a Ajustes ➔ Avanzado ➔ "Borrar datos de la actividad de la cuenta".'
+      }
+      setError(msg)
     } finally {
       setLoading(false)
     }
@@ -147,8 +151,8 @@ export function FloatingToolDrawer({ activeTab, setActiveTab, onRegistrationChan
                 </div>
               )}
               {error && (
-                <div className="text-xs text-red-400 font-semibold">
-                  Error: {error}
+                <div className="p-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-xs text-red-400 font-medium leading-relaxed">
+                  {error}
                 </div>
               )}
 
