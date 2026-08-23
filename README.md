@@ -40,7 +40,7 @@ source ./accounts.sh  # Load as environment variables
 
 After running `./setup.sh` or `./start.sh`, you'll have access to 3 pre-funded accounts.
 
-See [ACCOUNTS.md](ACCOUNTS.md) for detailed information about accessing and using the test accounts.
+See [ACCOUNTS.md](RepoTecno/ACCOUNTS.md) for detailed information about accessing and using the test accounts.
 
 Quick access:
 - All accounts have 10,000 ETH for gas

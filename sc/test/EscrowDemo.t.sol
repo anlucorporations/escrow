@@ -6,7 +6,7 @@ import {Escrow} from "../src/Escrow.sol";
 import {MockERC20} from "../src/MockERC20.sol";
 
 /**
- * Réplica determinista del guion de demo (README_CASO_PRACTICO.md):
+ * Réplica determinista del guion de demo (RepoTecno/README_CASO_PRACTICO.md):
  * SWAP, PAGO con garantía, disputa a favor de ambas partes, expiración.
  */
 contract EscrowDemoTest is Test {
