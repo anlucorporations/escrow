@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { ethers } from 'ethers'
 import { ESCROW_ADDRESS, ESCROW_ABI } from '@/lib/contracts'
 
-const provider = new ethers.JsonRpcProvider('http://localhost:8545')
+// RPC configurable vía variable de entorno (portable a otras redes).
+//   RPC_URL=http://localhost:8545  (por defecto)
+const RPC_URL = process.env.RPC_URL ?? 'http://localhost:8545'
+const provider = new ethers.JsonRpcProvider(RPC_URL)
 
 export async function GET(
   request: NextRequest,
@@ -21,10 +24,12 @@ export async function GET(
       tokenB: operation.tokenB,
       amountA: operation.amountA.toString(),
       amountB: operation.amountB.toString(),
-      isActive: operation.isActive,
+      status: Number(operation.status),
+      createdAt: operation.createdAt.toString(),
+      deadline: operation.deadline.toString(),
       closedAt: operation.closedAt.toString(),
     })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch operation' }, { status: 500 })
   }
 }

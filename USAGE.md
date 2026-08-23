@@ -75,16 +75,18 @@ Todas las cuentas tienen 10,000 ETH y 1,000 de cada token (TKA y TKB).
    - Amount A: 100
    - Token B: [dirección de TKB]
    - Amount B: 200
-   - Click "1. Approve Token A" → Confirmar transacción
-   - Click "2. Create Operation" → Confirmar transacción
+   - (Opcional) Deadline: 7 días
+   - Click "Create Operation" → **1 solo botón encadena approve + createOperation**
+   - Confirmar ambas transacciones en MetaMask
 
 2. **Usuario 2 - Completar Operación**
    - Desconectar y conectar con Cuenta #2
-   - Ver la operación en la lista
-   - Click "1. Approve Token B" → Confirmar transacción
-   - Click "2. Complete Operation" → Confirmar transacción
+   - Ver la operación en la lista (estado **Activa**)
+   - Click "Complete Operation" → **1 solo botón encadena approve + completeOperation**
+   - Confirmar ambas transacciones en MetaMask
    - ✓ Usuario 2 recibe 100 TKA
    - ✓ Usuario 1 recibe 200 TKB
+   - Estado: **Completada**
 
 ### Escenario 2: Usuario 1 cancela su operación
 
@@ -94,15 +96,30 @@ Todas las cuentas tienen 10,000 ETH y 1,000 de cada token (TKA y TKB).
    - Ver su operación en la lista
    - Click "Cancel Operation" → Confirmar transacción
    - ✓ Recupera sus 100 TKA
+   - Estado: **Cancelada**
 
-### Escenario 3: Admin agrega un nuevo token
+### Escenario 3: Expiración sin contraparte
+
+1. **Usuario 1** crea una operación con deadline (ej. 1 día)
+2. Nadie la completa antes de vencer
+3. **Usuario 1** ve el botón "Reclamar fondos (venció)"
+4. Click → `refundAfterExpiry()` → ✓ Recupera su tokenA
+
+### Escenario 4: Disputa y arbitraje
+
+1. **Usuario 1** crea una operación (ej. 1.000 USDT ↔ 1 DELIVERY)
+2. Una parte hace click en "Disputar operación" → estado **En disputa**
+3. **Árbitro** (cuenta designada por el admin) ve el "Panel de árbitro"
+4. Resuelve a favor del creador (refund) o de la contraparte (pago liberado)
+
+### Escenario 5: Admin agrega un nuevo token
 
 1. **Admin - Agregar Token**
    - Conectar wallet (Cuenta #0)
    - Ir a "Add Token (Admin Only)"
    - Token Address: [dirección del nuevo token]
    - Click "Add Token" → Confirmar transacción
-   - ✓ Token agregado y disponible para operaciones
+   - ✓ Token agregado (validado on-chain: contrato + symbol()) y disponible
 
 ## Comandos Útiles
 

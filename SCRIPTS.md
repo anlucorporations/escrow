@@ -1,6 +1,6 @@
 # Scripts de Automatización
 
-Este proyecto incluye 3 scripts bash para facilitar el desarrollo y testing.
+Este proyecto incluye 5 scripts bash para facilitar el desarrollo y testing.
 
 ## 📋 Resumen de Scripts
 
@@ -9,6 +9,8 @@ Este proyecto incluye 3 scripts bash para facilitar el desarrollo y testing.
 | `start.sh` | Inicio completo del proyecto | `./start.sh` |
 | `setup.sh` | Solo deployment de contratos | `./setup.sh` |
 | `stop.sh` | Detener todos los servicios | `./stop.sh` |
+| `verify-setup.sh` | Verificar que todo está configurado | `./verify-setup.sh` |
+| `accounts.sh` | Mostrar cuentas de prueba y claves | `./accounts.sh` |
 
 ---
 
@@ -69,61 +71,46 @@ Presiona `Ctrl+C` o ejecuta `./stop.sh`
    ```
    Si no está corriendo, muestra instrucciones y sale.
 
-2. **Deploy Escrow Contract**
+2. **Compila los contratos**
    ```bash
-   Step 1: Deploying Escrow contract...
-   ✓ Escrow deployed at: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+   Compiling contracts...
+   ✓ Contracts compiled
    ```
 
-3. **Deploy MockERC20 Tokens**
+3. **Despliega Escrow + 4 tokens mock**
    ```bash
-   Step 2: Deploying MockERC20 Token A...
-   ✓ Token A deployed at: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
-   
-   Step 3: Deploying MockERC20 Token B...
-   ✓ Token B deployed at: 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0
+   ✓ Escrow:   0x...
+   ✓ TKA:      0x... (18 decimals)
+   ✓ TKB:      0x... (18 decimals)
+   ✓ USDT:     0x... (6 decimals)
+   ✓ DELIVERY: 0x... (18 decimals)
    ```
 
-4. **Configura Escrow**
-   ```bash
-   Step 4: Adding Token A to Escrow contract...
-   ✓ Token A added to Escrow
-   
-   Step 5: Adding Token B to Escrow contract...
-   ✓ Token B added to Escrow
-   ```
+4. **Configura Escrow**: autoriza los 4 tokens (`addToken`) y designa al
+   **árbitro** (`setArbiter`) — por defecto la cuenta #3 de Anvil.
 
-5. **Mintea Tokens de Prueba**
-   ```bash
-   Step 6: Minting tokens to test accounts...
-   ✓ Tokens minted to Anvil accounts 0, 1, 2
-   ```
-   Cada cuenta recibe 1000 TKA y 1000 TKB.
+5. **Mintea Tokens de Prueba** a las 10 cuentas de Anvil:
+   - 1000 TKA + 1000 TKB + 5000 USDT + 5 DELIVERY por cuenta
 
-6. **Actualiza Web Config**
-   ```bash
-   Step 7: Updating web configuration...
-   ✓ Web configuration updated
-   ```
-   Actualiza `web/lib/contracts.ts` con la dirección del contrato.
+6. **Actualiza Web Config**: escribe `web/.env.local` con
+   `NEXT_PUBLIC_ESCROW_ADDRESS` y `RPC_URL` (el frontend ya no necesita editar
+   `web/lib/contracts.ts`).
 
 7. **Guarda Información**
    ```bash
-   Saving deployment information...
-   ✓ Deployment info saved to deployment-info.txt
+   ✓ deployment-info.txt guardado
    ```
 
 ### Archivos Generados
 
-- `deployment-info.txt` - Direcciones de contratos y cuentas
-- `web/lib/contracts.ts` - Actualizado con nueva dirección de Escrow
-- `web/lib/contracts.ts.backup` - Backup del archivo original
+- `deployment-info.txt` - Direcciones de contratos, árbitro y cuentas
+- `web/.env.local` - Dirección del Escrow + RPC para la web
 
 ### Cuentas Configuradas
 
 | Cuenta | Balance |
 |--------|---------|
-| 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 | 1000 TKA + 1000 TKB |
+| 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 | 1000 TKA + 1000 TKB + 5000 USDT + 5 DELIVERY |
 | 0x70997970C51812dc3A010C7d01b50e0d17dc79C8 | 1000 TKA + 1000 TKB |
 | 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC | 1000 TKA + 1000 TKB |
 

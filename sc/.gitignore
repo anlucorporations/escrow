@@ -2,6 +2,10 @@
 cache/
 out/
 
+# Dependencies instaladas localmente (se restauran con:
+# git submodule update --init --recursive  o  los pasos de setup.sh)
+lib/
+
 # Ignores development broadcast logs
 !/broadcast
 /broadcast/*/31337/

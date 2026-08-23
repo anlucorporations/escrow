@@ -2,10 +2,29 @@
 pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
+/**
+ * @title Escrow
+ * @notice Intercambio atómico de tokens ERC20 con custodia bilateral.
+ *
+ * Patrón central: ninguna parte entrega su contraprestación sin recibir la
+ * suya, y ninguna parte puede quedar atrapada con sus fondos en custodia
+ * para siempre (cancelación + expiración + arbitraje).
+ *
+ * Estados de una operación: Active -> Completed | Cancelled | Disputed
+ * Disputed -> Completed (resolución del árbitro).
+ */
 contract Escrow is Ownable, ReentrancyGuard {
+    enum Status {
+        Active,
+        Completed,
+        Cancelled,
+        Disputed
+    }
+
     struct Operation {
         uint256 id;
         address user1;
@@ -13,7 +32,9 @@ contract Escrow is Ownable, ReentrancyGuard {
         address tokenB;
         uint256 amountA;
         uint256 amountB;
-        bool isActive;
+        Status status;
+        uint256 createdAt;
+        uint256 deadline; // 0 = sin expiración
         uint256 closedAt;
     }
 
@@ -23,21 +44,27 @@ contract Escrow is Ownable, ReentrancyGuard {
     address[] private tokenList;
     uint256[] private operationIds;
 
+    /// Rol opcional que resuelve disputas. address(0) = arbitraje deshabilitado.
+    address public arbiter;
+
     event TokenAdded(address indexed token);
+    event ArbiterSet(address indexed arbiter);
     event OperationCreated(
         uint256 indexed operationId,
         address indexed user1,
         address tokenA,
         address tokenB,
         uint256 amountA,
-        uint256 amountB
+        uint256 amountB,
+        uint256 deadline
     );
     event OperationCompleted(
-        uint256 indexed operationId,
-        address indexed user2,
-        uint256 completedAt
+        uint256 indexed operationId, address indexed user2, uint256 amountA, uint256 amountB, uint256 completedAt
     );
-    event OperationCancelled(uint256 indexed operationId);
+    event OperationCancelled(uint256 indexed operationId, uint256 amountA, uint256 cancelledAt);
+    event OperationDisputed(uint256 indexed operationId, address indexed disputer, uint256 disputedAt);
+    event DisputeResolved(uint256 indexed operationId, bool favorUser1, uint256 resolvedAt);
+    event OperationExpired(uint256 indexed operationId, address indexed user1, uint256 amountA, uint256 expiredAt);
 
     constructor() Ownable(msg.sender) {
         nextOperationId = 1;
@@ -48,9 +75,34 @@ contract Escrow is Ownable, ReentrancyGuard {
         _;
     }
 
+    modifier onlyArbiter() {
+        require(msg.sender == arbiter, "Only arbiter can call");
+        _;
+    }
+
+    // ---------------------------------------------------------------- admin
+
+    /// @notice Autoriza un token ERC20. Valida que la dirección tenga código
+    ///         y que implemente `symbol()` (mínimo para ser considerado ERC20).
     function addToken(address token) external onlyOwner {
         require(token != address(0), "Invalid token address");
         require(!allowedTokens[token], "Token already added");
+
+        uint256 size;
+        assembly {
+            size := extcodesize(token)
+        }
+        require(size > 0, "Token address is not a contract");
+
+        try IERC20Metadata(token).symbol() returns (
+            string memory
+        ) {
+        // Dirección con contrato que responde a symbol(): candidata ERC20.
+        }
+        catch {
+            revert("Address is not an ERC20 token");
+        }
+
         allowedTokens[token] = true;
         tokenList.push(token);
         emit TokenAdded(token);
@@ -59,19 +111,31 @@ contract Escrow is Ownable, ReentrancyGuard {
     function getAllowedTokens() external view returns (address[] memory) {
         return tokenList;
     }
-    
+
     function getAllowedTokensCount() external view returns (uint256) {
         return tokenList.length;
     }
 
-    function createOperation(
-        address tokenA,
-        address tokenB,
-        uint256 amountA,
-        uint256 amountB
-    ) external onlyAllowedToken(tokenA) onlyAllowedToken(tokenB) nonReentrant returns (uint256) {
+    /// @notice Designa el árbitro que resolverá disputas (0 = deshabilita).
+    function setArbiter(address _arbiter) external onlyOwner {
+        arbiter = _arbiter;
+        emit ArbiterSet(_arbiter);
+    }
+
+    // ------------------------------------------------------------- lifecycle
+
+    /// @notice User1 deposita amountA de tokenA pidiendo amountB de tokenB.
+    /// @param deadline Timestamp UNIX de expiración (0 = sin expiración).
+    function createOperation(address tokenA, address tokenB, uint256 amountA, uint256 amountB, uint256 deadline)
+        external
+        onlyAllowedToken(tokenA)
+        onlyAllowedToken(tokenB)
+        nonReentrant
+        returns (uint256)
+    {
         require(tokenA != tokenB, "Tokens must be different");
         require(amountA > 0 && amountB > 0, "Amounts must be greater than 0");
+        require(deadline == 0 || deadline > block.timestamp, "Deadline must be in the future");
 
         IERC20(tokenA).transferFrom(msg.sender, address(this), amountA);
 
@@ -83,42 +147,114 @@ contract Escrow is Ownable, ReentrancyGuard {
             tokenB: tokenB,
             amountA: amountA,
             amountB: amountB,
-            isActive: true,
+            status: Status.Active,
+            createdAt: block.timestamp,
+            deadline: deadline,
             closedAt: 0
         });
 
         operationIds.push(operationId);
 
-        emit OperationCreated(operationId, msg.sender, tokenA, tokenB, amountA, amountB);
+        emit OperationCreated(operationId, msg.sender, tokenA, tokenB, amountA, amountB, deadline);
         return operationId;
     }
 
+    /// @notice User2 deposita amountB de tokenB y recibe al instante amountA
+    ///         de tokenA; User1 recibe amountB de tokenB (intercambio atómico).
     function completeOperation(uint256 operationId) external nonReentrant {
         Operation storage operation = operations[operationId];
-        require(operation.isActive, "Operation is not active");
+        require(operation.id != 0, "Operation does not exist");
+        require(operation.status == Status.Active, "Operation is not active");
         require(operation.user1 != msg.sender, "Cannot complete your own operation");
+        require(operation.deadline == 0 || block.timestamp <= operation.deadline, "Operation expired");
 
         IERC20(operation.tokenB).transferFrom(msg.sender, operation.user1, operation.amountB);
         IERC20(operation.tokenA).transfer(msg.sender, operation.amountA);
 
-        operation.isActive = false;
+        operation.status = Status.Completed;
         operation.closedAt = block.timestamp;
 
-        emit OperationCompleted(operationId, msg.sender, block.timestamp);
+        emit OperationCompleted(operationId, msg.sender, operation.amountA, operation.amountB, block.timestamp);
     }
 
+    /// @notice User1 recupera su tokenA cancelando la operación.
     function cancelOperation(uint256 operationId) external nonReentrant {
         Operation storage operation = operations[operationId];
-        require(operation.isActive, "Operation is not active");
+        require(operation.id != 0, "Operation does not exist");
+        require(operation.status == Status.Active, "Operation is not active");
         require(operation.user1 == msg.sender, "Only creator can cancel");
 
         IERC20(operation.tokenA).transfer(msg.sender, operation.amountA);
 
-        operation.isActive = false;
+        operation.status = Status.Cancelled;
         operation.closedAt = block.timestamp;
 
-        emit OperationCancelled(operationId);
+        emit OperationCancelled(operationId, operation.amountA, block.timestamp);
     }
+
+    /// @notice Tras vencer el deadline sin contraparte, User1 recupera su tokenA.
+    function refundAfterExpiry(uint256 operationId) external nonReentrant {
+        Operation storage operation = operations[operationId];
+        require(operation.id != 0, "Operation does not exist");
+        require(operation.status == Status.Active, "Operation is not active");
+        require(operation.user1 == msg.sender, "Only creator can refund");
+        require(operation.deadline != 0, "Operation has no deadline");
+        require(block.timestamp > operation.deadline, "Deadline not reached yet");
+
+        IERC20(operation.tokenA).transfer(msg.sender, operation.amountA);
+
+        operation.status = Status.Cancelled;
+        operation.closedAt = block.timestamp;
+
+        emit OperationExpired(operationId, msg.sender, operation.amountA, block.timestamp);
+    }
+
+    // ------------------------------------------------------------- disputes
+
+    /// @notice Abre una disputa mientras la operación está activa y no ha
+    ///         vencido. Puede invocarla cualquiera de las partes implicadas
+    ///         (user1 o la contraparte, que aún no está registrada on-chain)
+    ///         o el propio árbitro. Requiere que exista un árbitro designado.
+    function disputeOperation(uint256 operationId) external {
+        Operation storage operation = operations[operationId];
+        require(operation.id != 0, "Operation does not exist");
+        require(operation.status == Status.Active, "Operation is not active");
+        require(arbiter != address(0), "No arbiter set");
+        require(operation.deadline == 0 || block.timestamp <= operation.deadline, "Operation expired");
+
+        operation.status = Status.Disputed;
+        emit OperationDisputed(operationId, msg.sender, block.timestamp);
+    }
+
+    /// @notice El árbitro resuelve la disputa:
+    ///         favorUser1 == true  -> User1 recupera tokenA (refund).
+    ///         favorUser1 == false -> `recipient` (la contraparte que el
+    ///         árbitro determina como ganadora) recibe tokenA (pago liberado).
+    ///         El contrato no registra a la contraparte hasta que completa la
+    ///         operación, por eso el árbitro la indica explícitamente.
+    function resolveDispute(uint256 operationId, bool favorUser1, address recipient) external onlyArbiter nonReentrant {
+        Operation storage operation = operations[operationId];
+        require(operation.id != 0, "Operation does not exist");
+        require(operation.status == Status.Disputed, "Operation is not disputed");
+
+        address winner = operation.user1;
+        if (favorUser1) {
+            winner = operation.user1;
+        } else {
+            require(recipient != address(0), "Invalid recipient");
+            require(recipient != operation.user1, "Recipient must not be user1");
+            winner = recipient;
+        }
+
+        IERC20(operation.tokenA).transfer(winner, operation.amountA);
+
+        operation.status = Status.Completed;
+        operation.closedAt = block.timestamp;
+
+        emit DisputeResolved(operationId, favorUser1, block.timestamp);
+    }
+
+    // ------------------------------------------------------------ queries
 
     function getOperation(uint256 operationId) external view returns (Operation memory) {
         return operations[operationId];
@@ -128,11 +264,24 @@ contract Escrow is Ownable, ReentrancyGuard {
         return nextOperationId;
     }
 
-    function getAllOperations() external view returns (Operation[] memory) {
-        Operation[] memory allOps = new Operation[](operationIds.length);
-        for (uint256 i = 0; i < operationIds.length; i++) {
-            allOps[i] = operations[operationIds[i]];
+    /// @notice Número total de operaciones creadas (para paginación).
+    function getOperationsCount() external view returns (uint256) {
+        return operationIds.length;
+    }
+
+    /// @notice Paginación: devuelve `limit` operaciones desde `offset`.
+    function getOperations(uint256 offset, uint256 limit) external view returns (Operation[] memory) {
+        uint256 count = operationIds.length;
+        if (offset >= count) return new Operation[](0);
+
+        uint256 end = offset + limit;
+        if (end > count) end = count;
+
+        uint256 resultLength = end - offset;
+        Operation[] memory result = new Operation[](resultLength);
+        for (uint256 i = 0; i < resultLength; i++) {
+            result[i] = operations[operationIds[offset + i]];
         }
-        return allOps;
+        return result;
     }
 }

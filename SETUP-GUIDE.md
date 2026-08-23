@@ -11,14 +11,22 @@ Keep this terminal running.
 
 ### 2. Deploy Contracts (Terminal 2)
 ```bash
-./setup-simple.sh
+./setup.sh
 ```
 
 This will:
 - Deploy Escrow contract
-- Deploy Token A (TKA) and Token B (TKB)
-- Mint 1000 TKA + 1000 TKB to 3 test accounts
-- Update web configuration with deployed addresses
+- Deploy mock tokens: TKA, TKB, USDT (6 decimals) y DELIVERY
+- Authorize all tokens in the escrow contract
+- Designate an **arbiter** (account #3 by default)
+- Mint test tokens to the Anvil accounts
+- Create `web/.env.local` with `NEXT_PUBLIC_ESCROW_ADDRESS`
+- Write `deployment-info.txt` with all addresses and keys
+
+Verify everything works:
+```bash
+./verify-setup.sh
+```
 
 ### 3. Configure MetaMask
 
@@ -42,10 +50,9 @@ This will:
    ```
 4. Click "Import"
 
-This account will have:
+This account (Account #0, the owner/admin) will have:
 - ~10,000 ETH (for gas)
-- 1000 TKA tokens
-- 1000 TKB tokens
+- 1000 TKA + 1000 TKB + 5000 USDT + 5 DELIVERY
 
 ### 4. Start Web App (Terminal 2)
 ```bash
@@ -66,20 +73,24 @@ Open http://localhost:3000
 ### Add Token (Admin Only - Account #0)
 The first account (0xf39F...) is the owner and can add new tokens to the escrow.
 
-1. Enter token address (e.g., Token A or Token B from deployment-info.txt)
-2. Click "Add Token"
-3. Approve transaction in MetaMask
-4. Wait for confirmation
+1. Go to /add-token (visible only for the owner)
+2. Enter token address (e.g., a new MockERC20 from deployment-info.txt)
+3. Click "Añadir token"
+4. Approve transaction in MetaMask
+5. The contract validates that the address has code and implements `symbol()`
 
-### Create Operation
-1. Enter Token A address (token you're providing)
-2. Enter amount of Token A
-3. Enter Token B address (token you want)
-4. Enter amount of Token B
-5. Click "1. Approve Token A" - approve in MetaMask
-6. Wait for confirmation
-7. Click "2. Create Operation" - approve in MetaMask
-8. Wait for confirmation
+### Designate the Arbiter (Admin Only)
+The same admin page lets you set the arbitration address. Only the arbiter can
+resolve disputes.
+
+### Create Operation (1 button)
+1. Connect with Account #1 (or #2) in MetaMask
+2. In "Operaciones", click "+ Nueva operación"
+3. Select Token A, amount A, Token B, amount B
+4. Optional: deadline in days (0 = no expiration)
+5. Select type: **SWAP** or **PAGO con garantía**
+6. Click **"Crear operación"** — a single button chains `approve(tokenA)` +
+   `createOperation()` (confirm both transactions in MetaMask)
 
 ### Complete Operation (Second User)
 1. Import second account to MetaMask:
@@ -88,22 +99,32 @@ The first account (0xf39F...) is the owner and can add new tokens to the escrow.
    ```
 2. Switch to this account in MetaMask
 3. Find an active operation in the list
-4. Click "1. Approve Token B"
-5. Click "2. Complete"
+4. Click **"Completar operación"** — a single button chains `approve(tokenB)` +
+   `completeOperation()` (confirm both transactions in MetaMask)
+5. Both users receive their tokens in the same atomic transaction
+
+### Expiration / Dispute / Arbitration
+- When an operation's deadline passes, the creator sees **"Reclamar fondos (venció)"**
+- Any party can open a **dispute** with the "Disputar operación" button
+- The arbiter (account #3 by default) sees the **Panel de árbitro** on disputed
+  operations and can resolve them
 
 ## Test Accounts
 
-All accounts have 1000 TKA + 1000 TKB:
+All accounts have ETH + mock tokens (see deployment-info.txt):
 
 ```
-Account #0: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+Account #0 (Owner/Admin): 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
 Private Key: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 
-Account #1: 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
+Account #1 (User1): 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
 Private Key: 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
 
-Account #2: 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
+Account #2 (User2): 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
 Private Key: 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+
+Account #3 (Arbiter): 0x90F79bf6EB2c4f870365E785982E1f101E93b906
+Private Key: 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
 ```
 
 ## Troubleshooting
@@ -114,14 +135,11 @@ Private Key: 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
 - Check browser console (F12) for errors
 - Verify you're using Account #0 for admin functions
 
-### "Operation not found" error
-- Refresh the page to load latest operations
-- Check that the operation ID exists
-
 ### Transaction fails
 - Make sure you have enough tokens
-- Check that tokens are approved before creating/completing operations
+- Check that tokens are approved (the app chains approve + tx automatically)
 - Verify you're connected to the correct network
+- If you see a friendly error in Spanish, it explains the revert reason
 
 ### Need to reset
 ```bash
@@ -130,7 +148,7 @@ Private Key: 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
 anvil
 
 # Re-run setup
-./setup-simple.sh
+./setup.sh
 
 # In MetaMask:
 # Settings → Advanced → Clear activity tab data

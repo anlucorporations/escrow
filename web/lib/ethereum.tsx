@@ -1,11 +1,17 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 import { ethers } from 'ethers'
+
+/** Provider inyectado por MetaMask (extiende EIP-1193 con eventos). */
+export interface EthereumProvider extends ethers.Eip1193Provider {
+  on(event: string, handler: (...args: unknown[]) => void): void
+  removeListener(event: string, handler: (...args: unknown[]) => void): void
+}
 
 declare global {
   interface Window {
-    ethereum?: any
+    ethereum?: EthereumProvider
   }
 }
 
@@ -33,6 +39,13 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
   const [account, setAccount] = useState<string | null>(null)
   const [isConnected, setIsConnected] = useState(false)
 
+  const disconnect = useCallback(() => {
+    setProvider(null)
+    setSigner(null)
+    setAccount(null)
+    setIsConnected(false)
+  }, [])
+
   useEffect(() => {
     const checkConnection = async () => {
       if (typeof window !== 'undefined' && window.ethereum) {
@@ -58,7 +71,8 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.ethereum) {
-      const handleAccountsChanged = async (accounts: string[]) => {
+      const handleAccountsChanged = async (...args: unknown[]) => {
+        const accounts = (args[0] ?? []) as string[]
         if (accounts.length === 0) {
           disconnect()
         } else {
@@ -90,7 +104,7 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
         window.ethereum?.removeListener('chainChanged', handleChainChanged)
       }
     }
-  }, [provider])
+  }, [provider, disconnect])
 
   const connect = async () => {
     if (!window.ethereum) {
@@ -105,18 +119,11 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
 
       setProvider(provider)
       setSigner(signer)
-      setAccount(accounts[0])
+      setAccount(accounts[0] as string)
       setIsConnected(true)
     } catch (error) {
       console.error('Error connecting:', error)
     }
-  }
-
-  const disconnect = () => {
-    setProvider(null)
-    setSigner(null)
-    setAccount(null)
-    setIsConnected(false)
   }
 
   return (

@@ -1,226 +1,96 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useEthereum } from '@/lib/ethereum'
-import { ESCROW_ADDRESS, ESCROW_ABI, ERC20_ABI } from '@/lib/contracts'
-import { ethers } from 'ethers'
+import { useEscrow } from '@/lib/hooks'
+import { OperationCard } from '@/components/OperationCard'
 import { CreateOperationModal } from '@/components/CreateOperationModal'
+import { Operation, OperationStatus, isExpired } from '@/lib/escrow'
 
-interface Operation {
-  id: bigint
-  user1: string
-  tokenA: string
-  tokenB: string
-  amountA: bigint
-  amountB: bigint
-  isActive: boolean
-  closedAt: bigint
-}
+const PAGE_SIZE = 10
 
-function OperationCard({ operation, onRefresh }: { operation: Operation; onRefresh: () => void }) {
-  const { account, signer } = useEthereum()
-  const [tokenASymbol, setTokenASymbol] = useState('')
-  const [tokenBSymbol, setTokenBSymbol] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
+type FilterKey = 'all' | 'active' | 'completed' | 'cancelled' | 'disputed' | 'expired'
 
-  useEffect(() => {
-    const loadSymbols = async () => {
-      if (!signer) return
-      try {
-        const tokenA = new ethers.Contract(operation.tokenA, ERC20_ABI, signer)
-        const tokenB = new ethers.Contract(operation.tokenB, ERC20_ABI, signer)
-        const [symA, symB] = await Promise.all([tokenA.symbol(), tokenB.symbol()])
-        setTokenASymbol(symA)
-        setTokenBSymbol(symB)
-      } catch (err) {
-        console.error('Error loading symbols:', err)
-      }
-    }
-    loadSymbols()
-  }, [operation, signer])
-
-  const handleComplete = async () => {
-    if (!signer) return
-    setLoading(true)
-    setError('')
-    setSuccess(false)
-
-    try {
-      const tokenContract = new ethers.Contract(operation.tokenB, ERC20_ABI, signer)
-      const tx1 = await tokenContract.approve(ESCROW_ADDRESS, operation.amountB)
-      await tx1.wait()
-
-      const contract = new ethers.Contract(ESCROW_ADDRESS, ESCROW_ABI, signer)
-      const tx2 = await contract.completeOperation(operation.id)
-      await tx2.wait()
-
-      setSuccess(true)
-      setTimeout(() => {
-        setSuccess(false)
-        onRefresh()
-      }, 2000)
-    } catch (err: unknown) {
-      setError((err as Error).message || 'Transaction failed')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleCancel = async () => {
-    if (!signer) return
-    setLoading(true)
-    setError('')
-    try {
-      const contract = new ethers.Contract(ESCROW_ADDRESS, ESCROW_ABI, signer)
-      const tx = await contract.cancelOperation(operation.id)
-      await tx.wait()
-      setTimeout(() => onRefresh(), 2000)
-    } catch (err: unknown) {
-      setError((err as Error).message || 'Transaction failed')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const isCreator = account?.toLowerCase() === operation.user1.toLowerCase()
-
-  return (
-    <div className="border border-gray-200 dark:border-zinc-700 rounded-lg p-6 bg-white dark:bg-zinc-900 hover:shadow-lg transition-shadow">
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h3 className="font-bold text-lg text-gray-900 dark:text-white">
-            Operation #{operation.id.toString()}
-          </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Creator: {operation.user1.slice(0, 6)}...{operation.user1.slice(-4)}
-          </p>
-        </div>
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-semibold ${
-            operation.isActive
-              ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
-              : 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-200'
-          }`}
-        >
-          {operation.isActive ? 'Active' : 'Closed'}
-        </span>
-      </div>
-
-      <div className="space-y-3 mb-6 p-4 bg-gray-50 dark:bg-zinc-800 rounded-lg">
-        <div className="flex justify-between items-center">
-          <div>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Offering</p>
-            <p className="font-bold text-lg text-gray-900 dark:text-white">
-              {ethers.formatEther(operation.amountA)} {tokenASymbol || '...'}
-            </p>
-          </div>
-          <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 12l2 2 4-4"
-            />
-          </svg>
-          <div className="text-right">
-            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Requesting</p>
-            <p className="font-bold text-lg text-gray-900 dark:text-white">
-              {ethers.formatEther(operation.amountB)} {tokenBSymbol || '...'}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {operation.isActive && !isCreator && (
-        <div className="space-y-2">
-          <button
-            onClick={handleComplete}
-            disabled={loading}
-            className="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-400 font-semibold transition-all duration-200"
-          >
-            {loading ? 'Processing...' : 'Complete Operation'}
-          </button>
-          {success && (
-            <div className="text-green-600 dark:text-green-400 text-sm text-center bg-green-50 dark:bg-green-900/20 p-2 rounded">
-              Operation completed successfully!
-            </div>
-          )}
-          {error && (
-            <div className="text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/20 p-2 rounded">
-              Error: {error}
-            </div>
-          )}
-        </div>
-      )}
-
-      {operation.isActive && isCreator && (
-        <button
-          onClick={handleCancel}
-          disabled={loading}
-          className="w-full px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:bg-gray-400 font-semibold transition-all duration-200"
-        >
-          {loading ? 'Cancelling...' : 'Cancel Operation'}
-        </button>
-      )}
-
-      {!operation.isActive && (
-        <div className="text-center text-sm text-gray-600 dark:text-gray-400 p-2 bg-gray-50 dark:bg-zinc-800 rounded">
-          Closed at {new Date(Number(operation.closedAt) * 1000).toLocaleString()}
-        </div>
-      )}
-    </div>
-  )
-}
+const FILTERS: { key: FilterKey; label: string }[] = [
+  { key: 'all', label: 'Todas' },
+  { key: 'active', label: 'Activas' },
+  { key: 'completed', label: 'Completadas' },
+  { key: 'cancelled', label: 'Canceladas' },
+  { key: 'disputed', label: 'En disputa' },
+  { key: 'expired', label: 'Vencidas' },
+]
 
 export default function OperationsPage() {
   const [operations, setOperations] = useState<Operation[]>([])
-  const [filter, setFilter] = useState<'all' | 'active' | 'closed'>('all')
+  const [filter, setFilter] = useState<FilterKey>('all')
+  const [myActivity, setMyActivity] = useState(false)
   const [showModal, setShowModal] = useState(false)
-  const { provider, isConnected } = useEthereum()
+  const [hasMore, setHasMore] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const { isConnected, account } = useEthereum()
+  const { getOperationsCount, getOperations } = useEscrow()
+  const loadedAll = useRef(false)
 
-  const loadOperations = async () => {
-    if (!provider) return
-
-    try {
-      const contract = new ethers.Contract(ESCROW_ADDRESS, ESCROW_ABI, provider)
-      let allOps: any[] = []
-
-      try {
-        allOps = await contract.getAllOperations()
-      } catch (err) {
-        console.log('No operations yet or error fetching operations:', err)
-        allOps = []
+  const loadOperations = useCallback(
+    async (append = false) => {
+      if (!isConnected) {
+        setOperations([])
+        setHasMore(false)
+        return
       }
+      const count = await getOperationsCount()
+      const loaded = loadedAll.current ? operations.length : append ? operations.length : 0
+      if (loaded >= count) {
+        setHasMore(false)
+        return
+      }
+      const page = await getOperations(loaded, PAGE_SIZE)
+      const next = append ? [...operations, ...page] : page
+      setOperations(next)
+      setHasMore(next.length < count)
+    },
+    [isConnected, getOperationsCount, getOperations, operations]
+  )
 
-      const ops: Operation[] = allOps.map((op: any) => ({
-        id: op.id,
-        user1: op.user1,
-        tokenA: op.tokenA,
-        tokenB: op.tokenB,
-        amountA: op.amountA,
-        amountB: op.amountB,
-        isActive: op.isActive,
-        closedAt: op.closedAt,
-      }))
+  useEffect(() => {
+    loadedAll.current = false
+    loadOperations()
+  }, [isConnected]) // eslint-disable-line react-hooks/exhaustive-deps
 
-      setOperations(ops)
-    } catch (error) {
-      console.error('Error loading operations:', error)
+  const handleLoadMore = async () => {
+    setLoadingMore(true)
+    try {
+      await loadOperations(true)
+    } finally {
+      setLoadingMore(false)
     }
   }
 
-  useEffect(() => {
+  const refresh = useCallback(() => {
+    loadedAll.current = false
     loadOperations()
-    const interval = setInterval(loadOperations, 5000)
-    return () => clearInterval(interval)
-  }, [provider])
+  }, [loadOperations])
 
+  const now = BigInt(Date.now())
   const filteredOperations = operations.filter((op) => {
-    if (filter === 'active') return op.isActive
-    if (filter === 'closed') return !op.isActive
-    return true
+    const expired = isExpired(op, now)
+    if (myActivity && account && op.user1.toLowerCase() !== account.toLowerCase()) {
+      return false
+    }
+    switch (filter) {
+      case 'active':
+        return op.status === OperationStatus.Active && !expired
+      case 'completed':
+        return op.status === OperationStatus.Completed
+      case 'cancelled':
+        return op.status === OperationStatus.Cancelled
+      case 'disputed':
+        return op.status === OperationStatus.Disputed
+      case 'expired':
+        return expired
+      default:
+        return true
+    }
   })
 
   if (!isConnected) {
@@ -229,10 +99,10 @@ export default function OperationsPage() {
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center py-20">
             <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
-              Connect Your Wallet
+              Conecta tu wallet
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-400">
-              Please connect your wallet to view operations
+              Conecta tu wallet para ver las operaciones
             </p>
           </div>
         </div>
@@ -244,45 +114,51 @@ export default function OperationsPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-black dark:to-zinc-950 pt-20">
       <div className="container mx-auto px-4 max-w-5xl pb-20">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-12">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-              Operations
+              Operaciones
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Manage your escrow operations and token swaps
+              Custodia bilateral con intercambio atómico, deadline y arbitraje
             </p>
           </div>
           <button
             onClick={() => setShowModal(true)}
             className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl w-full sm:w-auto"
           >
-            + New Operation
+            + Nueva operación
           </button>
         </div>
 
         {/* Filters */}
-        <div className="flex gap-2 mb-8">
-          {(['all', 'active', 'closed'] as const).map((f) => (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {FILTERS.map((f) => (
             <button
-              key={f}
-              onClick={() => setFilter(f)}
+              key={f.key}
+              onClick={() => setFilter(f.key)}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                filter === f
+                filter === f.key
                   ? 'bg-blue-600 text-white'
                   : 'bg-white dark:bg-zinc-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-zinc-700 hover:border-blue-500 dark:hover:border-blue-500'
               }`}
             >
-              {f.charAt(0).toUpperCase() + f.slice(1)} ({' '}
-              {filteredOperations.filter(
-                (op) =>
-                  (f === 'all' || f === 'active') && op.isActive ||
-                  (f === 'all' || f === 'closed') && !op.isActive
-              ).length}{' '}
-              )
+              {f.label}
             </button>
           ))}
         </div>
+
+        <label className="inline-flex items-center gap-2 mb-8 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={myActivity}
+            onChange={(e) => setMyActivity(e.target.checked)}
+            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+          <span className="text-sm text-gray-700 dark:text-gray-300">
+            Solo mi actividad (operaciones que creé)
+          </span>
+        </label>
 
         {/* Operations List */}
         {filteredOperations.length === 0 ? (
@@ -303,24 +179,33 @@ export default function OperationsPage() {
               </svg>
             </div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              No operations found
+              No hay operaciones
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
               {filter === 'all'
-                ? 'Start by creating a new operation'
-                : `No ${filter} operations at the moment`}
+                ? 'Crea tu primera operación para empezar'
+                : `No hay operaciones en el filtro "${FILTERS.find((f) => f.key === filter)?.label}"`}
             </p>
           </div>
         ) : (
-          <div className="grid gap-6">
-            {filteredOperations.map((op) => (
-              <OperationCard
-                key={op.id.toString()}
-                operation={op}
-                onRefresh={loadOperations}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid gap-6">
+              {filteredOperations.map((op) => (
+                <OperationCard key={op.id.toString()} operation={op} onRefresh={refresh} />
+              ))}
+            </div>
+            {hasMore && (
+              <div className="text-center mt-8">
+                <button
+                  onClick={handleLoadMore}
+                  disabled={loadingMore}
+                  className="px-6 py-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white rounded-lg font-semibold hover:border-blue-500 disabled:opacity-50 transition-all"
+                >
+                  {loadingMore ? 'Cargando...' : 'Cargar más'}
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
 
@@ -329,7 +214,7 @@ export default function OperationsPage() {
         isOpen={showModal}
         onClose={() => {
           setShowModal(false)
-          loadOperations()
+          refresh()
         }}
       />
     </div>

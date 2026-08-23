@@ -28,7 +28,7 @@ Crear una aplicación descentralizada (DApp) completa para realizar intercambios
 │   └── test/
 │       └── Escrow.t.sol        # Tests del contrato
 │
-├── web/                         # Frontend (Next.js 14)
+├── web/                         # Frontend (Next.js 16)
 │   ├── app/
 │   │   └── page.tsx            # Página principal
 │   ├── components/
@@ -54,7 +54,7 @@ Crear una aplicación descentralizada (DApp) completa para realizar intercambios
 Necesito crear un proyecto DApp de escrow para intercambio de tokens ERC20.
 Estructura:
 - Smart contracts con Foundry
-- Frontend con Next.js 14 y ethers.js
+- Frontend con Next.js 16 y ethers.js
 - Debe permitir crear operaciones de swap, completarlas y cancelarlas
 
 Crea la estructura básica del proyecto con los directorios necesarios.
@@ -112,7 +112,7 @@ El script debe asumir que Anvil ya está corriendo en http://localhost:8545
 **Prompt sugerido:**
 ```
 Crea el setup base del frontend:
-1. Configurar Next.js 14 con TypeScript
+1. Configurar Next.js 16 con TypeScript
 2. Instalar ethers.js v6
 3. Configurar Tailwind CSS v4
 4. Crear el context provider de Ethereum en lib/ethereum.tsx que:
@@ -285,7 +285,7 @@ npm run dev
 - **Solidity 0.8.13**: Lenguaje de smart contracts
 - **Foundry**: Framework para desarrollo y testing de contratos
 - **OpenZeppelin**: Librerías estándar (Ownable, ReentrancyGuard, IERC20)
-- **Next.js 14**: Framework de React con App Router
+- **Next.js 16**: Framework de React con App Router
 - **TypeScript**: Tipado estático
 - **Ethers.js v6**: Librería para interactuar con Ethereum
 - **Tailwind CSS v4**: Estilos

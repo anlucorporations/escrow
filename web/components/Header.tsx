@@ -1,36 +1,14 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { ConnectButton } from '@/components/ConnectButton'
-import { useEthereum } from '@/lib/ethereum'
-import { ESCROW_ADDRESS, ESCROW_ABI } from '@/lib/contracts'
-import { ethers } from 'ethers'
+import { useEscrow } from '@/lib/hooks'
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [isAdmin, setIsAdmin] = useState(false)
-  const { account, provider } = useEthereum()
-
-  // Check if user is owner
-  const checkAdmin = async () => {
-    if (!provider || !account) {
-      setIsAdmin(false)
-      return
-    }
-
-    try {
-      const contract = new ethers.Contract(ESCROW_ADDRESS, ESCROW_ABI, provider)
-      const owner = await contract.owner()
-      setIsAdmin(owner.toLowerCase() === account.toLowerCase())
-    } catch (err) {
-      setIsAdmin(false)
-    }
-  }
-
-  useEffect(() => {
-    checkAdmin()
-  }, [account, provider])
+  const { roles } = useEscrow()
+  const isAdmin = roles.isOwner
 
   const navItems = [
     { label: 'Home', href: '/' },

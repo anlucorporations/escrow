@@ -65,23 +65,27 @@ Quick access:
 
 ### Smart Contract Features
 
-- **Multi-token Support**: Admin can add multiple ERC20 tokens
+- **Multi-token Support**: Admin can add multiple ERC20 tokens (validated on-chain)
 - **Create Operations**: Users can create escrow operations specifying:
-  - Token A (offering)
-  - Token B (requesting)
-  - Amount A and Amount B
-- **Complete Operations**: Other users can fulfill escrow operations
+  - Token A (offering), Token B (requesting), Amount A and Amount B
+  - Optional **deadline** (expiration) after which the creator can recover funds
+- **Complete Operations**: Other users can fulfill escrow operations (atomic swap)
 - **Cancel Operations**: Creators can cancel their operations and retrieve tokens
+- **Arbitration**: Owner can designate an arbiter; parties can open a dispute and
+  the arbiter resolves it (refund to creator or payment to counterparty)
+- **Pagination**: `getOperations(offset, limit)` + `getOperationsCount()`
+- **Status enum**: `Active / Completed / Cancelled / Disputed` instead of a bool
 - **Security**: Uses OpenZeppelin's ReentrancyGuard and Ownable
 
 ### Web Features
 
 - **Wallet Connection**: Connect via MetaMask or other injected wallets
-- **Admin Panel**: Add new tokens to the escrow contract
-- **Create Operations**: User-friendly interface to create escrow swaps
-- **View Operations**: Browse all active and closed operations
-- **Complete Operations**: Two-step process (approve + complete)
-- **Cancel Operations**: Creators can cancel their own operations
+- **Admin Panel**: Add new tokens and designate the arbiter
+- **Create Operations**: One-button flow (approve + tx chained) with deadline and type
+- **View Operations**: Status badges, filters (Activa / Completada / Cancelada /
+  En disputa / Vencida) and "My activity" filter
+- **Arbitrator panel**: contextual actions to resolve disputes
+- **Correct decimals**: amounts formatted with each token's real `decimals()`
 
 ## Getting Started
 
@@ -98,9 +102,11 @@ Quick access:
 cd sc
 ```
 
-2. Install dependencies:
+2. Install dependencies (forge-std + OpenZeppelin). `setup.sh` does this
+   automatically; manually you can run:
 ```bash
-forge install
+git clone --depth 1 --branch v1.11.0 https://github.com/foundry-rs/forge-std lib/forge-std
+git clone --depth 1 --branch v5.4.0 https://github.com/OpenZeppelin/openzeppelin-contracts lib/openzeppelin-contracts
 ```
 
 3. Compile contracts:
@@ -164,21 +170,23 @@ npm run dev
    - Enter Amount A
    - Enter Token B address (token you want)
    - Enter Amount B
-3. Click "1. Approve Token A" and confirm transaction
-4. Click "2. Create Operation" and confirm transaction
-5. Your operation appears in the operations list
+   - Optional: deadline in days (0 = no expiration)
+   - Select the operation type (SWAP or PAYMENT with escrow)
+3. Click **"Create Operation"** — a single button chains
+   `approve(tokenA)` + `createOperation()` and confirms both transactions
+4. Your operation appears in the operations list as **Activa**
 
 ### For User 2 (Completing Operation)
 
 1. Connect your wallet
 2. Browse operations in the operations list
 3. Find an active operation you want to complete
-4. Click "1. Approve Token B" and confirm transaction
-5. Click "2. Complete Operation" and confirm transaction
-6. Tokens are swapped:
+4. Click **"Complete Operation"** — a single button chains
+   `approve(tokenB)` + `completeOperation()` and confirms both transactions
+5. Tokens are swapped atomically in the same transaction:
    - You receive Token A
    - Creator receives Token B
-   - Operation is marked as closed
+   - Operation is marked as **Completada**
 
 ### Cancelling an Operation
 
@@ -186,17 +194,25 @@ If you created an operation and want to cancel it:
 1. Find your operation in the list
 2. Click "Cancel Operation"
 3. Confirm the transaction
-4. Your tokens are returned
+4. Your tokens are returned (operation **Cancelada**)
+
+### Expiration, Disputes and Arbitration
+
+- If an operation has a deadline and it expires without a counterparty, the
+  creator sees **Reclamar fondos (venció)** → calls `refundAfterExpiry()`
+- Any party can open a **dispute** while the operation is active
+- The designated arbiter sees the **Panel de árbitro** and resolves the dispute
+  (refund to creator, or payment to the counterparty)
 
 ## Testing with Mock Tokens
 
 For local testing, you can deploy mock ERC20 tokens:
 
 1. The `MockERC20.sol` contract is included in the `sc/src` directory
-2. Deploy two mock tokens:
+2. Deploy two mock tokens (constructor: name, symbol, decimals):
 ```bash
-forge create src/MockERC20.sol:MockERC20 --constructor-args "Token A" "TKA" --rpc-url http://localhost:8545 --private-key <PRIVATE_KEY>
-forge create src/MockERC20.sol:MockERC20 --constructor-args "Token B" "TKB" --rpc-url http://localhost:8545 --private-key <PRIVATE_KEY>
+forge create src/MockERC20.sol:MockERC20 --constructor-args "Token A" "TKA" 18 --rpc-url http://localhost:8545 --private-key <PRIVATE_KEY>
+forge create src/MockERC20.sol:MockERC20 --constructor-args "Token B" "TKB" 18 --rpc-url http://localhost:8545 --private-key <PRIVATE_KEY>
 ```
 3. Add these token addresses to the escrow contract via the web interface
 4. Use these addresses when creating operations
@@ -205,7 +221,8 @@ forge create src/MockERC20.sol:MockERC20 --constructor-args "Token B" "TKB" --rp
 
 After deployment, update these addresses in your configuration:
 
-- **Escrow Contract**: Update in `web/lib/contracts.ts`
+- **Escrow Contract**: set `NEXT_PUBLIC_ESCROW_ADDRESS` in `web/.env.local`
+  (created automatically by `setup.sh`)
 - **ERC20 Tokens**: Add via the admin interface in the web app
 
 ## Technology Stack
@@ -216,13 +233,12 @@ After deployment, update these addresses in your configuration:
 - OpenZeppelin Contracts
 
 ### Frontend
-- Next.js 16
+- Next.js 16 (App Router)
 - React 19
-- TypeScript
+- TypeScript (strict)
 - Tailwind CSS v4
-- Wagmi (Web3 React hooks)
-- Viem (Ethereum library)
-- TanStack Query (React Query)
+- ethers.js v6
+- Vitest + Testing Library (component tests)
 
 ## Security Considerations
 

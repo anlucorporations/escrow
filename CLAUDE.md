@@ -13,7 +13,7 @@ This is a monorepo containing an escrow application with two main components:
 **Recommended Simple Setup:**
 ```bash
 anvil                    # Terminal 1 - keep running
-./setup-simple.sh        # Terminal 2 - deploy contracts
+./setup.sh               # Terminal 2 - deploy contracts + env
 ./verify-setup.sh        # Verify everything is configured
 cd web && npm run dev    # Start web app
 ```
@@ -30,7 +30,8 @@ This checks/starts Anvil, deploys contracts, configures the web app, and starts 
 ```bash
 ./setup.sh
 ```
-This deploys Escrow + 2 mock ERC20 tokens, adds them to the escrow, mints test tokens, and updates web config.
+This deploys Escrow + 4 mock ERC20 tokens (TKA, TKB, USDT, DELIVERY), authorizes
+them, designates the arbiter, mints test tokens, and writes web/.env.local.
 
 **Verify setup:**
 ```bash
@@ -38,13 +39,18 @@ This deploys Escrow + 2 mock ERC20 tokens, adds them to the escrow, mints test t
 ```
 Checks that Anvil is running, contracts are deployed, and configuration is correct.
 
+**Show test accounts:**
+```bash
+./accounts.sh            # print all Anvil accounts + private keys
+```
+
 **Stop all services:**
 ```bash
 ./stop.sh
 ```
 This stops both Anvil and the Next.js dev server.
 
-After running `setup.sh` or `setup-simple.sh`, contract addresses and account details are saved in `deployment-info.txt`.
+After running `setup.sh`, contract addresses and account details are saved in `deployment-info.txt`.
 
 **Important:** See SETUP-GUIDE.md for complete MetaMask configuration instructions.
 

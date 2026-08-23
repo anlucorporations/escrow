@@ -1,3 +1,5 @@
+// GENERADO AUTOMÁTICAMENTE por web/scripts/generate-contracts.mjs — NO editar a mano.
+// Se regenera con: node web/scripts/generate-contracts.mjs (tras forge build).
 export const ESCROW_ABI = [
   {
     "type": "constructor",
@@ -38,13 +40,13 @@ export const ESCROW_ABI = [
   },
   {
     "type": "function",
-    "name": "getAllowedTokens",
+    "name": "arbiter",
     "inputs": [],
     "outputs": [
       {
         "name": "",
-        "type": "address[]",
-        "internalType": "address[]"
+        "type": "address",
+        "internalType": "address"
       }
     ],
     "stateMutability": "view"
@@ -98,6 +100,11 @@ export const ESCROW_ABI = [
         "name": "amountB",
         "type": "uint256",
         "internalType": "uint256"
+      },
+      {
+        "name": "deadline",
+        "type": "uint256",
+        "internalType": "uint256"
       }
     ],
     "outputs": [
@@ -111,7 +118,33 @@ export const ESCROW_ABI = [
   },
   {
     "type": "function",
-    "name": "getNextOperationId",
+    "name": "disputeOperation",
+    "inputs": [
+      {
+        "name": "operationId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "getAllowedTokens",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address[]",
+        "internalType": "address[]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getAllowedTokensCount",
     "inputs": [],
     "outputs": [
       {
@@ -124,55 +157,13 @@ export const ESCROW_ABI = [
   },
   {
     "type": "function",
-    "name": "getAllOperations",
+    "name": "getNextOperationId",
     "inputs": [],
     "outputs": [
       {
         "name": "",
-        "type": "tuple[]",
-        "internalType": "struct Escrow.Operation[]",
-        "components": [
-          {
-            "name": "id",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "user1",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "tokenA",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "tokenB",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "amountA",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "amountB",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "isActive",
-            "type": "bool",
-            "internalType": "bool"
-          },
-          {
-            "name": "closedAt",
-            "type": "uint256",
-            "internalType": "uint256"
-          }
-        ]
+        "type": "uint256",
+        "internalType": "uint256"
       }
     ],
     "stateMutability": "view"
@@ -224,9 +215,19 @@ export const ESCROW_ABI = [
             "internalType": "uint256"
           },
           {
-            "name": "isActive",
-            "type": "bool",
-            "internalType": "bool"
+            "name": "status",
+            "type": "uint8",
+            "internalType": "enum Escrow.Status"
+          },
+          {
+            "name": "createdAt",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "deadline",
+            "type": "uint256",
+            "internalType": "uint256"
           },
           {
             "name": "closedAt",
@@ -234,6 +235,95 @@ export const ESCROW_ABI = [
             "internalType": "uint256"
           }
         ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getOperations",
+    "inputs": [
+      {
+        "name": "offset",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "limit",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple[]",
+        "internalType": "struct Escrow.Operation[]",
+        "components": [
+          {
+            "name": "id",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "user1",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "tokenA",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "tokenB",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "amountA",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "amountB",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "status",
+            "type": "uint8",
+            "internalType": "enum Escrow.Status"
+          },
+          {
+            "name": "createdAt",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "deadline",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "closedAt",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getOperationsCount",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
       }
     ],
     "stateMutability": "view"
@@ -280,9 +370,19 @@ export const ESCROW_ABI = [
         "internalType": "uint256"
       },
       {
-        "name": "isActive",
-        "type": "bool",
-        "internalType": "bool"
+        "name": "status",
+        "type": "uint8",
+        "internalType": "enum Escrow.Status"
+      },
+      {
+        "name": "createdAt",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "deadline",
+        "type": "uint256",
+        "internalType": "uint256"
       },
       {
         "name": "closedAt",
@@ -307,8 +407,57 @@ export const ESCROW_ABI = [
   },
   {
     "type": "function",
+    "name": "refundAfterExpiry",
+    "inputs": [
+      {
+        "name": "operationId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "renounceOwnership",
     "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "resolveDispute",
+    "inputs": [
+      {
+        "name": "operationId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "favorUser1",
+        "type": "bool",
+        "internalType": "bool"
+      },
+      {
+        "name": "recipient",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setArbiter",
+    "inputs": [
+      {
+        "name": "_arbiter",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
     "outputs": [],
     "stateMutability": "nonpayable"
   },
@@ -327,12 +476,62 @@ export const ESCROW_ABI = [
   },
   {
     "type": "event",
+    "name": "ArbiterSet",
+    "inputs": [
+      {
+        "name": "arbiter",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "DisputeResolved",
+    "inputs": [
+      {
+        "name": "operationId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "favorUser1",
+        "type": "bool",
+        "indexed": false,
+        "internalType": "bool"
+      },
+      {
+        "name": "resolvedAt",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
     "name": "OperationCancelled",
     "inputs": [
       {
         "name": "operationId",
         "type": "uint256",
         "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "amountA",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "cancelledAt",
+        "type": "uint256",
+        "indexed": false,
         "internalType": "uint256"
       }
     ],
@@ -353,6 +552,18 @@ export const ESCROW_ABI = [
         "type": "address",
         "indexed": true,
         "internalType": "address"
+      },
+      {
+        "name": "amountA",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "amountB",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
       },
       {
         "name": "completedAt",
@@ -399,6 +610,68 @@ export const ESCROW_ABI = [
       },
       {
         "name": "amountB",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "deadline",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "OperationDisputed",
+    "inputs": [
+      {
+        "name": "operationId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "disputer",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "disputedAt",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "OperationExpired",
+    "inputs": [
+      {
+        "name": "operationId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "user1",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "amountA",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "expiredAt",
         "type": "uint256",
         "indexed": false,
         "internalType": "uint256"
@@ -472,51 +745,54 @@ export const ERC20_ABI = [
     "type": "function",
     "name": "approve",
     "inputs": [
-      {"name": "spender", "type": "address"},
-      {"name": "amount", "type": "uint256"}
+      { "name": "spender", "type": "address" },
+      { "name": "amount", "type": "uint256" }
     ],
-    "outputs": [{"name": "", "type": "bool"}],
+    "outputs": [{ "name": "", "type": "bool" }],
     "stateMutability": "nonpayable"
   },
   {
     "type": "function",
     "name": "balanceOf",
-    "inputs": [{"name": "account", "type": "address"}],
-    "outputs": [{"name": "", "type": "uint256"}],
+    "inputs": [{ "name": "account", "type": "address" }],
+    "outputs": [{ "name": "", "type": "uint256" }],
     "stateMutability": "view"
   },
   {
     "type": "function",
     "name": "allowance",
     "inputs": [
-      {"name": "owner", "type": "address"},
-      {"name": "spender", "type": "address"}
+      { "name": "owner", "type": "address" },
+      { "name": "spender", "type": "address" }
     ],
-    "outputs": [{"name": "", "type": "uint256"}],
+    "outputs": [{ "name": "", "type": "uint256" }],
     "stateMutability": "view"
   },
   {
     "type": "function",
     "name": "symbol",
     "inputs": [],
-    "outputs": [{"name": "", "type": "string"}],
+    "outputs": [{ "name": "", "type": "string" }],
     "stateMutability": "view"
   },
   {
     "type": "function",
     "name": "name",
     "inputs": [],
-    "outputs": [{"name": "", "type": "string"}],
+    "outputs": [{ "name": "", "type": "string" }],
     "stateMutability": "view"
   },
   {
     "type": "function",
     "name": "decimals",
     "inputs": [],
-    "outputs": [{"name": "", "type": "uint8"}],
+    "outputs": [{ "name": "", "type": "uint8" }],
     "stateMutability": "view"
   }
 ] as const;
 
-// Set your deployed contract address here
-export const ESCROW_ADDRESS = '0xb6deb76f1418e6524e21fcc8d5d2e06bc317c5d3' as const;
+// Dirección del contrato Escrow. Configúrala en web/.env.local:
+//   NEXT_PUBLIC_ESCROW_ADDRESS=0x...
+export const ESCROW_ADDRESS: string =
+  process.env.NEXT_PUBLIC_ESCROW_ADDRESS ??
+  '0x0000000000000000000000000000000000000000'
