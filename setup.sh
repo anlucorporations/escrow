@@ -77,19 +77,21 @@ deploy() {
 
 echo "Desplegando contratos..."
 ESCROW="$(cd "$ROOT/sc" && deploy Escrow)"
+REGISTRY="$(cd "$ROOT/sc" && deploy UserRegistry)"
 TKA="$(cd "$ROOT/sc" && deploy MockERC20 TokenA TKA 18)"
 TKB="$(cd "$ROOT/sc" && deploy MockERC20 TokenB TKB 18)"
 USDT="$(cd "$ROOT/sc" && deploy MockERC20 USDT USDT 6)"
 DELIVERY="$(cd "$ROOT/sc" && deploy MockERC20 DELIVERY DELIVERY 18)"
 
-[ -n "$ESCROW" ] && [ -n "$TKA" ] && [ -n "$TKB" ] && [ -n "$USDT" ] && [ -n "$DELIVERY" ] \
+[ -n "$ESCROW" ] && [ -n "$REGISTRY" ] && [ -n "$TKA" ] && [ -n "$TKB" ] && [ -n "$USDT" ] && [ -n "$DELIVERY" ] \
   || { echo "❌ Falló el despliegue"; exit 1; }
 
-echo "✓ Escrow:   $ESCROW"
-echo "✓ TKA:      $TKA"
-echo "✓ TKB:      $TKB"
-echo "✓ USDT:     $USDT (6 decimals)"
-echo "✓ DELIVERY: $DELIVERY"
+echo "✓ Escrow:    $ESCROW"
+echo "✓ Registry:  $REGISTRY"
+echo "✓ TKA:       $TKA"
+echo "✓ TKB:       $TKB"
+echo "✓ USDT:      $USDT (6 decimals)"
+echo "✓ DELIVERY:  $DELIVERY"
 
 # 4) Autorizar tokens y árbitro
 echo "Autorizando tokens y árbitro en el contrato..."
@@ -127,14 +129,16 @@ echo "✓ Tokens minteados: 1000 TKA + 1000 TKB + 5000 USDT + 5 DELIVERY por cue
 echo "Configurando web/.env.local..."
 cat > "$ROOT/web/.env.local" <<EOF
 NEXT_PUBLIC_ESCROW_ADDRESS=$ESCROW
+NEXT_PUBLIC_USER_REGISTRY_ADDRESS=$REGISTRY
 RPC_URL=$RPC_URL
 EOF
 echo "✓ web/.env.local actualizado"
 
 # 7) Guardar información de deployment
 cat > "$ROOT/deployment-info.txt" <<EOF
-Escrow:   $ESCROW
-Arbiter:  $ARBITER
+Escrow:    $ESCROW
+Registry:  $REGISTRY (UserRegistry - inscripción de usuarios)
+Arbiter:   $ARBITER
 
 Tokens autorizados:
   Token A:    $TKA (TKA, 18 decimals)
@@ -162,6 +166,7 @@ echo "✓ deployment-info.txt guardado"
 echo ""
 echo "✅ Setup completado"
 echo "   Escrow:   $ESCROW"
+echo "   Registry: $REGISTRY"
 echo "   Web env:  web/.env.local"
 echo ""
 echo "Siguiente paso: cd web && npm run dev"

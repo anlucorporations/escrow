@@ -2,19 +2,29 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { ConnectButton } from '@/components/ConnectButton'
-import { useEscrow } from '@/lib/hooks'
+import { UserMenu } from '@/components/UserMenu'
+import { useEthereum } from '@/lib/ethereum'
+import { useEscrow, useRegistration } from '@/lib/hooks'
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { isConnected } = useEthereum()
+  const { isRegistered, loading: registrationLoading } = useRegistration()
   const { roles } = useEscrow()
   const isAdmin = roles.isOwner
 
+  // Las secciones de la plataforma solo se muestran con billetera inscrita.
+  const hasAccess = isConnected && !registrationLoading && isRegistered
+
   const navItems = [
     { label: 'Home', href: '/' },
-    { label: 'Operations', href: '/operations' },
-    { label: 'Balances', href: '/balances' },
-    ...(isAdmin ? [{ label: 'Add Token', href: '/add-token' }] : []),
+    ...(hasAccess
+      ? [
+          { label: 'Operations', href: '/operations' },
+          { label: 'Balances', href: '/balances' },
+          ...(isAdmin ? [{ label: 'Add Token', href: '/add-token' }] : []),
+        ]
+      : []),
   ]
 
   return (
@@ -48,7 +58,7 @@ export function Header() {
 
           {/* Right side */}
           <div className="flex items-center gap-4">
-            <ConnectButton />
+            <UserMenu />
 
             {/* Mobile Menu Button */}
             <button

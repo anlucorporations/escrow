@@ -740,6 +740,251 @@ export const ESCROW_ABI = [
   }
 ] as const;
 
+export const USER_REGISTRY_ABI = [
+  {
+    "type": "function",
+    "name": "getRegisteredWalletsCount",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getRegisteredWalletsPaged",
+    "inputs": [
+      {
+        "name": "offset",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "limit",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple[]",
+        "internalType": "struct UserRegistry.UserProfile[]",
+        "components": [
+          {
+            "name": "wallet",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "username",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "registeredAt",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "isRegistered",
+            "type": "bool",
+            "internalType": "bool"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getUserProfile",
+    "inputs": [
+      {
+        "name": "wallet",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "internalType": "struct UserRegistry.UserProfile",
+        "components": [
+          {
+            "name": "wallet",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "username",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "registeredAt",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "isRegistered",
+            "type": "bool",
+            "internalType": "bool"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "isRegistered",
+    "inputs": [
+      {
+        "name": "wallet",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "profiles",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "wallet",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "username",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "registeredAt",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "isRegistered",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "register",
+    "inputs": [
+      {
+        "name": "username",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "updateUsername",
+    "inputs": [
+      {
+        "name": "newUsername",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "usernameToWallet",
+    "inputs": [
+      {
+        "name": "",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "event",
+    "name": "UserRegistered",
+    "inputs": [
+      {
+        "name": "wallet",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "username",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "registeredAt",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "UsernameUpdated",
+    "inputs": [
+      {
+        "name": "wallet",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "newUsername",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  }
+] as const;
+
 export const ERC20_ABI = [
   {
     "type": "function",
@@ -791,8 +1036,13 @@ export const ERC20_ABI = [
   }
 ] as const;
 
-// Dirección del contrato Escrow. Configúrala en web/.env.local:
+// Direcciones de los contratos. Configúralas en web/.env.local:
 //   NEXT_PUBLIC_ESCROW_ADDRESS=0x...
+//   NEXT_PUBLIC_USER_REGISTRY_ADDRESS=0x...
 export const ESCROW_ADDRESS: string =
   process.env.NEXT_PUBLIC_ESCROW_ADDRESS ??
+  '0x0000000000000000000000000000000000000000'
+
+export const USER_REGISTRY_ADDRESS: string =
+  process.env.NEXT_PUBLIC_USER_REGISTRY_ADDRESS ??
   '0x0000000000000000000000000000000000000000'

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { EthereumProvider } from "@/lib/ethereum";
+import { RegisterProvider } from "@/components/RegisterModal";
 import { Header } from "@/components/Header";
 
 const geistSans = Geist({
@@ -30,8 +31,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <EthereumProvider>
-          <Header />
-          {children}
+          <RegisterProvider>
+            <Header />
+            {children}
+          </RegisterProvider>
         </EthereumProvider>
       </body>
     </html>

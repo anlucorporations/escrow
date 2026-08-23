@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 /**
- * Genera `web/lib/contracts.ts` con el ABI real de Escrow compilado por Foundry.
+ * Genera `web/lib/contracts.ts` con los ABIs reales compilados por Foundry
+ * (Escrow + UserRegistry).
  *
  * Uso:
  *   node web/scripts/generate-contracts.mjs
  *
  * Debe ejecutarse después de `forge build` en sc/.
- * La dirección del contrato se lee de NEXT_PUBLIC_ESCROW_ADDRESS (fallback local).
+ * Las direcciones se leen de las variables NEXT_PUBLIC_* (fallback local).
  */
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -15,18 +16,22 @@ import { dirname, join } from 'node:path'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const repoRoot = join(__dirname, '..', '..')
 
-const artifactPath = join(repoRoot, 'sc', 'out', 'Escrow.sol', 'Escrow.json')
-const outPath = join(repoRoot, 'web', 'lib', 'contracts.ts')
-
-let artifact
-try {
-  artifact = JSON.parse(readFileSync(artifactPath, 'utf8'))
-} catch {
-  console.error(`No se encontró el artefacto en ${artifactPath}. Ejecuta: cd sc && forge build`)
-  process.exit(1)
+function loadArtifact(contractName) {
+  const artifactPath = join(repoRoot, 'sc', 'out', `${contractName}.sol`, `${contractName}.json`)
+  try {
+    return JSON.parse(readFileSync(artifactPath, 'utf8'))
+  } catch {
+    console.error(`No se encontró el artefacto en ${artifactPath}. Ejecuta: cd sc && forge build`)
+    process.exit(1)
+  }
 }
 
-const abi = JSON.stringify(artifact.abi, null, 2)
+const escrow = loadArtifact('Escrow')
+const registry = loadArtifact('UserRegistry')
+const outPath = join(repoRoot, 'web', 'lib', 'contracts.ts')
+
+const escrowAbi = JSON.stringify(escrow.abi, null, 2)
+const registryAbi = JSON.stringify(registry.abi, null, 2)
 
 const erc20Abi = `[
   {
@@ -81,16 +86,25 @@ const erc20Abi = `[
 
 const content = `// GENERADO AUTOMÁTICAMENTE por web/scripts/generate-contracts.mjs — NO editar a mano.
 // Se regenera con: node web/scripts/generate-contracts.mjs (tras forge build).
-export const ESCROW_ABI = ${abi} as const;
+export const ESCROW_ABI = ${escrowAbi} as const;
+
+export const USER_REGISTRY_ABI = ${registryAbi} as const;
 
 export const ERC20_ABI = ${erc20Abi}
 
-// Dirección del contrato Escrow. Configúrala en web/.env.local:
+// Direcciones de los contratos. Configúralas en web/.env.local:
 //   NEXT_PUBLIC_ESCROW_ADDRESS=0x...
+//   NEXT_PUBLIC_USER_REGISTRY_ADDRESS=0x...
 export const ESCROW_ADDRESS: string =
   process.env.NEXT_PUBLIC_ESCROW_ADDRESS ??
+  '0x0000000000000000000000000000000000000000'
+
+export const USER_REGISTRY_ADDRESS: string =
+  process.env.NEXT_PUBLIC_USER_REGISTRY_ADDRESS ??
   '0x0000000000000000000000000000000000000000'
 `
 
 writeFileSync(outPath, content, 'utf8')
-console.log(`✔ ${outPath} generado (${artifact.abi.length} entradas de ABI)`)
+console.log(
+  `✔ ${outPath} generado (Escrow: ${escrow.abi.length} entradas, UserRegistry: ${registry.abi.length} entradas)`
+)

@@ -111,6 +111,10 @@ const REVERT_TRANSLATIONS: Record<string, string> = {
   'Address is not an ERC20 token': 'La dirección no es un token ERC20.',
   'ERC20: transfer amount exceeds balance': 'Saldo insuficiente del token.',
   'ERC20: insufficient allowance': 'Permiso (allowance) insuficiente. Aprueba primero el token.',
+  'Already registered': 'Esta billetera ya está inscrita en la plataforma.',
+  'Username already taken': 'Ese nombre de usuario ya está en uso.',
+  'Username must be between 3 and 20 chars': 'El nombre de usuario debe tener entre 3 y 20 caracteres.',
+  'Not registered': 'Esta billetera aún no está inscrita en la plataforma.',
 }
 
 /** Estructura mínima de un error de ethers (revert reason). */

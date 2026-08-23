@@ -4,7 +4,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ethers } from 'ethers'
 import { useEthereum } from '@/lib/ethereum'
-import { ESCROW_ADDRESS, ESCROW_ABI, ERC20_ABI } from '@/lib/contracts'
+import {
+  ESCROW_ADDRESS,
+  ESCROW_ABI,
+  ERC20_ABI,
+  USER_REGISTRY_ADDRESS,
+  USER_REGISTRY_ABI,
+} from '@/lib/contracts'
 import {
   Operation,
   TokenInfo,
@@ -327,6 +333,74 @@ export function useAllowedTokens() {
   }, [provider])
 
   return { tokens, loading }
+}
+
+export interface RegistrationState {
+  isRegistered: boolean
+  username: string | null
+  loading: boolean
+  /** Inscribe la billetera conectada y re-verifica on-chain. */
+  register: (username: string) => Promise<void>
+  refresh: () => Promise<void>
+}
+
+/**
+ * Hook de inscripción on-chain (UserRegistry): la fuente de verdad es el
+ * contrato; tras cada transacción se re-verifica registered(address).
+ */
+export function useRegistration(): RegistrationState {
+  const { provider, account, isConnected } = useEthereum()
+  const [isRegistered, setIsRegistered] = useState(false)
+  const [username, setUsername] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  const refresh = useCallback(async () => {
+    if (!provider || !account) {
+      setIsRegistered(false)
+      setUsername(null)
+      setLoading(false)
+      return
+    }
+    setLoading(true)
+    try {
+      const c = new ethers.Contract(USER_REGISTRY_ADDRESS, USER_REGISTRY_ABI, provider)
+      const [registered, profile] = await Promise.all([
+        c.isRegistered(account),
+        c.getUserProfile(account),
+      ])
+      setIsRegistered(Boolean(registered))
+      setUsername(profile?.username ?? null)
+    } catch {
+      setIsRegistered(false)
+      setUsername(null)
+    } finally {
+      setLoading(false)
+    }
+  }, [provider, account])
+
+  useEffect(() => {
+    if (isConnected) {
+      refresh()
+    } else {
+      setIsRegistered(false)
+      setUsername(null)
+      setLoading(false)
+    }
+  }, [isConnected, refresh])
+
+  const register = useCallback(
+    async (usernameInput: string) => {
+      if (!provider) throw new Error('Connect your wallet first')
+      const signer = await provider.getSigner()
+      const c = new ethers.Contract(USER_REGISTRY_ADDRESS, USER_REGISTRY_ABI, signer)
+      const tx = await c.register(usernameInput.trim())
+      await tx.wait()
+      await refresh() // verificación on-chain tras la inscripción
+    },
+    [provider, refresh]
+  )
+
+  return { isRegistered, username, loading, register, refresh }
 }
 
 export { getFriendlyError }
