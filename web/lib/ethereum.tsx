@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react'
 import { ethers } from 'ethers'
 
 declare global {
@@ -15,7 +15,7 @@ interface EthereumContextType {
   account: string | null
   isConnected: boolean
   connect: () => Promise<void>
-  disconnect: () => void
+  disconnect: () => Promise<void>
 }
 
 const EthereumContext = createContext<EthereumContextType>({
@@ -24,7 +24,7 @@ const EthereumContext = createContext<EthereumContextType>({
   account: null,
   isConnected: false,
   connect: async () => {},
-  disconnect: () => {},
+  disconnect: async () => {},
 })
 
 export function EthereumProvider({ children }: { children: ReactNode }) {
@@ -33,9 +33,40 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
   const [account, setAccount] = useState<string | null>(null)
   const [isConnected, setIsConnected] = useState(false)
 
+  const clearLocalState = useCallback(() => {
+    setProvider(null)
+    setSigner(null)
+    setAccount(null)
+    setIsConnected(false)
+  }, [])
+
+  const disconnect = useCallback(async () => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('is_wallet_disconnected', 'true')
+
+      if (window.ethereum && window.ethereum.request) {
+        try {
+          // Revoke MetaMask permissions to disconnect the wallet completely from the DApp
+          await window.ethereum.request({
+            method: 'wallet_revokePermissions',
+            params: [{ eth_accounts: {} }],
+          })
+        } catch (err) {
+          console.log('Revoke permissions error or not supported:', err)
+        }
+      }
+    }
+
+    clearLocalState()
+  }, [clearLocalState])
+
   useEffect(() => {
     const checkConnection = async () => {
       if (typeof window !== 'undefined' && window.ethereum) {
+        if (localStorage.getItem('is_wallet_disconnected') === 'true') {
+          return
+        }
+
         try {
           const provider = new ethers.BrowserProvider(window.ethereum)
           const accounts = await provider.send('eth_accounts', [])
@@ -60,20 +91,21 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
     if (typeof window !== 'undefined' && window.ethereum) {
       const handleAccountsChanged = async (accounts: string[]) => {
         if (accounts.length === 0) {
-          disconnect()
+          clearLocalState()
         } else {
-          // Update signer when account changes
-          if (provider) {
-            try {
-              const newSigner = await provider.getSigner()
-              setSigner(newSigner)
-              setAccount(accounts[0])
-            } catch (error) {
-              console.error('Error updating signer:', error)
+          if (localStorage.getItem('is_wallet_disconnected') !== 'true') {
+            if (provider) {
+              try {
+                const newSigner = await provider.getSigner()
+                setSigner(newSigner)
+                setAccount(accounts[0])
+              } catch (error) {
+                console.error('Error updating signer:', error)
+                setAccount(accounts[0])
+              }
+            } else {
               setAccount(accounts[0])
             }
-          } else {
-            setAccount(accounts[0])
           }
         }
       }
@@ -90,7 +122,7 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
         window.ethereum?.removeListener('chainChanged', handleChainChanged)
       }
     }
-  }, [provider])
+  }, [provider, clearLocalState])
 
   const connect = async () => {
     if (!window.ethereum) {
@@ -99,6 +131,10 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
     }
 
     try {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('is_wallet_disconnected')
+      }
+
       const provider = new ethers.BrowserProvider(window.ethereum)
       const accounts = await provider.send('eth_requestAccounts', [])
       const signer = await provider.getSigner()
@@ -110,13 +146,6 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Error connecting:', error)
     }
-  }
-
-  const disconnect = () => {
-    setProvider(null)
-    setSigner(null)
-    setAccount(null)
-    setIsConnected(false)
   }
 
   return (
