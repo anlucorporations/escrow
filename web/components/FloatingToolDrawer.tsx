@@ -62,7 +62,7 @@ export function FloatingToolDrawer({ onRegistrationChange }: FloatingToolDrawerP
 
       if (registered) {
         const profile = await registryContract.getUserProfile(account)
-        const dateStr = profile.registeredAt && profile.registeredAt > 0n
+        const dateStr = profile.registeredAt && profile.registeredAt > BigInt(0)
           ? new Date(Number(profile.registeredAt) * 1000).toLocaleDateString()
           : 'Hoy'
 
