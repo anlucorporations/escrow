@@ -82,16 +82,21 @@ TKA="$(cd "$ROOT/sc" && deploy MockERC20 TokenA TKA 18)"
 TKB="$(cd "$ROOT/sc" && deploy MockERC20 TokenB TKB 18)"
 USDT="$(cd "$ROOT/sc" && deploy MockERC20 USDT USDT 6)"
 DELIVERY="$(cd "$ROOT/sc" && deploy MockERC20 DELIVERY DELIVERY 18)"
+BRLT="$(cd "$ROOT/sc" && deploy BRLT)"
+SUBSCRIPTION="$(cd "$ROOT/sc" && deploy Subscription "$BRLT" 100000000000000000000)"
 
 [ -n "$ESCROW" ] && [ -n "$REGISTRY" ] && [ -n "$TKA" ] && [ -n "$TKB" ] && [ -n "$USDT" ] && [ -n "$DELIVERY" ] \
+  && [ -n "$BRLT" ] && [ -n "$SUBSCRIPTION" ] \
   || { echo "❌ Falló el despliegue"; exit 1; }
 
-echo "✓ Escrow:    $ESCROW"
-echo "✓ Registry:  $REGISTRY"
-echo "✓ TKA:       $TKA"
-echo "✓ TKB:       $TKB"
-echo "✓ USDT:      $USDT (6 decimals)"
-echo "✓ DELIVERY:  $DELIVERY"
+echo "✓ Escrow:      $ESCROW"
+echo "✓ Registry:    $REGISTRY"
+echo "✓ TKA:         $TKA"
+echo "✓ TKB:         $TKB"
+echo "✓ USDT:        $USDT (6 decimals)"
+echo "✓ DELIVERY:    $DELIVERY"
+echo "✓ BRLT:        $BRLT (stablecoin, 18 decimals)"
+echo "✓ Subscription:$SUBSCRIPTION (100 BRLT/mes)"
 
 # 4) Autorizar tokens y árbitro
 echo "Autorizando tokens y árbitro en el contrato..."
@@ -122,8 +127,9 @@ for ADDR in "${ACCOUNTS[@]}"; do
   "$CAST" send --rpc-url "$RPC_URL" --private-key "$PRIVATE_KEY" "$TKB" "mint(address,uint256)" "$ADDR" 1000000000000000000000 >/dev/null 2>&1 || true
   "$CAST" send --rpc-url "$RPC_URL" --private-key "$PRIVATE_KEY" "$USDT" "mint(address,uint256)" "$ADDR" 5000000000 >/dev/null 2>&1 || true
   "$CAST" send --rpc-url "$RPC_URL" --private-key "$PRIVATE_KEY" "$DELIVERY" "mint(address,uint256)" "$ADDR" 5 >/dev/null 2>&1 || true
+  "$CAST" send --rpc-url "$RPC_URL" --private-key "$PRIVATE_KEY" "$BRLT" "mint(address,uint256)" "$ADDR" 10000000000000000000000 >/dev/null 2>&1 || true
 done
-echo "✓ Tokens minteados: 1000 TKA + 1000 TKB + 5000 USDT + 5 DELIVERY por cuenta"
+echo "✓ Tokens minteados: 1000 TKA + 1000 TKB + 5000 USDT + 5 DELIVERY + 10000 BRLT por cuenta"
 
 # 6) Configurar web/.env.local
 echo "Configurando web/.env.local..."
@@ -138,6 +144,8 @@ echo "✓ web/.env.local actualizado"
 cat > "$ROOT/deployment-info.txt" <<EOF
 Escrow:    $ESCROW
 Registry:  $REGISTRY (UserRegistry - inscripción de usuarios)
+BRLT:      $BRLT (BorloTokens - stablecoin 18 decimals)
+Subscription: $SUBSCRIPTION (100 BRLT/mes)
 Arbiter:   $ARBITER
 
 Tokens autorizados:
@@ -146,7 +154,7 @@ Tokens autorizados:
   USDT mock:  $USDT (USDT, 6 decimals)
   DELIVERY:   $DELIVERY (DELIVERY, 18 decimals)
 
-Cuentas (1000 TKA + 1000 TKB + 5000 USDT + 5 DELIVERY cada una):
+Cuentas (1000 TKA + 1000 TKB + 5000 USDT + 5 DELIVERY + 10000 BRLT cada una):
   0 - Owner/Admin: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
   1 - User1:        0x70997970C51812dc3A010C7d01b50e0d17dc79C8
   2 - User2:        0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC

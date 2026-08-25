@@ -289,3 +289,151 @@ export function itemPayload({ owner, title, description, category, quantity }) {
     quantity: Number(quantity || 1),
   })
 }
+
+/* ------------------------------------------------------------------ *
+ *  M7 — Puntos de encuentro (geolocalización)
+ * ------------------------------------------------------------------ */
+
+/** Distancia máxima permitida entre las partes (TrueKeate). */
+export const MAX_MEETUP_DISTANCE_KM = 10
+
+/** Distancia haversine en km (local/SQLite). En producción se usa PostGIS. */
+export function haversineKm(lat1, lng1, lat2, lng2) {
+  const R = 6371
+  const toRad = (d) => (d * Math.PI) / 180
+  const dLat = toRad(lat2 - lat1)
+  const dLng = toRad(lng2 - lng1)
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2
+  return 2 * R * Math.asin(Math.sqrt(a))
+}
+
+/**
+ * M7 — Aceptación de la operación (acuerdo bilateral off-chain).
+ * La contraparte (user2) solo se conoce on-chain al completar; para poder
+ * proponer encuentros con la regla de <= 10 km, el segundo usuario acepta
+ * el acuerdo en la capa de datos (ambas partes "abren" el intercambio).
+ */
+export async function acceptOperation(operationId, address) {
+  const op = await first('SELECT * FROM operations WHERE id = ?', [Number(operationId)])
+  if (!op) return { ok: false, error: 'Operación no encontrada' }
+  if (Number(op.status) !== 0) return { ok: false, error: 'La operación no está activa' }
+  const lower = address.toLowerCase()
+  if (op.user1.toLowerCase() === lower) return { ok: false, error: 'El creador no puede aceptar su propia operación' }
+  if (op.user2 && op.user2.toLowerCase() === lower) return { ok: true, op }
+  await query('UPDATE operations SET user2 = ? WHERE id = ?', [lower, Number(operationId)])
+  return { ok: true, op: { ...op, user2: lower } }
+}
+
+/**
+ * Valida y registra un punto de encuentro (M7):
+ * - la operación debe existir y estar activa
+ * - el solicitante debe ser parte (user1 o user2 en la capa de datos)
+ * - si la contraparte tiene ubicación registrada, la distancia debe ser <= 10 km
+ */
+export async function createMeetup({ operationId, requester, scheduledAt, lat, lng, placeName = '' }) {
+  const op = await first('SELECT * FROM operations WHERE id = ?', [Number(operationId)])
+  if (!op) return { ok: false, error: 'Operación no encontrada' }
+  if (Number(op.status) !== 0) return { ok: false, error: 'La operación no está activa' }
+
+  const lower = requester.toLowerCase()
+  const isParty = op.user1.toLowerCase() === lower || (op.user2 && op.user2.toLowerCase() === lower)
+  if (!isParty) return { ok: false, error: 'Solo las partes de la operación pueden proponer un encuentro' }
+
+  if (typeof lat !== 'number' || typeof lng !== 'number' || Number.isNaN(lat) || Number.isNaN(lng)) {
+    return { ok: false, error: 'Coordenadas inválidas' }
+  }
+  if (!scheduledAt || Number(scheduledAt) <= nowSec()) {
+    return { ok: false, error: 'La fecha debe estar en el futuro' }
+  }
+
+  // Distancia con la contraparte (si tiene ubicación registrada)
+  const otherAddress = op.user1.toLowerCase() === lower ? op.user2 : op.user1
+  let distanceKm = null
+  if (otherAddress) {
+    const other = await first('SELECT lat, lng FROM users WHERE address = ?', [otherAddress])
+    if (other && other.lat != null && other.lng != null) {
+      distanceKm = haversineKm(lat, lng, Number(other.lat), Number(other.lng))
+      if (distanceKm > MAX_MEETUP_DISTANCE_KM) {
+        return {
+          ok: false,
+          error: `La distancia entre las partes es ${distanceKm.toFixed(1)} km (máximo ${MAX_MEETUP_DISTANCE_KM} km)`,
+        }
+      }
+    }
+  }
+
+  const meetup = {
+    id: newId(),
+    operation_id: Number(operationId),
+    scheduled_at: Number(scheduledAt),
+    lat,
+    lng,
+    place_name: placeName,
+    status: 'scheduled',
+  }
+  await query(
+    `INSERT INTO meetups (id, operation_id, scheduled_at, lat, lng, place_name, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [meetup.id, meetup.operation_id, meetup.scheduled_at, meetup.lat, meetup.lng, meetup.place_name, meetup.status]
+  )
+  return { ok: true, meetup: { ...meetup, distance_km: distanceKm } }
+}
+
+export async function listMeetups(operationId) {
+  return query('SELECT * FROM meetups WHERE operation_id = ? ORDER BY scheduled_at DESC', [Number(operationId)])
+}
+
+/** Actualiza la ubicación registrada de un usuario (para regla de 10 km). */
+export async function setUserLocation(address, lat, lng) {
+  if (typeof lat !== 'number' || typeof lng !== 'number' || Number.isNaN(lat) || Number.isNaN(lng)) {
+    throw new Error('Coordenadas inválidas')
+  }
+  await query('UPDATE users SET lat = ?, lng = ? WHERE address = ?', [lat, lng, address.toLowerCase()])
+}
+
+/* ------------------------------------------------------------------ *
+ *  M6 — KYC cifrado (metadata confidencial en PostgreSQL/SQLite)
+ * ------------------------------------------------------------------ */
+
+function kycKey() {
+  // Clave derivada de KYC_SECRET (en producción: Secret Manager de GCP)
+  const secret = process.env.KYC_SECRET || 'truekeate-dev-secret-0123456789abcdef'
+  return crypto.createHash('sha256').update(secret).digest()
+}
+
+/** Cifra un campo KYC (AES-256-GCM): iv:tag:data en hex. */
+export function encryptField(plain) {
+  const iv = crypto.randomBytes(12)
+  const cipher = crypto.createCipheriv('aes-256-gcm', kycKey(), iv)
+  const enc = Buffer.concat([cipher.update(String(plain ?? ''), 'utf8'), cipher.final()])
+  const tag = cipher.getAuthTag()
+  return `${iv.toString('hex')}:${tag.toString('hex')}:${enc.toString('hex')}`
+}
+
+/** Descifra un campo KYC cifrado ('' si falla). */
+export function decryptField(enc) {
+  try {
+    const [ivHex, tagHex, dataHex] = String(enc).split(':')
+    const decipher = crypto.createDecipheriv('aes-256-gcm', kycKey(), Buffer.from(ivHex, 'hex'))
+    decipher.setAuthTag(Buffer.from(tagHex, 'hex'))
+    return Buffer.concat([decipher.update(Buffer.from(dataHex, 'hex')), decipher.final()]).toString('utf8')
+  } catch {
+    return ''
+  }
+}
+
+/**
+ * Registra la verificación KYC (M6): correo/teléfono CIFRADOS en la BD y
+ * hashes de documento/selfie. El estado público es solo kyc_status.
+ * (En producción la verificación requiere revisión; en demo se auto-aprueba.)
+ */
+export async function submitKyc(address, { email, phone, documentHash = '', selfieHash = '' }) {
+  const encryptedEmail = encryptField(email || '')
+  const encryptedPhone = encryptField(phone || '')
+  await query(
+    `UPDATE users SET email = ?, phone = ?, document_hash = ?, selfie_hash = ?, kyc_status = 'verified' WHERE address = ?`,
+    [encryptedEmail, encryptedPhone, documentHash, selfieHash, address.toLowerCase()]
+  )
+}

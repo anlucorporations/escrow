@@ -5,12 +5,23 @@ import { useEthereum } from '@/lib/ethereum'
 import { useEscrow, useTokenInfo } from '@/lib/hooks'
 import { StatusBadge } from '@/components/StatusBadge'
 import { RateOperationModal } from '@/components/RateOperationModal'
+import { MeetupModal } from '@/components/MeetupModal'
 import { buildMetaComplete, relayRequest } from '@/lib/relay'
 import { Operation, OperationStatus, isExpired, formatUnits, getFriendlyError } from '@/lib/escrow'
 
 interface OperationCardProps {
   operation: Operation
   onRefresh: () => void
+}
+
+interface Meetup {
+  id: string
+  operation_id: number
+  scheduled_at: number
+  lat: number
+  lng: number
+  place_name: string
+  status: string
 }
 
 export function OperationCard({ operation, onRefresh }: OperationCardProps) {
@@ -25,7 +36,10 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
   const [success, setSuccess] = useState('')
   const [now, setNow] = useState(BigInt(Date.now()))
   const [counterparty, setCounterparty] = useState<string | null>(null)
+  const [accepted, setAccepted] = useState(false)
   const [showRate, setShowRate] = useState(false)
+  const [showMeetup, setShowMeetup] = useState(false)
+  const [meetups, setMeetups] = useState<Meetup[]>([])
 
   // Re-evalúa el estado "vencida" cada 30 s para operaciones con deadline.
   useEffect(() => {
@@ -33,18 +47,35 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
     return () => clearInterval(id)
   }, [])
 
-  // Para valoraciones (M3): la contraparte (user2) solo existe en la capa de datos
+  // Puntos de encuentro (M7) de la operación activa
   useEffect(() => {
-    if (operation.status !== OperationStatus.Completed || !account) return
+    if (operation.status !== OperationStatus.Active) return
+    let cancelled = false
+    fetch(`/api/meetups?operationId=${operation.id.toString()}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.meetups) setMeetups(data.meetups)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [operation])
+
+  // Capa de datos (M7): contraparte (user2) y estado de aceptación
+  useEffect(() => {
+    if (!account) return
     let cancelled = false
     fetch(`/api/operations/${operation.id.toString()}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (!cancelled && data?.operation) {
-          const dbOp = data.operation
-          const me = account.toLowerCase()
-          const other = me === dbOp.user1?.toLowerCase() ? dbOp.user2 : dbOp.user1
-          if (other && other.toLowerCase() !== me) setCounterparty(other)
+        if (cancelled || !data?.operation) return
+        const dbOp = data.operation
+        const me = account.toLowerCase()
+        const other = me === dbOp.user1?.toLowerCase() ? dbOp.user2 : dbOp.user1
+        if (other && other.toLowerCase() !== me) setCounterparty(other)
+        if (operation.status === OperationStatus.Active) {
+          setAccepted(!!dbOp.user2 && dbOp.user2.toLowerCase() === me)
         }
       })
       .catch(() => {})
@@ -61,6 +92,20 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
   const canDispute =
     operation.status === OperationStatus.Active && !expired && roles.arbiter !== null
   const canRefund = operation.status === OperationStatus.Active && isCreator && expired
+  const canProposeMeetup = operation.status === OperationStatus.Active && !expired && (isCreator || accepted)
+  const canAccept = operation.status === OperationStatus.Active && !expired && !isCreator && !accepted
+
+  const handleAccept = () =>
+    run(async () => {
+      if (!account) throw new Error('Connect your wallet first')
+      const res = await fetch(`/api/operations/${operation.id.toString()}/accept`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address: account }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Error al aceptar')
+    }, 'Operación aceptada — ya puedes proponer encuentros')
   const isDisputed = operation.status === OperationStatus.Disputed
   const canResolve = isDisputed && roles.isArbiter
   const canRate = operation.status === OperationStatus.Completed && counterparty !== null
@@ -145,10 +190,49 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
             <span>Cerrada: {new Date(Number(operation.closedAt) * 1000).toLocaleString()}</span>
           )}
         </div>
+
+        {/* M7: puntos de encuentro */}
+        {meetups.length > 0 && (
+          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-zinc-700">
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
+              📍 Encuentros propuestos
+            </p>
+            <ul className="space-y-2">
+              {meetups.map((m) => (
+                <li key={m.id} className="text-xs bg-white dark:bg-zinc-900 rounded p-2 border border-gray-200 dark:border-zinc-700">
+                  <p className="text-gray-800 dark:text-gray-200">
+                    {new Date(Number(m.scheduled_at) * 1000).toLocaleString()}
+                    {m.place_name ? ` — ${m.place_name}` : ''}
+                  </p>
+                  <p className="text-gray-500 dark:text-gray-400 font-mono mt-0.5">
+                    {m.lat.toFixed(5)}, {m.lng.toFixed(5)}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       {/* Botones contextuales por actor + estado */}
       <div className="space-y-2">
+        {canAccept && (
+          <button
+            onClick={handleAccept}
+            disabled={loading}
+            className="w-full px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold transition-all duration-200"
+          >
+            🤝 Aceptar operación (acuerdo bilateral)
+          </button>
+        )}
+        {canProposeMeetup && (
+          <button
+            onClick={() => setShowMeetup(true)}
+            className="w-full px-4 py-2.5 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 font-semibold transition-all duration-200"
+          >
+            📍 Proponer punto de encuentro
+          </button>
+        )}
         {canComplete && (
           <>
             <button
@@ -257,6 +341,16 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
           isCreator={isCreator}
           onClose={() => {
             setShowRate(false)
+            onRefresh()
+          }}
+        />
+      )}
+
+      {showMeetup && (
+        <MeetupModal
+          operationId={operation.id}
+          onClose={() => {
+            setShowMeetup(false)
             onRefresh()
           }}
         />

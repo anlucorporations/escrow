@@ -72,6 +72,15 @@ export async function query(sql, params = []) {
   const kind = sql.trim().slice(0, 6).toUpperCase()
   if (kind === 'SELECT' || kind === 'WITH' || kind === 'PRAGMA') return stmt.all(...params)
   if (kind === 'INSERT' && /RETURNING/i.test(sql)) return stmt.get(...params) || null
+  if (kind === 'ALTER') {
+    // ALTER TABLE no devuelve filas; run() lanza si la columna ya existe
+    try {
+      stmt.run(...params)
+    } catch {
+      throw new Error('ALTER_FAILED')
+    }
+    return { changes: 0 }
+  }
   const r = stmt.run(...params)
   return { changes: Number(r.changes) }
 }
@@ -206,5 +215,32 @@ export async function initSchema() {
     await query('CREATE INDEX IF NOT EXISTS idx_items_category ON items (category)')
     await query('CREATE INDEX IF NOT EXISTS idx_operations_user1 ON operations (user1)')
     await query('CREATE INDEX IF NOT EXISTS idx_ratings_ratee ON ratings (ratee)')
+  }
+  // Columnas añadidas después de la creación inicial (M7 geolocalización)
+  await ensureColumn('users', 'lat', 'REAL')
+  await ensureColumn('users', 'lng', 'REAL')
+  await ensureColumn('users', 'document_hash', 'TEXT NOT NULL DEFAULT \'\'')
+  await ensureColumn('users', 'selfie_hash', 'TEXT NOT NULL DEFAULT \'\'')
+}
+
+/**
+ * Añade una columna si no existe (BD ya creadas en versiones anteriores).
+ * SQLite: ALTER TABLE ADD COLUMN; PostgreSQL: idempotente vía DO block.
+ */
+export async function ensureColumn(table, column, decl) {
+  try {
+    if (isPostgres()) {
+      await query(
+        `DO $$ BEGIN
+           IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = '${table}' AND column_name = '${column}') THEN
+             ALTER TABLE ${table} ADD COLUMN ${column} ${decl};
+           END IF;
+         END $$;`
+      )
+    } else {
+      await query(`ALTER TABLE ${table} ADD COLUMN ${column} ${decl}`)
+    }
+  } catch {
+    // La columna ya existe (error ignorable)
   }
 }
