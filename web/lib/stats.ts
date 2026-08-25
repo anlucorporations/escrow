@@ -6,4 +6,9 @@ export interface PlatformStats {
   activeOperations: number
   tokens: number
   users: number
+  /** Capa de datos (M1+): opcionales si la BD no está disponible */
+  items?: number
+  usersByLevel?: Record<string, number>
+  ratings?: number
+  avgRating?: number
 }

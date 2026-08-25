@@ -3,20 +3,21 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useEthereum } from '@/lib/ethereum'
-import { useRegistration } from '@/lib/hooks'
+import { useProfile, useRegistration } from '@/lib/hooks'
 import { useRegisterModal } from '@/components/RegisterModal'
 
 /**
  * Menú de usuario minimalista de la barra de navegación:
  *  - sin conexión: opción "Conectar billetera"
  *  - conectada sin inscribir: opción "Inscribirme"
- *  - conectada e inscrita: "Mi actividad" + "Desconectar"
+ *  - conectada e inscrita: nivel de confianza + "Mi actividad" + "Desconectar"
  */
 export function UserMenu() {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const { isConnected, account, connect, disconnect } = useEthereum()
   const { isRegistered, username, loading } = useRegistration()
+  const { profile } = useProfile(isConnected && isRegistered ? account : null)
   const { openRegister } = useRegisterModal()
 
   // Cerrar al hacer click fuera
@@ -71,6 +72,21 @@ export function UserMenu() {
                       ? `Inscrito como @${username ?? short}`
                       : 'No inscrito en la plataforma'}
                 </p>
+                {isRegistered && profile && (
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200">
+                      {profile.levelLabel}
+                    </span>
+                    {profile.isBusiness && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200">
+                        Empresa
+                      </span>
+                    )}
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200">
+                      ★ {profile.reputation.overall.toFixed(1)} · {profile.reputation.total} valoraciones
+                    </span>
+                  </div>
+                )}
               </>
             )}
           </div>

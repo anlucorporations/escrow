@@ -18,6 +18,7 @@ import {
   toOperation,
   getFriendlyError,
 } from '@/lib/escrow'
+import { UserProfile } from '@/lib/items'
 
 export interface RoleInfo {
   isOwner: boolean
@@ -401,6 +402,41 @@ export function useRegistration(): RegistrationState {
   )
 
   return { isRegistered, username, loading, register, refresh }
+}
+
+/**
+ * Perfil público de un usuario (reputación, nivel de confianza) desde la
+ * capa de datos (M3/M4). Fuente: GET /api/users/[address].
+ */
+export function useProfile(address: string | null | undefined) {
+  const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    const load = async () => {
+      if (!address) {
+        setProfile(null)
+        return
+      }
+      setLoading(true)
+      try {
+        const { fetchProfile } = await import('@/lib/items')
+        const data = await fetchProfile(address)
+        if (!cancelled) setProfile(data)
+      } catch {
+        if (!cancelled) setProfile(null)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [address])
+
+  return { profile, loading }
 }
 
 export { getFriendlyError }

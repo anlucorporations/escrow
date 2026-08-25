@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useEthereum } from '@/lib/ethereum'
 import { useEscrow, useTokenInfo } from '@/lib/hooks'
 import { StatusBadge } from '@/components/StatusBadge'
+import { RateOperationModal } from '@/components/RateOperationModal'
 import { Operation, OperationStatus, isExpired, formatUnits, getFriendlyError } from '@/lib/escrow'
 
 interface OperationCardProps {
@@ -22,12 +23,34 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [now, setNow] = useState(BigInt(Date.now()))
+  const [counterparty, setCounterparty] = useState<string | null>(null)
+  const [showRate, setShowRate] = useState(false)
 
   // Re-evalúa el estado "vencida" cada 30 s para operaciones con deadline.
   useEffect(() => {
     const id = setInterval(() => setNow(BigInt(Date.now())), 30_000)
     return () => clearInterval(id)
   }, [])
+
+  // Para valoraciones (M3): la contraparte (user2) solo existe en la capa de datos
+  useEffect(() => {
+    if (operation.status !== OperationStatus.Completed || !account) return
+    let cancelled = false
+    fetch(`/api/operations/${operation.id.toString()}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.operation) {
+          const dbOp = data.operation
+          const me = account.toLowerCase()
+          const other = me === dbOp.user1?.toLowerCase() ? dbOp.user2 : dbOp.user1
+          if (other && other.toLowerCase() !== me) setCounterparty(other)
+        }
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [operation, account])
 
   const expired = isExpired(operation, now)
   const isCreator = account?.toLowerCase() === operation.user1.toLowerCase()
@@ -39,6 +62,7 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
   const canRefund = operation.status === OperationStatus.Active && isCreator && expired
   const isDisputed = operation.status === OperationStatus.Disputed
   const canResolve = isDisputed && roles.isArbiter
+  const canRate = operation.status === OperationStatus.Completed && counterparty !== null
 
   const run = useCallback(
     async (fn: () => Promise<unknown>, okMessage: string) => {
@@ -181,6 +205,15 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
           </div>
         )}
 
+        {canRate && (
+          <button
+            onClick={() => setShowRate(true)}
+            className="w-full px-4 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 font-semibold transition-all duration-200"
+          >
+            Valorar operación (reputación)
+          </button>
+        )}
+
         {success && (
           <div className="text-green-600 dark:text-green-400 text-sm text-center bg-green-50 dark:bg-green-900/20 p-2 rounded">
             {success}
@@ -198,6 +231,18 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
           </div>
         )}
       </div>
+
+      {showRate && counterparty && (
+        <RateOperationModal
+          operationId={operation.id}
+          counterparty={counterparty}
+          isCreator={isCreator}
+          onClose={() => {
+            setShowRate(false)
+            onRefresh()
+          }}
+        />
+      )}
     </div>
   )
 }

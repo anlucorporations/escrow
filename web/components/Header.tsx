@@ -21,6 +21,7 @@ export function Header() {
     ...(hasAccess
       ? [
           { label: 'Operations', href: '/operations' },
+          { label: 'Catálogo', href: '/items' },
           { label: 'Balances', href: '/balances' },
           ...(isAdmin ? [{ label: 'Add Token', href: '/add-token' }] : []),
         ]

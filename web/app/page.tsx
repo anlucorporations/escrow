@@ -46,14 +46,14 @@ export default function Home() {
       hint: 'usuarios verificados on-chain',
     },
     {
-      label: 'Tokens soportados',
-      value: stats ? String(stats.tokens) : '—',
-      hint: 'ERC20 autorizados por el admin',
+      label: 'Artículos en catálogo',
+      value: stats?.items != null ? String(stats.items) : '—',
+      hint: 'bienes y servicios publicados',
     },
     {
-      label: 'Operaciones activas',
-      value: stats ? String(stats.activeOperations) : '—',
-      hint: 'fondos en custodia bilateral',
+      label: 'Valoraciones emitidas',
+      value: stats?.ratings != null ? String(stats.ratings) : '—',
+      hint: 'reputación en 5 dimensiones',
     },
   ]
 
