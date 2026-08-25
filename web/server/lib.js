@@ -378,6 +378,16 @@ export async function createMeetup({ operationId, requester, scheduledAt, lat, l
      VALUES (?, ?, ?, ?, ?, ?, ?)`,
     [meetup.id, meetup.operation_id, meetup.scheduled_at, meetup.lat, meetup.lng, meetup.place_name, meetup.status]
   )
+  // M15: notificar a la contraparte
+  const notifyTarget = op.user1.toLowerCase() === lower ? op.user2 : op.user1
+  if (notifyTarget) {
+    await notify(
+      notifyTarget,
+      'meetup',
+      `Te propusieron un punto de encuentro para la operación #${operationId} (${placeName || 'ver en la operación'}).`,
+      meetup.id
+    )
+  }
   return { ok: true, meetup: { ...meetup, distance_km: distanceKm } }
 }
 
@@ -391,6 +401,165 @@ export async function setUserLocation(address, lat, lng) {
     throw new Error('Coordenadas inválidas')
   }
   await query('UPDATE users SET lat = ?, lng = ? WHERE address = ?', [lat, lng, address.toLowerCase()])
+}
+
+/* ------------------------------------------------------------------ *
+ *  M12 — Avales entre usuarios verificados
+ * ------------------------------------------------------------------ */
+
+/** Un usuario verificado avala a otro (5 avales = aceptación de operación). */
+export async function createVouch(vouchBy, vouchFor) {
+  const by = vouchBy.toLowerCase()
+  const for_ = vouchFor.toLowerCase()
+  if (by === for_) throw new Error('No puedes avalarte a ti mismo')
+
+  const user = await first('SELECT kyc_status FROM users WHERE address = ?', [by])
+  if (!user) throw new Error('Avalador no encontrado en la BD')
+  if (user.kyc_status !== 'verified') throw new Error('Solo usuarios verificados (KYC) pueden avalar')
+
+  const existing = await first('SELECT id FROM vouches WHERE vouch_by = ? AND vouch_for = ?', [by, for_])
+  if (existing) throw new Error('Ya avalaste a este usuario')
+
+  await query('INSERT INTO vouches (id, vouch_by, vouch_for, created_at) VALUES (?, ?, ?, ?)', [
+    newId(),
+    by,
+    for_,
+    nowSec(),
+  ])
+  return { ok: true }
+}
+
+export async function listVouches(address) {
+  const rows = await query('SELECT * FROM vouches WHERE vouch_for = ? ORDER BY created_at DESC', [address.toLowerCase()])
+  return rows
+}
+
+/* ------------------------------------------------------------------ *
+ *  M11 — Campañas (venta masiva / recolección)
+ * ------------------------------------------------------------------ */
+
+export async function createCampaign({ owner, title, description = '', kind = 'masiva' }) {
+  if (!title || title.trim().length < 3) throw new Error('El título debe tener al menos 3 caracteres')
+  if (!['masiva', 'recoleccion'].includes(kind)) throw new Error('kind debe ser masiva o recoleccion')
+  const campaign = {
+    id: newId(),
+    owner: owner.toLowerCase(),
+    title: title.trim(),
+    description: description.trim(),
+    kind,
+    status: 'pending',
+    created_at: nowSec(),
+  }
+  await query(
+    `INSERT INTO campaigns (id, owner, title, description, kind, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [campaign.id, campaign.owner, campaign.title, campaign.description, campaign.kind, campaign.status, campaign.created_at]
+  )
+  return campaign
+}
+
+export async function listCampaigns() {
+  return query('SELECT * FROM campaigns ORDER BY created_at DESC')
+}
+
+/** Aprueba una campaña (solo Socios, verificado on-chain vía Governance). */
+export async function approveCampaign(campaignId, approver, governanceAddress, provider) {
+  const { ethers } = await import('ethers')
+  const campaign = await first('SELECT * FROM campaigns WHERE id = ?', [campaignId])
+  if (!campaign) throw new Error('Campaña no encontrada')
+  if (campaign.status !== 'pending') throw new Error('La campaña ya no está pendiente')
+
+  const governanceAbi = ['function isSocio(address) view returns (bool)']
+  const gov = new ethers.Contract(governanceAddress, governanceAbi, provider)
+  const socio = await gov.isSocio(approver)
+  if (!socio) throw new Error('Solo un Socio puede aprobar campañas')
+
+  await query('UPDATE campaigns SET status = ?, approved_by = ? WHERE id = ?', ['approved', approver.toLowerCase(), campaignId])
+  return { ...campaign, status: 'approved', approved_by: approver.toLowerCase() }
+}
+
+/* ------------------------------------------------------------------ *
+ *  M15 — Notificaciones (capa de datos)
+ * ------------------------------------------------------------------ */
+
+export async function notify(user, type, message, refId = '') {
+  await query(
+    'INSERT INTO notifications (id, user, type, message, ref_id, read, created_at) VALUES (?, ?, ?, ?, ?, 0, ?)',
+    [newId(), user.toLowerCase(), type, message, refId, nowSec()]
+  )
+}
+
+export async function listNotifications(address) {
+  const rows = await query(
+    'SELECT * FROM notifications WHERE user = ? ORDER BY created_at DESC LIMIT 30',
+    [address.toLowerCase()]
+  )
+  const unread = await first('SELECT COUNT(*) AS total FROM notifications WHERE user = ? AND read = 0', [address.toLowerCase()])
+  return { notifications: rows, unread: Number(unread.total || 0) }
+}
+
+export async function markNotificationsRead(address) {
+  await query('UPDATE notifications SET read = 1 WHERE user = ?', [address.toLowerCase()])
+}
+
+/* ------------------------------------------------------------------ *
+ *  M16 — Ventana de intercambio (10 minutos)
+ * ------------------------------------------------------------------ */
+
+export const MEETUP_WINDOW_MIN = 10
+
+/**
+ * Abre el intercambio por una de las partes (M16):
+ * - debe estar dentro de [scheduled_at - 10m, scheduled_at + 10m]
+ * - al abrir ambas partes, la diferencia entre aperturas debe ser <= 10 min
+ * - cualquier violación bloquea el encuentro (requiere autorización de cierre)
+ */
+export async function openMeetup(meetupId, address) {
+  const m = await first('SELECT * FROM meetups WHERE id = ?', [meetupId])
+  if (!m) return { ok: false, error: 'Encuentro no encontrado' }
+  if (m.status === 'blocked') return { ok: false, error: 'El encuentro está bloqueado' }
+  if (m.status === 'completed') return { ok: false, error: 'El encuentro ya se completó' }
+
+  // Solo las partes de la operación pueden abrir el intercambio
+  const op = await first('SELECT * FROM operations WHERE id = ?', [Number(m.operation_id)])
+  const lower = address.toLowerCase()
+  if (!op) return { ok: false, error: 'Operación no encontrada' }
+  const isParty = op.user1.toLowerCase() === lower || (op.user2 && op.user2.toLowerCase() === lower)
+  if (!isParty) return { ok: false, error: 'Solo las partes de la operación pueden abrir el intercambio' }
+
+  const now = nowSec()
+  const windowMs = MEETUP_WINDOW_MIN * 60
+  if (now < Number(m.scheduled_at) - windowMs || now > Number(m.scheduled_at) + windowMs) {
+    await query("UPDATE meetups SET status = 'blocked', blocked_reason = 'Fuera de la ventana de 10 minutos' WHERE id = ?", [meetupId])
+    return { ok: false, error: 'Fuera de la ventana de 10 minutos (±10 min de la hora pautada)' }
+  }
+
+  if (m.opened_at_user1 == null && m.opened_at_user2 == null) {
+    // primera apertura: registramos la parte (no sabemos cuál es user1/user2 aquí;
+    // la capa de datos guarda ambas columnas según quien abra primero)
+    await query('UPDATE meetups SET opened_at_user1 = ?, status = ? WHERE id = ?', [now, 'opened', meetupId])
+    return { ok: true, meetup: { ...m, opened_at_user1: now, status: 'opened' } }
+  }
+
+  // segunda apertura: validar diferencia <= 10 min
+  const firstOpen = Number(m.opened_at_user1 ?? m.opened_at_user2)
+  if (Math.abs(now - firstOpen) > windowMs) {
+    await query(
+      "UPDATE meetups SET opened_at_user2 = ?, status = 'blocked', blocked_reason = 'Diferencia de apertura mayor a 10 minutos' WHERE id = ?",
+      [now, meetupId]
+    )
+    return { ok: false, error: 'Diferencia de apertura mayor a 10 minutos: intercambio bloqueado' }
+  }
+
+  await query('UPDATE meetups SET opened_at_user2 = ?, status = ? WHERE id = ?', [now, 'opened', meetupId])
+  return { ok: true, meetup: { ...m, opened_at_user2: now, status: 'opened' } }
+}
+
+export async function closeMeetup(meetupId) {
+  const m = await first('SELECT * FROM meetups WHERE id = ?', [meetupId])
+  if (!m) return { ok: false, error: 'Encuentro no encontrado' }
+  if (m.status === 'blocked') return { ok: false, error: 'El encuentro está bloqueado' }
+  await query("UPDATE meetups SET status = 'completed' WHERE id = ?", [meetupId])
+  return { ok: true }
 }
 
 /* ------------------------------------------------------------------ *

@@ -84,9 +84,10 @@ USDT="$(cd "$ROOT/sc" && deploy MockERC20 USDT USDT 6)"
 DELIVERY="$(cd "$ROOT/sc" && deploy MockERC20 DELIVERY DELIVERY 18)"
 BRLT="$(cd "$ROOT/sc" && deploy BRLT)"
 SUBSCRIPTION="$(cd "$ROOT/sc" && deploy Subscription "$BRLT" 100000000000000000000)"
+GOVERNANCE="$(cd "$ROOT/sc" && deploy Governance)"
 
 [ -n "$ESCROW" ] && [ -n "$REGISTRY" ] && [ -n "$TKA" ] && [ -n "$TKB" ] && [ -n "$USDT" ] && [ -n "$DELIVERY" ] \
-  && [ -n "$BRLT" ] && [ -n "$SUBSCRIPTION" ] \
+  && [ -n "$BRLT" ] && [ -n "$SUBSCRIPTION" ] && [ -n "$GOVERNANCE" ] \
   || { echo "❌ Falló el despliegue"; exit 1; }
 
 echo "✓ Escrow:      $ESCROW"
@@ -97,16 +98,20 @@ echo "✓ USDT:        $USDT (6 decimals)"
 echo "✓ DELIVERY:    $DELIVERY"
 echo "✓ BRLT:        $BRLT (stablecoin, 18 decimals)"
 echo "✓ Subscription:$SUBSCRIPTION (100 BRLT/mes)"
+echo "✓ Governance:  $GOVERNANCE (nivel Socio)"
 
-# 4) Autorizar tokens y árbitro
-echo "Autorizando tokens y árbitro en el contrato..."
+# 4) Autorizar tokens, árbitro y Socios
+echo "Autorizando tokens, árbitro y Socios..."
 for T in "$TKA" "$TKB" "$USDT" "$DELIVERY"; do
   "$CAST" send --rpc-url "$RPC_URL" --private-key "$PRIVATE_KEY" "$ESCROW" \
     "addToken(address)" "$T" >/dev/null 2>&1
 done
 "$CAST" send --rpc-url "$RPC_URL" --private-key "$PRIVATE_KEY" "$ESCROW" \
   "setArbiter(address)" "$ARBITER" >/dev/null 2>&1
-echo "✓ 4 tokens autorizados + árbitro $ARBITER"
+# Socios demo: owner (cuenta 0) y cuenta 3 (árbitro)
+"$CAST" send --rpc-url "$RPC_URL" --private-key "$PRIVATE_KEY" "$GOVERNANCE" "setSocio(address,bool)" "$DEPLOYER" true >/dev/null 2>&1
+"$CAST" send --rpc-url "$RPC_URL" --private-key "$PRIVATE_KEY" "$GOVERNANCE" "setSocio(address,bool)" "$ARBITER" true >/dev/null 2>&1
+echo "✓ 4 tokens autorizados + árbitro $ARBITER + 2 Socios"
 
 # 5) Mint tokens de prueba (a las 10 cuentas de Anvil)
 echo "Minteando tokens de prueba..."
@@ -136,6 +141,7 @@ echo "Configurando web/.env.local..."
 cat > "$ROOT/web/.env.local" <<EOF
 NEXT_PUBLIC_ESCROW_ADDRESS=$ESCROW
 NEXT_PUBLIC_USER_REGISTRY_ADDRESS=$REGISTRY
+NEXT_PUBLIC_GOVERNANCE_ADDRESS=$GOVERNANCE
 RPC_URL=$RPC_URL
 EOF
 echo "✓ web/.env.local actualizado"

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { EthereumProvider } from "@/lib/ethereum";
 import { RegisterProvider } from "@/components/RegisterModal";
+import { PwaRegister } from "@/components/PwaRegister";
 import { Header } from "@/components/Header";
 
 const geistSans = Geist({
@@ -16,8 +17,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Escrow DApp",
-  description: "Decentralized escrow application for ERC20 token swaps",
+  title: "TrueKeate — Escrow & Exchange",
+  description: "Intercambio seguro de tokens, bienes y servicios entre pares",
+  manifest: "/manifest.webmanifest",
 };
 
 export default function RootLayout({
@@ -26,10 +28,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <PwaRegister />
         <EthereumProvider>
           <RegisterProvider>
             <Header />

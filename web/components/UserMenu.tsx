@@ -14,16 +14,49 @@ import { useRegisterModal } from '@/components/RegisterModal'
  */
 export function UserMenu() {
   const [open, setOpen] = useState(false)
+  const [notifOpen, setNotifOpen] = useState(false)
+  const [notifications, setNotifications] = useState<Array<{ id: string; message: string; created_at: number; type: string }>>([])
+  const [unread, setUnread] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
   const { isConnected, account, connect, disconnect } = useEthereum()
   const { isRegistered, username, loading } = useRegistration()
   const { profile } = useProfile(isConnected && isRegistered ? account : null)
   const { openRegister } = useRegisterModal()
 
+  // M15: notificaciones
+  useEffect(() => {
+    if (!isConnected || !account) return
+    let cancelled = false
+    const load = async () => {
+      const res = await fetch(`/api/notifications?user=${account}`)
+      if (!res.ok) return
+      const data = await res.json()
+      if (!cancelled) {
+        setNotifications(data.notifications)
+        setUnread(data.unread)
+      }
+    }
+    load()
+    const id = setInterval(load, 15000)
+    return () => {
+      cancelled = true
+      clearInterval(id)
+    }
+  }, [isConnected, account])
+
+  const markRead = async () => {
+    if (!account) return
+    await fetch('/api/notifications', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user: account }) })
+    setUnread(0)
+  }
+
   // Cerrar al hacer click fuera
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false)
+        setNotifOpen(false)
+      }
     }
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
@@ -33,6 +66,52 @@ export function UserMenu() {
 
   return (
     <div className="relative" ref={ref}>
+      {/* M15: campana de notificaciones */}
+      {isConnected && account && (
+        <button
+          onClick={() => {
+            setNotifOpen((v) => !v)
+            if (!notifOpen) markRead()
+          }}
+          aria-label="Notificaciones"
+          className="relative p-2 rounded-lg border border-gray-200 dark:border-zinc-700 hover:border-blue-500 transition-colors mr-2"
+        >
+          <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+            />
+          </svg>
+          {unread > 0 && (
+            <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+              {unread}
+            </span>
+          )}
+        </button>
+      )}
+
+      {notifOpen && (
+        <div className="absolute right-16 mt-2 w-80 rounded-lg bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 shadow-lg overflow-hidden z-50">
+          <div className="px-4 py-3 border-b border-gray-100 dark:border-zinc-800 font-semibold text-sm text-gray-900 dark:text-white">
+            Notificaciones
+          </div>
+          <div className="max-h-72 overflow-y-auto">
+            {notifications.length === 0 ? (
+              <p className="px-4 py-6 text-center text-sm text-gray-500 dark:text-gray-400">Sin notificaciones</p>
+            ) : (
+              notifications.map((n) => (
+                <div key={n.id} className="px-4 py-3 border-b border-gray-50 dark:border-zinc-800 text-sm">
+                  <p className="text-gray-800 dark:text-gray-200">{n.message}</p>
+                  <p className="text-xs text-gray-400 mt-1">{new Date(n.created_at * 1000).toLocaleString()}</p>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label="Menú de usuario"

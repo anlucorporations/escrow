@@ -202,6 +202,16 @@ const SCHEMA = [
     paid_until INTEGER NOT NULL DEFAULT 0,
     updated_at INTEGER NOT NULL DEFAULT 0
   )`,
+  // Notificaciones (M15)
+  `CREATE TABLE IF NOT EXISTS notifications (
+    id         TEXT PRIMARY KEY,
+    user       TEXT NOT NULL,
+    type       TEXT NOT NULL DEFAULT 'info',
+    message    TEXT NOT NULL DEFAULT '',
+    ref_id     TEXT NOT NULL DEFAULT '',
+    read       INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL DEFAULT 0
+  )`,
 ]
 
 /** Crea las tablas si no existen. Idempotente. */

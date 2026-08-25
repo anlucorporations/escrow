@@ -22,6 +22,7 @@ export function Header() {
       ? [
           { label: 'Operations', href: '/operations' },
           { label: 'Catálogo', href: '/items' },
+          { label: 'Campañas', href: '/campaigns' },
           { label: 'Balances', href: '/balances' },
           { label: 'Perfil', href: '/profile' },
           ...(isAdmin ? [{ label: 'Add Token', href: '/add-token' }] : []),

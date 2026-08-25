@@ -22,6 +22,7 @@ interface Meetup {
   lng: number
   place_name: string
   status: string
+  blocked_reason?: string
 }
 
 export function OperationCard({ operation, onRefresh }: OperationCardProps) {
@@ -191,7 +192,7 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
           )}
         </div>
 
-        {/* M7: puntos de encuentro */}
+        {/* M7: puntos de encuentro + M16: ventana de 10 min */}
         {meetups.length > 0 && (
           <div className="mt-3 pt-3 border-t border-gray-200 dark:border-zinc-700">
             <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
@@ -200,13 +201,71 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
             <ul className="space-y-2">
               {meetups.map((m) => (
                 <li key={m.id} className="text-xs bg-white dark:bg-zinc-900 rounded p-2 border border-gray-200 dark:border-zinc-700">
-                  <p className="text-gray-800 dark:text-gray-200">
-                    {new Date(Number(m.scheduled_at) * 1000).toLocaleString()}
-                    {m.place_name ? ` — ${m.place_name}` : ''}
-                  </p>
-                  <p className="text-gray-500 dark:text-gray-400 font-mono mt-0.5">
-                    {m.lat.toFixed(5)}, {m.lng.toFixed(5)}
-                  </p>
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="text-gray-800 dark:text-gray-200">
+                        {new Date(Number(m.scheduled_at) * 1000).toLocaleString()}
+                        {m.place_name ? ` — ${m.place_name}` : ''}
+                      </p>
+                      <p className="text-gray-500 dark:text-gray-400 font-mono mt-0.5">
+                        {m.lat.toFixed(5)}, {m.lng.toFixed(5)}
+                      </p>
+                    </div>
+                    <span
+                      className={`px-2 py-1 rounded-full font-semibold flex-shrink-0 ${
+                        m.status === 'completed'
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
+                          : m.status === 'blocked'
+                            ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200'
+                            : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200'
+                      }`}
+                    >
+                      {m.status === 'scheduled' ? 'Programado' : m.status === 'opened' ? 'En curso' : m.status === 'completed' ? 'Completado' : 'Bloqueado'}
+                    </span>
+                  </div>
+                  {m.status === 'blocked' && m.blocked_reason && (
+                    <p className="text-red-600 dark:text-red-400 mt-1">{m.blocked_reason}</p>
+                  )}
+                  {account && (m.status === 'scheduled' || m.status === 'opened') && (
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        onClick={() =>
+                          run(
+                            async () => {
+                              const res = await fetch(`/api/meetups/${m.id}/open`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ address: account }),
+                              })
+                              const data = await res.json()
+                              if (!res.ok) throw new Error(data.error || 'Error')
+                            },
+                            'Apertura registrada (ventana ±10 min)'
+                          )
+                        }
+                        className="flex-1 px-2 py-1.5 bg-blue-600 text-white rounded font-semibold hover:bg-blue-700"
+                      >
+                        Abrir intercambio
+                      </button>
+                      {m.status === 'opened' && (
+                        <button
+                          onClick={() =>
+                            run(
+                              async () => {
+                                const res = await fetch(`/api/meetups/${m.id}/close`, { method: 'POST' })
+                                const data = await res.json()
+                                if (!res.ok) throw new Error(data.error || 'Error')
+                              },
+                              'Intercambio cerrado'
+                            )
+                          }
+                          className="flex-1 px-2 py-1.5 bg-green-600 text-white rounded font-semibold hover:bg-green-700"
+                        >
+                          Cerrar intercambio
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>
