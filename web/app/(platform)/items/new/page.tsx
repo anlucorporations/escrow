@@ -3,14 +3,21 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useEthereum } from '@/lib/ethereum'
-import { createItemSigned } from '@/lib/items'
+import { createItemSigned, certifyImage } from '@/lib/items'
 import { getFriendlyError } from '@/lib/escrow'
 
 const CATEGORIES = ['general', 'electronica', 'hogar', 'vehiculos', 'ropa', 'coleccionables', 'servicios', 'otros']
 
+interface CertifiedFile {
+  sha256: string
+  signature: string
+  fileName: string
+}
+
 /**
- * Publicar artículo (M2). La wallet firma el payload canónico (ECDSA) y el
- * servidor verifica la firma antes de guardar (certificación).
+ * Publicar artículo (M2 + M8). La wallet firma el payload canónico (ECDSA) y
+ * cada imagen (hash SHA-256) para certificar autenticidad; el servidor
+ * verifica todas las firmas antes de guardar.
  */
 export default function NewItemPage() {
   const router = useRouter()
@@ -19,8 +26,29 @@ export default function NewItemPage() {
   const [description, setDescription] = useState('')
   const [category, setCategory] = useState('general')
   const [quantity, setQuantity] = useState('1')
+  const [files, setFiles] = useState<CertifiedFile[]>([])
+  const [certifying, setCertifying] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  const handleFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!provider || !e.target.files || e.target.files.length === 0) return
+    setCertifying(true)
+    setError('')
+    try {
+      const signer = await provider.getSigner()
+      const certified: CertifiedFile[] = []
+      for (const file of Array.from(e.target.files)) {
+        certified.push(await certifyImage(file, signer))
+      }
+      setFiles((prev) => [...prev, ...certified])
+    } catch (err) {
+      setError(getFriendlyError(err))
+    } finally {
+      setCertifying(false)
+      e.target.value = ''
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,13 +60,17 @@ export default function NewItemPage() {
     setError('')
     try {
       const signer = await provider.getSigner()
-      const item = await createItemSigned(signer, {
-        owner: account,
-        title,
-        description,
-        category,
-        quantity: parseInt(quantity, 10) || 1,
-      })
+      const item = await createItemSigned(
+        signer,
+        {
+          owner: account,
+          title,
+          description,
+          category,
+          quantity: parseInt(quantity, 10) || 1,
+        },
+        files.map((f) => ({ sha256: f.sha256, signature: f.signature }))
+      )
       router.push(`/items/${item.id}`)
     } catch (err) {
       setError(getFriendlyError(err))
@@ -108,6 +140,39 @@ export default function NewItemPage() {
                 className="w-full px-4 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg dark:bg-zinc-800 dark:text-white"
               />
             </div>
+          </div>
+
+          {/* M8: imágenes certificadas */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+              Imágenes (se certifican: SHA-256 + firma de tu wallet)
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleFiles}
+              disabled={certifying}
+              className="w-full text-sm text-gray-600 dark:text-gray-300 file:mr-4 file:px-4 file:py-2 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700"
+            />
+            {certifying && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                Calculando hash y firmando imágenes (revisa MetaMask)...
+              </p>
+            )}
+            {files.length > 0 && (
+              <ul className="mt-3 space-y-2">
+                {files.map((f) => (
+                  <li key={f.sha256} className="flex items-start justify-between gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-xs">
+                    <div>
+                      <p className="font-semibold text-green-800 dark:text-green-200">{f.fileName}</p>
+                      <p className="font-mono text-green-700 dark:text-green-300 break-all">sha256: {f.sha256.slice(0, 32)}...</p>
+                    </div>
+                    <span className="px-2 py-1 rounded-full bg-green-600 text-white font-semibold flex-shrink-0">✓ firmada</span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           {account && (

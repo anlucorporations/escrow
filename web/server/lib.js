@@ -197,7 +197,33 @@ export async function createItem({ owner, title, description, category, quantity
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [item.id, item.owner, item.title, item.description, item.category, item.quantity, item.images, item.signature, item.created_at]
   )
-  return item
+  // Registro individual de imágenes certificadas (M8)
+  for (const img of images) {
+    await query(
+      `INSERT INTO images (id, item_id, cid, sha256, signature, signed_by, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [newId(), item.id, img.cid || '', img.sha256, img.signature, item.owner, nowSec()]
+    )
+  }
+  return { ...item, images }
+}
+
+/**
+ * M8 — Certificación de imágenes: cada imagen debe llevar su hash SHA-256 y
+ * la firma ECDSA de la wallet propietaria sobre ese hash.
+ */
+export function verifyImageSignatures(images, owner) {
+  const out = []
+  for (const img of images || []) {
+    if (!img || !img.sha256 || !img.signature) {
+      throw new Error('Cada imagen requiere sha256 y firma (certificación)')
+    }
+    if (!verifySignature(img.sha256, img.signature, owner)) {
+      throw new Error('Firma de imagen inválida: el hash no fue firmado por la wallet propietaria')
+    }
+    out.push({ sha256: img.sha256, signature: img.signature, cid: img.cid || '' })
+  }
+  return out
 }
 
 export async function listItems({ category, owner, q, limit = 50, offset = 0 } = {}) {

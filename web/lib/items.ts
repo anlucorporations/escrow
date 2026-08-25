@@ -86,16 +86,34 @@ export async function fetchProfile(address: string): Promise<UserProfile> {
 
 export async function createItemSigned(
   signer: { signMessage: (msg: string) => Promise<string> },
-  input: ItemInput
+  input: ItemInput,
+  images: Array<{ sha256: string; signature: string }> = []
 ): Promise<Item> {
   const payload = itemPayload(input)
   const signature = await signer.signMessage(payload)
   const res = await fetch('/api/items', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...input, payload, signature }),
+    body: JSON.stringify({ ...input, payload, signature, images }),
   })
   const data = await res.json()
   if (!res.ok) throw new Error(data.error || 'Error al crear artículo')
   return data.item
+}
+
+/**
+ * M8 — Certifica un archivo de imagen: calcula SHA-256 (Web Crypto) y lo firma
+ * con la wallet. El servidor guarda hash + firma para auditoría inmutable.
+ */
+export async function certifyImage(
+  file: File,
+  signer: { signMessage: (msg: string) => Promise<string> }
+): Promise<{ sha256: string; signature: string; fileName: string }> {
+  const buf = await file.arrayBuffer()
+  const hashBuf = await crypto.subtle.digest('SHA-256', buf)
+  const sha256 = Array.from(new Uint8Array(hashBuf))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+  const signature = await signer.signMessage(sha256)
+  return { sha256, signature, fileName: file.name }
 }

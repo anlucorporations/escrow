@@ -81,6 +81,20 @@ const erc20Abi = `[
     "inputs": [],
     "outputs": [{ "name": "", "type": "uint8" }],
     "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "nonces",
+    "inputs": [{ "name": "owner", "type": "address" }],
+    "outputs": [{ "name": "", "type": "uint256" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "DOMAIN_SEPARATOR",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "bytes32" }],
+    "stateMutability": "view"
   }
 ] as const;`
 

@@ -228,6 +228,7 @@ export function useEscrow() {
 
   return {
     contract,
+    provider,
     isConnected,
     account,
     roles,

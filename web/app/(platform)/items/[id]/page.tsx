@@ -78,7 +78,17 @@ export default function ItemDetailPage({ params }: { params: Promise<{ id: strin
 
           {item.images.length > 0 && (
             <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg text-sm text-green-800 dark:text-green-200">
-              ✓ {item.images.length} imagen(es) certificada(s) — hash SHA-256 + firma ECDSA registrada
+              <p className="font-semibold mb-2">
+                ✓ {item.images.length} imagen(es) certificada(s) — SHA-256 + firma ECDSA
+              </p>
+              <ul className="space-y-1">
+                {item.images.map((img) => (
+                  <li key={img.sha256} className="font-mono text-xs break-all">
+                    sha256: {img.sha256.slice(0, 24)}... · firma: {img.signature?.slice(0, 14)}...
+                    {img.cid ? ` · ipfs: ${img.cid}` : ''}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 

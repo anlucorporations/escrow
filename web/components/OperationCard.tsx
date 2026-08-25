@@ -5,6 +5,7 @@ import { useEthereum } from '@/lib/ethereum'
 import { useEscrow, useTokenInfo } from '@/lib/hooks'
 import { StatusBadge } from '@/components/StatusBadge'
 import { RateOperationModal } from '@/components/RateOperationModal'
+import { buildMetaComplete, relayRequest } from '@/lib/relay'
 import { Operation, OperationStatus, isExpired, formatUnits, getFriendlyError } from '@/lib/escrow'
 
 interface OperationCardProps {
@@ -14,7 +15,7 @@ interface OperationCardProps {
 
 export function OperationCard({ operation, onRefresh }: OperationCardProps) {
   const { account } = useEthereum()
-  const { completeOperation, cancelOperation, refundAfterExpiry, disputeOperation, resolveDispute, roles } =
+  const { provider, completeOperation, cancelOperation, refundAfterExpiry, disputeOperation, resolveDispute, roles } =
     useEscrow()
   const tokenA = useTokenInfo(operation.tokenA)
   const tokenB = useTokenInfo(operation.tokenB)
@@ -86,6 +87,13 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
   )
 
   const handleComplete = () => run(() => completeOperation(operation), 'Operación completada ✓')
+  const handleMetaComplete = () =>
+    run(async () => {
+      if (!provider) throw new Error('Connect your wallet first')
+      const signer = await provider.getSigner()
+      const req = await buildMetaComplete(signer, provider, operation.id, operation.tokenB, operation.amountB)
+      await relayRequest(req)
+    }, 'Operación completada sin gas (relayer) ✓')
   const handleCancel = () => run(() => cancelOperation(operation.id), 'Operación cancelada')
   const handleRefund = () =>
     run(() => refundAfterExpiry(operation.id), 'Fondos reclamados tras el vencimiento')
@@ -142,13 +150,23 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
       {/* Botones contextuales por actor + estado */}
       <div className="space-y-2">
         {canComplete && (
-          <button
-            onClick={handleComplete}
-            disabled={loading}
-            className="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-400 font-semibold transition-all duration-200"
-          >
-            {loading ? 'Procesando...' : 'Completar operación'}
-          </button>
+          <>
+            <button
+              onClick={handleComplete}
+              disabled={loading}
+              className="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-400 font-semibold transition-all duration-200"
+            >
+              {loading ? 'Procesando...' : 'Completar operación'}
+            </button>
+            {/* M5: completar sin gas vía relayer */}
+            <button
+              onClick={handleMetaComplete}
+              disabled={loading}
+              className="w-full px-4 py-2.5 bg-teal-500 text-white rounded-lg hover:bg-teal-600 disabled:from-gray-400 disabled:to-gray-400 font-semibold transition-all duration-200"
+            >
+              ⚡ Completar sin gas (firma + relayer)
+            </button>
+          </>
         )}
 
         {canCancel && (

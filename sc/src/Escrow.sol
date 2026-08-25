@@ -3,8 +3,10 @@ pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 /**
  * @title Escrow
@@ -46,6 +48,159 @@ contract Escrow is Ownable, ReentrancyGuard {
 
     /// Rol opcional que resuelve disputas. address(0) = arbitraje deshabilitado.
     address public arbiter;
+
+    // ------------------------------------------------- meta-transacciones
+    // M5: los particulares firman sus intenciones (EIP-712 + permit EIP-2612)
+    // y un relayer ejecuta la transacción asumiendo el gas. El usuario NO
+    // necesita pagar gas ni aprobar manualmente (permit incluido).
+
+    bytes32 internal constant _DOMAIN_TYPEHASH =
+        keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
+    bytes32 internal constant _CREATE_TYPEHASH = keccak256(
+        "MetaCreateOperation(address user,address tokenA,address tokenB,uint256 amountA,uint256 amountB,uint256 deadline,uint256 nonce)"
+    );
+    bytes32 internal constant _COMPLETE_TYPEHASH =
+        keccak256("MetaCompleteOperation(address user,uint256 operationId,uint256 nonce)");
+
+    /// Nonce EIP-712 por usuario (anti-replay de meta-transacciones).
+    mapping(address => uint256) public metaNonces;
+
+    function _domainSeparator() internal view returns (bytes32) {
+        return keccak256(
+            abi.encode(
+                _DOMAIN_TYPEHASH, keccak256(bytes("Escrow")), keccak256(bytes("1")), block.chainid, address(this)
+            )
+        );
+    }
+
+    function _verifyMetaSignature(bytes32 structHash, address user, bytes calldata signature) internal view {
+        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", _domainSeparator(), structHash));
+        address recovered = ECDSA.recover(digest, signature);
+        require(recovered == user, "Invalid signature");
+    }
+
+    /// @notice Crea una operación SIN gas para el usuario: el relayer (msg.sender)
+    ///         paga el gas. El usuario firma un permit EIP-2612 del tokenA y una
+    ///         intención EIP-712; ambas se incluyen en una sola transacción.
+    function metaCreateOperation(
+        address user,
+        address tokenA,
+        address tokenB,
+        uint256 amountA,
+        uint256 amountB,
+        uint256 deadline,
+        uint256 nonce,
+        bytes calldata signature,
+        uint256 permitDeadline,
+        uint8 permitV,
+        bytes32 permitR,
+        bytes32 permitS
+    ) external nonReentrant onlyAllowedToken(tokenA) onlyAllowedToken(tokenB) returns (uint256) {
+        _verifyCreateIntent(user, tokenA, tokenB, amountA, amountB, deadline, nonce, signature);
+        _applyPermit(tokenA, user, amountA, permitDeadline, permitV, permitR, permitS);
+        IERC20(tokenA).transferFrom(user, address(this), amountA);
+
+        return _createOperationRecord(user, tokenA, tokenB, amountA, amountB, deadline);
+    }
+
+    /// @notice Registra una operación nueva (struct, push, evento).
+    function _createOperationRecord(
+        address user,
+        address tokenA,
+        address tokenB,
+        uint256 amountA,
+        uint256 amountB,
+        uint256 deadline
+    ) internal returns (uint256) {
+        uint256 operationId = nextOperationId++;
+        operations[operationId] = Operation({
+            id: operationId,
+            user1: user,
+            tokenA: tokenA,
+            tokenB: tokenB,
+            amountA: amountA,
+            amountB: amountB,
+            status: Status.Active,
+            createdAt: block.timestamp,
+            deadline: deadline,
+            closedAt: 0
+        });
+
+        operationIds.push(operationId);
+
+        emit OperationCreated(operationId, user, tokenA, tokenB, amountA, amountB, deadline);
+        return operationId;
+    }
+
+    /// @notice Validación de la intención de crear (EIP-712 + nonce anti-replay).
+    function _verifyCreateIntent(
+        address user,
+        address tokenA,
+        address tokenB,
+        uint256 amountA,
+        uint256 amountB,
+        uint256 deadline,
+        uint256 nonce,
+        bytes calldata signature
+    ) internal {
+        require(metaNonces[user] == nonce, "Invalid nonce");
+        require(tokenA != tokenB, "Tokens must be different");
+        require(amountA > 0 && amountB > 0, "Amounts must be greater than 0");
+        require(deadline == 0 || deadline > block.timestamp, "Deadline must be in the future");
+
+        bytes32 structHash =
+            keccak256(abi.encode(_CREATE_TYPEHASH, user, tokenA, tokenB, amountA, amountB, deadline, nonce));
+        _verifyMetaSignature(structHash, user, signature);
+        metaNonces[user] = nonce + 1;
+    }
+
+    /// @notice Aplica una aprobación EIP-2612 (permit) sin que el usuario pague gas.
+    function _applyPermit(
+        address token,
+        address owner,
+        uint256 value,
+        uint256 permitDeadline,
+        uint8 permitV,
+        bytes32 permitR,
+        bytes32 permitS
+    ) internal {
+        IERC20Permit(token).permit(owner, address(this), value, permitDeadline, permitV, permitR, permitS);
+    }
+
+    /// @notice Completa una operación SIN gas para el usuario: el relayer paga
+    ///         el gas; el usuario firma permit del tokenB + intención EIP-712.
+    function metaCompleteOperation(
+        address user,
+        uint256 operationId,
+        uint256 nonce,
+        bytes calldata signature,
+        uint256 permitDeadline,
+        uint8 permitV,
+        bytes32 permitR,
+        bytes32 permitS
+    ) external nonReentrant {
+        Operation storage operation = operations[operationId];
+        require(operation.id != 0, "Operation does not exist");
+        require(operation.status == Status.Active, "Operation is not active");
+        require(operation.user1 != user, "Cannot complete your own operation");
+        require(operation.deadline == 0 || block.timestamp <= operation.deadline, "Operation expired");
+        require(metaNonces[user] == nonce, "Invalid nonce");
+
+        bytes32 structHash = keccak256(abi.encode(_COMPLETE_TYPEHASH, user, operationId, nonce));
+        _verifyMetaSignature(structHash, user, signature);
+        metaNonces[user] = nonce + 1;
+
+        _applyPermit(operation.tokenB, user, operation.amountB, permitDeadline, permitV, permitR, permitS);
+        IERC20(operation.tokenB).transferFrom(user, operation.user1, operation.amountB);
+        IERC20(operation.tokenA).transfer(user, operation.amountA);
+
+        operation.status = Status.Completed;
+        operation.closedAt = block.timestamp;
+
+        emit OperationCompleted(operationId, user, operation.amountA, operation.amountB, block.timestamp);
+    }
+
+    // ------------------------------------------------------------ queries
 
     event TokenAdded(address indexed token);
     event ArbiterSet(address indexed arbiter);
@@ -139,24 +294,7 @@ contract Escrow is Ownable, ReentrancyGuard {
 
         IERC20(tokenA).transferFrom(msg.sender, address(this), amountA);
 
-        uint256 operationId = nextOperationId++;
-        operations[operationId] = Operation({
-            id: operationId,
-            user1: msg.sender,
-            tokenA: tokenA,
-            tokenB: tokenB,
-            amountA: amountA,
-            amountB: amountB,
-            status: Status.Active,
-            createdAt: block.timestamp,
-            deadline: deadline,
-            closedAt: 0
-        });
-
-        operationIds.push(operationId);
-
-        emit OperationCreated(operationId, msg.sender, tokenA, tokenB, amountA, amountB, deadline);
-        return operationId;
+        return _createOperationRecord(msg.sender, tokenA, tokenB, amountA, amountB, deadline);
     }
 
     /// @notice User2 deposita amountB de tokenB y recibe al instante amountA

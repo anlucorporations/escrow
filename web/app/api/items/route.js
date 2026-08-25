@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
-import { initSchema } from '../../../server/db'
-import { createItem, listItems, verifySignature, itemPayload } from '../../../server/lib'
+import { initSchema } from '../../../server/db.js'
+import { createItem, listItems, verifySignature, verifyImageSignatures, itemPayload } from '../../../server/lib.js'
 
 /**
- * Catálogo de artículos (M2).
+ * Catálogo de artículos (M2) + certificación de imágenes (M8).
  * GET  /api/items?category=&owner=&q=&limit=&offset=  — listado público
- * POST /api/items  — crear artículo (body firmado por la wallet propietaria)
+ * POST /api/items  — crear artículo (payload e imágenes firmados por la wallet)
  */
 export async function GET(request) {
   try {
@@ -40,7 +40,10 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Firma inválida: el payload no fue firmado por la wallet propietaria' }, { status: 401 })
     }
 
-    const item = await createItem({ owner, title, description, category, quantity, images: images || [], signature })
+    // M8: cada imagen debe estar certificada (hash SHA-256 + firma de la wallet)
+    const certifiedImages = verifyImageSignatures(images, owner)
+
+    const item = await createItem({ owner, title, description, category, quantity, images: certifiedImages, signature })
     return NextResponse.json({ item }, { status: 201 })
   } catch (err) {
     return NextResponse.json({ error: err.message || 'Error al crear artículo' }, { status: 400 })

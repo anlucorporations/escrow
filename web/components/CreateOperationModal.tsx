@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useEscrow, useAllowedTokens, useTokenInfo } from '@/lib/hooks'
 import { getFriendlyError, parseUnits } from '@/lib/escrow'
+import { buildMetaCreate, relayRequest } from '@/lib/relay'
 
 interface CreateOperationModalProps {
   isOpen: boolean
@@ -16,11 +17,13 @@ export function CreateOperationModal({ isOpen, onClose }: CreateOperationModalPr
   const [amountB, setAmountB] = useState('')
   const [deadlineDays, setDeadlineDays] = useState('0')
   const [kind, setKind] = useState<'SWAP' | 'PAGO'>('SWAP')
+  const [metaTx, setMetaTx] = useState(false)
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [txHash, setTxHash] = useState('')
   const [error, setError] = useState('')
 
-  const { isConnected, createOperation } = useEscrow()
+  const { isConnected, provider, createOperation } = useEscrow()
   const { tokens } = useAllowedTokens()
   const infoA = useTokenInfo(tokenA || null)
   const infoB = useTokenInfo(tokenB || null)
@@ -37,19 +40,37 @@ export function CreateOperationModal({ isOpen, onClose }: CreateOperationModalPr
 
     setLoading(true)
     setError('')
+    setTxHash('')
 
     try {
       const days = parseInt(deadlineDays || '0', 10)
       const deadline =
         days > 0 ? BigInt(Math.floor(Date.now() / 1000) + days * 86400) : 0n
+      const amountAUnits = parseUnits(amountA, infoA.info?.decimals ?? 18)
+      const amountBUnits = parseUnits(amountB, infoB.info?.decimals ?? 18)
 
-      await createOperation({
-        tokenA,
-        tokenB,
-        amountA: parseUnits(amountA, infoA.info?.decimals ?? 18),
-        amountB: parseUnits(amountB, infoB.info?.decimals ?? 18),
-        deadline,
-      })
+      if (metaTx) {
+        // M5: sin gas — el usuario solo firma (EIP-712 + permit); el relayer paga
+        if (!provider) throw new Error('Connect your wallet first')
+        const signer = await provider.getSigner()
+        const req = await buildMetaCreate(signer, provider, {
+          tokenA,
+          tokenB,
+          amountA: amountAUnits,
+          amountB: amountBUnits,
+          deadline,
+        })
+        const res = await relayRequest(req)
+        setTxHash(res.txHash)
+      } else {
+        await createOperation({
+          tokenA,
+          tokenB,
+          amountA: amountAUnits,
+          amountB: amountBUnits,
+          deadline,
+        })
+      }
 
       setSuccess(true)
       setTimeout(() => {
@@ -59,8 +80,9 @@ export function CreateOperationModal({ isOpen, onClose }: CreateOperationModalPr
         setAmountB('')
         setDeadlineDays('0')
         setSuccess(false)
+        setTxHash('')
         onClose() // el padre re-fetcha los datos (sin recargar la página)
-      }, 1500)
+      }, 2000)
     } catch (err) {
       setError(getFriendlyError(err))
     } finally {
@@ -129,6 +151,24 @@ export function CreateOperationModal({ isOpen, onClose }: CreateOperationModalPr
                   {kind === 'SWAP'
                     ? 'Intercambio directo tokenA ↔ tokenB.'
                     : 'tokenA = pago (ej. USDT), tokenB = recibo de entrega. Ideal con deadline y arbitraje.'}
+                </p>
+              </div>
+
+              {/* M5: meta-transacción sin gas */}
+              <div className="p-3 bg-gray-50 dark:bg-zinc-800 rounded-lg">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={metaTx}
+                    onChange={(e) => setMetaTx(e.target.checked)}
+                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                    ⚡ Sin gas (meta-transacción)
+                  </span>
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Solo firmas (EIP-712 + permit); el relayer paga el gas por ti.
                 </p>
               </div>
 
@@ -221,12 +261,21 @@ export function CreateOperationModal({ isOpen, onClose }: CreateOperationModalPr
                 disabled={loading}
                 className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-400 font-semibold transition-all duration-200"
               >
-                {loading ? 'Creando (approve + tx)...' : 'Crear operación'}
+                {loading
+                  ? metaTx
+                    ? 'Firmando y enviando al relayer...'
+                    : 'Creando (approve + tx)...'
+                  : metaTx
+                    ? '⚡ Crear sin gas'
+                    : 'Crear operación'}
               </button>
 
               {success && (
                 <div className="p-3 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-lg text-sm">
                   Operación creada correctamente.
+                  {txHash && (
+                    <span className="block font-mono text-xs mt-1 break-all">tx: {txHash}</span>
+                  )}
                 </div>
               )}
 
