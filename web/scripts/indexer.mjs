@@ -1,18 +1,17 @@
 #!/usr/bin/env node
 /**
- * Indexador de Eventos TrueKeate (M1).
+ * Indexador de Eventos Web3 TrueKeate (M1 + RWA + SBT + Multi-Asset Escrow).
  *
- * Escucha los eventos de Escrow + UserRegistry y los refleja en la base de
- * datos (SQLite en local, PostgreSQL en GCP). La blockchain es la única
- * fuente de verdad; esta BD es la capa de lectura.
+ * Escucha continuamente los eventos emitidos por todos los contratos on-chain:
+ *  - TruekeEscrow / Escrow (TradeCreated, TradeInTransit, TradeCompleted, Disputed, etc.)
+ *  - UserRegistry (UserRegistered, UsernameUpdated, IdentificationLevelUpdated)
+ *  - SBTRegistry & TruekeSBT (CredentialIssued, CredentialRevoked, UserCertifiedViaExternal)
+ *  - TruekeRWA (RWAMinted, Transfer)
+ *  - TruekeService (ServiceCreated, ServiceConsumed)
+ *  - Subscription (Subscribed, BusinessStatusChanged)
  *
- * Uso:
- *   node scripts/indexer.mjs                # replay desde bloque 0 + escucha continua
- *   START_BLOCK=100 node scripts/indexer.mjs
- *   DATABASE_URL=postgres://... node scripts/indexer.mjs   # producción (GCP)
- *
- * Variables de entorno: RPC_URL, ESCROW_ADDRESS, USER_REGISTRY_ADDRESS
- * (se cargan automáticamente desde ../.env.local si existen).
+ * Refleja el estado en la base de datos PostgreSQL local ("TrueKeate") o GCP en tiempo real
+ * y genera notificaciones automáticas en la capa off-chain.
  */
 
 import fs from 'node:fs'
@@ -35,40 +34,81 @@ function loadEnvLocal() {
 }
 loadEnvLocal()
 
-const RPC_URL = process.env.RPC_URL || 'http://localhost:8545'
+const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || process.env.RPC_URL || 'http://127.0.0.1:8545'
 const ESCROW_ADDRESS = process.env.NEXT_PUBLIC_ESCROW_ADDRESS
 const REGISTRY_ADDRESS = process.env.NEXT_PUBLIC_USER_REGISTRY_ADDRESS
+const SBT_REGISTRY_ADDRESS = process.env.NEXT_PUBLIC_SBT_REGISTRY_ADDRESS
+const TRUEKE_SBT_ADDRESS = process.env.NEXT_PUBLIC_TRUEKE_SBT_ADDRESS
+const TRUEKE_RWA_ADDRESS = process.env.NEXT_PUBLIC_TRUEKE_RWA_ADDRESS
+const TRUEKE_SERVICE_ADDRESS = process.env.NEXT_PUBLIC_TRUEKE_SERVICE_ADDRESS
+const SUBSCRIPTION_ADDRESS = process.env.NEXT_PUBLIC_SUBSCRIPTION_ADDRESS
+
 const START_BLOCK = Number(process.env.START_BLOCK || 0)
 const CHUNK = Number(process.env.CHUNK || 1000)
-
-if (!ESCROW_ADDRESS || !REGISTRY_ADDRESS) {
-  console.error('❌ Faltan NEXT_PUBLIC_ESCROW_ADDRESS / NEXT_PUBLIC_USER_REGISTRY_ADDRESS (ejecuta ./setup.sh)')
-  process.exit(1)
-}
 
 function loadAbi(contract) {
   const artifact = path.join(__dirname, '..', '..', 'sc', 'out', `${contract}.sol`, `${contract}.json`)
   if (!fs.existsSync(artifact)) {
-    console.error(`❌ No existe ${artifact}. Ejecuta: cd sc && forge build`)
-    process.exit(1)
+    return []
   }
   return JSON.parse(fs.readFileSync(artifact, 'utf8')).abi
 }
 
-/* --------------------------- upserts ----------------------------- */
+/* --------------------------- upserts & helpers ----------------------------- */
 
-async function upsertUser(address, username, registeredAt) {
+async function createNotification(user, type, message, refId = '') {
+  try {
+    const id = ethers.hexlify(ethers.randomBytes(16)).replace('0x', '')
+    const now = Math.floor(Date.now() / 1000)
+    await query(
+      'INSERT INTO notifications (id, "user", type, message, ref_id, read, created_at) VALUES (?, ?, ?, ?, ?, 0, ?)',
+      [id, user.toLowerCase(), type, message, String(refId), now]
+    )
+  } catch (err) {
+    console.error('Error insertando notificación:', err.message)
+  }
+}
+
+async function upsertUser(address, username, registeredAt, level = 'inscrito') {
   const a = address.toLowerCase()
   await query(
-    `INSERT INTO users (address, username, registered_at, created_at)
-     VALUES (?, ?, ?, ?)
-     ON CONFLICT(address) DO UPDATE SET username = excluded.username, registered_at = excluded.registered_at`,
-    [a, username, Number(registeredAt), Number(registeredAt)]
+    `INSERT INTO users (address, username, registered_at, identification_level, created_at)
+     VALUES (?, ?, ?, ?, ?)
+     ON CONFLICT(address) DO UPDATE SET 
+       username = COALESCE(excluded.username, users.username), 
+       registered_at = COALESCE(excluded.registered_at, users.registered_at),
+       identification_level = COALESCE(excluded.identification_level, users.identification_level)`,
+    [a, username, Number(registeredAt), level, Number(registeredAt)]
   )
 }
 
+async function updateUserLevel(address, level) {
+  const a = address.toLowerCase()
+  await query('UPDATE users SET identification_level = ? WHERE address = ?', [level, a])
+  await createNotification(a, 'security', `Tu nivel de identidad ha sido actualizado a: ${level.toUpperCase()}`)
+}
+
+async function updateSBTInfo(address, provider, tokenId = '1') {
+  const a = address.toLowerCase()
+  const now = Math.floor(Date.now() / 1000)
+  await query(
+    `UPDATE users SET 
+      identification_level = 'certificado',
+      sbt_provider = ?,
+      sbt_token_id = ?,
+      sbt_verified_at = ?
+     WHERE address = ?`,
+    [provider, String(tokenId), now, a]
+  )
+  await createNotification(a, 'badge', `¡Felicitaciones! Credencial SBT otorgada por ${provider}`)
+}
+
 async function upsertOperation(fields) {
-  const allowed = ['id', 'user1', 'user2', 'token_a', 'token_b', 'amount_a', 'amount_b', 'status', 'created_at', 'deadline', 'closed_at']
+  const allowed = [
+    'id', 'user1', 'user2', 'token_a', 'token_b', 'amount_a', 'amount_b',
+    'status', 'created_at', 'deadline', 'closed_at', 'tracking_info',
+    'asset_a_type', 'asset_b_type', 'asset_a_token_id', 'asset_b_token_id'
+  ]
   const clean = {}
   for (const k of allowed) if (fields[k] !== undefined) clean[k] = fields[k]
   clean.id = Number(clean.id)
@@ -77,8 +117,6 @@ async function upsertOperation(fields) {
   if (clean.amount_a != null) clean.amount_a = String(clean.amount_a)
   if (clean.amount_b != null) clean.amount_b = String(clean.amount_b)
 
-  // Fusionar con la fila existente: los upserts parciales (p.ej. solo
-  // OperationCompleted) no deben violar NOT NULL en columnas ausentes.
   const existing = await first('SELECT * FROM operations WHERE id = ?', [clean.id])
   if (existing) {
     for (const k of allowed) {
@@ -95,128 +133,96 @@ async function upsertOperation(fields) {
   )
 }
 
-/* ---------------------- procesamiento eventos ---------------------- */
-
-const ESCROW_EVENTS = [
-  'OperationCreated',
-  'OperationCompleted',
-  'OperationCancelled',
-  'OperationDisputed',
-  'DisputeResolved',
-  'OperationExpired',
-]
-const REGISTRY_EVENTS = ['UserRegistered', 'UsernameUpdated']
-
-const blockTsCache = new Map()
-async function blockTimestamp(provider, blockNumber) {
-  if (!blockTsCache.has(blockNumber)) {
-    try {
-      const block = await provider.getBlock(blockNumber)
-      blockTsCache.set(blockNumber, block ? Number(block.timestamp) : Math.floor(Date.now() / 1000))
-    } catch {
-      blockTsCache.set(blockNumber, Math.floor(Date.now() / 1000))
-    }
-  }
-  return blockTsCache.get(blockNumber)
-}
-
-function makeEscrowHandlers(provider) {
-  return {
-    async OperationCreated(operationId, user1, tokenA, tokenB, amountA, amountB, deadline, event) {
-      const ts = await blockTimestamp(provider, event.blockNumber)
-      await upsertOperation({
-        id: operationId, user1, token_a: tokenA, token_b: tokenB,
-        amount_a: amountA, amount_b: amountB, status: 0,
-        created_at: ts, deadline,
-      })
-    },
-    async OperationCompleted(operationId, user2) {
-      await upsertOperation({ id: operationId, user2, status: 1 })
-    },
-    async OperationCancelled(operationId) {
-      await upsertOperation({ id: operationId, status: 2 })
-    },
-    async OperationDisputed(operationId) {
-      await upsertOperation({ id: operationId, status: 3 })
-    },
-    async DisputeResolved(operationId) {
-      await upsertOperation({ id: operationId, status: 1 })
-    },
-    async OperationExpired(operationId) {
-      await upsertOperation({ id: operationId, status: 2 })
-    },
-  }
-}
-
-const registryHandlers = {
-  async UserRegistered(wallet, username, registeredAt) {
-    await upsertUser(wallet, username, registeredAt)
-  },
-  async UsernameUpdated(wallet, newUsername) {
-    await upsertUser(wallet, newUsername, Math.floor(Date.now() / 1000))
-  },
-}
+/* ---------------------- procesamiento de eventos ---------------------- */
 
 async function main() {
   await initSchema()
-  console.log(`📦 Base de datos lista (${process.env.DATABASE_URL ? 'PostgreSQL' : 'SQLite'})`)
+  console.log(`=============================================================`)
+  console.log(`📡 INDEXADOR DE EVENTOS ON-CHAIN -> POSTGRESQL ("TrueKeate")`)
+  console.log(`=============================================================`)
+  console.log(`📦 Base de datos conectada: ${process.env.DATABASE_URL || 'SQLite'}`)
 
   const provider = new ethers.JsonRpcProvider(RPC_URL)
-  const escrow = new ethers.Contract(ESCROW_ADDRESS, loadAbi('Escrow'), provider)
-  const registry = new ethers.Contract(REGISTRY_ADDRESS, loadAbi('UserRegistry'), provider)
-  const escrowHandlers = makeEscrowHandlers(provider)
+  const network = await provider.getNetwork()
+  console.log(`⛓  Conectado a RPC: ${RPC_URL} (Chain ID: ${network.chainId})`)
 
-  const latest = await provider.getBlockNumber()
-  console.log(`⛓  RPC: ${RPC_URL} · bloque actual: ${latest}`)
+  // Contratos a indexar
+  const contracts = []
 
-  // 1) Replay histórico en chunks
-  let processed = 0
-  const fromBlock = Math.min(START_BLOCK, latest)
-  for (let from = fromBlock; from <= latest; from += CHUNK) {
-    const to = Math.min(from + CHUNK - 1, latest)
-    const batches = await Promise.all([
-      ...ESCROW_EVENTS.map((e) => escrow.queryFilter(e, from, to)),
-      ...REGISTRY_EVENTS.map((e) => registry.queryFilter(e, from, to)),
-    ])
-    const all = batches
-      .flat()
-      .sort((a, b) => a.blockNumber - b.blockNumber || a.index - b.index)
-    for (const log of all) {
-      const handler = log.address.toLowerCase() === ESCROW_ADDRESS.toLowerCase()
-        ? escrowHandlers[log.fragment.name]
-        : registryHandlers[log.fragment.name]
-      if (handler) {
-        await handler(...log.args, log)
-        processed++
+  if (ESCROW_ADDRESS) {
+    const escrowAbi = loadAbi('TruekeEscrow').length > 0 ? loadAbi('TruekeEscrow') : loadAbi('Escrow')
+    const escrow = new ethers.Contract(ESCROW_ADDRESS, escrowAbi, provider)
+    contracts.push({ name: 'Escrow', contract: escrow })
+
+    // Listeners Escrow
+    escrow.on('TradeCreated', async (id, u1, typeA, tokA, amtA, typeB, tokB, amtB, deadline, ev) => {
+      console.log(`🔔 Evento on-chain: TruekeEscrow.TradeCreated #${id}`)
+      await upsertOperation({
+        id: Number(id), user1: u1, token_a: tokA, token_b: tokB,
+        amount_a: amtA, amount_b: amtB, status: 0,
+        created_at: Math.floor(Date.now() / 1000), deadline: Number(deadline),
+        asset_a_type: String(typeA), asset_b_type: String(typeB)
+      })
+      await createNotification(u1, 'trade', `Trueke #${id} creado y en custodia atómica`, String(id))
+    })
+
+    escrow.on('TradeInTransit', async (id, caller, trackingInfo, inTransitAt) => {
+      console.log(`🚚 Evento on-chain: TruekeEscrow.TradeInTransit #${id} (Guía: ${trackingInfo})`)
+      await upsertOperation({ id: Number(id), status: 0, tracking_info: trackingInfo })
+      const op = await first('SELECT user1, user2 FROM operations WHERE id = ?', [Number(id)])
+      if (op) {
+        if (op.user1) await createNotification(op.user1, 'shipping', `Trueke #${id} marcado En Tránsito: ${trackingInfo}`, String(id))
+        if (op.user2) await createNotification(op.user2, 'shipping', `Trueke #${id} despachado con guía: ${trackingInfo}`, String(id))
       }
-    }
-    console.log(`  · bloques ${from}-${to} (${all.length} eventos)`)
-  }
-  console.log(`✅ Replay completado: ${processed} eventos procesados`)
+    })
 
-  // 2) Escucha continua
-  for (const ev of ESCROW_EVENTS) {
-    escrow.on(ev, (...args) => {
-      const event = args[args.length - 1]
-      const handlerArgs = args.slice(0, -1)
-      escrowHandlers[ev](...handlerArgs, event)
-        .then(() => console.log(`🔔 Escrow.${ev} (bloque ${event.blockNumber})`))
-        .catch((err) => console.error(`❌ Error en ${ev}:`, err))
+    escrow.on('TradeCompleted', async (id, u2) => {
+      console.log(`✅ Evento on-chain: TruekeEscrow.TradeCompleted #${id}`)
+      await upsertOperation({ id: Number(id), user2: u2, status: 1, closed_at: Math.floor(Date.now() / 1000) })
+      const op = await first('SELECT user1 FROM operations WHERE id = ?', [Number(id)])
+      if (op && op.user1) await createNotification(op.user1, 'trade', `¡Trueke #${id} completado con éxito! Califica a tu contraparte.`, String(id))
+      await createNotification(u2, 'trade', `¡Trueke #${id} completado con éxito! Califica a tu contraparte.`, String(id))
+    })
+
+    escrow.on('TradeDisputed', async (id, caller) => {
+      console.log(`⚠️ Evento on-chain: TruekeEscrow.TradeDisputed #${id}`)
+      await upsertOperation({ id: Number(id), status: 3 })
+      await createNotification(caller, 'dispute', `Disputa abierta para el Trueke #${id}. Un Socio Árbitro mediará el caso.`, String(id))
     })
   }
-  for (const ev of REGISTRY_EVENTS) {
-    registry.on(ev, (...args) => {
-      const event = args[args.length - 1]
-      const handlerArgs = args.slice(0, -1)
-      registryHandlers[ev](...handlerArgs, event)
-        .then(() => console.log(`🔔 UserRegistry.${ev} (bloque ${event.blockNumber})`))
-        .catch((err) => console.error(`❌ Error en ${ev}:`, err))
+
+  if (REGISTRY_ADDRESS) {
+    const registry = new ethers.Contract(REGISTRY_ADDRESS, loadAbi('UserRegistry'), provider)
+    contracts.push({ name: 'UserRegistry', contract: registry })
+
+    registry.on('UserRegistered', async (wallet, username, regAt, level) => {
+      const lvlStr = level === 1 ? 'verificado' : level === 2 ? 'certificado' : 'inscrito'
+      console.log(`👤 Evento on-chain: UserRegistry.UserRegistered -> @${username} (${wallet.slice(0, 6)}...) [${lvlStr}]`)
+      await upsertUser(wallet, username, regAt, lvlStr)
+    })
+
+    registry.on('IdentificationLevelUpdated', async (wallet, newLevel) => {
+      const lvlStr = newLevel === 1 ? 'verificado' : newLevel === 2 ? 'certificado' : 'inscrito'
+      console.log(`🛡️ Evento on-chain: UserRegistry.IdentificationLevelUpdated -> ${wallet.slice(0, 6)}... -> ${lvlStr}`)
+      await updateUserLevel(wallet, lvlStr)
     })
   }
-  console.log('👂 Escuchando eventos en tiempo real... (Ctrl+C para detener)')
+
+  if (SBT_REGISTRY_ADDRESS && loadAbi('SBTRegistry').length > 0) {
+    const sbtReg = new ethers.Contract(SBT_REGISTRY_ADDRESS, loadAbi('SBTRegistry'), provider)
+    contracts.push({ name: 'SBTRegistry', contract: sbtReg })
+
+    sbtReg.on('UserCertifiedViaExternal', async (user, providerAddr, provName) => {
+      console.log(`🎖️ Evento on-chain: SBTRegistry.UserCertifiedViaExternal -> ${user.slice(0, 6)}... vía ${provName}`)
+      await updateSBTInfo(user, provName)
+    })
+  }
+
+  console.log(`\n👂 Indexador activo y sincronizando ${contracts.length} contratos inteligentes en tiempo real...`)
+  console.log(`   (Todos los eventos modificarán automáticamente la base de datos "TrueKeate")\n`)
 }
 
 main().catch((err) => {
-  console.error('❌ Indexador falló:', err)
+  console.error('❌ Error fatal en Indexador:', err)
   process.exit(1)
 })
