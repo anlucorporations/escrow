@@ -78,7 +78,7 @@ export function useEscrow() {
   }, [contract, account])
 
   const getSigner = useCallback(async () => {
-    if (!provider) throw new Error('Connect your wallet first')
+    if (!provider) throw new Error('Conecta tu billetera primero')
     return provider.getSigner()
   }, [provider])
 

@@ -55,10 +55,10 @@ export default function BalancesPage() {
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center py-20">
             <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
-              Conecta tu wallet
+              Conecta tu billetera
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-400">
-              Conecta tu wallet para ver tus balances
+              Conecta tu billetera para consultar tus balances de tokens y activos
             </p>
           </div>
         </div>

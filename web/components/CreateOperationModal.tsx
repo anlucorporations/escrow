@@ -51,7 +51,7 @@ export function CreateOperationModal({ isOpen, onClose }: CreateOperationModalPr
 
       if (metaTx) {
         // M5: sin gas — el usuario solo firma (EIP-712 + permit); el relayer paga
-        if (!provider) throw new Error('Connect your wallet first')
+        if (!provider) throw new Error('Conecta tu billetera primero')
         const signer = await provider.getSigner()
         const req = await buildMetaCreate(signer, provider, {
           tokenA,

@@ -37,8 +37,8 @@ describe('parseUnits', () => {
   })
 
   it('lanza error con input inválido', () => {
-    expect(() => parseUnits('abc', 18)).toThrow('Invalid amount')
-    expect(() => parseUnits('', 18)).toThrow('Invalid amount')
+    expect(() => parseUnits('abc', 18)).toThrow('Monto inválido')
+    expect(() => parseUnits('', 18)).toThrow('Monto inválido')
   })
 })
 

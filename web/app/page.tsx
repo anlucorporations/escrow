@@ -38,15 +38,15 @@ export default function VelvetyLandingPage() {
           <div className="absolute top-[20%] -left-[10%] w-[400px] h-[400px] rounded-full bg-purple-50/80 blur-3xl mix-blend-multiply"></div>
         </div>
 
-        <span className="text-xs tracking-[0.2em] uppercase text-slate-500 mb-6 font-medium">Elevate Your Trade</span>
+        <span className="text-xs tracking-[0.2em] uppercase text-slate-500 mb-6 font-medium">Eleva tus Intercambios</span>
         
         <h1 className="text-5xl md:text-7xl font-serif text-slate-900 mb-8 max-w-4xl leading-tight">
-          The art of mindful <br className="hidden md:block"/> 
-          <span className="italic text-indigo-600">digital exchange.</span>
+          El arte del intercambio <br className="hidden md:block"/> 
+          <span className="italic text-indigo-600">digital y consciente.</span>
         </h1>
         
         <p className="max-w-2xl text-lg text-slate-600 mb-12 font-light leading-relaxed">
-          Experience a refined peer-to-peer escrow platform. Secure your assets with elegant smart contracts, designed for transparency and peace of mind.
+          Descubre una plataforma de custodia e intercambio entre pares de alta fidelidad. Protege tus activos y bienes con contratos inteligentes elegantes, diseñados para garantizar máxima transparencia y tranquilidad.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-6 items-center">
@@ -54,13 +54,13 @@ export default function VelvetyLandingPage() {
             onClick={handleCta}
             className="px-10 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-full text-sm tracking-wide uppercase transition-all shadow-xl shadow-slate-900/10"
           >
-            {isConnected ? (isRegistered ? 'Enter Suite' : 'Register Wallet') : 'Connect Wallet'}
+            {isConnected ? (isRegistered ? 'Entrar a la Suite' : 'Registrar Billetera') : 'Conectar Billetera'}
           </button>
           <Link 
             href="/items" 
             className="px-10 py-4 bg-transparent border border-slate-300 hover:border-slate-400 text-slate-900 rounded-full text-sm tracking-wide uppercase transition-all"
           >
-            Explore Collection
+            Explorar Catálogo
           </Link>
         </div>
       </section>
@@ -69,25 +69,25 @@ export default function VelvetyLandingPage() {
       <section className="py-24 bg-white border-y border-slate-100">
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="text-center mb-20">
-            <h2 className="text-3xl md:text-5xl font-serif text-slate-900 mb-4">A curated experience</h2>
-            <p className="text-slate-500 font-light max-w-lg mx-auto">Discover the principles that make our escrow protocol naturally secure and effortlessly beautiful.</p>
+            <h2 className="text-3xl md:text-5xl font-serif text-slate-900 mb-4">Los Tres Pilares de Confianza</h2>
+            <p className="text-slate-500 font-light max-w-lg mx-auto">Descubre los principios que hacen que nuestro protocolo de custodia sea naturalmente seguro, transparente y fácil de usar.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-12">
             {[
               {
-                title: 'Bilateral Custody',
-                desc: 'Your assets are held in a secure, decentralized vault until both parties fulfill their commitments. Absolute harmony.',
+                title: 'Custodia Bilateral',
+                desc: 'Tus activos y tokens quedan resguardados en bóvedas criptográficas inteligentes hasta que ambas partes validan y cumplen sus compromisos.',
                 color: 'bg-indigo-50'
               },
               {
-                title: 'Seamless Resolution',
-                desc: 'In the rare event of a disagreement, our governance partners provide swift, objective arbitration to restore balance.',
+                title: 'Resolución Imparcial',
+                desc: 'En el improbable caso de una discrepancia, socios árbitros designados por la gobernanza aplican mediación justa y objetiva on-chain.',
                 color: 'bg-purple-50'
               },
               {
-                title: 'Timeless Security',
-                desc: 'Built on immutable blockchain architecture. No hidden fees, no intermediaries. Just pure, transparent trade.',
+                title: 'Seguridad Inmutable',
+                desc: 'Construido sobre arquitectura blockchain sin intermediarios ocultos. Trueke transparente con trazabilidad total y sin comisiones abusivas.',
                 color: 'bg-[#F2F5ED]' // Soft sage hint
               }
             ].map((pillar, i) => (
@@ -118,18 +118,18 @@ export default function VelvetyLandingPage() {
               </div>
             </div>
             <div className="flex-1">
-              <span className="text-xs tracking-[0.2em] uppercase text-indigo-600 mb-4 block font-medium">The Marketplace</span>
+              <span className="text-xs tracking-[0.2em] uppercase text-indigo-600 mb-4 block font-medium">El Mercado Descentralizado</span>
               <h2 className="text-4xl md:text-5xl font-serif text-slate-900 mb-6 leading-tight">
-                Curated goods <br/>& premium services
+                Bienes RWA certificados <br/>& servicios profesionales
               </h2>
               <p className="text-lg text-slate-600 mb-8 font-light leading-relaxed">
-                Whether you are trading digital tokens, physical goods, or offering professional services, our catalog connects you with a community of verified merchants and users.
+                Ya sea que intercambies tokens digitales, bienes físicos con compromiso inmutable SHA-256 o vouchers de servicios, nuestro catálogo te conecta con una comunidad de comerciantes y usuarios verificados.
               </p>
               <ul className="space-y-4 mb-10">
                 {[
-                  'Verified merchant profiles with reputation scores.',
-                  'Gasless meta-transactions for effortless trading.',
-                  'Automated escrow deadlines and refunds.'
+                  'Perfiles de comerciantes con nivel de reputación y avales comunitarios.',
+                  'Meta-transacciones sin gas para operar sin complicaciones.',
+                  'Plazos de custodia automáticos y reembolsos garantizados tras vencimiento.'
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3 text-slate-700 font-light">
                     <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-2.5"></div>
@@ -141,7 +141,7 @@ export default function VelvetyLandingPage() {
                 href="/items" 
                 className="inline-flex items-center gap-2 text-indigo-700 font-medium hover:text-indigo-900 transition-colors border-b border-indigo-200 pb-1"
               >
-                Browse the catalog
+                Explorar el catálogo
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
@@ -154,15 +154,15 @@ export default function VelvetyLandingPage() {
       {/* BANNER CTA */}
       <section className="py-32 bg-slate-900 text-white text-center px-4">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-4xl md:text-6xl font-serif mb-8 text-indigo-50">Ready to begin?</h2>
+          <h2 className="text-4xl md:text-6xl font-serif mb-8 text-indigo-50">¿Listo para comenzar?</h2>
           <p className="text-xl text-slate-400 mb-12 font-light">
-            Join the decentralized economy today. Connect your wallet and discover a new standard of trust.
+            Únete a la nueva economía descentralizada hoy mismo. Conecta tu billetera y descubre un nuevo estándar de confianza en el comercio entre pares.
           </p>
           <button 
             onClick={handleCta}
             className="px-12 py-5 bg-indigo-50 hover:bg-white text-slate-900 rounded-full tracking-wide uppercase text-sm font-medium transition-all hover:scale-105"
           >
-            Start your journey
+            Iniciar Experiencia
           </button>
         </div>
       </section>
@@ -171,7 +171,7 @@ export default function VelvetyLandingPage() {
       <footer className="bg-background py-16 border-t border-slate-200 text-center">
         <h3 className="text-2xl font-serif text-slate-900 mb-4 italic">TrueKeate</h3>
         <p className="text-slate-500 font-light text-sm">
-          &copy; {new Date().getFullYear()} TrueKeate Protocol. The beauty of trustless trade.
+          &copy; {new Date().getFullYear()} Protocolo TrueKeate. El arte del intercambio y la confianza en Web3.
         </p>
       </footer>
     </div>

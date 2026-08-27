@@ -85,7 +85,7 @@ export function formatUnits(amount: bigint, decimals: number): string {
 /** Convierte un input decimal del usuario a unidades crudas (con decimals del token). */
 export function parseUnits(input: string, decimals: number): bigint {
   const cleaned = input.trim()
-  if (!cleaned || Number.isNaN(Number(cleaned))) throw new Error('Invalid amount')
+  if (!cleaned || Number.isNaN(Number(cleaned))) throw new Error('Monto inválido')
   const [intPart = '0', fracPart = ''] = cleaned.split('.')
   const frac = (fracPart + '0'.repeat(decimals)).slice(0, decimals)
   return BigInt(intPart) * 10n ** BigInt(decimals) + BigInt(frac || '0')

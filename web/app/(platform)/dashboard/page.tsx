@@ -1,11 +1,12 @@
 'use client'
 
-import { useUserRole } from '@/lib/hooks'
+import { useUserRole, useRegistration } from '@/lib/hooks'
 import { useEthereum } from '@/lib/ethereum'
 import Link from 'next/link'
 
 export default function DashboardPage() {
   const { account, isConnected, connect } = useEthereum()
+  const { username, isRegistered } = useRegistration()
   const role = useUserRole()
 
   if (!isConnected) {
@@ -35,9 +36,9 @@ export default function DashboardPage() {
         {/* WELCOME HEADER */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 pb-8 border-b border-slate-200">
           <div>
-            <span className="text-xs tracking-[0.2em] uppercase text-slate-400 font-medium block mb-2">Workspace</span>
+            <span className="text-xs tracking-[0.2em] uppercase text-slate-400 font-medium block mb-2">Panel de Control</span>
             <h1 className="text-4xl md:text-5xl font-serif text-slate-900 leading-tight">
-              Bienvenido, <span className="italic text-indigo-600">User</span>
+              Bienvenido, <span className="italic text-indigo-600">{isRegistered && username ? `@${username}` : 'Comerciante'}</span>
             </h1>
             <p className="text-slate-500 font-light mt-1 font-mono text-xs">
               {account}

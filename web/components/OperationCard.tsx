@@ -98,7 +98,7 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
 
   const handleAccept = () =>
     run(async () => {
-      if (!account) throw new Error('Connect your wallet first')
+      if (!account) throw new Error('Conecta tu billetera primero')
       const res = await fetch(`/api/operations/${operation.id.toString()}/accept`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -135,7 +135,7 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
   const handleComplete = () => run(() => completeOperation(operation), 'Operación completada ✓')
   const handleMetaComplete = () =>
     run(async () => {
-      if (!provider) throw new Error('Connect your wallet first')
+      if (!provider) throw new Error('Conecta tu billetera primero')
       const signer = await provider.getSigner()
       const req = await buildMetaComplete(signer, provider, operation.id, operation.tokenB, operation.amountB)
       await relayRequest(req)
