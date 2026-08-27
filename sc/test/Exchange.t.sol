@@ -35,10 +35,10 @@ contract ExchangeTest is Test {
 
         // Register user1 and user2
         vm.prank(user1);
-        userRegistry.register("trader1");
+        userRegistry.register("trader1", "trader1@truekeate.com", "+584120000001", "Calle 1, Caracas", 729100, 1159100, 19, true);
 
         vm.prank(user2);
-        userRegistry.register("trader2");
+        userRegistry.register("trader2", "trader2@truekeate.com", "+584120000002", "Calle 2, Caracas", 729200, 1159200, 19, true);
     }
 
     function testUserRegistration() public {
@@ -54,7 +54,7 @@ contract ExchangeTest is Test {
         address user3 = makeAddr("user3");
         vm.prank(user3);
         vm.expectRevert("Username already taken");
-        userRegistry.register("trader1");
+        userRegistry.register("trader1", "user3@truekeate.com", "+584120000003", "Calle 3, Caracas", 729300, 1159300, 19, true);
     }
 
     function testUnregisteredUserCannotTrade() public {

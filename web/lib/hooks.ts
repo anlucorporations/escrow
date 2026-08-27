@@ -347,12 +347,23 @@ export function useAllowedTokens() {
   return { tokens, loading }
 }
 
+export interface RegisterParams {
+  username: string
+  email: string
+  phone: string
+  physicalAddress: string
+  utmEasting: number
+  utmNorthing: number
+  utmZone: number
+  isNorthernHemisphere: boolean
+}
+
 export interface RegistrationState {
   isRegistered: boolean
   username: string | null
   loading: boolean
-  /** Inscribe la billetera conectada y re-verifica on-chain. */
-  register: (username: string) => Promise<void>
+  /** Inscribe la billetera conectada y re-verifica on-chain con 4 datos únicos y coordenadas UTM. */
+  register: (params: RegisterParams | string) => Promise<void>
   refresh: () => Promise<void>
 }
 
@@ -414,16 +425,51 @@ export function useRegistration(): RegistrationState {
   }, [isConnected, account, refresh])
 
   const register = useCallback(
-    async (usernameInput: string) => {
+    async (paramsInput: RegisterParams | string) => {
       if (!provider || !account) {
         throw new Error('Conecta tu billetera primero')
       }
-      const name = usernameInput.trim()
-      if (name.length < 3 || name.length > 20) {
+
+      let p: RegisterParams
+      if (typeof paramsInput === 'string') {
+        const uname = paramsInput.trim()
+        p = {
+          username: uname,
+          email: `${uname.toLowerCase()}@truekeate.com`,
+          phone: '+584120000000',
+          physicalAddress: 'Barlovento, Miranda, Venezuela',
+          utmEasting: 729450,
+          utmNorthing: 1159800,
+          utmZone: 19,
+          isNorthernHemisphere: true,
+        }
+      } else {
+        p = {
+          username: paramsInput.username.trim(),
+          email: paramsInput.email.trim(),
+          phone: paramsInput.phone.trim(),
+          physicalAddress: paramsInput.physicalAddress.trim(),
+          utmEasting: Math.round(paramsInput.utmEasting),
+          utmNorthing: Math.round(paramsInput.utmNorthing),
+          utmZone: Number(paramsInput.utmZone) || 19,
+          isNorthernHemisphere: Boolean(paramsInput.isNorthernHemisphere),
+        }
+      }
+
+      if (p.username.length < 3 || p.username.length > 20) {
         throw new Error('El nombre de usuario debe tener entre 3 y 20 caracteres')
       }
-      if (!/^[a-zA-Z0-9_]+$/.test(name)) {
-        throw new Error('Solo se permiten letras, números y guiones bajos (_)')
+      if (!/^[a-zA-Z0-9_]+$/.test(p.username)) {
+        throw new Error('Solo se permiten letras, números y guiones bajos (_) en el usuario')
+      }
+      if (!p.email || !p.email.includes('@')) {
+        throw new Error('El correo electrónico es obligatorio y debe ser válido')
+      }
+      if (!p.phone || p.phone.length < 7) {
+        throw new Error('El teléfono móvil es obligatorio')
+      }
+      if (!p.physicalAddress || p.physicalAddress.length < 3) {
+        throw new Error('La dirección de ubicación física es obligatoria')
       }
 
       const signer = await provider.getSigner()
@@ -437,15 +483,24 @@ export function useRegistration(): RegistrationState {
         return
       }
 
-      const tx = await c.register(name)
+      const tx = await c.register(
+        p.username,
+        p.email,
+        p.phone,
+        p.physicalAddress,
+        p.utmEasting,
+        p.utmNorthing,
+        p.utmZone,
+        p.isNorthernHemisphere
+      )
       await tx.wait()
       
       // Actualizar estado local inmediatamente
       setIsRegistered(true)
-      setUsername(name)
+      setUsername(p.username)
       await refresh()
       
-      // Notificar a otras instancias del hook (ej. AccessGate, Header)
+      // Notificar a otras instancias del hook (ej. AccessGate, Header, UserMenu)
       window.dispatchEvent(new Event('user-registered'))
     },
     [provider, account, refresh]

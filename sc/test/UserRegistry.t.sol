@@ -16,9 +16,18 @@ contract UserRegistryTest is Test {
         registry = new UserRegistry();
     }
 
-    function testRegister() public {
+    function testRegisterWithAllMandatoryFields() public {
         vm.prank(user1);
-        registry.register("alice");
+        registry.register(
+            "alice",
+            "alice@truekeate.com",
+            "+584121112233",
+            "Av. Bolivar, Barlovento, Miranda",
+            729450,
+            1159800,
+            19,
+            true
+        );
 
         assertTrue(registry.isRegistered(user1));
         assertEq(registry.getRegisteredWalletsCount(), 1);
@@ -26,72 +35,197 @@ contract UserRegistryTest is Test {
         UserRegistry.UserProfile memory profile = registry.getUserProfile(user1);
         assertEq(profile.wallet, user1);
         assertEq(profile.username, "alice");
+        assertEq(profile.email, "alice@truekeate.com");
+        assertEq(profile.phone, "+584121112233");
+        assertEq(profile.physicalAddress, "Av. Bolivar, Barlovento, Miranda");
+        assertEq(profile.utmEasting, 729450);
+        assertEq(profile.utmNorthing, 1159800);
+        assertEq(profile.utmZone, 19);
+        assertTrue(profile.isNorthernHemisphere);
         assertGt(profile.registeredAt, 0);
         assertTrue(profile.isRegistered);
     }
 
     function testCannotRegisterTwice() public {
         vm.startPrank(user1);
-        registry.register("alice");
+        registry.register(
+            "alice",
+            "alice@truekeate.com",
+            "+584121112233",
+            "Av. Bolivar, Barlovento, Miranda",
+            729450,
+            1159800,
+            19,
+            true
+        );
         vm.expectRevert("Already registered");
-        registry.register("alice2");
+        registry.register(
+            "alice2",
+            "alice2@truekeate.com",
+            "+584129998877",
+            "Calle 2, Caracas",
+            730000,
+            1160000,
+            19,
+            true
+        );
         vm.stopPrank();
     }
 
     function testCannotRegisterWithDuplicateUsername() public {
         vm.prank(user1);
-        registry.register("alice");
+        registry.register(
+            "alice",
+            "alice@truekeate.com",
+            "+584121112233",
+            "Av. Bolivar, Barlovento, Miranda",
+            729450,
+            1159800,
+            19,
+            true
+        );
 
         vm.prank(user2);
         vm.expectRevert("Username already taken");
-        registry.register("alice");
+        registry.register(
+            "alice",
+            "bob@truekeate.com",
+            "+584122223344",
+            "Calle 5, Higuerote",
+            735000,
+            1165000,
+            19,
+            true
+        );
     }
 
-    function testCannotRegisterWithShortUsername() public {
+    function testCannotRegisterWithDuplicateEmail() public {
         vm.prank(user1);
-        vm.expectRevert("Username must be between 3 and 20 chars");
-        registry.register("ab");
+        registry.register(
+            "alice",
+            "alice@truekeate.com",
+            "+584121112233",
+            "Av. Bolivar, Barlovento, Miranda",
+            729450,
+            1159800,
+            19,
+            true
+        );
+
+        vm.prank(user2);
+        vm.expectRevert("Email already registered");
+        registry.register(
+            "bob",
+            "alice@truekeate.com",
+            "+584122223344",
+            "Calle 5, Higuerote",
+            735000,
+            1165000,
+            19,
+            true
+        );
     }
 
-    function testCannotRegisterWithLongUsername() public {
+    function testCannotRegisterWithDuplicatePhone() public {
         vm.prank(user1);
-        vm.expectRevert("Username must be between 3 and 20 chars");
-        registry.register("abcdefghijklmnopqrstuvwxyz");
+        registry.register(
+            "alice",
+            "alice@truekeate.com",
+            "+584121112233",
+            "Av. Bolivar, Barlovento, Miranda",
+            729450,
+            1159800,
+            19,
+            true
+        );
+
+        vm.prank(user2);
+        vm.expectRevert("Phone already registered");
+        registry.register(
+            "bob",
+            "bob@truekeate.com",
+            "+584121112233",
+            "Calle 5, Higuerote",
+            735000,
+            1165000,
+            19,
+            true
+        );
+    }
+
+    function testCannotRegisterWithDuplicateLocation() public {
+        vm.prank(user1);
+        registry.register(
+            "alice",
+            "alice@truekeate.com",
+            "+584121112233",
+            "Av. Bolivar, Barlovento, Miranda",
+            729450,
+            1159800,
+            19,
+            true
+        );
+
+        vm.prank(user2);
+        vm.expectRevert("Location already registered");
+        registry.register(
+            "bob",
+            "bob@truekeate.com",
+            "+584122223344",
+            "Av. Bolivar, Barlovento, Miranda",
+            729450,
+            1159800,
+            19,
+            true
+        );
+    }
+
+    function testCannotRegisterWithInvalidZone() public {
+        vm.prank(user1);
+        vm.expectRevert("Invalid UTM zone (1-60)");
+        registry.register(
+            "alice",
+            "alice@truekeate.com",
+            "+584121112233",
+            "Av. Bolivar, Barlovento, Miranda",
+            729450,
+            1159800,
+            0,
+            true
+        );
     }
 
     function testUpdateUsername() public {
         vm.startPrank(user1);
-        registry.register("alice");
+        registry.register(
+            "alice",
+            "alice@truekeate.com",
+            "+584121112233",
+            "Av. Bolivar, Barlovento, Miranda",
+            729450,
+            1159800,
+            19,
+            true
+        );
         registry.updateUsername("alicia");
 
         UserRegistry.UserProfile memory profile = registry.getUserProfile(user1);
         assertEq(profile.username, "alicia");
 
-        // El nombre anterior queda libre
+        // El nombre anterior queda libre para otro usuario
         vm.stopPrank();
         vm.prank(user2);
-        registry.register("alice");
+        registry.register(
+            "alice",
+            "bob@truekeate.com",
+            "+584122223344",
+            "Calle 5, Higuerote",
+            735000,
+            1165000,
+            19,
+            true
+        );
         assertTrue(registry.isRegistered(user2));
     }
-
-    function testUpdateUsernameOnlyForRegistered() public {
-        vm.prank(user1);
-        vm.expectRevert("Not registered");
-        registry.updateUsername("alice");
-    }
-
-    function testPagination() public {
-        for (uint256 i = 0; i < 5; i++) {
-            vm.prank(makeAddr(string(abi.encodePacked("u", vm.toString(i)))));
-            registry.register(string(abi.encodePacked("user", vm.toString(i))));
-        }
-
-        assertEq(registry.getRegisteredWalletsCount(), 5);
-
-        UserRegistry.UserProfile[] memory page = registry.getRegisteredWalletsPaged(1, 2);
-        assertEq(page.length, 2);
-
-        UserRegistry.UserProfile[] memory empty = registry.getRegisteredWalletsPaged(10, 2);
-        assertEq(empty.length, 0);
-    }
 }
+

@@ -30,7 +30,7 @@ contract DeployExchangeScript is Script {
         exchange.addToken(address(tokenB));
 
         // Register Account 0 as trader0
-        userRegistry.register("trader0");
+        userRegistry.register("trader0", "trader0@truekeate.com", "+584120000000", "Calle 0, Caracas", 729000, 1159000, 19, true);
 
         tokenA.mint(account0, 1000 ether);
         tokenB.mint(account0, 1000 ether);
@@ -41,7 +41,7 @@ contract DeployExchangeScript is Script {
 
         // Register Account 1 as trader1
         vm.startBroadcast(user2PrivateKey);
-        userRegistry.register("trader1");
+        userRegistry.register("trader1", "trader1@truekeate.com", "+584120000001", "Calle 1, Caracas", 729100, 1159100, 19, true);
         vm.stopBroadcast();
 
         console.log("UserRegistry Deployed:", address(userRegistry));

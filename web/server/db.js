@@ -258,9 +258,14 @@ export async function initSchema() {
     }
   }
 
-  // Columnas añadidas después de la creación inicial (M7 geolocalización)
+  // Columnas añadidas después de la creación inicial (M7 geolocalización & UTM)
   await ensureColumn('users', 'lat', 'REAL')
   await ensureColumn('users', 'lng', 'REAL')
+  await ensureColumn('users', 'physical_address', 'TEXT NOT NULL DEFAULT \'\'')
+  await ensureColumn('users', 'utm_easting', 'INTEGER NOT NULL DEFAULT 0')
+  await ensureColumn('users', 'utm_northing', 'INTEGER NOT NULL DEFAULT 0')
+  await ensureColumn('users', 'utm_zone', 'INTEGER NOT NULL DEFAULT 19')
+  await ensureColumn('users', 'utm_hemisphere', 'TEXT NOT NULL DEFAULT \'N\'')
   await ensureColumn('users', 'document_hash', 'TEXT NOT NULL DEFAULT \'\'')
   await ensureColumn('users', 'selfie_hash', 'TEXT NOT NULL DEFAULT \'\'')
 

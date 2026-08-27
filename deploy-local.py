@@ -129,7 +129,19 @@ for t in [tka, tkb, usdt, delivery]:
     send_tx(OWNER_KEY, escrow, "addToken(address)", t)
 send_tx(OWNER_KEY, escrow, "setArbiter(address)", OWNER_ADDR)
 send_tx(OWNER_KEY, governance, "setSocio(address,bool)", OWNER_ADDR, "true")
-send_tx(OWNER_KEY, registry, "register(string)", "superadmin")
+send_tx(
+    OWNER_KEY,
+    registry,
+    "register(string,string,string,string,int32,int32,uint8,bool)",
+    "superadmin",
+    "superadmin@truekeate.com",
+    "+584120000000",
+    "Sede Central TrueKeate, Barlovento, Miranda",
+    "729000",
+    "1159000",
+    "19",
+    "true",
+)
 print(f"  [+] Cuenta 0 ({OWNER_ADDR}) configurada como: Owner + Arbiter + Socio + @superadmin")
 
 # 5. Minteo de tokens para todas las 10 cuentas
@@ -144,37 +156,48 @@ print("  [+] 1000 TKA + 1000 TKB + 5000 USDT + 5 DELIVERY + 10000 BRLT asignados
 
 # 6. Inscribir Usuarios Particulares (Cuentas 1, 2, 3)
 print("\n[Paso 5/7] Inscribiendo 3 Usuarios Particulares en UserRegistry...")
-part_names = ["particular_alice", "particular_bob", "particular_carol"]
+part_data = [
+    ("particular_alice", "alice@truekeate.com", "+584121112233", "Av. Principal 1, Higuerote", "729450", "1159800", "19", "true"),
+    ("particular_bob", "bob@truekeate.com", "+584122223344", "Calle Marina 12, Carenero", "731200", "1162400", "19", "true"),
+    ("particular_carol", "carol@truekeate.com", "+584123334455", "Sector Playa 4, Rio Chico", "735800", "1148900", "19", "true"),
+]
 for i in [1, 2, 3]:
     addr = ADDRS[i]
     key = KEYS[i]
-    uname = part_names[i - 1]
-    send_tx(key, registry, "register(string)", uname)
-    print(f"  [+] Cuenta {i} ({addr}) -> @{uname}")
+    u, em, ph, loc, east, north, z, nhem = part_data[i - 1]
+    send_tx(key, registry, "register(string,string,string,string,int32,int32,uint8,bool)", u, em, ph, loc, east, north, z, nhem)
+    print(f"  [+] Cuenta {i} ({addr}) -> @{u} ({em}, {ph}, UTM Zone {z}N)")
 
 # 7. Inscribir y Configurar Comerciantes (Cuentas 4, 5)
 print("\n[Paso 6/7] Inscribiendo 2 Comerciantes y activando membresia BRLT...")
-com_names = ["tienda_tech", "mercado_central"]
+com_data = [
+    ("tienda_tech", "tech@barloventas.com", "+584124445566", "Centro Comercial Barlovento Local 14", "728900", "1158500", "19", "true"),
+    ("mercado_central", "mercado@barloventas.com", "+584125556677", "Av. Comercio Local 3, Tacarigua", "727500", "1156200", "19", "true"),
+]
 for i in [4, 5]:
     addr = ADDRS[i]
     key = KEYS[i]
-    uname = com_names[i - 4]
-    send_tx(key, registry, "register(string)", uname)
+    u, em, ph, loc, east, north, z, nhem = com_data[i - 4]
+    send_tx(key, registry, "register(string,string,string,string,int32,int32,uint8,bool)", u, em, ph, loc, east, north, z, nhem)
     send_tx(OWNER_KEY, subscription, "setBusiness(address,bool)", addr, "true")
     send_tx(key, brlt, "approve(address,uint256)", subscription, "1200000000000000000000")
     send_tx(key, subscription, "subscribe(uint256)", "12")
-    print(f"  [+] Cuenta {i} ({addr}) -> @{uname} (Business: TRUE, Suscripcion: 12 meses activa)")
+    print(f"  [+] Cuenta {i} ({addr}) -> @{u} (Business: TRUE, Suscripcion: 12 meses activa)")
 
 # 8. Inscribir y Configurar Socios (Cuentas 6, 7, 8)
 print("\n[Paso 7/7] Inscribiendo 3 Socios y asignando rol en Governance...")
-soc_names = ["socio_juez_alpha", "socio_juez_beta", "socio_juez_gamma"]
+soc_data = [
+    ("socio_juez_alpha", "juez.alpha@truekeate.com", "+584126667788", "Tribunal Comunitario Alpha, Barlovento", "729800", "1160100", "19", "true"),
+    ("socio_juez_beta", "juez.beta@truekeate.com", "+584127778899", "Tribunal Comunitario Beta, Caucagua", "725100", "1152000", "19", "true"),
+    ("socio_juez_gamma", "juez.gamma@truekeate.com", "+584128889900", "Tribunal Comunitario Gamma, San Jose", "733000", "1157400", "19", "true"),
+]
 for i in [6, 7, 8]:
     addr = ADDRS[i]
     key = KEYS[i]
-    uname = soc_names[i - 6]
-    send_tx(key, registry, "register(string)", uname)
+    u, em, ph, loc, east, north, z, nhem = soc_data[i - 6]
+    send_tx(key, registry, "register(string,string,string,string,int32,int32,uint8,bool)", u, em, ph, loc, east, north, z, nhem)
     send_tx(OWNER_KEY, governance, "setSocio(address,bool)", addr, "true")
-    print(f"  [+] Cuenta {i} ({addr}) -> @{uname} (Socio en Governance: TRUE)")
+    print(f"  [+] Cuenta {i} ({addr}) -> @{u} (Socio en Governance: TRUE)")
 
 # 9. Actualizar web/.env.local
 env_path = os.path.join(ROOT, "web", ".env.local")

@@ -5,10 +5,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title UserRegistry
- * @notice Registro on-chain de usuarios y niveles de identificación de TrueKeate.
+ * @notice Registro on-chain de usuarios, coordenadas UTM y niveles de identificación de TrueKeate.
  *
  * Administra los 3 niveles de identificación progresivos:
- * 1. Inscrito: Registro básico con nombre de usuario y aceptación de acuerdos de convivencia.
+ * 1. Inscrito: Registro obligatorio con Username, Correo, Teléfono y Ubicación UTM (únicos on-chain).
  * 2. Verificado: Correo electrónico, teléfono y 2FA confirmados.
  * 3. Certificado: KYC avanzado completado (SBT nativo) o SBT de terceros verificado.
  */
@@ -22,6 +22,13 @@ contract UserRegistry is Ownable {
     struct UserProfile {
         address wallet;
         string username;
+        string email;
+        string phone;
+        string physicalAddress;
+        int32 utmEasting;
+        int32 utmNorthing;
+        uint8 utmZone;
+        bool isNorthernHemisphere;
         uint256 registeredAt;
         bool isRegistered;
         IdentificationLevel identificationLevel;
@@ -30,12 +37,27 @@ contract UserRegistry is Ownable {
 
     mapping(address => UserProfile) public profiles;
     mapping(string => address) public usernameToWallet;
+    mapping(bytes32 => address) public emailHashToWallet;
+    mapping(bytes32 => address) public phoneHashToWallet;
+    mapping(bytes32 => address) public locationHashToWallet;
     address[] private registeredWallets;
 
     // Relayer autorizado para actualizar niveles tras validaciones 2FA / KYC
     address public identityAdmin;
 
-    event UserRegistered(address indexed wallet, string username, uint256 registeredAt, IdentificationLevel level);
+    event UserRegistered(
+        address indexed wallet,
+        string username,
+        string email,
+        string phone,
+        string physicalAddress,
+        int32 utmEasting,
+        int32 utmNorthing,
+        uint8 utmZone,
+        bool isNorthernHemisphere,
+        uint256 registeredAt,
+        IdentificationLevel level
+    );
     event UsernameUpdated(address indexed wallet, string newUsername);
     event IdentificationLevelUpdated(address indexed wallet, IdentificationLevel newLevel);
     event IdentityAdminSet(address indexed admin);
@@ -52,16 +74,43 @@ contract UserRegistry is Ownable {
         emit IdentityAdminSet(_admin);
     }
 
-    /// @notice Inscribe la billetera del llamador (Nivel 1: Inscrito) aceptando los acuerdos de convivencia.
-    /// @param username 3-20 caracteres alfanuméricos únicos.
-    function register(string calldata username) external {
+    /// @notice Inscribe la billetera del llamador (Nivel 1: Inscrito) con datos únicos obligatorios y coordenadas UTM.
+    function register(
+        string calldata username,
+        string calldata email,
+        string calldata phone,
+        string calldata physicalAddress,
+        int32 utmEasting,
+        int32 utmNorthing,
+        uint8 utmZone,
+        bool isNorthernHemisphere
+    ) external {
         require(bytes(username).length >= 3 && bytes(username).length <= 20, "Username must be between 3 and 20 chars");
+        require(bytes(email).length >= 5, "Email is required");
+        require(bytes(phone).length >= 7, "Phone is required");
+        require(bytes(physicalAddress).length >= 3, "Address is required");
+        require(utmZone >= 1 && utmZone <= 60, "Invalid UTM zone (1-60)");
         require(!profiles[msg.sender].isRegistered, "Already registered");
+
+        bytes32 emailHash = keccak256(bytes(email));
+        bytes32 phoneHash = keccak256(bytes(phone));
+        bytes32 locHash = keccak256(abi.encodePacked(physicalAddress, utmEasting, utmNorthing, utmZone, isNorthernHemisphere));
+
         require(usernameToWallet[username] == address(0), "Username already taken");
+        require(emailHashToWallet[emailHash] == address(0), "Email already registered");
+        require(phoneHashToWallet[phoneHash] == address(0), "Phone already registered");
+        require(locationHashToWallet[locHash] == address(0), "Location already registered");
 
         profiles[msg.sender] = UserProfile({
             wallet: msg.sender,
             username: username,
+            email: email,
+            phone: phone,
+            physicalAddress: physicalAddress,
+            utmEasting: utmEasting,
+            utmNorthing: utmNorthing,
+            utmZone: utmZone,
+            isNorthernHemisphere: isNorthernHemisphere,
             registeredAt: block.timestamp,
             isRegistered: true,
             identificationLevel: IdentificationLevel.Inscrito,
@@ -69,9 +118,24 @@ contract UserRegistry is Ownable {
         });
 
         usernameToWallet[username] = msg.sender;
+        emailHashToWallet[emailHash] = msg.sender;
+        phoneHashToWallet[phoneHash] = msg.sender;
+        locationHashToWallet[locHash] = msg.sender;
         registeredWallets.push(msg.sender);
 
-        emit UserRegistered(msg.sender, username, block.timestamp, IdentificationLevel.Inscrito);
+        emit UserRegistered(
+            msg.sender,
+            username,
+            email,
+            phone,
+            physicalAddress,
+            utmEasting,
+            utmNorthing,
+            utmZone,
+            isNorthernHemisphere,
+            block.timestamp,
+            IdentificationLevel.Inscrito
+        );
     }
 
     /// @notice Actualiza el nivel de identificación de un usuario (Inscrito -> Verificado -> Certificado).
@@ -133,3 +197,4 @@ contract UserRegistry is Ownable {
         return page;
     }
 }
+

@@ -65,10 +65,17 @@ contract TruekeMultiAssetTest is Test {
     function testUserRegistration3Tiers() public {
         // Nivel 1: Inscrito
         vm.prank(user1);
-        userRegistry.register("alice");
+        userRegistry.register("alice", "alice@truekeate.com", "+584121112233", "Av. Bolivar, Barlovento", 729450, 1159800, 19, true);
 
         UserRegistry.UserProfile memory p1 = userRegistry.getUserProfile(user1);
         assertEq(p1.username, "alice");
+        assertEq(p1.email, "alice@truekeate.com");
+        assertEq(p1.phone, "+584121112233");
+        assertEq(p1.physicalAddress, "Av. Bolivar, Barlovento");
+        assertEq(p1.utmEasting, 729450);
+        assertEq(p1.utmNorthing, 1159800);
+        assertEq(p1.utmZone, 19);
+        assertTrue(p1.isNorthernHemisphere);
         assertEq(uint256(p1.identificationLevel), uint256(UserRegistry.IdentificationLevel.Inscrito));
         assertTrue(p1.termsAccepted);
 

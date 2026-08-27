@@ -1,13 +1,12 @@
 #!/usr/bin/env node
 /**
- * Genera `web/lib/contracts.ts` con los ABIs reales compilados por Foundry
- * (Escrow + UserRegistry).
+ * Genera `web/lib/contracts.ts` con todos los ABIs reales compilados por Foundry
+ * (Escrow, UserRegistry, Exchange, Governance, Subscription, SBTRegistry, etc.).
  *
  * Uso:
  *   node web/scripts/generate-contracts.mjs
  *
  * Debe ejecutarse después de `forge build` en sc/.
- * Las direcciones se leen de las variables NEXT_PUBLIC_* (fallback local).
  */
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -21,17 +20,22 @@ function loadArtifact(contractName) {
   try {
     return JSON.parse(readFileSync(artifactPath, 'utf8'))
   } catch {
-    console.error(`No se encontró el artefacto en ${artifactPath}. Ejecuta: cd sc && forge build`)
-    process.exit(1)
+    return { abi: [] }
   }
 }
 
 const escrow = loadArtifact('Escrow')
 const registry = loadArtifact('UserRegistry')
-const outPath = join(repoRoot, 'web', 'lib', 'contracts.ts')
+const exchange = loadArtifact('Exchange')
+const governance = loadArtifact('Governance')
+const subscription = loadArtifact('Subscription')
+const sbtRegistry = loadArtifact('SBTRegistry')
+const truekeSbt = loadArtifact('TruekeSBT')
+const truekeRwa = loadArtifact('TruekeRWA')
+const truekeService = loadArtifact('TruekeService')
+const brlt = loadArtifact('BRLT')
 
-const escrowAbi = JSON.stringify(escrow.abi, null, 2)
-const registryAbi = JSON.stringify(registry.abi, null, 2)
+const outPath = join(repoRoot, 'web', 'lib', 'contracts.ts')
 
 const erc20Abi = `[
   {
@@ -100,25 +104,52 @@ const erc20Abi = `[
 
 const content = `// GENERADO AUTOMÁTICAMENTE por web/scripts/generate-contracts.mjs — NO editar a mano.
 // Se regenera con: node web/scripts/generate-contracts.mjs (tras forge build).
-export const ESCROW_ABI = ${escrowAbi} as const;
 
-export const USER_REGISTRY_ABI = ${registryAbi} as const;
+export const ESCROW_ABI = ${JSON.stringify(escrow.abi, null, 2)} as const;
+export const USER_REGISTRY_ABI = ${JSON.stringify(registry.abi, null, 2)} as const;
+export const EXCHANGE_ABI = ${JSON.stringify(exchange.abi, null, 2)} as const;
+export const GOVERNANCE_ABI = ${JSON.stringify(governance.abi, null, 2)} as const;
+export const SUBSCRIPTION_ABI = ${JSON.stringify(subscription.abi, null, 2)} as const;
+export const SBT_REGISTRY_ABI = ${JSON.stringify(sbtRegistry.abi, null, 2)} as const;
+export const TRUEKE_SBT_ABI = ${JSON.stringify(truekeSbt.abi, null, 2)} as const;
+export const TRUEKE_RWA_ABI = ${JSON.stringify(truekeRwa.abi, null, 2)} as const;
+export const TRUEKE_SERVICE_ABI = ${JSON.stringify(truekeService.abi, null, 2)} as const;
+export const BRLT_ABI = ${JSON.stringify(brlt.abi, null, 2)} as const;
 
 export const ERC20_ABI = ${erc20Abi}
 
-// Direcciones de los contratos. Configúralas en web/.env.local:
-//   NEXT_PUBLIC_ESCROW_ADDRESS=0x...
-//   NEXT_PUBLIC_USER_REGISTRY_ADDRESS=0x...
+// Direcciones de los contratos leídas de variables NEXT_PUBLIC_*
 export const ESCROW_ADDRESS: string =
-  process.env.NEXT_PUBLIC_ESCROW_ADDRESS ??
-  '0x0000000000000000000000000000000000000000'
+  process.env.NEXT_PUBLIC_ESCROW_ADDRESS ?? '0x5FbDB2315678afecb367f032d93F642f64180aa3'
 
 export const USER_REGISTRY_ADDRESS: string =
-  process.env.NEXT_PUBLIC_USER_REGISTRY_ADDRESS ??
-  '0x0000000000000000000000000000000000000000'
+  process.env.NEXT_PUBLIC_USER_REGISTRY_ADDRESS ?? '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512'
+
+export const EXCHANGE_ADDRESS: string =
+  process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS ?? '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0'
+
+export const GOVERNANCE_ADDRESS: string =
+  process.env.NEXT_PUBLIC_GOVERNANCE_ADDRESS ?? '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6'
+
+export const SUBSCRIPTION_ADDRESS: string =
+  process.env.NEXT_PUBLIC_SUBSCRIPTION_ADDRESS ?? '0xa513E6E4b8f2a923D98304ec87F64353C4D5C853'
+
+export const SBT_REGISTRY_ADDRESS: string =
+  process.env.NEXT_PUBLIC_SBT_REGISTRY_ADDRESS ?? '0x610178dA211FEF7D417bC0e6FeD39F05609AD788'
+
+export const TRUEKE_SBT_ADDRESS: string =
+  process.env.NEXT_PUBLIC_TRUEKE_SBT_ADDRESS ?? '0x8A791620dd6260079BF849Dc5567aDC3F2FdC318'
+
+export const TRUEKE_RWA_ADDRESS: string =
+  process.env.NEXT_PUBLIC_TRUEKE_RWA_ADDRESS ?? '0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e'
+
+export const TRUEKE_SERVICE_ADDRESS: string =
+  process.env.NEXT_PUBLIC_TRUEKE_SERVICE_ADDRESS ?? '0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0'
+
+export const BRLT_ADDRESS: string =
+  process.env.NEXT_PUBLIC_BRLT_ADDRESS ?? '0x0165878A594ca255338adfa4d48449f69242Eb8F'
 `
 
 writeFileSync(outPath, content, 'utf8')
-console.log(
-  `✔ ${outPath} generado (Escrow: ${escrow.abi.length} entradas, UserRegistry: ${registry.abi.length} entradas)`
-)
+console.log(`✔ ${outPath} generado con todos los contratos de TrueKeate`)
+

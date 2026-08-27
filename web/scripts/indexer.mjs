@@ -76,16 +76,51 @@ async function createNotification(user, type, message, refId = '') {
   }
 }
 
-async function upsertUser(address, username, registeredAt, level = 'inscrito') {
+async function upsertUser(
+  address,
+  username,
+  registeredAt,
+  level = 'inscrito',
+  email = '',
+  phone = '',
+  physicalAddress = '',
+  utmEasting = 0,
+  utmNorthing = 0,
+  utmZone = 19,
+  utmHemisphere = 'N'
+) {
   const a = address.toLowerCase()
   await query(
-    `INSERT INTO users (address, username, registered_at, identification_level, created_at)
-     VALUES (?, ?, ?, ?, ?)
+    `INSERT INTO users (
+       address, username, registered_at, identification_level, created_at,
+       email, phone, physical_address, utm_easting, utm_northing, utm_zone, utm_hemisphere
+     )
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT(address) DO UPDATE SET 
        username = COALESCE(excluded.username, users.username), 
        registered_at = COALESCE(excluded.registered_at, users.registered_at),
-       identification_level = COALESCE(excluded.identification_level, users.identification_level)`,
-    [a, username, Number(registeredAt), level, Number(registeredAt)]
+       identification_level = COALESCE(excluded.identification_level, users.identification_level),
+       email = CASE WHEN excluded.email <> '' THEN excluded.email ELSE users.email END,
+       phone = CASE WHEN excluded.phone <> '' THEN excluded.phone ELSE users.phone END,
+       physical_address = CASE WHEN excluded.physical_address <> '' THEN excluded.physical_address ELSE users.physical_address END,
+       utm_easting = CASE WHEN excluded.utm_easting <> 0 THEN excluded.utm_easting ELSE users.utm_easting END,
+       utm_northing = CASE WHEN excluded.utm_northing <> 0 THEN excluded.utm_northing ELSE users.utm_northing END,
+       utm_zone = excluded.utm_zone,
+       utm_hemisphere = excluded.utm_hemisphere`,
+    [
+      a,
+      username,
+      Number(registeredAt),
+      level,
+      Number(registeredAt),
+      email,
+      phone,
+      physicalAddress,
+      Number(utmEasting),
+      Number(utmNorthing),
+      Number(utmZone),
+      utmHemisphere,
+    ]
   )
 }
 
@@ -202,11 +237,41 @@ async function main() {
     const registry = new ethers.Contract(REGISTRY_ADDRESS, loadAbi('UserRegistry'), provider)
     contracts.push({ name: 'UserRegistry', contract: registry })
 
-    registry.on('UserRegistered', async (wallet, username, regAt, level) => {
-      const lvlStr = level === 1 ? 'verificado' : level === 2 ? 'certificado' : 'inscrito'
-      console.log(`👤 Evento on-chain: UserRegistry.UserRegistered -> @${username} (${wallet.slice(0, 6)}...) [${lvlStr}]`)
-      await upsertUser(wallet, username, regAt, lvlStr)
-    })
+    registry.on(
+      'UserRegistered',
+      async (
+        wallet,
+        username,
+        email,
+        phone,
+        physicalAddress,
+        utmEasting,
+        utmNorthing,
+        utmZone,
+        isNorthernHemisphere,
+        regAt,
+        level
+      ) => {
+        const lvlStr = level === 1 ? 'verificado' : level === 2 ? 'certificado' : 'inscrito'
+        const hemStr = isNorthernHemisphere ? 'N' : 'S'
+        console.log(
+          `👤 Evento on-chain: UserRegistry.UserRegistered -> @${username} (${wallet.slice(0, 6)}...) [${lvlStr}] (UTM: ${utmZone}${hemStr} ${utmEasting}m E, ${utmNorthing}m N)`
+        )
+        await upsertUser(
+          wallet,
+          username,
+          regAt,
+          lvlStr,
+          email,
+          phone,
+          physicalAddress,
+          utmEasting,
+          utmNorthing,
+          utmZone,
+          hemStr
+        )
+      }
+    )
 
     registry.on('IdentificationLevelUpdated', async (wallet, newLevel) => {
       const lvlStr = newLevel === 1 ? 'verificado' : newLevel === 2 ? 'certificado' : 'inscrito'
