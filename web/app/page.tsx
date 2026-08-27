@@ -13,13 +13,20 @@ export default function VelvetyLandingPage() {
   const router = useRouter()
   const { openRegister } = useRegisterModal()
 
+  // Redirigir automáticamente a la sección de Catálogo (/items) al conectar e inscribir la billetera
+  useEffect(() => {
+    if (isConnected && isRegistered) {
+      router.push('/items')
+    }
+  }, [isConnected, isRegistered, router])
+
   const handleCta = async () => {
     if (!isConnected) {
       await connect()
     } else if (!isRegistered) {
       openRegister()
     } else {
-      router.push('/dashboard')
+      router.push('/items')
     }
   }
 
@@ -54,7 +61,7 @@ export default function VelvetyLandingPage() {
             onClick={handleCta}
             className="px-10 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-full text-sm tracking-wide uppercase transition-all shadow-xl shadow-slate-900/10"
           >
-            {isConnected ? (isRegistered ? 'Entrar a la Suite' : 'Registrar Billetera') : 'Conectar Billetera'}
+            {isConnected ? (isRegistered ? 'Ir al Catálogo' : 'Registrar Billetera') : 'Conectar Billetera'}
           </button>
           <Link 
             href="/items" 

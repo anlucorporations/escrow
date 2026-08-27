@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useRouter, usePathname } from 'next/navigation'
 import { useEthereum } from '@/lib/ethereum'
 import { useEscrow, useProfile, useRegistration, useUserRole } from '@/lib/hooks'
 import { useRegisterModal } from '@/components/RegisterModal'
@@ -27,6 +28,9 @@ export function UserMenu() {
   const [unread, setUnread] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
 
+  const router = useRouter()
+  const pathname = usePathname()
+
   const { isConnected, account, connect, disconnect } = useEthereum()
   const { isRegistered, username, loading: regLoading } = useRegistration()
   const profileResult = useProfile(isConnected && isRegistered ? account : null)
@@ -36,6 +40,15 @@ export function UserMenu() {
   const { openRegister } = useRegisterModal()
 
   const isAdmin = roles.isOwner
+
+  const handleConnect = async () => {
+    try {
+      await connect()
+      if (pathname === '/') {
+        router.push('/items')
+      }
+    } catch {}
+  }
 
   // Notificaciones off-chain
   useEffect(() => {
@@ -101,7 +114,7 @@ export function UserMenu() {
   if (!isConnected) {
     return (
       <button
-        onClick={connect}
+        onClick={handleConnect}
         className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-full text-xs font-semibold tracking-wide uppercase transition-all shadow-md shadow-slate-900/10"
       >
         Conectar Billetera

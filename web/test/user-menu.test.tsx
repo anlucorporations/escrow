@@ -4,6 +4,11 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { UserMenu } from '@/components/UserMenu'
 
 // Mocks
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn() }),
+  usePathname: () => '/',
+}))
+
 vi.mock('@/lib/ethereum', () => ({
   useEthereum: vi.fn(),
 }))

@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, ReactNode } from 'react'
+import { useRouter } from 'next/navigation'
 import { useRegistration } from '@/lib/hooks'
 import { getFriendlyError } from '@/lib/escrow'
 
@@ -26,6 +27,7 @@ export function RegisterProvider({ children }: { children: ReactNode }) {
 
 function RegisterModal({ onClose }: { onClose: () => void }) {
   const { register } = useRegistration()
+  const router = useRouter()
   const [username, setUsername] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -43,7 +45,10 @@ function RegisterModal({ onClose }: { onClose: () => void }) {
     try {
       await register(name)
       setSuccess(true)
-      setTimeout(onClose, 1500)
+      setTimeout(() => {
+        onClose()
+        router.push('/items')
+      }, 1200)
     } catch (err) {
       setError(getFriendlyError(err))
     } finally {
