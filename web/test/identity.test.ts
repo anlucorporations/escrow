@@ -30,7 +30,7 @@ describe('Módulo de Identidad en 3 Niveles & SBTs', () => {
     const res = await acceptCommunityTerms(user1)
     expect(res.ok).toBe(true)
 
-    const profile = await getUserIdentityProfile(user1, user1)
+    const profile: any = await getUserIdentityProfile(user1, user1)
     expect(profile.terms_accepted).toBe(true)
     expect(profile.identification_level).toBe('inscrito')
   })
@@ -55,25 +55,40 @@ describe('Módulo de Identidad en 3 Niveles & SBTs', () => {
     expect(confirm.identificationLevel).toBe('verificado')
 
     // Verificar perfil actualizado
-    const profile = await getUserIdentityProfile(user1, user1)
+    const profile: any = await getUserIdentityProfile(user1, user1)
     expect(profile.identification_level).toBe('verificado')
     expect(profile.email_verified).toBe(true)
     expect(profile.phone_verified).toBe(true)
     expect(profile.two_factor_enabled).toBe(true)
   })
 
-  it('Nivel 3: Verifica SBT de terceros y asciende a Certificado', async () => {
-    const sbtRes = await verifyThirdPartySBT(user1, {
-      sbtContract: '0x2B09ECe09c507920c44Ba6d81294F3841D7d472C',
+  it('Nivel 3: Verifica SBT de terceros y asciende a Certificado con firma criptográfica válida', async () => {
+    const { ethers } = await import('ethers')
+    const wallet = new ethers.Wallet('0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80')
+    const addr = wallet.address.toLowerCase()
+
+    await query(
+      `INSERT INTO users (address, username, identification_level, registered_at, created_at) VALUES (?, ?, ?, ?, ?)`,
+      [addr, 'bob_certified', 'verificado', Math.floor(Date.now() / 1000), Math.floor(Date.now() / 1000)]
+    )
+
+    const sbtContract = '0x2B09ECe09c507920c44Ba6d81294F3841D7d472C'
+    const tokenId = '1001'
+    const payload = `VerifyExternalSBT:${addr}:${sbtContract.toLowerCase()}:${tokenId}`
+    const signature = await wallet.signMessage(payload)
+
+    const sbtRes = await verifyThirdPartySBT(addr, {
+      sbtContract,
       sbtProviderName: 'Binance BABT',
-      tokenId: '1001',
+      tokenId,
+      signature,
     })
 
     expect(sbtRes.ok).toBe(true)
     expect(sbtRes.identificationLevel).toBe('certificado')
     expect(sbtRes.provider).toBe('Binance BABT')
 
-    const profile = await getUserIdentityProfile(user1, user1)
+    const profile: any = await getUserIdentityProfile(addr, addr)
     expect(profile.identification_level).toBe('certificado')
     expect(profile.sbt_provider).toBe('Binance BABT')
   })

@@ -1,8 +1,6 @@
 'use client'
 
 import { OrderBook } from '@/components/OrderBook'
-import { CreateOperation } from '@/components/CreateOperation'
-import { AddToken } from '@/components/AddToken'
 
 interface ExchangePlatformProps {
   activeTab: 'trade' | 'create' | 'tokens'
@@ -12,74 +10,50 @@ interface ExchangePlatformProps {
 
 export function ExchangePlatform({ activeTab, setActiveTab, currentUsername }: ExchangePlatformProps) {
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans pb-32">
+    <div className="min-h-screen bg-[#FAF8F5] text-[#2D2A26] font-sans pb-32">
       {/* Platform Top Header */}
-      <header className="border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-30 px-4 sm:px-6 lg:px-8 py-4">
+      <header className="border-b border-[#D4A373]/20 bg-[#FAF8F5]/80 backdrop-blur-md sticky top-0 z-30 px-4 sm:px-6 lg:px-8 py-4">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center font-bold text-white text-sm">
-              X
+            <div className="w-8 h-8 rounded-lg bg-[#D4A373] flex items-center justify-center font-bold text-[#2D2A26] text-sm">
+              TK
             </div>
             <div>
-              <h1 className="font-extrabold text-base tracking-tight text-white">
-                P2P EXCHANGE PLATFORM
-              </h1>
-              <span className="text-[10px] text-zinc-400 font-mono">Acceso Concedido: Trader Verificado On-Chain</span>
+              <h1 className="text-xl font-bold tracking-tight text-[#2D2A26] font-serif">TrueKeate DEX</h1>
+              <p className="text-xs text-[#2D2A26]/70">P2P Decentralized Asset Swap</p>
             </div>
           </div>
-
-          <div className="flex items-center gap-3">
-            <div className="px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              @{currentUsername || 'Trader'}
+          
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+            <div className="flex items-center gap-2 bg-[#2D2A26]/5 px-3 py-1.5 rounded-full border border-[#D4A373]/30">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+              <span className="text-xs font-mono font-medium text-[#2D2A26]">
+                {currentUsername ? `@${currentUsername}` : 'Conectado'}
+              </span>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Container & Navigation Tabs */}
+      {/* Main Container */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Navigation Tabs */}
-        <div className="flex border-b border-zinc-900 overflow-x-auto">
+        <div className="flex border-b border-[#D4A373]/20 space-x-8">
           <button
             onClick={() => setActiveTab('trade')}
-            className={`pb-3 px-6 font-bold text-sm transition border-b-2 whitespace-nowrap ${
+            className={`pb-4 text-sm font-medium transition-colors relative ${
               activeTab === 'trade'
-                ? 'border-blue-500 text-blue-400'
-                : 'border-transparent text-zinc-500 hover:text-zinc-300'
+                ? 'text-[#D4A373] border-b-2 border-[#D4A373] font-semibold'
+                : 'text-[#2D2A26]/60 hover:text-[#2D2A26]'
             }`}
           >
-            📊 Libro de Órdenes P2P
-          </button>
-
-          <button
-            onClick={() => setActiveTab('create')}
-            className={`pb-3 px-6 font-bold text-sm transition border-b-2 whitespace-nowrap ${
-              activeTab === 'create'
-                ? 'border-blue-500 text-blue-400'
-                : 'border-transparent text-zinc-500 hover:text-zinc-300'
-            }`}
-          >
-            ➕ Publicar Orden
-          </button>
-
-          <button
-            onClick={() => setActiveTab('tokens')}
-            className={`pb-3 px-6 font-bold text-sm transition border-b-2 whitespace-nowrap ${
-              activeTab === 'tokens'
-                ? 'border-blue-500 text-blue-400'
-                : 'border-transparent text-zinc-500 hover:text-zinc-300'
-            }`}
-          >
-            🪙 Administrar Tokens
+            Libro de Órdenes
           </button>
         </div>
 
-        {/* Tab View Contents */}
+        {/* Dynamic Content */}
         <div>
-          {activeTab === 'trade' && <OrderBook />}
-          {activeTab === 'create' && <CreateOperation />}
-          {activeTab === 'tokens' && <AddToken />}
+          <OrderBook />
         </div>
       </main>
     </div>
