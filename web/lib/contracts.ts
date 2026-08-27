@@ -9,6 +9,25 @@ export const ESCROW_ABI = [
   },
   {
     "type": "function",
+    "name": "activeTradesCount",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "addToken",
     "inputs": [
       {
@@ -615,6 +634,19 @@ export const ESCROW_ABI = [
   },
   {
     "type": "function",
+    "name": "setUserRegistry",
+    "inputs": [
+      {
+        "name": "_registry",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "transferOwnership",
     "inputs": [
       {
@@ -625,6 +657,19 @@ export const ESCROW_ABI = [
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "userRegistry",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
   },
   {
     "type": "event",
@@ -864,6 +909,19 @@ export const ESCROW_ABI = [
     "anonymous": false
   },
   {
+    "type": "event",
+    "name": "UserRegistrySet",
+    "inputs": [
+      {
+        "name": "registry",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
     "type": "error",
     "name": "ECDSAInvalidSignature",
     "inputs": []
@@ -923,6 +981,44 @@ export const USER_REGISTRY_ABI = [
     "type": "constructor",
     "inputs": [],
     "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "completedTradesCount",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "disputesLostCount",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -1062,6 +1158,59 @@ export const USER_REGISTRY_ABI = [
             "internalType": "bool"
           }
         ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getReputation",
+    "inputs": [
+      {
+        "name": "wallet",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "completed",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "lost",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "effectiveness",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "rank",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getReputationRank",
+    "inputs": [
+      {
+        "name": "wallet",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint8",
+        "internalType": "uint8"
       }
     ],
     "stateMutability": "view"
@@ -1316,6 +1465,29 @@ export const USER_REGISTRY_ABI = [
   },
   {
     "type": "function",
+    "name": "recordTradeOutcome",
+    "inputs": [
+      {
+        "name": "user",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "isCompleted",
+        "type": "bool",
+        "internalType": "bool"
+      },
+      {
+        "name": "isDisputeLost",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "register",
     "inputs": [
       {
@@ -1492,6 +1664,37 @@ export const USER_REGISTRY_ABI = [
         "type": "address",
         "indexed": true,
         "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "ReputationUpdated",
+    "inputs": [
+      {
+        "name": "wallet",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "completed",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "lost",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "rank",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
       }
     ],
     "anonymous": false
@@ -2254,7 +2457,7 @@ export const GOVERNANCE_ABI = [
   },
   {
     "type": "function",
-    "name": "VOTING_WINDOW",
+    "name": "SANCTION_VOTING_WINDOW",
     "inputs": [],
     "outputs": [
       {
@@ -2264,6 +2467,61 @@ export const GOVERNANCE_ABI = [
       }
     ],
     "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "SOCIO_APPLICATION_WINDOW",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "applicationCount",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "applyForSocio",
+    "inputs": [
+      {
+        "name": "motivation",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "depositToken",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "depositAmount",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -2281,6 +2539,30 @@ export const GOVERNANCE_ABI = [
   {
     "type": "function",
     "name": "hasVoted",
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "hasVotedApplication",
     "inputs": [
       {
         "name": "",
@@ -2473,6 +2755,19 @@ export const GOVERNANCE_ABI = [
   },
   {
     "type": "function",
+    "name": "resolveSocioApplication",
+    "inputs": [
+      {
+        "name": "applicationId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "sanctioned",
     "inputs": [
       {
@@ -2523,6 +2818,83 @@ export const GOVERNANCE_ABI = [
   },
   {
     "type": "function",
+    "name": "setTreasury",
+    "inputs": [
+      {
+        "name": "_treasury",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "socioApplications",
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "id",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "candidate",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "motivation",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "depositToken",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "depositAmount",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "yes",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "no",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "createdAt",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "executed",
+        "type": "bool",
+        "internalType": "bool"
+      },
+      {
+        "name": "passed",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "transferOwnership",
     "inputs": [
       {
@@ -2536,10 +2908,41 @@ export const GOVERNANCE_ABI = [
   },
   {
     "type": "function",
+    "name": "treasuryAddress",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "vote",
     "inputs": [
       {
         "name": "proposalId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "support",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "voteSocioApplication",
+    "inputs": [
+      {
+        "name": "applicationId",
         "type": "uint256",
         "internalType": "uint256"
       },
@@ -2636,6 +3039,99 @@ export const GOVERNANCE_ABI = [
   },
   {
     "type": "event",
+    "name": "SocioApplicationCreated",
+    "inputs": [
+      {
+        "name": "applicationId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "candidate",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "motivation",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "depositToken",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "depositAmount",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "createdAt",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "SocioApplicationResolved",
+    "inputs": [
+      {
+        "name": "applicationId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "candidate",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "passed",
+        "type": "bool",
+        "indexed": false,
+        "internalType": "bool"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "SocioApplicationVoted",
+    "inputs": [
+      {
+        "name": "applicationId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "socio",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "support",
+        "type": "bool",
+        "indexed": false,
+        "internalType": "bool"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
     "name": "SocioSet",
     "inputs": [
       {
@@ -2649,6 +3145,19 @@ export const GOVERNANCE_ABI = [
         "type": "bool",
         "indexed": false,
         "internalType": "bool"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "TreasurySet",
+    "inputs": [
+      {
+        "name": "treasury",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
       }
     ],
     "anonymous": false

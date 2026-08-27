@@ -128,6 +128,8 @@ print("\n[Paso 3/7] Configurando SuperUsuario (Cuenta 0)...")
 for t in [tka, tkb, usdt, delivery]:
     send_tx(OWNER_KEY, escrow, "addToken(address)", t)
 send_tx(OWNER_KEY, escrow, "setArbiter(address)", OWNER_ADDR)
+send_tx(OWNER_KEY, escrow, "setUserRegistry(address)", registry)
+send_tx(OWNER_KEY, governance, "setTreasury(address)", OWNER_ADDR)
 send_tx(OWNER_KEY, governance, "setSocio(address,bool)", OWNER_ADDR, "true")
 send_tx(
     OWNER_KEY,

@@ -19,6 +19,10 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
  * Estados de una operación: Active -> Completed | Cancelled | Disputed
  * Disputed -> Completed (resolución del árbitro).
  */
+interface IUserRegistryEscrow {
+    function getIdentificationLevel(address wallet) external view returns (uint8);
+}
+
 contract Escrow is Ownable, ReentrancyGuard {
     enum Status {
         Active,
@@ -45,11 +49,12 @@ contract Escrow is Ownable, ReentrancyGuard {
     mapping(uint256 => Operation) public operations;
     mapping(address => bool) public allowedTokens;
     address[] private tokenList;
-    // A1.2: operationIds[] eliminado — IDs son secuenciales desde 1;
-    //       getOperationsCount() y getOperations() usan nextOperationId directamente.
 
-    /// Rol opcional que resuelve disputas. address(0) = arbitraje deshabilitado.
     address public arbiter;
+    address public userRegistry;
+    mapping(address => uint256) public activeTradesCount;
+
+    event UserRegistrySet(address indexed registry);
 
     // ------------------------------------------------- meta-transacciones
     // M5: los particulares firman sus intenciones (EIP-712 + permit EIP-2612)
@@ -114,6 +119,9 @@ contract Escrow is Ownable, ReentrancyGuard {
         uint256 amountB,
         uint256 deadline
     ) internal returns (uint256) {
+        _checkActiveTradeQuota(user);
+        activeTradesCount[user]++;
+
         uint256 operationId = nextOperationId++;
         operations[operationId] = Operation({
             id: operationId,
@@ -187,6 +195,8 @@ contract Escrow is Ownable, ReentrancyGuard {
         require(operation.deadline == 0 || block.timestamp <= operation.deadline, "Operation expired");
         require(metaNonces[user] == nonce, "Invalid nonce");
 
+        _checkActiveTradeQuota(user);
+
         bytes32 structHash = keccak256(abi.encode(_COMPLETE_TYPEHASH, user, operationId, nonce));
         _verifyMetaSignature(structHash, user, signature);
         metaNonces[user] = nonce + 1;
@@ -198,6 +208,10 @@ contract Escrow is Ownable, ReentrancyGuard {
         operation.user2 = user;  // A1.1: registrar la contraparte on-chain
         operation.status = Status.Completed;
         operation.closedAt = block.timestamp;
+
+        if (activeTradesCount[operation.user1] > 0) {
+            activeTradesCount[operation.user1]--;
+        }
 
         emit OperationCompleted(operationId, user, operation.amountA, operation.amountB, block.timestamp);
     }
@@ -279,6 +293,28 @@ contract Escrow is Ownable, ReentrancyGuard {
         emit ArbiterSet(_arbiter);
     }
 
+    /// @notice Configura el contrato UserRegistry para validar cuotas por nivel.
+    function setUserRegistry(address _registry) external onlyOwner {
+        userRegistry = _registry;
+        emit UserRegistrySet(_registry);
+    }
+
+    /// @notice Valida el límite de operaciones concurrentes activas según el nivel de identificación.
+    function _checkActiveTradeQuota(address user) internal view {
+        if (userRegistry != address(0)) {
+            try IUserRegistryEscrow(userRegistry).getIdentificationLevel(user) returns (uint8 level) {
+                if (level == 0) {
+                    // Inscrito (Nivel 1 = 0 en enum): máximo 1 intercambio activo a la vez
+                    require(activeTradesCount[user] < 1, "Inscrito limit: max 1 active trade");
+                } else if (level == 1) {
+                    // Verificado (Nivel 2 = 1 en enum): máximo 3 intercambios activos a la vez
+                    require(activeTradesCount[user] < 3, "Verificado limit: max 3 active trades");
+                }
+                // Certificado (Nivel 3 = 2 en enum): Ilimitados
+            } catch {}
+        }
+    }
+
     // ------------------------------------------------------------- lifecycle
 
     /// @notice User1 deposita amountA de tokenA pidiendo amountB de tokenB.
@@ -308,12 +344,18 @@ contract Escrow is Ownable, ReentrancyGuard {
         require(operation.user1 != msg.sender, "Cannot complete your own operation");
         require(operation.deadline == 0 || block.timestamp <= operation.deadline, "Operation expired");
 
+        _checkActiveTradeQuota(msg.sender);
+
         IERC20(operation.tokenB).transferFrom(msg.sender, operation.user1, operation.amountB);
         IERC20(operation.tokenA).transfer(msg.sender, operation.amountA);
 
-        operation.user2 = msg.sender;  // A1.1: registrar la contraparte on-chain
+        operation.user2 = msg.sender;
         operation.status = Status.Completed;
         operation.closedAt = block.timestamp;
+
+        if (activeTradesCount[operation.user1] > 0) {
+            activeTradesCount[operation.user1]--;
+        }
 
         emit OperationCompleted(operationId, msg.sender, operation.amountA, operation.amountB, block.timestamp);
     }
@@ -329,6 +371,10 @@ contract Escrow is Ownable, ReentrancyGuard {
 
         operation.status = Status.Cancelled;
         operation.closedAt = block.timestamp;
+
+        if (activeTradesCount[operation.user1] > 0) {
+            activeTradesCount[operation.user1]--;
+        }
 
         emit OperationCancelled(operationId, operation.amountA, block.timestamp);
     }
@@ -347,15 +393,16 @@ contract Escrow is Ownable, ReentrancyGuard {
         operation.status = Status.Cancelled;
         operation.closedAt = block.timestamp;
 
+        if (activeTradesCount[operation.user1] > 0) {
+            activeTradesCount[operation.user1]--;
+        }
+
         emit OperationExpired(operationId, msg.sender, operation.amountA, block.timestamp);
     }
 
     // ------------------------------------------------------------- disputes
 
-    /// @notice Abre una disputa mientras la operación está activa y no ha
-    ///         vencido. Puede invocarla cualquiera de las partes implicadas
-    ///         (user1 o la contraparte, que aún no está registrada on-chain)
-    ///         o el propio árbitro. Requiere que exista un árbitro designado.
+    /// @notice Abre una disputa mientras la operación está activa y no ha vencido.
     function disputeOperation(uint256 operationId) external {
         Operation storage operation = operations[operationId];
         require(operation.id != 0, "Operation does not exist");
@@ -371,12 +418,7 @@ contract Escrow is Ownable, ReentrancyGuard {
         emit OperationDisputed(operationId, msg.sender, block.timestamp);
     }
 
-    /// @notice El árbitro resuelve la disputa:
-    ///         favorUser1 == true  -> User1 recupera tokenA (refund).
-    ///         favorUser1 == false -> `recipient` (la contraparte que el
-    ///         árbitro determina como ganadora) recibe tokenA (pago liberado).
-    ///         A1.1: user2 queda registrado on-chain al completar, por lo que el
-    ///         árbitro ya no necesita indicar al ganador externamente.
+    /// @notice El árbitro resuelve la disputa.
     function resolveDispute(uint256 operationId, bool favorUser1) external onlyArbiter nonReentrant {
         Operation storage operation = operations[operationId];
         require(operation.id != 0, "Operation does not exist");
@@ -386,7 +428,10 @@ contract Escrow is Ownable, ReentrancyGuard {
         if (favorUser1) {
             winner = operation.user1;
         } else {
-            require(operation.user2 != address(0), "No counterpart on-chain: disputa abierta antes de que user2 completara");
+            require(
+                operation.user2 != address(0),
+                "No counterpart on-chain: disputa abierta antes de que user2 completara"
+            );
             winner = operation.user2;
         }
 
@@ -394,6 +439,10 @@ contract Escrow is Ownable, ReentrancyGuard {
 
         operation.status = Status.Completed;
         operation.closedAt = block.timestamp;
+
+        if (activeTradesCount[operation.user1] > 0) {
+            activeTradesCount[operation.user1]--;
+        }
 
         emit DisputeResolved(operationId, favorUser1, block.timestamp);
     }

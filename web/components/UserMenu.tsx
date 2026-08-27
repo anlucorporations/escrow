@@ -406,25 +406,107 @@ export function UserMenu() {
               </div>
             </Link>
 
+            {/* SECCIÓN EMPRESA (Si es Empresa Activa) */}
+            {role.isBusiness && (
+              <>
+                <Link
+                  href="/company/inventory"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-amber-50/70 transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-amber-600">📦</span>
+                    <div>
+                      <p className="text-xs font-semibold text-amber-900 group-hover:text-amber-700">
+                        Inventario Comercial
+                      </p>
+                      <p className="text-[10px] text-amber-600/80 font-light">
+                        Gestión de stock, catálogos y tiendas
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+
+                <Link
+                  href="/company/finances"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-amber-50/70 transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-amber-600">📈</span>
+                    <div>
+                      <p className="text-xs font-semibold text-amber-900 group-hover:text-amber-700">
+                        Finanzas Comerciales
+                      </p>
+                      <p className="text-[10px] text-amber-600/80 font-light">
+                        Cobros y flujo de ventas en cripto
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              </>
+            )}
+
+            {/* SECCIÓN SOCIO (Si es Socio Árbitro) */}
+            {role.isSocio && (
+              <>
+                <Link
+                  href="/governance/socio-voting"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-purple-50/70 transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-purple-600">⚖️</span>
+                    <div>
+                      <p className="text-xs font-semibold text-purple-900 group-hover:text-purple-700">
+                        Votación de Nuevos Socios
+                      </p>
+                      <p className="text-[10px] text-purple-600/80 font-light">
+                        Revisión de postulaciones y quórum
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+
+                <Link
+                  href="/governance/treasury"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-purple-50/70 transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-purple-600">🌐</span>
+                    <div>
+                      <p className="text-xs font-semibold text-purple-900 group-hover:text-purple-700">
+                        Finanzas Globales & Gas
+                      </p>
+                      <p className="text-[10px] text-purple-600/80 font-light">
+                        Tesorería y costos de operación
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              </>
+            )}
+
             {/* Administración (si es Admin) */}
             {isAdmin && (
               <Link
                 href="/add-token"
                 onClick={() => setOpen(false)}
-                className="flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-amber-50/60 transition-colors group"
+                className="flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-fuchsia-50/60 transition-colors group"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-amber-500">
+                  <span className="text-fuchsia-500">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                   </span>
                   <div>
-                    <p className="text-xs font-semibold text-amber-800">
+                    <p className="text-xs font-semibold text-fuchsia-800">
                       Panel de Administración
                     </p>
-                    <p className="text-[10px] text-amber-600 font-light">
+                    <p className="text-[10px] text-fuchsia-600 font-light">
                       Autorizar tokens y gestión del contrato
                     </p>
                   </div>

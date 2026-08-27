@@ -674,5 +674,212 @@ export function useUserRole(): UserRoleInfo {
   return roleInfo
 }
 
+/**
+ * Hook para consultar el rango de reputación transaccional on-chain (Bronce, Plata, Oro).
+ */
+export function useReputation(targetAddress?: string) {
+  const { provider, account } = useEthereum()
+  const wallet = targetAddress || account
+
+  const [reputation, setReputation] = useState<{
+    completed: number
+    lost: number
+    effectiveness: number
+    rank: number
+    rankName: 'Bronce' | 'Plata' | 'Oro'
+    isOro: boolean
+    isPlata: boolean
+    isBronce: boolean
+    loading: boolean
+  }>({
+    completed: 0,
+    lost: 0,
+    effectiveness: 100,
+    rank: 1,
+    rankName: 'Bronce',
+    isOro: false,
+    isPlata: false,
+    isBronce: true,
+    loading: true,
+  })
+
+  useEffect(() => {
+    let cancelled = false
+    const fetchReputation = async () => {
+      if (!provider || !wallet) {
+        setReputation(prev => ({ ...prev, loading: false }))
+        return
+      }
+      try {
+        const registry = new ethers.Contract(USER_REGISTRY_ADDRESS, USER_REGISTRY_ABI, provider)
+        const [comp, lost, eff, r] = await registry.getReputation(wallet)
+        if (cancelled) return
+
+        const rankNum = Number(r)
+        const rankName: 'Bronce' | 'Plata' | 'Oro' = rankNum === 3 ? 'Oro' : rankNum === 2 ? 'Plata' : 'Bronce'
+        setReputation({
+          completed: Number(comp),
+          lost: Number(lost),
+          effectiveness: Number(eff),
+          rank: rankNum,
+          rankName,
+          isOro: rankNum === 3,
+          isPlata: rankNum === 2,
+          isBronce: rankNum === 1,
+          loading: false,
+        })
+      } catch (err) {
+        console.warn('Error fetching reputation for', wallet, err)
+        if (!cancelled) setReputation(prev => ({ ...prev, loading: false }))
+      }
+    }
+    fetchReputation()
+    return () => {
+      cancelled = true
+    }
+  }, [provider, wallet])
+
+  return reputation
+}
+
+/**
+ * Hook para verificar el límite de operaciones concurrentes activas on-chain según nivel.
+ */
+export function useTradeQuota(targetAddress?: string) {
+  const { provider, account } = useEthereum()
+  const wallet = targetAddress || account
+
+  const [quota, setQuota] = useState<{
+    activeTrades: number
+    limit: number
+    canCreate: boolean
+    isUnlimited: boolean
+    level: number
+    levelName: string
+    loading: boolean
+  }>({
+    activeTrades: 0,
+    limit: 1,
+    canCreate: true,
+    isUnlimited: false,
+    level: 0,
+    levelName: 'Inscrito',
+    loading: true,
+  })
+
+  useEffect(() => {
+    let cancelled = false
+    const fetchQuota = async () => {
+      if (!provider || !wallet) {
+        setQuota(prev => ({ ...prev, loading: false }))
+        return
+      }
+      try {
+        const escrow = new ethers.Contract(ESCROW_ADDRESS, ESCROW_ABI, provider)
+        const registry = new ethers.Contract(USER_REGISTRY_ADDRESS, USER_REGISTRY_ABI, provider)
+
+        const [activeCountRaw, levelRaw] = await Promise.all([
+          escrow.activeTradesCount(wallet).catch(() => 0n),
+          registry.getIdentificationLevel(wallet).catch(() => 0),
+        ])
+
+        if (cancelled) return
+
+        const activeTrades = Number(activeCountRaw)
+        const level = Number(levelRaw)
+
+        let limit = 1
+        let levelName = 'Inscrito'
+        let isUnlimited = false
+
+        if (level === 1) {
+          limit = 3
+          levelName = 'Verificado'
+        } else if (level === 2) {
+          limit = 999
+          levelName = 'Certificado'
+          isUnlimited = true
+        }
+
+        const canCreate = isUnlimited || activeTrades < limit
+
+        setQuota({
+          activeTrades,
+          limit,
+          canCreate,
+          isUnlimited,
+          level,
+          levelName,
+          loading: false,
+        })
+      } catch (err) {
+        console.warn('Error fetching trade quota for', wallet, err)
+        if (!cancelled) setQuota(prev => ({ ...prev, loading: false }))
+      }
+    }
+    fetchQuota()
+    return () => {
+      cancelled = true
+    }
+  }, [provider, wallet])
+
+  return quota
+}
+
+/**
+ * Hook para gestionar postulaciones de Socios en Governance.
+ */
+export function useSocioApplications() {
+  const { provider, account } = useEthereum()
+
+  const applyForSocio = useCallback(
+    async (motivation: string, depositToken: string, depositAmount: string) => {
+      if (!provider || !account) throw new Error('Conecta tu billetera primero')
+      const signer = await provider.getSigner()
+
+      // 1. Aprobar depósito
+      const token = new ethers.Contract(depositToken, ERC20_ABI, signer)
+      const approveTx = await token.approve(GOVERNANCE_ADDRESS, ethers.parseUnits(depositAmount, 18))
+      await approveTx.wait()
+
+      // 2. Postularse en Governance
+      const gov = new ethers.Contract(GOVERNANCE_ADDRESS, GOVERNANCE_ABI, signer)
+      const tx = await gov.applyForSocio(motivation, depositToken, ethers.parseUnits(depositAmount, 18))
+      const receipt = await tx.wait()
+      return receipt
+    },
+    [provider, account]
+  )
+
+  const voteSocioApplication = useCallback(
+    async (applicationId: number, support: boolean) => {
+      if (!provider || !account) throw new Error('Conecta tu billetera primero')
+      const signer = await provider.getSigner()
+      const gov = new ethers.Contract(GOVERNANCE_ADDRESS, GOVERNANCE_ABI, signer)
+      const tx = await gov.voteSocioApplication(applicationId, support)
+      return tx.wait()
+    },
+    [provider, account]
+  )
+
+  const resolveSocioApplication = useCallback(
+    async (applicationId: number) => {
+      if (!provider || !account) throw new Error('Conecta tu billetera primero')
+      const signer = await provider.getSigner()
+      const gov = new ethers.Contract(GOVERNANCE_ADDRESS, GOVERNANCE_ABI, signer)
+      const tx = await gov.resolveSocioApplication(applicationId)
+      return tx.wait()
+    },
+    [provider, account]
+  )
+
+  return {
+    applyForSocio,
+    voteSocioApplication,
+    resolveSocioApplication,
+  }
+}
+
 export { getFriendlyError }
+
 

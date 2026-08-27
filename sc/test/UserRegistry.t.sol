@@ -227,5 +227,42 @@ contract UserRegistryTest is Test {
         );
         assertTrue(registry.isRegistered(user2));
     }
+
+    function testReputationRanksBroncePlataOro() public {
+        vm.prank(user1);
+        registry.register(
+            "alice",
+            "alice@truekeate.com",
+            "+584121112233",
+            "Av. Bolivar, Barlovento, Miranda",
+            729450,
+            1159800,
+            19,
+            true
+        );
+
+        // Inicial: 0 trades -> Bronce (rank = 1)
+        (uint256 completed, uint256 lost, uint256 eff, uint8 rank) = registry.getReputation(user1);
+        assertEq(completed, 0);
+        assertEq(lost, 0);
+        assertEq(eff, 100);
+        assertEq(rank, 1); // Bronce
+
+        // Simular 60 trades completados y 5 perdidos -> Plata (rank = 2, 60/65 = 92%)
+        for (uint256 i = 0; i < 60; i++) {
+            registry.recordTradeOutcome(user1, true, false);
+        }
+        for (uint256 i = 0; i < 5; i++) {
+            registry.recordTradeOutcome(user1, false, true);
+        }
+        assertEq(registry.getReputationRank(user1), 2); // Plata
+
+        // Simular 950 trades adicionales ganados (total 1010 ganados, 5 perdidos = 99.5%) -> Oro (rank = 3)
+        for (uint256 i = 0; i < 950; i++) {
+            registry.recordTradeOutcome(user1, true, false);
+        }
+        assertEq(registry.getReputationRank(user1), 3); // Oro
+    }
 }
+
 

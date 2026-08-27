@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { fetchItems, Item } from '@/lib/items'
+import { TradeQuotaBanner } from '@/components/TradeQuotaBanner'
 
 const CATEGORIES = ['general', 'electronica', 'hogar', 'vehiculos', 'ropa', 'coleccionables', 'servicios', 'otros']
 
@@ -34,6 +35,8 @@ export default function ItemsPage() {
   return (
     <div className="min-h-screen bg-background pt-28">
       <div className="container mx-auto px-6 max-w-6xl pb-20">
+        <TradeQuotaBanner />
+
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
           <div>
             <h1 className="text-4xl md:text-5xl font-serif text-slate-900 mb-2">Colección de artículos</h1>

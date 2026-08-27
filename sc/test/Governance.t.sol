@@ -3,6 +3,7 @@ pragma solidity ^0.8.13;
 
 import {Test} from "forge-std/Test.sol";
 import {Governance} from "../src/Governance.sol";
+import {MockERC20} from "../src/MockERC20.sol";
 
 /// M10 — Gobernanza del nivel Socio.
 contract GovernanceTest is Test {
@@ -112,4 +113,69 @@ contract GovernanceTest is Test {
         gov.removeSanction(target);
         assertFalse(gov.isSanctioned(target));
     }
+
+    // ------------------------------------------------------------- Admisión de Socios y Depósito
+
+    function testSocioApplicationApprovedTransfersDepositToTreasury() public {
+        MockERC20 depositToken = new MockERC20("Governance Deposit", "BRLT", 18);
+        address candidate = makeAddr("candidate");
+        address treasury = makeAddr("treasury");
+        gov.setTreasury(treasury);
+
+        depositToken.mint(candidate, 500 ether);
+
+        vm.startPrank(candidate);
+        depositToken.approve(address(gov), 500 ether);
+        uint256 appId = gov.applyForSocio("Quiero postularme como Socio y mediador", address(depositToken), 500 ether);
+        vm.stopPrank();
+
+        assertEq(depositToken.balanceOf(address(gov)), 500 ether);
+
+        // Socios votan a favor (mayoría simple)
+        vm.prank(socio1);
+        gov.voteSocioApplication(appId, true);
+
+        vm.prank(socio2);
+        gov.voteSocioApplication(appId, true);
+
+        // Avanzar ventana de 5 días
+        vm.warp(block.timestamp + 5 days + 1 hours);
+        gov.resolveSocioApplication(appId);
+
+        // Candidato ahora es Socio y el depósito pasó a tesorería
+        assertTrue(gov.isSocio(candidate));
+        assertEq(depositToken.balanceOf(treasury), 500 ether);
+        assertEq(depositToken.balanceOf(address(gov)), 0);
+    }
+
+    function testSocioApplicationRejectedRefundsDeposit() public {
+        MockERC20 depositToken = new MockERC20("Governance Deposit", "BRLT", 18);
+        address candidate = makeAddr("candidate");
+        address treasury = makeAddr("treasury");
+        gov.setTreasury(treasury);
+
+        depositToken.mint(candidate, 500 ether);
+
+        vm.startPrank(candidate);
+        depositToken.approve(address(gov), 500 ether);
+        uint256 appId = gov.applyForSocio("Postulacion sin experiencia", address(depositToken), 500 ether);
+        vm.stopPrank();
+
+        // Socios votan en contra
+        vm.prank(socio1);
+        gov.voteSocioApplication(appId, false);
+
+        vm.prank(socio2);
+        gov.voteSocioApplication(appId, false);
+
+        // Avanzar ventana de 5 días
+        vm.warp(block.timestamp + 5 days + 1 hours);
+        gov.resolveSocioApplication(appId);
+
+        // Candidato NO es Socio y el depósito fue reembolsado
+        assertFalse(gov.isSocio(candidate));
+        assertEq(depositToken.balanceOf(candidate), 500 ether);
+        assertEq(depositToken.balanceOf(treasury), 0);
+    }
 }
+

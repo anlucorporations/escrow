@@ -278,6 +278,65 @@ async function main() {
       console.log(`🛡️ Evento on-chain: UserRegistry.IdentificationLevelUpdated -> ${wallet.slice(0, 6)}... -> ${lvlStr}`)
       await updateUserLevel(wallet, lvlStr)
     })
+
+    registry.on('ReputationUpdated', async (wallet, completed, lost, rank) => {
+      const rankStr = rank === 3 ? 'oro' : rank === 2 ? 'plata' : 'bronce'
+      const compNum = Number(completed)
+      const lostNum = Number(lost)
+      const total = compNum + lostNum
+      const eff = total > 0 ? (compNum * 100) / total : 100.0
+      console.log(`🏆 Evento on-chain: UserRegistry.ReputationUpdated -> ${wallet.slice(0, 6)}... [${rankStr.toUpperCase()}] (${compNum} completados, ${lostNum} perdidos, ${eff.toFixed(1)}% eff)`)
+      await query(
+        `UPDATE users SET completed_trades = ?, disputes_lost = ?, reputation_rank = ?, effectiveness_pct = ? WHERE address = ?`,
+        [compNum, lostNum, rankStr, eff, wallet.toLowerCase()]
+      )
+    })
+  }
+
+  const GOVERNANCE_ADDRESS = process.env.NEXT_PUBLIC_GOVERNANCE_ADDRESS
+  if (GOVERNANCE_ADDRESS && loadAbi('Governance').length > 0) {
+    const gov = new ethers.Contract(GOVERNANCE_ADDRESS, loadAbi('Governance'), provider)
+    contracts.push({ name: 'Governance', contract: gov })
+
+    gov.on('SocioSet', async (account, flag) => {
+      console.log(`⚖️ Evento on-chain: Governance.SocioSet -> ${account.slice(0, 6)}... (Socio: ${flag})`)
+      if (flag) {
+        await query(`UPDATE users SET role = 'socio' WHERE address = ?`, [account.toLowerCase()])
+      }
+    })
+
+    gov.on('SocioApplicationCreated', async (id, candidate, motivation, depToken, depAmount, created) => {
+      console.log(`📝 Evento on-chain: Governance.SocioApplicationCreated #${id} por ${candidate.slice(0, 6)}...`)
+      await query(
+        `INSERT INTO socio_applications (id, candidate, motivation, deposit_token, deposit_amount, created_at, status)
+         VALUES (?, ?, ?, ?, ?, ?, 'voting')
+         ON CONFLICT(id) DO UPDATE SET motivation = excluded.motivation`,
+        [Number(id), candidate.toLowerCase(), motivation, depToken, depAmount.toString(), Number(created)]
+      )
+      await createNotification(candidate, 'governance', `Tu postulación a Socio #${id} está en votación (ventana de 5 días).`, String(id))
+    })
+
+    gov.on('SocioApplicationVoted', async (id, socio, support) => {
+      console.log(`🗳️ Evento on-chain: Governance.SocioApplicationVoted #${id} por ${socio.slice(0, 6)}... (Voto: ${support ? 'SÍ' : 'NO'})`)
+      if (support) {
+        await query(`UPDATE socio_applications SET yes_votes = yes_votes + 1 WHERE id = ?`, [Number(id)])
+      } else {
+        await query(`UPDATE socio_applications SET no_votes = no_votes + 1 WHERE id = ?`, [Number(id)])
+      }
+    })
+
+    gov.on('SocioApplicationResolved', async (id, candidate, passed) => {
+      console.log(`🏛️ Evento on-chain: Governance.SocioApplicationResolved #${id} -> ${passed ? 'APROBADA' : 'RECHAZADA'}`)
+      const status = passed ? 'approved' : 'rejected'
+      const now = Math.floor(Date.now() / 1000)
+      await query(`UPDATE socio_applications SET status = ?, resolved_at = ? WHERE id = ?`, [status, now, Number(id)])
+      if (passed) {
+        await query(`UPDATE users SET role = 'socio' WHERE address = ?`, [candidate.toLowerCase()])
+        await createNotification(candidate, 'governance', `¡Felicidades! Tu postulación a Socio #${id} fue aprobada. Ahora tienes rol de Socio y Árbitro.`, String(id))
+      } else {
+        await createNotification(candidate, 'governance', `Tu postulación a Socio #${id} no alcanzó los votos requeridos. Tu depósito fue reembolsado.`, String(id))
+      }
+    })
   }
 
   if (SBT_REGISTRY_ADDRESS && loadAbi('SBTRegistry').length > 0) {

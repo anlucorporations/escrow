@@ -213,6 +213,55 @@ const SCHEMA = [
     read       INTEGER NOT NULL DEFAULT 0,
     created_at INTEGER NOT NULL DEFAULT 0
   )`,
+  // Solicitudes de admisión a Socio (Gobernanza de 5 días y depósito)
+  `CREATE TABLE IF NOT EXISTS socio_applications (
+    id             INTEGER PRIMARY KEY,
+    candidate      TEXT NOT NULL,
+    motivation     TEXT NOT NULL DEFAULT '',
+    deposit_token  TEXT NOT NULL,
+    deposit_amount TEXT NOT NULL,
+    yes_votes      INTEGER NOT NULL DEFAULT 0,
+    no_votes       INTEGER NOT NULL DEFAULT 0,
+    status         TEXT NOT NULL DEFAULT 'voting', -- voting|approved|rejected
+    created_at     INTEGER NOT NULL DEFAULT 0,
+    resolved_at    INTEGER NOT NULL DEFAULT 0
+  )`,
+  // Locales y sucursales comerciales fijas de Empresas
+  `CREATE TABLE IF NOT EXISTS company_stores (
+    id               TEXT PRIMARY KEY,
+    owner            TEXT NOT NULL,
+    name             TEXT NOT NULL,
+    physical_address TEXT NOT NULL,
+    lat              REAL,
+    lng              REAL,
+    utm_easting      INTEGER,
+    utm_northing     INTEGER,
+    utm_zone         INTEGER DEFAULT 19,
+    schedule         TEXT NOT NULL DEFAULT '',
+    phone            TEXT NOT NULL DEFAULT '',
+    created_at       INTEGER NOT NULL DEFAULT 0
+  )`,
+  // Finanzas comerciales particulares de Empresas (Ventas y cobros cripto)
+  `CREATE TABLE IF NOT EXISTS company_finances (
+    id          TEXT PRIMARY KEY,
+    company     TEXT NOT NULL,
+    type        TEXT NOT NULL DEFAULT 'sale', -- sale|swap|fee|payout
+    token       TEXT NOT NULL,
+    amount      TEXT NOT NULL,
+    ref_id      TEXT NOT NULL DEFAULT '',
+    description TEXT NOT NULL DEFAULT '',
+    created_at  INTEGER NOT NULL DEFAULT 0
+  )`,
+  // Finanzas globales y tesorería comunitaria (Gastos operativos de gas, servidores, fondo)
+  `CREATE TABLE IF NOT EXISTS platform_treasury_logs (
+    id          TEXT PRIMARY KEY,
+    type        TEXT NOT NULL, -- deposit_admission|subscription|gas_expense|server_maintenance
+    token       TEXT NOT NULL,
+    amount      TEXT NOT NULL,
+    actor       TEXT NOT NULL DEFAULT '',
+    description TEXT NOT NULL DEFAULT '',
+    created_at  INTEGER NOT NULL DEFAULT 0
+  )`,
 ]
 
 /** Crea las tablas si no existen. Idempotente. */
@@ -248,6 +297,10 @@ export async function initSchema() {
     // Campañas: por owner y estado
     'CREATE INDEX IF NOT EXISTS idx_campaigns_owner         ON campaigns (owner)',
     'CREATE INDEX IF NOT EXISTS idx_campaigns_status        ON campaigns (status)',
+    // Solicitudes de socio y finanzas
+    'CREATE INDEX IF NOT EXISTS idx_socio_apps_candidate    ON socio_applications (candidate)',
+    'CREATE INDEX IF NOT EXISTS idx_company_stores_owner    ON company_stores (owner)',
+    'CREATE INDEX IF NOT EXISTS idx_company_finances_comp   ON company_finances (company)',
   ]
 
   for (const idx of INDEXES) {
@@ -280,6 +333,14 @@ export async function initSchema() {
   await ensureColumn('users', 'sbt_provider', 'TEXT NOT NULL DEFAULT \'\'')
   await ensureColumn('users', 'sbt_contract', 'TEXT NOT NULL DEFAULT \'\'')
   await ensureColumn('users', 'sbt_verified_at', 'INTEGER NOT NULL DEFAULT 0')
+
+  // Doble Eje de Progresión: Roles (Particular, Empresa, Socio) y Reputación (Bronce, Plata, Oro)
+  await ensureColumn('users', 'role', 'TEXT NOT NULL DEFAULT \'particular\'')
+  await ensureColumn('users', 'reputation_rank', 'TEXT NOT NULL DEFAULT \'bronce\'')
+  await ensureColumn('users', 'completed_trades', 'INTEGER NOT NULL DEFAULT 0')
+  await ensureColumn('users', 'disputes_lost', 'INTEGER NOT NULL DEFAULT 0')
+  await ensureColumn('users', 'effectiveness_pct', 'REAL NOT NULL DEFAULT 100.0')
+  await ensureColumn('users', 'active_trades_limit', 'INTEGER NOT NULL DEFAULT 1')
 
   // Soporte Multi-Activo y Seguimiento Logístico en Operaciones
   await ensureColumn('operations', 'tracking_info', 'TEXT NOT NULL DEFAULT \'\'')

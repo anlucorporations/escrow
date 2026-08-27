@@ -138,6 +138,54 @@ contract UserRegistry is Ownable {
         );
     }
 
+    mapping(address => uint256) public completedTradesCount;
+    mapping(address => uint256) public disputesLostCount;
+
+    event ReputationUpdated(address indexed wallet, uint256 completed, uint256 lost, uint8 rank);
+
+    /// @notice Registra el resultado de un trueke para computar reputación.
+    function recordTradeOutcome(address user, bool isCompleted, bool isDisputeLost) external onlyIdentityAdminOrOwner {
+        if (isCompleted) {
+            completedTradesCount[user]++;
+        }
+        if (isDisputeLost) {
+            disputesLostCount[user]++;
+        }
+        emit ReputationUpdated(user, completedTradesCount[user], disputesLostCount[user], getReputationRank(user));
+    }
+
+    /// @notice Calcula el rango de reputación: 1: Bronce, 2: Plata, 3: Oro.
+    function getReputationRank(address wallet) public view returns (uint8) {
+        uint256 completed = completedTradesCount[wallet];
+        uint256 lost = disputesLostCount[wallet];
+        uint256 total = completed + lost;
+
+        if (total == 0 || completed < 50) {
+            return 1; // Bronce
+        }
+
+        uint256 eff = (completed * 100) / total;
+        if (completed >= 1000 && eff >= 90) {
+            return 3; // Oro
+        } else if (completed >= 50 && eff >= 80) {
+            return 2; // Plata
+        }
+        return 1; // Bronce
+    }
+
+    /// @notice Devuelve el resumen completo de reputación de un usuario.
+    function getReputation(address wallet)
+        external
+        view
+        returns (uint256 completed, uint256 lost, uint256 effectiveness, uint8 rank)
+    {
+        completed = completedTradesCount[wallet];
+        lost = disputesLostCount[wallet];
+        uint256 total = completed + lost;
+        effectiveness = total > 0 ? (completed * 100) / total : 100;
+        rank = getReputationRank(wallet);
+    }
+
     /// @notice Actualiza el nivel de identificación de un usuario (Inscrito -> Verificado -> Certificado).
     function setUserIdentificationLevel(address wallet, IdentificationLevel level) external onlyIdentityAdminOrOwner {
         require(profiles[wallet].isRegistered, "User is not registered");

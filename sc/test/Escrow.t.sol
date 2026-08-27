@@ -4,6 +4,7 @@ pragma solidity ^0.8.13;
 import {Test} from "forge-std/Test.sol";
 import {Escrow} from "../src/Escrow.sol";
 import {MockERC20} from "../src/MockERC20.sol";
+import {UserRegistry} from "../src/UserRegistry.sol";
 
 contract EscrowTest is Test {
     Escrow public escrow;
@@ -373,6 +374,78 @@ contract EscrowTest is Test {
 
         Escrow.Operation[] memory empty = escrow.getOperations(10, 2);
         assertEq(empty.length, 0);
+    }
+
+    // ------------------------------------------------------------ trade quota tests
+
+    function testInscritoUserQuotaMax1ActiveTrade() public {
+        UserRegistry registry = new UserRegistry();
+        escrow.setUserRegistry(address(registry));
+
+        // Registrar user1 como Inscrito (level 0)
+        vm.prank(user1);
+        registry.register("user1_inscrito", "user1@test.com", "+584121234567", "Calle 1, Caracas", 729000, 1159000, 19, true);
+
+        // Primer trade permitido
+        uint256 op1 = _createSwap();
+        assertEq(escrow.activeTradesCount(user1), 1);
+
+        // Segundo trade consecutivo revierte
+        vm.startPrank(user1);
+        tokenA.approve(address(escrow), 100 ether);
+        vm.expectRevert("Inscrito limit: max 1 active trade");
+        escrow.createOperation(address(tokenA), address(tokenB), 100 ether, 200 ether, 0);
+        vm.stopPrank();
+
+        // Al cancelar el primero, se libera la cuota
+        vm.prank(user1);
+        escrow.cancelOperation(op1);
+        assertEq(escrow.activeTradesCount(user1), 0);
+
+        // Ahora sí puede crear otro
+        uint256 op2 = _createSwap();
+        assertEq(op2, 2);
+        assertEq(escrow.activeTradesCount(user1), 1);
+    }
+
+    function testVerificadoUserQuotaMax3ActiveTrades() public {
+        UserRegistry registry = new UserRegistry();
+        escrow.setUserRegistry(address(registry));
+
+        // Registrar user1 y subir a Verificado (level 1)
+        vm.prank(user1);
+        registry.register("user1_verif", "user1@test.com", "+584121234567", "Calle 2, Caracas", 729000, 1159000, 19, true);
+        registry.setUserIdentificationLevel(user1, UserRegistry.IdentificationLevel.Verificado);
+
+        // 3 trades permitidos
+        _createSwap();
+        _createSwap();
+        _createSwap();
+        assertEq(escrow.activeTradesCount(user1), 3);
+
+        // El 4to trade revierte
+        vm.startPrank(user1);
+        tokenA.approve(address(escrow), 100 ether);
+        vm.expectRevert("Verificado limit: max 3 active trades");
+        escrow.createOperation(address(tokenA), address(tokenB), 100 ether, 200 ether, 0);
+        vm.stopPrank();
+    }
+
+    function testCertificadoUserUnlimitedTrades() public {
+        UserRegistry registry = new UserRegistry();
+        escrow.setUserRegistry(address(registry));
+
+        // Registrar user1 y subir a Certificado (level 2)
+        vm.prank(user1);
+        registry.register("user1_cert", "user1@test.com", "+584121234567", "Calle 3, Caracas", 729000, 1159000, 19, true);
+        registry.setUserIdentificationLevel(user1, UserRegistry.IdentificationLevel.Certificado);
+
+        // Puede crear 4 o más sin restricción
+        _createSwap();
+        _createSwap();
+        _createSwap();
+        _createSwap();
+        assertEq(escrow.activeTradesCount(user1), 4);
     }
 
     // ------------------------------------------------------------ helpers
