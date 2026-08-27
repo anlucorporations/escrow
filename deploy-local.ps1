@@ -174,7 +174,7 @@ NEXT_PUBLIC_BRLT_ADDRESS=$BRLT
 NEXT_PUBLIC_RPC_URL=$RpcUrl
 NEXT_PUBLIC_CHAIN_ID=31337
 RELAYER_PRIVATE_KEY=$OwnerKey
-DATABASE_URL=postgresql://postgres:KeLuDa.2324@127.0.0.1:5432/truekeate
+DATABASE_URL=postgresql://anlucorporations:KeLuDa.2324@127.0.0.1:5432/truekeate
 KYC_SECRET=truekeate-local-dev-secret-0123456789abcdef0123456789abcdef
 "@
 Set-Content -Path "web/.env.local" -Encoding utf8 -Value $envContent
