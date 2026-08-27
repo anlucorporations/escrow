@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { EthereumProvider } from "@/lib/ethereum";
 import { RegisterProvider } from "@/components/RegisterModal";
@@ -8,13 +8,13 @@ import { Header } from "@/components/Header";
 import { BottomNav } from "@/components/BottomNav";
 import { PwaInstallBanner } from "@/components/PwaInstallBanner";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin"],
 });
 
@@ -46,7 +46,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased pb-20 md:pb-0`}
+        className={`${inter.variable} ${playfair.variable} antialiased pb-20 md:pb-0 font-sans`}
       >
         <PwaRegister />
         <EthereumProvider>

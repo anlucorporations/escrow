@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect, useCallback } from 'react'
 import { useEthereum } from '@/lib/ethereum'
 import { useRegistration } from '@/lib/hooks'
