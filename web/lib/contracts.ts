@@ -195,6 +195,11 @@ export const ESCROW_ABI = [
             "internalType": "address"
           },
           {
+            "name": "user2",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
             "name": "tokenA",
             "type": "address",
             "internalType": "address"
@@ -267,6 +272,11 @@ export const ESCROW_ABI = [
           },
           {
             "name": "user1",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "user2",
             "type": "address",
             "internalType": "address"
           },
@@ -491,6 +501,11 @@ export const ESCROW_ABI = [
         "internalType": "address"
       },
       {
+        "name": "user2",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
         "name": "tokenA",
         "type": "address",
         "internalType": "address"
@@ -579,11 +594,6 @@ export const ESCROW_ABI = [
         "name": "favorUser1",
         "type": "bool",
         "internalType": "bool"
-      },
-      {
-        "name": "recipient",
-        "type": "address",
-        "internalType": "address"
       }
     ],
     "outputs": [],
@@ -1218,6 +1228,19 @@ export const ERC20_ABI = [
   }
 ] as const;
 
+export const GOVERNANCE_ABI = [
+  { "type": "function", "name": "owner", "inputs": [], "outputs": [{ "name": "", "type": "address" }], "stateMutability": "view" },
+  { "type": "function", "name": "isSocio", "inputs": [{ "name": "", "type": "address" }], "outputs": [{ "name": "", "type": "bool" }], "stateMutability": "view" },
+  { "type": "function", "name": "setSocio", "inputs": [{ "name": "user", "type": "address" }, { "name": "value", "type": "bool" }], "outputs": [], "stateMutability": "nonpayable" }
+] as const;
+
+export const SUBSCRIPTION_ABI = [
+  { "type": "function", "name": "owner", "inputs": [], "outputs": [{ "name": "", "type": "address" }], "stateMutability": "view" },
+  { "type": "function", "name": "businessFlag", "inputs": [{ "name": "", "type": "address" }], "outputs": [{ "name": "", "type": "bool" }], "stateMutability": "view" },
+  { "type": "function", "name": "isActive", "inputs": [{ "name": "company", "type": "address" }], "outputs": [{ "name": "", "type": "bool" }], "stateMutability": "view" },
+  { "type": "function", "name": "subscriptions", "inputs": [{ "name": "", "type": "address" }], "outputs": [{ "name": "", "type": "uint256" }], "stateMutability": "view" }
+] as const;
+
 // Direcciones de los contratos. Configúralas en web/.env.local:
 //   NEXT_PUBLIC_ESCROW_ADDRESS=0x...
 //   NEXT_PUBLIC_USER_REGISTRY_ADDRESS=0x...
@@ -1228,3 +1251,12 @@ export const ESCROW_ADDRESS: string =
 export const USER_REGISTRY_ADDRESS: string =
   process.env.NEXT_PUBLIC_USER_REGISTRY_ADDRESS ??
   '0x0000000000000000000000000000000000000000'
+
+export const GOVERNANCE_ADDRESS: string =
+  process.env.NEXT_PUBLIC_GOVERNANCE_ADDRESS ??
+  '0x0000000000000000000000000000000000000000'
+
+export const SUBSCRIPTION_ADDRESS: string =
+  process.env.NEXT_PUBLIC_SUBSCRIPTION_ADDRESS ??
+  '0x0000000000000000000000000000000000000000'
+

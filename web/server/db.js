@@ -12,7 +12,6 @@
  */
 
 import { DatabaseSync } from 'node:sqlite'
-import { Pool } from 'pg'
 import path from 'node:path'
 import fs from 'node:fs'
 
@@ -41,6 +40,8 @@ function getSqlite() {
 
 async function getPg() {
   if (!pgPool) {
+    const mod = 'pg'
+    const { Pool } = await import(/* webpackIgnore: true */ mod)
     pgPool = new Pool({ connectionString: process.env.DATABASE_URL })
   }
   return pgPool
@@ -219,18 +220,68 @@ export async function initSchema() {
   for (const sql of SCHEMA) {
     await query(sql)
   }
-  if (!isPostgres()) {
-    // Índices de uso frecuente (portables)
-    await query('CREATE INDEX IF NOT EXISTS idx_items_owner ON items (owner)')
-    await query('CREATE INDEX IF NOT EXISTS idx_items_category ON items (category)')
-    await query('CREATE INDEX IF NOT EXISTS idx_operations_user1 ON operations (user1)')
-    await query('CREATE INDEX IF NOT EXISTS idx_ratings_ratee ON ratings (ratee)')
+
+  // A2.1: Índices críticos — portables para SQLite y PostgreSQL
+  const INDEXES = [
+    // Operaciones: consultas por usuario (listados, stats)
+    'CREATE INDEX IF NOT EXISTS idx_operations_user1        ON operations (user1)',
+    'CREATE INDEX IF NOT EXISTS idx_operations_user2        ON operations (user2)',
+    'CREATE INDEX IF NOT EXISTS idx_operations_status       ON operations (status)',
+    'CREATE INDEX IF NOT EXISTS idx_operations_user1_status ON operations (user1, status)',
+    'CREATE INDEX IF NOT EXISTS idx_operations_user2_status ON operations (user2, status)',
+    // Artículos: catálogo por owner, categoría y estado
+    'CREATE INDEX IF NOT EXISTS idx_items_owner             ON items (owner)',
+    'CREATE INDEX IF NOT EXISTS idx_items_category          ON items (category)',
+    'CREATE INDEX IF NOT EXISTS idx_items_status            ON items (status)',
+    'CREATE INDEX IF NOT EXISTS idx_items_category_status   ON items (category, status)',
+    // Valoraciones: promedios por usuario valorado
+    'CREATE INDEX IF NOT EXISTS idx_ratings_ratee           ON ratings (ratee)',
+    'CREATE INDEX IF NOT EXISTS idx_ratings_rater           ON ratings (rater)',
+    // Avales: consultar cuántos avales tiene un usuario
+    'CREATE INDEX IF NOT EXISTS idx_vouches_vouch_for       ON vouches (vouch_for)',
+    'CREATE INDEX IF NOT EXISTS idx_vouches_vouch_by        ON vouches (vouch_by)',
+    // Meetups: buscar por operación
+    'CREATE INDEX IF NOT EXISTS idx_meetups_operation_id    ON meetups (operation_id)',
+    // Notificaciones: consultas por usuario y estado de lectura
+    'CREATE INDEX IF NOT EXISTS idx_notifications_user      ON notifications (user)',
+    'CREATE INDEX IF NOT EXISTS idx_notifications_user_read ON notifications (user, read)',
+    // Campañas: por owner y estado
+    'CREATE INDEX IF NOT EXISTS idx_campaigns_owner         ON campaigns (owner)',
+    'CREATE INDEX IF NOT EXISTS idx_campaigns_status        ON campaigns (status)',
+  ]
+
+  for (const idx of INDEXES) {
+    try {
+      await query(idx)
+    } catch {
+      // Índice ya existe o BD no lo soporta — ignorable
+    }
   }
+
   // Columnas añadidas después de la creación inicial (M7 geolocalización)
   await ensureColumn('users', 'lat', 'REAL')
   await ensureColumn('users', 'lng', 'REAL')
   await ensureColumn('users', 'document_hash', 'TEXT NOT NULL DEFAULT \'\'')
   await ensureColumn('users', 'selfie_hash', 'TEXT NOT NULL DEFAULT \'\'')
+
+  // Módulo de Identidad en 3 Niveles y SBTs
+  await ensureColumn('users', 'identification_level', 'TEXT NOT NULL DEFAULT \'inscrito\'')
+  await ensureColumn('users', 'terms_accepted', 'INTEGER NOT NULL DEFAULT 0')
+  await ensureColumn('users', 'email_verified', 'INTEGER NOT NULL DEFAULT 0')
+  await ensureColumn('users', 'phone_verified', 'INTEGER NOT NULL DEFAULT 0')
+  await ensureColumn('users', 'two_factor_enabled', 'INTEGER NOT NULL DEFAULT 0')
+  await ensureColumn('users', 'two_factor_secret', 'TEXT NOT NULL DEFAULT \'\'')
+  await ensureColumn('users', 'sbt_token_id', 'TEXT NOT NULL DEFAULT \'\'')
+  await ensureColumn('users', 'sbt_provider', 'TEXT NOT NULL DEFAULT \'\'')
+  await ensureColumn('users', 'sbt_contract', 'TEXT NOT NULL DEFAULT \'\'')
+  await ensureColumn('users', 'sbt_verified_at', 'INTEGER NOT NULL DEFAULT 0')
+
+  // Soporte Multi-Activo y Seguimiento Logístico en Operaciones
+  await ensureColumn('operations', 'tracking_info', 'TEXT NOT NULL DEFAULT \'\'')
+  await ensureColumn('operations', 'asset_a_type', 'TEXT NOT NULL DEFAULT \'ERC20\'')
+  await ensureColumn('operations', 'asset_b_type', 'TEXT NOT NULL DEFAULT \'ERC20\'')
+  await ensureColumn('operations', 'asset_a_token_id', 'TEXT NOT NULL DEFAULT \'0\'')
+  await ensureColumn('operations', 'asset_b_token_id', 'TEXT NOT NULL DEFAULT \'0\'')
 }
 
 /**

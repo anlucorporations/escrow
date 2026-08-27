@@ -46,6 +46,7 @@ describe('isExpired', () => {
   const base = {
     id: 1n,
     user1: '0x1',
+    user2: '0x0000000000000000000000000000000000000000',
     tokenA: '0xa',
     tokenB: '0xb',
     amountA: 100n,
@@ -81,6 +82,7 @@ describe('toOperation', () => {
     const raw: RawOperation = {
       id: 1,
       user1: '0xabc',
+      user2: '0x0000000000000000000000000000000000000000',
       tokenA: '0xaaa',
       tokenB: '0xbbb',
       amountA: 1000,

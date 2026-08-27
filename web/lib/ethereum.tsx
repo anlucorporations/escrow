@@ -71,8 +71,15 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
       if (typeof window !== 'undefined' && window.ethereum) {
         try {
           const provider = new ethers.BrowserProvider(window.ethereum)
-          const accounts = await provider.send('eth_accounts', [])
+          const network = await provider.getNetwork()
+          
+          // Only auto-connect if we are actually on Anvil local node
+          if (network.chainId !== 31337n) {
+            console.warn("MetaMask is connected to the wrong network. Expected Anvil (31337).")
+            return
+          }
 
+          const accounts = await provider.send('eth_accounts', [])
           if (accounts.length > 0) {
             const signer = await provider.getSigner()
             setProvider(provider)
@@ -134,6 +141,39 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
 
     try {
       const provider = new ethers.BrowserProvider(window.ethereum)
+      
+      // Ensure we are on Anvil local network (Chain ID 31337 / 0x7a69)
+      const network = await provider.getNetwork()
+      if (network.chainId !== 31337n) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0x7a69' }],
+          })
+        } catch (switchError: any) {
+          // This error code indicates that the chain has not been added to MetaMask.
+          if (switchError.code === 4902) {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [
+                {
+                  chainId: '0x7a69',
+                  chainName: 'Anvil Localhost',
+                  rpcUrls: ['http://127.0.0.1:8545'],
+                  nativeCurrency: {
+                    name: 'ETH',
+                    symbol: 'ETH',
+                    decimals: 18,
+                  },
+                },
+              ],
+            })
+          } else {
+            throw switchError
+          }
+        }
+      }
+
       const accounts = await provider.send('eth_requestAccounts', [])
       const signer = await provider.getSigner()
 

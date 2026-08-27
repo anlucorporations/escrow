@@ -17,42 +17,34 @@ export function Header() {
   const hasAccess = isConnected && !registrationLoading && isRegistered
 
   const navItems = [
-    { label: 'Home', href: '/' },
-    ...(hasAccess
-      ? [
-          { label: 'Operations', href: '/operations' },
-          { label: 'Catálogo', href: '/items' },
-          { label: 'Campañas', href: '/campaigns' },
-          { label: 'Balances', href: '/balances' },
-          { label: 'Perfil', href: '/profile' },
-          ...(isAdmin ? [{ label: 'Add Token', href: '/add-token' }] : []),
-        ]
-      : []),
+    { label: 'Inicio', href: '/' },
+    { label: 'Suite', href: '/dashboard' },
+    { label: 'Catálogo', href: '/items' },
+    { label: 'Truekes', href: '/operations' },
+    { label: 'Campañas', href: '/campaigns' },
+    { label: 'Balances', href: '/balances' },
+    { label: 'Perfil', href: '/profile' },
+    ...(isAdmin ? [{ label: 'Admin', href: '/add-token' }] : []),
   ]
 
   return (
-    <header className="sticky top-0 z-50 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center py-4">
+    <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-slate-200">
+      <div className="container mx-auto px-6 max-w-6xl">
+        <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link href="/" className="group">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold">
-                E
-              </div>
-              <span className="text-lg font-bold hidden sm:inline bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Escrow
-              </span>
-            </div>
+          <Link href="/" className="flex items-center gap-2 flex-shrink-0">
+            <span className="text-2xl font-serif font-semibold text-slate-900 tracking-tight italic">
+              TrueKeate.
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden lg:flex items-center gap-8">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                className="text-sm tracking-wide uppercase text-slate-600 hover:text-slate-900 transition-colors"
               >
                 {item.label}
               </Link>

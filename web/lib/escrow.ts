@@ -11,6 +11,7 @@ export enum OperationStatus {
 export interface Operation {
   id: bigint
   user1: string
+  user2: string   // A1.1: contraparte — address(0) si la operación no ha sido completada
   tokenA: string
   tokenB: string
   amountA: bigint
@@ -32,6 +33,7 @@ export interface TokenInfo {
 export interface RawOperation {
   id: bigint | string | number
   user1: string
+  user2: string   // A1.1: contraparte on-chain
   tokenA: string
   tokenB: string
   amountA: bigint | string | number
@@ -47,6 +49,7 @@ export function toOperation(raw: RawOperation): Operation {
   return {
     id: BigInt(raw.id),
     user1: raw.user1 as string,
+    user2: (raw.user2 as string) ?? '0x0000000000000000000000000000000000000000',
     tokenA: raw.tokenA as string,
     tokenB: raw.tokenB as string,
     amountA: BigInt(raw.amountA),

@@ -113,10 +113,10 @@ contract EscrowMetaTest is Test {
         );
 
         assertEq(opId, 1);
-        (,,,, uint256 opAmount,, Escrow.Status status,,,) = escrow.operations(opId);
-        assertEq(escrow.getOperation(opId).user1, user1);
-        assertEq(opAmount, 100 ether);
-        assertEq(uint256(status), uint256(Escrow.Status.Active));
+        Escrow.Operation memory op = escrow.getOperation(opId);
+        assertEq(op.user1, user1);
+        assertEq(op.amountA, 100 ether);
+        assertEq(uint256(op.status), uint256(Escrow.Status.Active));
         assertEq(escrow.metaNonces(user1), 1);
         assertEq(tokenA.balanceOf(user1), 900 ether);
         assertEq(tokenA.balanceOf(address(escrow)), 100 ether);

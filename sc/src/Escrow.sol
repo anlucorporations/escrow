@@ -30,6 +30,7 @@ contract Escrow is Ownable, ReentrancyGuard {
     struct Operation {
         uint256 id;
         address user1;
+        address user2;    // A1.1: contraparte registrada al completar / resolver
         address tokenA;
         address tokenB;
         uint256 amountA;
@@ -44,7 +45,8 @@ contract Escrow is Ownable, ReentrancyGuard {
     mapping(uint256 => Operation) public operations;
     mapping(address => bool) public allowedTokens;
     address[] private tokenList;
-    uint256[] private operationIds;
+    // A1.2: operationIds[] eliminado — IDs son secuenciales desde 1;
+    //       getOperationsCount() y getOperations() usan nextOperationId directamente.
 
     /// Rol opcional que resuelve disputas. address(0) = arbitraje deshabilitado.
     address public arbiter;
@@ -116,6 +118,7 @@ contract Escrow is Ownable, ReentrancyGuard {
         operations[operationId] = Operation({
             id: operationId,
             user1: user,
+            user2: address(0),  // se llena al completar la operación
             tokenA: tokenA,
             tokenB: tokenB,
             amountA: amountA,
@@ -125,8 +128,6 @@ contract Escrow is Ownable, ReentrancyGuard {
             deadline: deadline,
             closedAt: 0
         });
-
-        operationIds.push(operationId);
 
         emit OperationCreated(operationId, user, tokenA, tokenB, amountA, amountB, deadline);
         return operationId;
@@ -194,6 +195,7 @@ contract Escrow is Ownable, ReentrancyGuard {
         IERC20(operation.tokenB).transferFrom(user, operation.user1, operation.amountB);
         IERC20(operation.tokenA).transfer(user, operation.amountA);
 
+        operation.user2 = user;  // A1.1: registrar la contraparte on-chain
         operation.status = Status.Completed;
         operation.closedAt = block.timestamp;
 
@@ -309,6 +311,7 @@ contract Escrow is Ownable, ReentrancyGuard {
         IERC20(operation.tokenB).transferFrom(msg.sender, operation.user1, operation.amountB);
         IERC20(operation.tokenA).transfer(msg.sender, operation.amountA);
 
+        operation.user2 = msg.sender;  // A1.1: registrar la contraparte on-chain
         operation.status = Status.Completed;
         operation.closedAt = block.timestamp;
 
@@ -360,6 +363,10 @@ contract Escrow is Ownable, ReentrancyGuard {
         require(arbiter != address(0), "No arbiter set");
         require(operation.deadline == 0 || block.timestamp <= operation.deadline, "Operation expired");
 
+        if (msg.sender != operation.user1 && operation.user2 == address(0)) {
+            operation.user2 = msg.sender;
+        }
+
         operation.status = Status.Disputed;
         emit OperationDisputed(operationId, msg.sender, block.timestamp);
     }
@@ -368,20 +375,19 @@ contract Escrow is Ownable, ReentrancyGuard {
     ///         favorUser1 == true  -> User1 recupera tokenA (refund).
     ///         favorUser1 == false -> `recipient` (la contraparte que el
     ///         árbitro determina como ganadora) recibe tokenA (pago liberado).
-    ///         El contrato no registra a la contraparte hasta que completa la
-    ///         operación, por eso el árbitro la indica explícitamente.
-    function resolveDispute(uint256 operationId, bool favorUser1, address recipient) external onlyArbiter nonReentrant {
+    ///         A1.1: user2 queda registrado on-chain al completar, por lo que el
+    ///         árbitro ya no necesita indicar al ganador externamente.
+    function resolveDispute(uint256 operationId, bool favorUser1) external onlyArbiter nonReentrant {
         Operation storage operation = operations[operationId];
         require(operation.id != 0, "Operation does not exist");
         require(operation.status == Status.Disputed, "Operation is not disputed");
 
-        address winner = operation.user1;
+        address winner;
         if (favorUser1) {
             winner = operation.user1;
         } else {
-            require(recipient != address(0), "Invalid recipient");
-            require(recipient != operation.user1, "Recipient must not be user1");
-            winner = recipient;
+            require(operation.user2 != address(0), "No counterpart on-chain: disputa abierta antes de que user2 completara");
+            winner = operation.user2;
         }
 
         IERC20(operation.tokenA).transfer(winner, operation.amountA);
@@ -403,13 +409,15 @@ contract Escrow is Ownable, ReentrancyGuard {
     }
 
     /// @notice Número total de operaciones creadas (para paginación).
+    /// A1.2: usa nextOperationId — IDs secuenciales desde 1, sin array auxiliar.
     function getOperationsCount() external view returns (uint256) {
-        return operationIds.length;
+        return nextOperationId > 0 ? nextOperationId - 1 : 0;
     }
 
-    /// @notice Paginación: devuelve `limit` operaciones desde `offset`.
+    /// @notice Paginación: devuelve `limit` operaciones desde `offset` (base-0).
+    /// A1.2: itera por rango de IDs secuenciales en lugar del array eliminado.
     function getOperations(uint256 offset, uint256 limit) external view returns (Operation[] memory) {
-        uint256 count = operationIds.length;
+        uint256 count = nextOperationId > 0 ? nextOperationId - 1 : 0;
         if (offset >= count) return new Operation[](0);
 
         uint256 end = offset + limit;
@@ -418,7 +426,7 @@ contract Escrow is Ownable, ReentrancyGuard {
         uint256 resultLength = end - offset;
         Operation[] memory result = new Operation[](resultLength);
         for (uint256 i = 0; i < resultLength; i++) {
-            result[i] = operations[operationIds[offset + i]];
+            result[i] = operations[offset + 1 + i]; // IDs empiezan en 1
         }
         return result;
     }

@@ -53,16 +53,16 @@ contract EscrowDemoTest is Test {
         vm.stopPrank();
 
         assertEq(escrow.getOperationsCount(), 1);
-        (,,,,,, Escrow.Status s,,,) = escrow.operations(opId);
-        assertEq(uint256(s), uint256(Escrow.Status.Active));
+        Escrow.Operation memory op = escrow.getOperation(opId);
+        assertEq(uint256(op.status), uint256(Escrow.Status.Active));
 
         vm.startPrank(user2);
         tkb.approve(address(escrow), 200 ether);
         escrow.completeOperation(opId);
         vm.stopPrank();
 
-        (,,,,,, s,,,) = escrow.operations(opId);
-        assertEq(uint256(s), uint256(Escrow.Status.Completed));
+        Escrow.Operation memory opAfter = escrow.getOperation(opId);
+        assertEq(uint256(opAfter.status), uint256(Escrow.Status.Completed));
         assertEq(tka.balanceOf(user2), 100 ether);
         assertEq(tkb.balanceOf(user1), 200 ether);
     }
@@ -76,8 +76,8 @@ contract EscrowDemoTest is Test {
         uint256 opId = escrow.createOperation(address(usdt), address(delivery), 1000e6, 1 ether, deadline);
         vm.stopPrank();
 
-        (,,,,,,, uint256 createdAt,,) = escrow.operations(opId);
-        assertEq(createdAt, block.timestamp);
+        Escrow.Operation memory op = escrow.getOperation(opId);
+        assertEq(op.createdAt, block.timestamp);
 
         vm.startPrank(user2);
         delivery.approve(address(escrow), 1 ether);
@@ -94,15 +94,15 @@ contract EscrowDemoTest is Test {
 
         vm.prank(user2);
         escrow.disputeOperation(opId);
-        (,,,,,, Escrow.Status s,,,) = escrow.operations(opId);
-        assertEq(uint256(s), uint256(Escrow.Status.Disputed));
+        Escrow.Operation memory op = escrow.getOperation(opId);
+        assertEq(uint256(op.status), uint256(Escrow.Status.Disputed));
 
         uint256 balanceBefore = tka.balanceOf(user1);
         vm.prank(arbiter);
-        escrow.resolveDispute(opId, true, address(0));
+        escrow.resolveDispute(opId, true);
 
-        (,,,,,, s,,,) = escrow.operations(opId);
-        assertEq(uint256(s), uint256(Escrow.Status.Completed));
+        Escrow.Operation memory opAfter = escrow.getOperation(opId);
+        assertEq(uint256(opAfter.status), uint256(Escrow.Status.Completed));
         assertEq(tka.balanceOf(user1), balanceBefore + 100 ether);
     }
 
@@ -110,12 +110,12 @@ contract EscrowDemoTest is Test {
     function testDemoDisputeFavorUser2() public {
         uint256 opId = _createSwap();
 
-        vm.prank(user1);
+        vm.prank(user2);
         escrow.disputeOperation(opId);
 
         uint256 balanceBefore = tka.balanceOf(user2);
         vm.prank(arbiter);
-        escrow.resolveDispute(opId, false, user2);
+        escrow.resolveDispute(opId, false);
 
         assertEq(tka.balanceOf(user2), balanceBefore + 100 ether);
     }
@@ -135,8 +135,8 @@ contract EscrowDemoTest is Test {
         vm.prank(user1);
         escrow.refundAfterExpiry(opId);
 
-        (,,,,,, Escrow.Status s,,,) = escrow.operations(opId);
-        assertEq(uint256(s), uint256(Escrow.Status.Cancelled));
+        Escrow.Operation memory op = escrow.getOperation(opId);
+        assertEq(uint256(op.status), uint256(Escrow.Status.Cancelled));
         assertEq(tka.balanceOf(user1), balanceBefore + 100 ether);
     }
 
@@ -150,7 +150,7 @@ contract EscrowDemoTest is Test {
 
         vm.prank(arbiter);
         vm.expectRevert("Operation does not exist");
-        escrow.resolveDispute(42, true, address(0));
+        escrow.resolveDispute(42, true);
     }
 
     function _createSwap() internal returns (uint256) {

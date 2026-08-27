@@ -10,6 +10,10 @@ import {
   ERC20_ABI,
   USER_REGISTRY_ADDRESS,
   USER_REGISTRY_ABI,
+  GOVERNANCE_ADDRESS,
+  GOVERNANCE_ABI,
+  SUBSCRIPTION_ADDRESS,
+  SUBSCRIPTION_ABI,
 } from '@/lib/contracts'
 import {
   Operation,
@@ -34,7 +38,7 @@ export interface RoleInfo {
 export function useEscrow() {
   const { provider, account, isConnected } = useEthereum()
 
-  // Instancia del contrato derivada del provider (sin setState en efectos).
+  // A3.1: Una única instancia memoizada del contrato — no se recrea en cada llamada.
   const contract = useMemo(() => {
     if (!provider) return null
     return new ethers.Contract(ESCROW_ADDRESS, ESCROW_ABI, provider)
@@ -50,13 +54,12 @@ export function useEscrow() {
   useEffect(() => {
     let cancelled = false
     const loadRoles = async () => {
-      if (!provider || !account) {
+      if (!contract || !account) {
         setRoles({ isOwner: false, isArbiter: false, owner: null, arbiter: null })
         return
       }
       try {
-        const c = new ethers.Contract(ESCROW_ADDRESS, ESCROW_ABI, provider)
-        const [owner, arbiter] = await Promise.all([c.owner(), c.arbiter()])
+        const [owner, arbiter] = await Promise.all([contract.owner(), contract.arbiter()])
         if (cancelled) return
         setRoles({
           owner,
@@ -72,7 +75,7 @@ export function useEscrow() {
     return () => {
       cancelled = true
     }
-  }, [provider, account])
+  }, [contract, account])
 
   const getSigner = useCallback(async () => {
     if (!provider) throw new Error('Connect your wallet first')
@@ -82,38 +85,44 @@ export function useEscrow() {
   // ------------------------------------------------------------ queries
 
   const getAllowedTokens = useCallback(async (): Promise<string[]> => {
-    if (!provider) return []
-    const c = new ethers.Contract(ESCROW_ADDRESS, ESCROW_ABI, provider)
-    const tokens: string[] = await c.getAllowedTokens()
+    if (!contract) return []
+    const tokens: string[] = await contract.getAllowedTokens()
     return tokens.map((t: string) => ethers.getAddress(t))
-  }, [provider])
+  }, [contract])
 
   const getOperationsCount = useCallback(async (): Promise<number> => {
-    if (!provider) return 0
-    const c = new ethers.Contract(ESCROW_ADDRESS, ESCROW_ABI, provider)
-    const count = await c.getOperationsCount()
-    return Number(count)
-  }, [provider])
+    if (!contract) return 0
+    try {
+      const count = await contract.getOperationsCount()
+      return Number(count)
+    } catch (err) {
+      console.warn("Error fetching operations count (wrong network?):", err)
+      return 0
+    }
+  }, [contract])
 
   /** Paginación real contra el contrato (getOperations(offset, limit)). */
   const getOperations = useCallback(
     async (offset = 0, limit = 50): Promise<Operation[]> => {
-      if (!provider) return []
-      const c = new ethers.Contract(ESCROW_ADDRESS, ESCROW_ABI, provider)
-      const raw = (await c.getOperations(offset, limit)) as unknown as RawOperation[]
-      return raw.map((op) => toOperation(op))
+      if (!contract) return []
+      try {
+        const raw = (await contract.getOperations(offset, limit)) as unknown as RawOperation[]
+        return raw.map((op) => toOperation(op))
+      } catch (err) {
+        console.warn("Error fetching operations (wrong network?):", err)
+        return []
+      }
     },
-    [provider]
+    [contract]
   )
 
   const getOperation = useCallback(
     async (id: bigint): Promise<Operation | null> => {
-      if (!provider) return null
-      const c = new ethers.Contract(ESCROW_ADDRESS, ESCROW_ABI, provider)
-      const raw = await c.getOperation(id)
+      if (!contract) return null
+      const raw = await contract.getOperation(id)
       return toOperation(raw)
     },
-    [provider]
+    [contract]
   )
 
   // ------------------------------------------------------------ actions
@@ -193,11 +202,12 @@ export function useEscrow() {
     [getSigner]
   )
 
+  // A1.1: resolveDispute ya no necesita `recipient` — user2 está on-chain
   const resolveDispute = useCallback(
-    async (id: bigint, favorUser1: boolean, recipient: string) => {
+    async (id: bigint, favorUser1: boolean) => {
       const signer = await getSigner()
       const c = new ethers.Contract(ESCROW_ADDRESS, ESCROW_ABI, signer)
-      const tx = await c.resolveDispute(id, favorUser1, recipient)
+      const tx = await c.resolveDispute(id, favorUser1)
       await tx.wait()
       return tx
     },
@@ -365,13 +375,18 @@ export function useRegistration(): RegistrationState {
     }
     setLoading(true)
     try {
+      const normalized = ethers.getAddress(account)
       const c = new ethers.Contract(USER_REGISTRY_ADDRESS, USER_REGISTRY_ABI, provider)
       const [registered, profile] = await Promise.all([
-        c.isRegistered(account),
-        c.getUserProfile(account),
+        c.isRegistered(normalized).catch(() => false),
+        c.getUserProfile(normalized).catch(() => null),
       ])
-      setIsRegistered(Boolean(registered))
-      setUsername(profile?.username ?? null)
+
+      const isReg = Boolean(registered || profile?.isRegistered || profile?.[3])
+      const uname = profile?.username || profile?.[1] || null
+
+      setIsRegistered(isReg)
+      setUsername(isReg ? uname : null)
     } catch {
       setIsRegistered(false)
       setUsername(null)
@@ -381,25 +396,59 @@ export function useRegistration(): RegistrationState {
   }, [provider, account])
 
   useEffect(() => {
-    if (isConnected) {
+    if (isConnected && account) {
       refresh()
     } else {
       setIsRegistered(false)
       setUsername(null)
       setLoading(false)
     }
-  }, [isConnected, refresh])
+
+    // Escuchar evento global de registro para sincronizar otros componentes
+    const handleRegistered = () => refresh()
+    window.addEventListener('user-registered', handleRegistered)
+    
+    return () => {
+      window.removeEventListener('user-registered', handleRegistered)
+    }
+  }, [isConnected, account, refresh])
 
   const register = useCallback(
     async (usernameInput: string) => {
-      if (!provider) throw new Error('Connect your wallet first')
+      if (!provider || !account) {
+        throw new Error('Conecta tu billetera primero')
+      }
+      const name = usernameInput.trim()
+      if (name.length < 3 || name.length > 20) {
+        throw new Error('El nombre de usuario debe tener entre 3 y 20 caracteres')
+      }
+      if (!/^[a-zA-Z0-9_]+$/.test(name)) {
+        throw new Error('Solo se permiten letras, números y guiones bajos (_)')
+      }
+
       const signer = await provider.getSigner()
       const c = new ethers.Contract(USER_REGISTRY_ADDRESS, USER_REGISTRY_ABI, signer)
-      const tx = await c.register(usernameInput.trim())
+      
+      // Verificar si ya está inscrito
+      const already = await c.isRegistered(account).catch(() => false)
+      if (already) {
+        await refresh()
+        window.dispatchEvent(new Event('user-registered'))
+        return
+      }
+
+      const tx = await c.register(name)
       await tx.wait()
-      await refresh() // verificación on-chain tras la inscripción
+      
+      // Actualizar estado local inmediatamente
+      setIsRegistered(true)
+      setUsername(name)
+      await refresh()
+      
+      // Notificar a otras instancias del hook (ej. AccessGate, Header)
+      window.dispatchEvent(new Event('user-registered'))
     },
-    [provider, refresh]
+    [provider, account, refresh]
   )
 
   return { isRegistered, username, loading, register, refresh }
@@ -440,4 +489,135 @@ export function useProfile(address: string | null | undefined) {
   return { profile, loading }
 }
 
+export interface UserRoleInfo {
+  isOwner: boolean
+  isArbiter: boolean
+  isSocio: boolean
+  isBusiness: boolean
+  isBusinessActive: boolean
+  roleKey: 'admin' | 'socio' | 'business' | 'particular'
+  roleLabel: string
+  roleDescription: string
+  badgeBg: string
+  badgeText: string
+  loading: boolean
+}
+
+/**
+ * Hook para consultar el rol y nivel completo del usuario on-chain.
+ */
+export function useUserRole(): UserRoleInfo {
+  const { provider, account, isConnected } = useEthereum()
+  const [roleInfo, setRoleInfo] = useState<UserRoleInfo>({
+    isOwner: false,
+    isArbiter: false,
+    isSocio: false,
+    isBusiness: false,
+    isBusinessActive: false,
+    roleKey: 'particular',
+    roleLabel: 'Usuario Particular',
+    roleDescription: 'Intercambios P2P seguros entre pares con custodia bilateral.',
+    badgeBg: 'bg-blue-100 dark:bg-blue-900/30',
+    badgeText: 'text-blue-700 dark:text-blue-300',
+    loading: true,
+  })
+
+  useEffect(() => {
+    let cancelled = false
+    const load = async () => {
+      if (!provider || !account) {
+        setRoleInfo({
+          isOwner: false,
+          isArbiter: false,
+          isSocio: false,
+          isBusiness: false,
+          isBusinessActive: false,
+          roleKey: 'particular',
+          roleLabel: 'Usuario Particular',
+          roleDescription: 'Intercambios P2P seguros entre pares con custodia bilateral.',
+          badgeBg: 'bg-blue-100 dark:bg-blue-900/30',
+          badgeText: 'text-blue-700 dark:text-blue-300',
+          loading: false,
+        })
+        return
+      }
+
+      try {
+        const escrow = new ethers.Contract(ESCROW_ADDRESS, ESCROW_ABI, provider)
+        const gov = new ethers.Contract(GOVERNANCE_ADDRESS, GOVERNANCE_ABI, provider)
+        const sub = new ethers.Contract(SUBSCRIPTION_ADDRESS, SUBSCRIPTION_ABI, provider)
+
+        const [owner, arbiter, isSocioRaw, isBizRaw, isBizActiveRaw] = await Promise.all([
+          escrow.owner().catch(() => null),
+          escrow.arbiter().catch(() => null),
+          gov.isSocio(account).catch(() => false),
+          sub.businessFlag(account).catch(() => false),
+          sub.isActive(account).catch(() => false),
+        ])
+
+        if (cancelled) return
+
+        const isOwner = owner?.toLowerCase() === account.toLowerCase()
+        const isArbiter = arbiter?.toLowerCase() === account.toLowerCase()
+        const isSocio = Boolean(isSocioRaw)
+        const isBusiness = Boolean(isBizRaw)
+        const isBusinessActive = Boolean(isBizActiveRaw)
+
+        let roleKey: 'admin' | 'socio' | 'business' | 'particular' = 'particular'
+        let roleLabel = 'Usuario Particular'
+        let roleDescription = 'Intercambios P2P seguros entre pares con custodia bilateral.'
+        let badgeBg = 'bg-blue-100 dark:bg-blue-900/30'
+        let badgeText = 'text-blue-700 dark:text-blue-300'
+
+        if (isOwner) {
+          roleKey = 'admin'
+          roleLabel = 'Administrador Supremo'
+          roleDescription = 'Control total sobre los tokens permitidos y la pausa del protocolo.'
+          badgeBg = 'bg-fuchsia-100 dark:bg-fuchsia-900/30'
+          badgeText = 'text-fuchsia-700 dark:text-fuchsia-300'
+        } else if (isSocio) {
+          roleKey = 'socio'
+          roleLabel = 'Socio Árbitro'
+          roleDescription = 'Mediador de disputas autorizado con poder de resolución on-chain.'
+          badgeBg = 'bg-red-100 dark:bg-red-900/30'
+          badgeText = 'text-red-700 dark:text-red-300'
+        } else if (isBusiness) {
+          roleKey = 'business'
+          roleLabel = isBusinessActive ? 'Comerciante Verificado' : 'Comerciante (Inactivo)'
+          roleDescription = 'Catálogo comercial propio, insignias de confianza y soporte BRLT.'
+          badgeBg = isBusinessActive ? 'bg-amber-100 dark:bg-amber-900/30' : 'bg-gray-100 dark:bg-gray-800'
+          badgeText = isBusinessActive ? 'text-amber-700 dark:text-amber-300' : 'text-gray-600 dark:text-gray-400'
+        }
+
+        setRoleInfo({
+          isOwner,
+          isArbiter,
+          isSocio,
+          isBusiness,
+          isBusinessActive,
+          roleKey,
+          roleLabel,
+          roleDescription,
+          badgeBg,
+          badgeText,
+          loading: false,
+        })
+      } catch (e) {
+        console.warn("Failed to load user role", e)
+        if (!cancelled) {
+          setRoleInfo(prev => ({ ...prev, loading: false }))
+        }
+      }
+    }
+
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [provider, account, isConnected])
+
+  return roleInfo
+}
+
 export { getFriendlyError }
+

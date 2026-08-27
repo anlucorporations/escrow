@@ -144,9 +144,9 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
   const handleRefund = () =>
     run(() => refundAfterExpiry(operation.id), 'Fondos reclamados tras el vencimiento')
   const handleDispute = () => run(() => disputeOperation(operation.id), 'Disputa abierta')
-  const handleResolve = (favorUser1: boolean, recipient: string) =>
+  const handleResolve = (favorUser1: boolean) =>
     run(
-      () => resolveDispute(operation.id, favorUser1, recipient),
+      () => resolveDispute(operation.id, favorUser1),
       favorUser1 ? 'Resuelto a favor del creador' : 'Resuelto a favor de la contraparte'
     )
 
@@ -348,7 +348,7 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
               Panel de árbitro — resolver disputa #{operation.id.toString()}
             </p>
             <button
-              onClick={() => handleResolve(true, operation.user1)}
+              onClick={() => handleResolve(true)}
               disabled={loading}
               className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 font-semibold"
             >
@@ -356,11 +356,11 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
             </button>
             <div className="flex gap-2 items-center">
               <button
-                onClick={() => handleResolve(false, account ?? '')}
-                disabled={loading || !account}
+                onClick={() => handleResolve(false)}
+                disabled={loading}
                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 font-semibold"
               >
-                A favor de mi dirección (contraparte)
+                A favor de la contraparte
               </button>
             </div>
           </div>

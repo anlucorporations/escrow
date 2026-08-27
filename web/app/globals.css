@@ -1,26 +1,41 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #FAF8F5; /* Soft Alabaster/Cream */
+  --foreground: #2D2A26; /* Charcoal / Dark Taupe */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-sans: 'Inter', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+  
+  /* Velvety Palette Overrides */
+  --color-indigo-50: #Fdfbf9;
+  --color-indigo-100: #F4ECE6; /* Warm Nude */
+  --color-indigo-500: #D4A373; /* Soft Camel */
+  --color-indigo-600: #C28E5C; 
+  --color-indigo-700: #A6754B;
+  
+  --color-purple-50: #FFF5F5;
+  --color-purple-500: #E5989B; /* Soft Rose */
+  --color-purple-600: #D67D81;
+  
+  --color-fuchsia-500: #A3B18A; /* Soft Sage */
+  --color-fuchsia-600: #8A9A70;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-slate-50: #FAF8F5;
+  --color-slate-100: #F0EBE1;
+  --color-slate-200: #E8E0D5; /* Soft Borders */
+  --color-slate-800: #4A4641;
+  --color-slate-900: #2D2A26;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }

@@ -76,29 +76,19 @@ contract EscrowTest is Test {
 
         assertEq(operationId, 1);
 
-        (
-            uint256 id,
-            address creator,
-            address tA,
-            address tB,
-            uint256 amtA,
-            uint256 amtB,
-            Escrow.Status status,
-            uint256 createdAt,
-            uint256 dl,
-            uint256 closedAt
-        ) = escrow.operations(operationId);
+        Escrow.Operation memory op = escrow.getOperation(operationId);
 
-        assertEq(id, 1);
-        assertEq(creator, user1);
-        assertEq(tA, address(tokenA));
-        assertEq(tB, address(tokenB));
-        assertEq(amtA, 100 ether);
-        assertEq(amtB, 200 ether);
-        assertEq(uint256(status), uint256(Escrow.Status.Active));
-        assertEq(createdAt, block.timestamp);
-        assertEq(dl, deadline);
-        assertEq(closedAt, 0);
+        assertEq(op.id, 1);
+        assertEq(op.user1, user1);
+        assertEq(op.user2, address(0));
+        assertEq(op.tokenA, address(tokenA));
+        assertEq(op.tokenB, address(tokenB));
+        assertEq(op.amountA, 100 ether);
+        assertEq(op.amountB, 200 ether);
+        assertEq(uint256(op.status), uint256(Escrow.Status.Active));
+        assertEq(op.createdAt, block.timestamp);
+        assertEq(op.deadline, deadline);
+        assertEq(op.closedAt, 0);
         assertEq(escrow.getOperationsCount(), 1);
         vm.stopPrank();
     }
@@ -107,8 +97,8 @@ contract EscrowTest is Test {
         vm.startPrank(user1);
         tokenA.approve(address(escrow), 100 ether);
         uint256 operationId = escrow.createOperation(address(tokenA), address(tokenB), 100 ether, 200 ether, 0);
-        (,,,,,,,, uint256 dl,) = escrow.operations(operationId);
-        assertEq(dl, 0);
+        Escrow.Operation memory op = escrow.getOperation(operationId);
+        assertEq(op.deadline, 0);
         vm.stopPrank();
     }
 
@@ -144,9 +134,10 @@ contract EscrowTest is Test {
         escrow.completeOperation(operationId);
         vm.stopPrank();
 
-        (,,,,,, Escrow.Status status,,, uint256 closedAt) = escrow.operations(operationId);
-        assertEq(uint256(status), uint256(Escrow.Status.Completed));
-        assertGt(closedAt, 0);
+        Escrow.Operation memory op = escrow.getOperation(operationId);
+        assertEq(uint256(op.status), uint256(Escrow.Status.Completed));
+        assertEq(op.user2, user2);
+        assertGt(op.closedAt, 0);
 
         assertEq(tokenB.balanceOf(user1), user1BalanceBBefore + 200 ether);
         assertEq(tokenA.balanceOf(user2), user2BalanceABefore + 100 ether);
@@ -192,8 +183,8 @@ contract EscrowTest is Test {
         escrow.cancelOperation(operationId);
         vm.stopPrank();
 
-        (,,,,,, Escrow.Status status,,,) = escrow.operations(operationId);
-        assertEq(uint256(status), uint256(Escrow.Status.Cancelled));
+        Escrow.Operation memory op = escrow.getOperation(operationId);
+        assertEq(uint256(op.status), uint256(Escrow.Status.Cancelled));
         assertEq(tokenA.balanceOf(user1), user1BalanceBefore + 100 ether);
     }
 
@@ -220,9 +211,9 @@ contract EscrowTest is Test {
         vm.prank(user1);
         escrow.refundAfterExpiry(operationId);
 
-        (,,,,,, Escrow.Status status,,, uint256 closedAt) = escrow.operations(operationId);
-        assertEq(uint256(status), uint256(Escrow.Status.Cancelled));
-        assertGt(closedAt, 0);
+        Escrow.Operation memory op = escrow.getOperation(operationId);
+        assertEq(uint256(op.status), uint256(Escrow.Status.Cancelled));
+        assertGt(op.closedAt, 0);
         assertEq(tokenA.balanceOf(user1), balanceBefore + 100 ether);
     }
 
@@ -261,15 +252,15 @@ contract EscrowTest is Test {
 
         vm.prank(user1);
         escrow.disputeOperation(operationId);
-        (,,,,,, Escrow.Status status,,,) = escrow.operations(operationId);
-        assertEq(uint256(status), uint256(Escrow.Status.Disputed));
+        Escrow.Operation memory op = escrow.getOperation(operationId);
+        assertEq(uint256(op.status), uint256(Escrow.Status.Disputed));
 
         vm.prank(arbiter);
-        escrow.resolveDispute(operationId, true, address(0));
+        escrow.resolveDispute(operationId, true);
 
-        (,,,,,, Escrow.Status statusAfter,,, uint256 closedAt) = escrow.operations(operationId);
-        assertEq(uint256(statusAfter), uint256(Escrow.Status.Completed));
-        assertGt(closedAt, 0);
+        Escrow.Operation memory opAfter = escrow.getOperation(operationId);
+        assertEq(uint256(opAfter.status), uint256(Escrow.Status.Completed));
+        assertGt(opAfter.closedAt, 0);
         assertEq(tokenA.balanceOf(user1), user1BalanceBefore + 100 ether);
     }
 
@@ -282,20 +273,21 @@ contract EscrowTest is Test {
         escrow.disputeOperation(operationId);
 
         vm.prank(arbiter);
-        escrow.resolveDispute(operationId, false, user2);
+        escrow.resolveDispute(operationId, false);
 
         assertEq(tokenA.balanceOf(user2), user2BalanceBefore + 100 ether);
     }
 
-    function testResolveDisputeFavorUser2RejectsUser1AsRecipient() public {
+    function testResolveDisputeFavorUser2RequiresCounterpartOnChain() public {
         uint256 operationId = _createSwap();
 
-        vm.prank(user2);
+        // user1 disputes alone without counterpart
+        vm.prank(user1);
         escrow.disputeOperation(operationId);
 
         vm.prank(arbiter);
-        vm.expectRevert("Recipient must not be user1");
-        escrow.resolveDispute(operationId, false, user1);
+        vm.expectRevert("No counterpart on-chain: disputa abierta antes de que user2 completara");
+        escrow.resolveDispute(operationId, false);
     }
 
     function testResolveDisputeOnlyArbiter() public {
@@ -306,7 +298,7 @@ contract EscrowTest is Test {
 
         vm.prank(user2);
         vm.expectRevert("Only arbiter can call");
-        escrow.resolveDispute(operationId, true, address(0));
+        escrow.resolveDispute(operationId, true);
     }
 
     function testCannotDisputeWithoutArbiter() public {
@@ -336,7 +328,7 @@ contract EscrowTest is Test {
 
         vm.prank(arbiter);
         vm.expectRevert("Operation is not disputed");
-        escrow.resolveDispute(operationId, true, address(0));
+        escrow.resolveDispute(operationId, true);
     }
 
     function testCannotDisputeAfterDeadline() public {

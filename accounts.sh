@@ -1,15 +1,22 @@
-#!/usr/bin/env bash
+﻿#!/usr/bin/env bash
 #
-# accounts.sh — Muestra las 10 cuentas de prueba de Anvil con sus claves
-# privadas (mnemónica por defecto de Anvil).
-#
-# Uso:
-#   ./accounts.sh              # imprime la tabla
-#   source ./accounts.sh       # exporta variables de entorno
+# accounts.sh — Muestra las 10 cuentas de prueba de Anvil con sus roles preconfigurados.
 #
 set -u
 
-# Las 10 cuentas por defecto de Anvil (solo para desarrollo local).
+declare -a ROLES=(
+  "SuperUsuario (Owner / Admin / Arbiter / Socio / Relayer)"
+  "Usuario Particular 1 (@particular_alice)"
+  "Usuario Particular 2 (@particular_bob)"
+  "Usuario Particular 3 (@particular_carol)"
+  "Usuario Comerciante 1 (@tienda_tech - 12m BRLT)"
+  "Usuario Comerciante 2 (@mercado_central - 12m BRLT)"
+  "Usuario Socio 1 (@socio_juez_alpha - Mediador)"
+  "Usuario Socio 2 (@socio_juez_beta - Mediador)"
+  "Usuario Socio 3 (@socio_juez_gamma - Mediador)"
+  "Cuenta Reserva"
+)
+
 declare -a ADDRS=(
   "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
   "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
@@ -36,22 +43,13 @@ declare -a KEYS=(
   "0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6"
 )
 
-export ANVIL_ACCOUNT_0="${ADDRS[0]}"
-export ANVIL_KEY_0="${KEYS[0]}"
-export ANVIL_ACCOUNT_1="${ADDRS[1]}"
-export ANVIL_KEY_1="${KEYS[1]}"
-export ANVIL_ACCOUNT_2="${ADDRS[2]}"
-export ANVIL_KEY_2="${KEYS[2]}"
-export ANVIL_ACCOUNT_3="${ADDRS[3]}"
-export ANVIL_KEY_3="${KEYS[3]}"
-
-echo "Cuentas de prueba de Anvil (solo desarrollo local):"
-echo ""
-printf "  %-3s %-44s %s\n" "#" "Address" "Private Key"
-printf "  %-3s %-44s %s\n" "---" "--------------------------------------------" "--------------------------------------------"
+echo "=========================================================================================="
+echo "  CUENTAS DE PRUEBA ANVIL — ROLES ASIGNADOS"
+echo "=========================================================================================="
 for i in "${!ADDRS[@]}"; do
-  printf "  %-3s %-44s %s\n" "$i" "${ADDRS[$i]}" "${KEYS[$i]}"
+  echo "[$i] ${ROLES[$i]}"
+  echo "    Address: ${ADDRS[$i]}"
+  echo "    PrivKey: ${KEYS[$i]}"
+  echo ""
 done
-echo ""
 echo "⚠️  NUNCA uses estas claves en mainnet ni con fondos reales."
-echo "   Exportadas: ANVIL_ACCOUNT_0..3 y ANVIL_KEY_0..3"

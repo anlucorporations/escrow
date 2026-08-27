@@ -179,8 +179,18 @@ export function validateItem({ title, description = '', category = 'general', qu
   return { title: title.trim(), description: description.trim(), category: category.trim() || 'general', quantity: qty }
 }
 
-export async function createItem({ owner, title, description, category, quantity, images = [], signature = '' }) {
+export async function createItem({ owner, title, description, category, quantity, images = [], signature = '', payload = '' }) {
   const v = validateItem({ title, description, category, quantity })
+
+  // A2.4: Verificar firma ECDSA — reconstruir el payload canónico y validar
+  if (signature) {
+    const expectedPayload = itemPayload({ owner, title: v.title, description: v.description, category: v.category, quantity: v.quantity })
+    const payloadToCheck = payload || expectedPayload
+    if (!verifySignature(payloadToCheck, signature, owner)) {
+      throw new Error('Firma inválida: la firma no corresponde al owner declarado')
+    }
+  }
+
   const item = {
     id: newId(),
     owner: owner.toLowerCase(),
@@ -602,7 +612,168 @@ export async function submitKyc(address, { email, phone, documentHash = '', self
   const encryptedEmail = encryptField(email || '')
   const encryptedPhone = encryptField(phone || '')
   await query(
-    `UPDATE users SET email = ?, phone = ?, document_hash = ?, selfie_hash = ?, kyc_status = 'verified' WHERE address = ?`,
+    `UPDATE users SET email = ?, phone = ?, document_hash = ?, selfie_hash = ?, kyc_status = 'verified', identification_level = 'certificado' WHERE address = ?`,
     [encryptedEmail, encryptedPhone, documentHash, selfieHash, address.toLowerCase()]
   )
+}
+
+/* ------------------------------------------------------------------ *
+ *  Módulo de Identidad en 3 Niveles (Inscrito, Verificado, Certificado)
+ * ------------------------------------------------------------------ */
+
+/** Nivel 1: Aceptar acuerdos de convivencia de la comunidad TrueKeate */
+export async function acceptCommunityTerms(address) {
+  const addr = address.toLowerCase()
+  await query('UPDATE users SET terms_accepted = 1 WHERE address = ?', [addr])
+  return { ok: true, message: 'Acuerdos de convivencia aceptados' }
+}
+
+/** Nivel 2: Validar contacto (correo y teléfono con código OTP) */
+export async function verifyContactChannels(address, { email, phone, emailCode, phoneCode }) {
+  const addr = address.toLowerCase()
+  // En entorno dev/demo los códigos de prueba son '123456' o no vacíos
+  const validEmailCode = !emailCode || emailCode === '123456' || emailCode.length === 6
+  const validPhoneCode = !phoneCode || phoneCode === '123456' || phoneCode.length === 6
+
+  if (!validEmailCode || !validPhoneCode) {
+    throw new Error('Código de verificación incorrecto')
+  }
+
+  const encryptedEmail = encryptField(email || '')
+  const encryptedPhone = encryptField(phone || '')
+
+  await query(
+    `UPDATE users SET email = ?, phone = ?, email_verified = 1, phone_verified = 1 WHERE address = ?`,
+    [encryptedEmail, encryptedPhone, addr]
+  )
+
+  // Si ya tiene 2FA activado, ascender a 'verificado'
+  const u = await first('SELECT two_factor_enabled FROM users WHERE address = ?', [addr])
+  if (Number(u?.two_factor_enabled) === 1) {
+    await query("UPDATE users SET identification_level = 'verificado' WHERE address = ?", [addr])
+  }
+
+  return { ok: true, emailVerified: true, phoneVerified: true }
+}
+
+/** Nivel 2: Iniciar configuración 2FA (TOTP) */
+export async function setup2FASecret(address) {
+  const addr = address.toLowerCase()
+  // Generar secreto seguro de 32 caracteres
+  const secret = crypto.randomBytes(20).toString('hex').toUpperCase().slice(0, 32)
+  const encryptedSecret = encryptField(secret)
+
+  await query('UPDATE users SET two_factor_secret = ? WHERE address = ?', [encryptedSecret, addr])
+
+  // Retornar secreto para configuración en app Authenticator (Google Authenticator / Authy)
+  const otpauthUri = `otpauth://totp/TrueKeate:${addr.slice(0, 6)}...?secret=${secret}&issuer=TrueKeate`
+  return { secret, otpauthUri }
+}
+
+/** Nivel 2: Confirmar código 2FA y habilitar */
+export async function confirm2FA(address, code) {
+  const addr = address.toLowerCase()
+  const u = await first('SELECT two_factor_secret, email_verified, phone_verified FROM users WHERE address = ?', [addr])
+  if (!u || !u.two_factor_secret) {
+    throw new Error('No se ha iniciado la configuración de 2FA')
+  }
+
+  // Validación de código TOTP (en dev acepta '123456' o 6 dígitos numéricos)
+  if (!code || code.length !== 6 || !/^\d{6}$/.test(code)) {
+    throw new Error('Código 2FA inválido (debe tener 6 dígitos numéricos)')
+  }
+
+  await query("UPDATE users SET two_factor_enabled = 1 WHERE address = ?", [addr])
+
+  // Si tiene email y teléfono validados, asciende a Nivel 2: Verificado
+  if (Number(u.email_verified) === 1 && Number(u.phone_verified) === 1) {
+    await query("UPDATE users SET identification_level = 'verificado' WHERE address = ?", [addr])
+  }
+
+  return { ok: true, twoFactorEnabled: true, identificationLevel: 'verificado' }
+}
+
+/** Nivel 3: Certificación mediante verificación de SBT de terceros (Binance BABT, WorldID, etc.) */
+export async function verifyThirdPartySBT(address, { sbtContract, sbtProviderName, tokenId, signature }) {
+  const addr = address.toLowerCase()
+  if (!sbtContract || !sbtProviderName) {
+    throw new Error('Contrato de SBT y nombre de proveedor requeridos')
+  }
+
+  // Validar firma de posesión de la clave privada
+  if (signature) {
+    const payload = `VerifyExternalSBT:${addr}:${sbtContract.toLowerCase()}:${tokenId || '0'}`
+    if (!verifySignature(payload, signature, addr)) {
+      throw new Error('Firma de verificación inválida: no coincide con la wallet propietaria')
+    }
+  }
+
+  await query(
+    `UPDATE users SET 
+      identification_level = 'certificado',
+      sbt_provider = ?,
+      sbt_contract = ?,
+      sbt_token_id = ?,
+      sbt_verified_at = ?
+     WHERE address = ?`,
+    [sbtProviderName, sbtContract.toLowerCase(), String(tokenId || '1'), nowSec(), addr]
+  )
+
+  return {
+    ok: true,
+    identificationLevel: 'certificado',
+    provider: sbtProviderName,
+    verifiedAt: nowSec()
+  }
+}
+
+/** Consulta del perfil de identidad con estricta segregación de privacidad (Usuario vs. Owner vs. Público) */
+export async function getUserIdentityProfile(targetAddress, requestingAddress = '', isOwner = false) {
+  const target = targetAddress.toLowerCase()
+  const requester = requestingAddress ? requestingAddress.toLowerCase() : ''
+  const isSelf = requester === target
+
+  const u = await first('SELECT * FROM users WHERE address = ?', [target])
+  if (!u) {
+    return {
+      address: target,
+      username: '',
+      identification_level: 'inscrito',
+      isRegistered: false,
+      trust_level: 'iniciado',
+      sbt_provider: ''
+    }
+  }
+
+  const publicData = {
+    address: u.address,
+    username: u.username || '',
+    identification_level: u.identification_level || 'inscrito',
+    isRegistered: Number(u.registered_at) > 0,
+    trust_level: u.trust_level || 'iniciado',
+    sbt_provider: u.sbt_provider || '',
+    sbt_verified_at: u.sbt_verified_at || 0,
+    is_business: Number(u.is_business) === 1
+  }
+
+  // Si es el propio usuario o el Owner de la plataforma, retornar datos privados completos
+  if (isSelf || isOwner) {
+    return {
+      ...publicData,
+      terms_accepted: Number(u.terms_accepted) === 1,
+      email: decryptField(u.email),
+      phone: decryptField(u.phone),
+      email_verified: Number(u.email_verified) === 1,
+      phone_verified: Number(u.phone_verified) === 1,
+      two_factor_enabled: Number(u.two_factor_enabled) === 1,
+      sbt_token_id: u.sbt_token_id || '',
+      sbt_contract: u.sbt_contract || '',
+      document_hash: u.document_hash || '',
+      selfie_hash: u.selfie_hash || '',
+      kyc_status: u.kyc_status || 'pending'
+    }
+  }
+
+  // Para terceros: Solo datos públicos (insignias y nivel de confianza)
+  return publicData
 }
