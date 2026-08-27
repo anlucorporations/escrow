@@ -24,8 +24,8 @@ contract ExchangeTest is Test {
         userRegistry = new UserRegistry();
         exchange = new Exchange(address(userRegistry));
 
-        tokenA = new MockERC20("Token A", "TKA");
-        tokenB = new MockERC20("Token B", "TKB");
+        tokenA = new MockERC20("Token A", "TKA", 18);
+        tokenB = new MockERC20("Token B", "TKB", 18);
 
         exchange.addToken(address(tokenA));
         exchange.addToken(address(tokenB));
@@ -35,10 +35,10 @@ contract ExchangeTest is Test {
 
         // Register user1 and user2
         vm.prank(user1);
-        userRegistry.registerUser("trader1");
+        userRegistry.register("trader1");
 
         vm.prank(user2);
-        userRegistry.registerUser("trader2");
+        userRegistry.register("trader2");
     }
 
     function testUserRegistration() public {
@@ -54,7 +54,7 @@ contract ExchangeTest is Test {
         address user3 = makeAddr("user3");
         vm.prank(user3);
         vm.expectRevert("Username already taken");
-        userRegistry.registerUser("trader1");
+        userRegistry.register("trader1");
     }
 
     function testUnregisteredUserCannotTrade() public {
