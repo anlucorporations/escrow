@@ -178,7 +178,7 @@ NEXT_PUBLIC_BRLT_ADDRESS={brlt}
 NEXT_PUBLIC_RPC_URL={RPC_URL}
 NEXT_PUBLIC_CHAIN_ID=31337
 RELAYER_PRIVATE_KEY={OWNER_KEY}
-DATABASE_URL=postgresql://anlucorporations:KeLuDa.2324@127.0.0.1:5432/truekeate
+DATABASE_URL=postgresql://anlucorporations:KeLuDa.2324@127.0.0.1:5432/TrueKeate
 KYC_SECRET=truekeate-local-dev-secret-0123456789abcdef0123456789abcdef
 """
 with open(env_path, "w", encoding="utf-8") as f:

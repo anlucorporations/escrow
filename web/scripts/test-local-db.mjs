@@ -2,7 +2,7 @@ import pg from 'pg'
 const { Pool } = pg
 
 const PG_CONFIG = {
-  connectionString: 'postgresql://anlucorporations:KeLuDa.2324@127.0.0.1:5432/truekeate',
+  connectionString: 'postgresql://anlucorporations:KeLuDa.2324@127.0.0.1:5432/TrueKeate',
 }
 
 async function testDatabaseCreationAndOperations() {
