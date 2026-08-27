@@ -1,15 +1,16 @@
 import type { MetadataRoute } from 'next'
 
-/** M13 — Manifest PWA de TrueKeate. */
+/** M13 — Manifest PWA de TrueKeate (Mobile-First Standalone). */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'TrueKeate — Escrow & Exchange',
+    name: 'TrueKeate — Mercado Web3 & Trueke RWA',
     short_name: 'TrueKeate',
-    description: 'Intercambio seguro de tokens, bienes y servicios entre pares',
+    description: 'Intercambio seguro de bienes, servicios y tokens en Web3',
     start_url: '/',
     display: 'standalone',
-    background_color: '#ffffff',
-    theme_color: '#2563eb',
+    orientation: 'portrait-primary',
+    background_color: '#FAF8F5',
+    theme_color: '#2D2A26',
     icons: [
       { src: '/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
       { src: '/favicon.ico', sizes: '256x256', type: 'image/x-icon' },
