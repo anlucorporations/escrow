@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 #
 # deploy-local.sh — Despliegue local con roles preconfigurados:
 #   1. Cuenta 0: SuperUsuario (Owner, Deployer, Relayer, Árbitro, Socio, Admin)
@@ -196,6 +196,8 @@ NEXT_PUBLIC_BRLT_ADDRESS=$BRLT
 NEXT_PUBLIC_RPC_URL=$RPC_URL
 NEXT_PUBLIC_CHAIN_ID=31337
 RELAYER_PRIVATE_KEY=$OWNER_KEY
+DATABASE_URL=postgresql://postgres:KeLuDa.2324@127.0.0.1:5432/truekeate
+KYC_SECRET=truekeate-local-dev-secret-0123456789abcdef0123456789abcdef
 EOF
 
 # 10) Guardar deployment-info.txt

@@ -206,7 +206,7 @@ const SCHEMA = [
   // Notificaciones (M15)
   `CREATE TABLE IF NOT EXISTS notifications (
     id         TEXT PRIMARY KEY,
-    user       TEXT NOT NULL,
+    "user"     TEXT NOT NULL,
     type       TEXT NOT NULL DEFAULT 'info',
     message    TEXT NOT NULL DEFAULT '',
     ref_id     TEXT NOT NULL DEFAULT '',
@@ -243,8 +243,8 @@ export async function initSchema() {
     // Meetups: buscar por operación
     'CREATE INDEX IF NOT EXISTS idx_meetups_operation_id    ON meetups (operation_id)',
     // Notificaciones: consultas por usuario y estado de lectura
-    'CREATE INDEX IF NOT EXISTS idx_notifications_user      ON notifications (user)',
-    'CREATE INDEX IF NOT EXISTS idx_notifications_user_read ON notifications (user, read)',
+    'CREATE INDEX IF NOT EXISTS idx_notifications_user      ON notifications ("user")',
+    'CREATE INDEX IF NOT EXISTS idx_notifications_user_read ON notifications ("user", read)',
     // Campañas: por owner y estado
     'CREATE INDEX IF NOT EXISTS idx_campaigns_owner         ON campaigns (owner)',
     'CREATE INDEX IF NOT EXISTS idx_campaigns_status        ON campaigns (status)',

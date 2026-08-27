@@ -493,22 +493,22 @@ export async function approveCampaign(campaignId, approver, governanceAddress, p
 
 export async function notify(user, type, message, refId = '') {
   await query(
-    'INSERT INTO notifications (id, user, type, message, ref_id, read, created_at) VALUES (?, ?, ?, ?, ?, 0, ?)',
+    'INSERT INTO notifications (id, "user", type, message, ref_id, read, created_at) VALUES (?, ?, ?, ?, ?, 0, ?)',
     [newId(), user.toLowerCase(), type, message, refId, nowSec()]
   )
 }
 
 export async function listNotifications(address) {
   const rows = await query(
-    'SELECT * FROM notifications WHERE user = ? ORDER BY created_at DESC LIMIT 30',
+    'SELECT * FROM notifications WHERE "user" = ? ORDER BY created_at DESC LIMIT 30',
     [address.toLowerCase()]
   )
-  const unread = await first('SELECT COUNT(*) AS total FROM notifications WHERE user = ? AND read = 0', [address.toLowerCase()])
+  const unread = await first('SELECT COUNT(*) AS total FROM notifications WHERE "user" = ? AND read = 0', [address.toLowerCase()])
   return { notifications: rows, unread: Number(unread.total || 0) }
 }
 
 export async function markNotificationsRead(address) {
-  await query('UPDATE notifications SET read = 1 WHERE user = ?', [address.toLowerCase()])
+  await query('UPDATE notifications SET read = 1 WHERE "user" = ?', [address.toLowerCase()])
 }
 
 /* ------------------------------------------------------------------ *
