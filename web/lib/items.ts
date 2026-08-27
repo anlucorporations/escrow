@@ -43,6 +43,10 @@ export interface UserProfile {
   kycStatus: string
   trustLevel: string
   levelLabel: string
+  identificationLevel?: number
+  sbtClaimed?: boolean
+  sbtProvider?: string | null
+  twoFactorEnabled?: boolean
   reputation: Reputation
   stats: { completed: number; active: number; items: number; vouches: number }
 }

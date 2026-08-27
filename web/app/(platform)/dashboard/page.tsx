@@ -2,6 +2,7 @@
 
 import { useUserRole, useRegistration } from '@/lib/hooks'
 import { useEthereum } from '@/lib/ethereum'
+import { IdentityStatusBanner } from '@/components/IdentityStatusBanner'
 import Link from 'next/link'
 
 export default function DashboardPage() {
@@ -33,6 +34,9 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-background pt-28 pb-20">
       <div className="container mx-auto px-6 max-w-6xl">
         
+        {/* IDENTITY STATUS PROGRESSION BANNER */}
+        <IdentityStatusBanner />
+
         {/* WELCOME HEADER */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 pb-8 border-b border-slate-200">
           <div>

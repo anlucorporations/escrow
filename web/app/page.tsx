@@ -66,7 +66,7 @@ export default function VelvetyLandingPage() {
       </section>
 
       {/* THREE PILLARS (Velvety Features) */}
-      <section className="py-24 bg-white border-y border-slate-100">
+      <section id="pilares" className="py-24 bg-white border-y border-slate-100 scroll-mt-20">
         <div className="container mx-auto px-6 max-w-6xl">
           <div className="text-center mb-20">
             <h2 className="text-3xl md:text-5xl font-serif text-slate-900 mb-4">Los Tres Pilares de Confianza</h2>

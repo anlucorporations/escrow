@@ -1,3 +1,5 @@
+import { AccessGate } from '@/components/AccessGate'
+
 export default function PlatformLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>
+  return <AccessGate>{children}</AccessGate>
 }

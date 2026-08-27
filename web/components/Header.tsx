@@ -13,19 +13,26 @@ export function Header() {
   const { roles } = useEscrow()
   const isAdmin = roles.isOwner
 
-  // Las secciones de la plataforma solo se muestran con billetera inscrita.
+  // Las secciones privadas de la plataforma se muestran tras validar inscripción.
   const hasAccess = isConnected && !registrationLoading && isRegistered
 
-  const navItems = [
-    { label: 'Inicio', href: '/' },
-    { label: 'Suite', href: '/dashboard' },
-    { label: 'Catálogo', href: '/items' },
-    { label: 'Truekes', href: '/operations' },
-    { label: 'Campañas', href: '/campaigns' },
-    { label: 'Balances', href: '/balances' },
-    { label: 'Perfil', href: '/profile' },
-    ...(isAdmin ? [{ label: 'Admin', href: '/add-token' }] : []),
-  ]
+  const navItems = hasAccess
+    ? [
+        { label: 'Inicio', href: '/' },
+        { label: 'Panel', href: '/dashboard' },
+        { label: 'Catálogo', href: '/items' },
+        { label: 'Truekes', href: '/operations' },
+        { label: 'Identidad', href: '/identity' },
+        { label: 'Campañas', href: '/campaigns' },
+        { label: 'Balances', href: '/balances' },
+        { label: 'Perfil', href: '/profile' },
+        ...(isAdmin ? [{ label: 'Admin', href: '/add-token' }] : []),
+      ]
+    : [
+        { label: 'Inicio', href: '/' },
+        { label: 'Catálogo', href: '/items' },
+        { label: 'Ayuda', href: '/help' },
+      ]
 
   return (
     <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-slate-200">
