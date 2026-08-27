@@ -15,8 +15,8 @@ contract DeployAndInitScript is Script {
         vm.startBroadcast(deployerPrivateKey);
 
         Escrow escrow = new Escrow();
-        MockERC20 tokenA = new MockERC20("Token A", "TKA");
-        MockERC20 tokenB = new MockERC20("Token B", "TKB");
+        MockERC20 tokenA = new MockERC20("Token A", "TKA", 18);
+        MockERC20 tokenB = new MockERC20("Token B", "TKB", 18);
 
         escrow.addToken(address(tokenA));
         escrow.addToken(address(tokenB));

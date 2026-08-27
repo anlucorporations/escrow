@@ -92,15 +92,25 @@ $BRLT = Deploy-Contract "BRLT"
 $Subscription = Deploy-Contract "Subscription" @($BRLT, "100000000000000000000")
 $Governance = Deploy-Contract "Governance"
 
-Write-Host "✓ Escrow:       $Escrow" -ForegroundColor Green
-Write-Host "✓ UserRegistry: $Registry" -ForegroundColor Green
-Write-Host "✓ Governance:   $Governance" -ForegroundColor Green
-Write-Host "✓ Subscription: $Subscription" -ForegroundColor Green
-Write-Host "✓ Token A:      $TKA" -ForegroundColor Green
-Write-Host "✓ Token B:      $TKB" -ForegroundColor Green
-Write-Host "✓ USDT Mock:    $USDT" -ForegroundColor Green
-Write-Host "✓ DELIVERY:     $DELIVERY" -ForegroundColor Green
-Write-Host "✓ BRLT Token:   $BRLT" -ForegroundColor Green
+# Despliegue de SBTs, RWA y Vouchers
+$TruekeSBT = Deploy-Contract "TruekeSBT" @($OwnerAddr, "https://ipfs.io/ipfs/")
+$SBTRegistry = Deploy-Contract "SBTRegistry" @($OwnerAddr)
+$TruekeRWA = Deploy-Contract "TruekeRWA" @($OwnerAddr, $Registry, $SBTRegistry)
+$TruekeService = Deploy-Contract "TruekeService" @($OwnerAddr, $Registry, $SBTRegistry)
+
+Write-Host "✓ Escrow:        $Escrow" -ForegroundColor Green
+Write-Host "✓ UserRegistry:  $Registry" -ForegroundColor Green
+Write-Host "✓ Governance:    $Governance" -ForegroundColor Green
+Write-Host "✓ Subscription:  $Subscription" -ForegroundColor Green
+Write-Host "✓ Token A:       $TKA" -ForegroundColor Green
+Write-Host "✓ Token B:       $TKB" -ForegroundColor Green
+Write-Host "✓ USDT Mock:     $USDT" -ForegroundColor Green
+Write-Host "✓ DELIVERY:      $DELIVERY" -ForegroundColor Green
+Write-Host "✓ BRLT Token:    $BRLT" -ForegroundColor Green
+Write-Host "✓ TruekeSBT:     $TruekeSBT" -ForegroundColor Green
+Write-Host "✓ SBTRegistry:   $SBTRegistry" -ForegroundColor Green
+Write-Host "✓ TruekeRWA:     $TruekeRWA" -ForegroundColor Green
+Write-Host "✓ TruekeService: $TruekeService" -ForegroundColor Green
 
 # 4. Configurar SuperUsuario (Cuenta 0)
 Write-Host "`n👑 [Paso 3/7] Configurando SuperUsuario (Cuenta 0)..." -ForegroundColor Yellow
@@ -171,6 +181,10 @@ NEXT_PUBLIC_TOKEN_B_ADDRESS=$TKB
 NEXT_PUBLIC_USDT_ADDRESS=$USDT
 NEXT_PUBLIC_DELIVERY_ADDRESS=$DELIVERY
 NEXT_PUBLIC_BRLT_ADDRESS=$BRLT
+NEXT_PUBLIC_SBT_REGISTRY_ADDRESS=$SBTRegistry
+NEXT_PUBLIC_TRUEKE_SBT_ADDRESS=$TruekeSBT
+NEXT_PUBLIC_TRUEKE_RWA_ADDRESS=$TruekeRWA
+NEXT_PUBLIC_TRUEKE_SERVICE_ADDRESS=$TruekeService
 NEXT_PUBLIC_RPC_URL=$RpcUrl
 NEXT_PUBLIC_CHAIN_ID=31337
 RELAYER_PRIVATE_KEY=$OwnerKey

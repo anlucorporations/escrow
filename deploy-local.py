@@ -100,6 +100,14 @@ delivery = deploy_contract("MockERC20", "DELIVERY", "DELIVERY", "18")
 brlt = deploy_contract("BRLT")
 subscription = deploy_contract("Subscription", brlt, "100000000000000000000") # 100 BRLT/mes
 governance = deploy_contract("Governance")
+trueke_sbt = deploy_contract("TruekeSBT")
+sbt_registry = deploy_contract("SBTRegistry")
+trueke_rwa = deploy_contract("TruekeRWA", sbt_registry)
+trueke_service = deploy_contract("TruekeService", sbt_registry)
+
+# Vincular minter de SBT nativo
+send_tx(OWNER_KEY, trueke_sbt, "setMinter(address)", sbt_registry)
+send_tx(OWNER_KEY, sbt_registry, "setNativeSBT(address)", trueke_sbt)
 
 print(f"  [+] Escrow:        {escrow}")
 print(f"  [+] UserRegistry:  {registry}")
@@ -110,6 +118,10 @@ print(f"  [+] Token B:       {tkb}")
 print(f"  [+] USDT Mock:     {usdt}")
 print(f"  [+] DELIVERY:      {delivery}")
 print(f"  [+] BRLT Token:    {brlt}")
+print(f"  [+] TruekeSBT:     {trueke_sbt}")
+print(f"  [+] SBTRegistry:   {sbt_registry}")
+print(f"  [+] TruekeRWA:     {trueke_rwa}")
+print(f"  [+] TruekeService: {trueke_service}")
 
 # 4. Configurar Cuenta 0 (SuperUsuario)
 print("\n[Paso 3/7] Configurando SuperUsuario (Cuenta 0)...")
@@ -175,6 +187,10 @@ NEXT_PUBLIC_TOKEN_B_ADDRESS={tkb}
 NEXT_PUBLIC_USDT_ADDRESS={usdt}
 NEXT_PUBLIC_DELIVERY_ADDRESS={delivery}
 NEXT_PUBLIC_BRLT_ADDRESS={brlt}
+NEXT_PUBLIC_SBT_REGISTRY_ADDRESS={sbt_registry}
+NEXT_PUBLIC_TRUEKE_SBT_ADDRESS={trueke_sbt}
+NEXT_PUBLIC_TRUEKE_RWA_ADDRESS={trueke_rwa}
+NEXT_PUBLIC_TRUEKE_SERVICE_ADDRESS={trueke_service}
 NEXT_PUBLIC_RPC_URL={RPC_URL}
 NEXT_PUBLIC_CHAIN_ID=31337
 RELAYER_PRIVATE_KEY={OWNER_KEY}

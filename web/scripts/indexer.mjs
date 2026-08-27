@@ -18,7 +18,6 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { ethers } from 'ethers'
-import { initSchema, query, first } from '../server/db.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -27,12 +26,20 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 function loadEnvLocal() {
   const envFile = path.join(__dirname, '..', '.env.local')
   if (!fs.existsSync(envFile)) return
-  for (const line of fs.readFileSync(envFile, 'utf8').split('\n')) {
-    const m = line.match(/^([A-Z_]+)=(.*)$/)
-    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].trim()
+  for (const raw of fs.readFileSync(envFile, 'utf8').split('\n')) {
+    const line = raw.trim()
+    if (!line || line.startsWith('#')) continue
+    const idx = line.indexOf('=')
+    if (idx > 0) {
+      const key = line.slice(0, idx).trim()
+      const val = line.slice(idx + 1).trim()
+      process.env[key] = val
+    }
   }
 }
 loadEnvLocal()
+
+const { initSchema, query, first } = await import('../server/db.js')
 
 const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || process.env.RPC_URL || 'http://127.0.0.1:8545'
 const ESCROW_ADDRESS = process.env.NEXT_PUBLIC_ESCROW_ADDRESS

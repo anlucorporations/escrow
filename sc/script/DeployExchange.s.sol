@@ -23,14 +23,14 @@ contract DeployExchangeScript is Script {
         UserRegistry userRegistry = new UserRegistry();
         Exchange exchange = new Exchange(address(userRegistry));
 
-        MockERC20 tokenA = new MockERC20("Token A", "TKA");
-        MockERC20 tokenB = new MockERC20("Token B", "TKB");
+        MockERC20 tokenA = new MockERC20("Token A", "TKA", 18);
+        MockERC20 tokenB = new MockERC20("Token B", "TKB", 18);
 
         exchange.addToken(address(tokenA));
         exchange.addToken(address(tokenB));
 
         // Register Account 0 as trader0
-        userRegistry.registerUser("trader0");
+        userRegistry.register("trader0");
 
         tokenA.mint(account0, 1000 ether);
         tokenB.mint(account0, 1000 ether);
@@ -41,7 +41,7 @@ contract DeployExchangeScript is Script {
 
         // Register Account 1 as trader1
         vm.startBroadcast(user2PrivateKey);
-        userRegistry.registerUser("trader1");
+        userRegistry.register("trader1");
         vm.stopBroadcast();
 
         console.log("UserRegistry Deployed:", address(userRegistry));
