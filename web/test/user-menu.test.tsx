@@ -64,7 +64,7 @@ describe('UserMenu — Menú Desplegable de Usuario y Balance', () => {
     })
 
     render(<UserMenu />)
-    expect(screen.getByText('Conectar Billetera')).toBeInTheDocument()
+    expect(screen.getByText(/Conectar/i)).toBeInTheDocument()
   })
 
   it('despliega el menú con accesos a balances, perfil, identidad y truekes al hacer click', () => {

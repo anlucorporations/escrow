@@ -113,9 +113,10 @@ export function UserMenu() {
     return (
       <button
         onClick={handleConnect}
-        className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-full text-xs font-semibold tracking-wide uppercase transition-all shadow-md shadow-slate-900/10"
+        className="px-6 py-2.5 bg-gradient-to-r from-[#00E5FF] to-[#00B4D8] hover:from-[#00B4D8] hover:to-[#008BA3] text-[#0A1128] font-bold rounded-full text-xs uppercase tracking-wider transition-all duration-300 shadow-md shadow-[#00E5FF]/20 active:scale-95 flex items-center gap-2"
       >
-        Conectar Billetera
+        <span>⚡</span>
+        <span>Conectar Wallet</span>
       </button>
     )
   }
@@ -133,7 +134,7 @@ export function UserMenu() {
               if (!notifOpen) markRead()
             }}
             aria-label="Notificaciones"
-            className="p-2.5 rounded-full bg-white border border-slate-200 hover:border-slate-400 text-slate-700 transition-colors relative shadow-sm"
+            className="p-2.5 rounded-full bg-white border border-slate-200 hover:border-cyan-400 text-slate-700 transition-colors relative shadow-xs"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -144,7 +145,7 @@ export function UserMenu() {
               />
             </svg>
             {unread > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-indigo-600 text-white text-[9px] font-bold flex items-center justify-center animate-pulse">
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-cyan-500 text-[#0A1128] text-[9px] font-bold flex items-center justify-center animate-pulse">
                 {unread}
               </span>
             )}
@@ -152,10 +153,10 @@ export function UserMenu() {
 
           {/* Panel de Notificaciones */}
           {notifOpen && (
-            <div className="absolute right-0 mt-3 w-80 rounded-[2rem] bg-white border border-slate-200 shadow-2xl shadow-indigo-900/10 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
+            <div className="absolute right-0 mt-3 w-80 rounded-[2rem] bg-white border border-slate-200 shadow-2xl shadow-cyan-900/10 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
               <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                <span className="font-serif font-bold text-sm text-slate-900">Notificaciones</span>
-                <span className="text-[10px] text-slate-400 font-mono uppercase">En tiempo real</span>
+                <span className="font-serif font-bold text-sm text-[#0A1128]">Notificaciones</span>
+                <span className="text-[10px] text-cyan-600 font-mono font-bold uppercase">En tiempo real</span>
               </div>
               <div className="max-h-72 overflow-y-auto divide-y divide-slate-50">
                 {notifications.length === 0 ? (
@@ -174,7 +175,7 @@ export function UserMenu() {
         </div>
       )}
 
-      {/* Botón Disparador del Menú de Usuario */}
+      {/* Botón Disparador del Menú de Usuario (Píldora con pulso e Isotipo) */}
       <button
         onClick={() => {
           triggerHaptic('light')
@@ -182,28 +183,29 @@ export function UserMenu() {
           setNotifOpen(false)
         }}
         aria-label="Menú desplegable de usuario"
-        className="flex items-center gap-2.5 px-3.5 py-2 bg-white rounded-full border border-slate-200 hover:border-slate-400 transition-all shadow-sm group"
+        className="flex items-center gap-2.5 px-3.5 py-1.5 bg-white rounded-full border border-slate-200 hover:border-cyan-400 transition-all shadow-xs group"
       >
-        {/* Avatar / Indicador de Nivel */}
-        <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm ${
-          level >= 3 ? 'bg-[#8A9A70]' : level === 2 ? 'bg-purple-600' : isRegistered ? 'bg-indigo-600' : 'bg-slate-400'
+        {/* Avatar Hexagonal / Indicador de Nivel */}
+        <div className={`w-7 h-7 clip-hexagon flex items-center justify-center text-[10px] font-bold text-white shadow-xs ${
+          level >= 3 ? 'bg-amber-500' : level === 2 ? 'bg-cyan-500' : isRegistered ? 'bg-[#0A1128]' : 'bg-slate-400'
         }`}>
           {isRegistered && username ? username.slice(0, 1).toUpperCase() : '0x'}
         </div>
 
         {/* Nombre / Identificador */}
         <div className="text-left hidden sm:block">
-          <p className="text-xs font-semibold text-slate-800 leading-tight">
-            {regLoading ? 'Cargando...' : isRegistered && username ? `@${username}` : short}
+          <p className="text-xs font-bold text-[#0A1128] leading-tight flex items-center gap-1">
+            <span>{regLoading ? 'Cargando...' : isRegistered && username ? `@${username}` : short}</span>
+            {isRegistered && <span className="text-[#00E5FF] text-[10px]">☑</span>}
           </p>
-          <p className="text-[10px] text-slate-400 font-light">
+          <p className="text-[10px] text-slate-400 font-medium">
             {level >= 3 ? 'N3 · Certificado' : level === 2 ? 'N2 · Verificado' : isRegistered ? 'N1 · Inscrito' : 'Sin Registrar'}
           </p>
         </div>
 
         {/* Flecha Chevron */}
         <svg
-          className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${open ? 'rotate-180 text-indigo-600' : 'group-hover:text-slate-600'}`}
+          className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${open ? 'rotate-180 text-cyan-500' : 'group-hover:text-slate-600'}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

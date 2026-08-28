@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #FAF8F5; /* Soft Alabaster/Cream */
-  --foreground: #2D2A26; /* Charcoal / Dark Taupe */
+  --background: #F8F9FA; /* Snow White / Clean High-Tech */
+  --foreground: #0A1128; /* Deep Navy Primary Text */
 }
 
 @theme inline {
@@ -11,25 +11,39 @@
   --font-sans: var(--font-inter), sans-serif;
   --font-serif: var(--font-playfair), serif;
   
-  /* Velvety Palette Overrides */
-  --color-indigo-50: #Fdfbf9;
-  --color-indigo-100: #F4ECE6; /* Warm Nude */
-  --color-indigo-500: #D4A373; /* Soft Camel */
-  --color-indigo-600: #C28E5C; 
-  --color-indigo-700: #A6754B;
+  /* Paleta Oficial TrueKeate Web3 */
+  --color-navy-950: #070D1E;
+  --color-navy-900: #0A1128; /* Azul Marino Profundo Principal */
+  --color-navy-800: #1C2541;
+  --color-navy-700: #2B3A67;
   
-  --color-purple-50: #FFF5F5;
-  --color-purple-500: #E5989B; /* Soft Rose */
-  --color-purple-600: #D67D81;
+  --color-cyan-electric: #00E5FF; /* Turquesa Eléctrico de Acción */
+  --color-cyan-hover: #00B4D8;
+  --color-cyan-dim: rgba(0, 229, 255, 0.15);
   
-  --color-fuchsia-500: #A3B18A; /* Soft Sage */
-  --color-fuchsia-600: #8A9A70;
+  --color-gold-400: #FBBF24;
+  --color-gold-500: #F59E0B; /* Dorado de Prestigio y SBT */
+  --color-gold-600: #D97706;
 
-  --color-slate-50: #FAF8F5;
-  --color-slate-100: #F0EBE1;
-  --color-slate-200: #E8E0D5; /* Soft Borders */
-  --color-slate-800: #4A4641;
-  --color-slate-900: #2D2A26;
+  /* Compatibilidad y utilitarios */
+  --color-indigo-50: #F4F8FA;
+  --color-indigo-100: #E6F3F7;
+  --color-indigo-500: #00E5FF;
+  --color-indigo-600: #00B4D8;
+  --color-indigo-700: #0A1128;
+  
+  --color-purple-50: #FFFDF5;
+  --color-purple-500: #F59E0B;
+  --color-purple-600: #D97706;
+  
+  --color-fuchsia-500: #10B981; /* Emerald Success */
+  --color-fuchsia-600: #059669;
+
+  --color-slate-50: #F8F9FA;
+  --color-slate-100: #F1F5F9;
+  --color-slate-200: #E2E8F0;
+  --color-slate-800: #1E293B;
+  --color-slate-900: #0A1128;
 }
 
 body {
@@ -40,6 +54,35 @@ body {
   overscroll-behavior-y: contain;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+}
+
+/* Geometría Hexagonal (Blockchain Block Identity) */
+.clip-hexagon {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+/* Efectos Glow Web3 */
+.glow-cyan {
+  box-shadow: 0 0 25px rgba(0, 229, 255, 0.35);
+}
+.glow-cyan-sm {
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.25);
+}
+.glow-gold {
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+}
+
+/* Animación Orbital de Intercambio */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
 }
 
 /* Mobile-First Safe Areas */
