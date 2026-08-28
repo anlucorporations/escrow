@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-deploy-local.py — Script de despliegue local con asignación de roles completos:
-  1. Cuenta 0: SuperUsuario (Owner, Deployer, Relayer, Árbitro, Socio, Admin)
-  2. Cuentas 1, 2, 3: Usuarios Particulares (inscritos en UserRegistry)
-  3. Cuentas 4, 5: Usuarios Comerciantes (inscritos, flag business + suscripción 12 meses BRLT)
-  4. Cuentas 6, 7, 8: Usuarios Socios (inscritos en UserRegistry + rol Socio en Governance)
+deploy-local.py — Script de despliegue local con matriz de pruebas de operación:
+  - Cuenta 0: SuperUsuario Owner (Deployer, Árbitro, Socio Fundador, Certificado N3 SBT, @superadmin)
+  - Cuentas 1, 2: Usuarios Socios Certificados (Gobernanza + Nivel 3 Certificado + TruekeSBT)
+  - Cuentas 3, 4: Usuarios Empresa Certificados (Nivel 3 Certificado + TruekeSBT + Suscripción 12 meses BRLT)
+  - Cuentas 5, 6: Usuarios Particulares Verificados (Nivel 2 Verificado, cuota 3 truekes simultáneos)
+  - Cuentas 7, 8: Cuentas Libres / No registradas (para pruebas de bienvenida e inscripción en /register)
+  - Cuenta 9: Cuenta Reserva Libre
 """
 
 import subprocess
@@ -23,16 +25,16 @@ RPC_URL = os.environ.get("RPC_URL", "http://127.0.0.1:8545")
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
 ADDRS = [
-    "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", # 0: SuperUsuario
-    "0x70997970C51812dc3A010C7d01b50e0d17dc79C8", # 1: Particular 1 (Alice)
-    "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", # 2: Particular 2 (Bob)
-    "0x90F79bf6EB2c4f870365E785982E1f101E93b906", # 3: Particular 3 (Carol)
-    "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65", # 4: Comerciante 1 (Tienda Tech)
-    "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc", # 5: Comerciante 2 (Super Market)
-    "0x976EA74026E726554dB657fA54763abd0C3a0aa9", # 6: Socio 1 (Juez Alpha)
-    "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955", # 7: Socio 2 (Juez Beta)
-    "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f", # 8: Socio 3 (Juez Gamma)
-    "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720"  # 9: Reserva
+    "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", # 0: Owner / SuperUsuario Socio
+    "0x70997970C51812dc3A010C7d01b50e0d17dc79C8", # 1: Usuario Socio 1 (Juez Alpha)
+    "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", # 2: Usuario Socio 2 (Juez Beta)
+    "0x90F79bf6EB2c4f870365E785982E1f101E93b906", # 3: Usuario Empresa 1 (Tech Store)
+    "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65", # 4: Usuario Empresa 2 (Agro Market)
+    "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc", # 5: Usuario Particular Verificado 1 (Carlos)
+    "0x976EA74026E726554dB657fA54763abd0C3a0aa9", # 6: Usuario Particular Verificado 2 (Diana)
+    "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955", # 7: Cuenta Libre 1 (Sin registrar)
+    "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f", # 8: Cuenta Libre 2 (Sin registrar)
+    "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720"  # 9: Cuenta Reserva
 ]
 
 KEYS = [
@@ -73,7 +75,7 @@ def deploy_contract(name, *args):
     raise RuntimeError(f"Deployment of {name} failed: {out}")
 
 print("=================================================================")
-print("  DESPLIEGUE LOCAL ESCROW / TRUEKEATE - ROLES PRECONFIGURADOS")
+print("  🚀 DESPLIEGUE LOCAL ESCROW / TRUEKEATE - MATRIZ DE ROLES")
 print("=================================================================")
 
 # 1. Verificar Anvil
@@ -84,7 +86,7 @@ except Exception as e:
     print(f"[!] Error al conectar con Anvil en {RPC_URL}. Inicia Anvil primero.")
     sys.exit(1)
 
-# 2. Compilar
+# 2. Compilar contratos
 print("\n[Paso 1/7] Compilando contratos inteligentes con Foundry...")
 run_cmd(["forge", "build"], cwd=os.path.join(ROOT, "sc"))
 print("[+] Contratos compilados correctamente")
@@ -144,13 +146,12 @@ send_tx(
     "19",
     "true",
 )
-# Asignar nivel 3 (Certificado on-chain) y emitir Soulbound Token
 send_tx(OWNER_KEY, registry, "setUserIdentificationLevel(address,uint8)", OWNER_ADDR, "2")
 send_tx(OWNER_KEY, trueke_sbt, "mint(address,string)", OWNER_ADDR, "Certificacion Fundador & Socio TrueKeate")
-print(f"  [+] Cuenta 0 ({OWNER_ADDR}) configurada como: Owner + Arbiter + Socio Certificado (Nivel 3 SBT) + @superadmin")
+print(f"  [+] Cuenta 0 ({OWNER_ADDR}) -> @superadmin (Owner + Socio Certificado N3 SBT)")
 
-# 5. Minteo de tokens para todas las 10 cuentas
-print("\n[Paso 4/7] Minteando tokens de prueba para las 10 cuentas...")
+# 5. Minteo de tokens para todas las cuentas
+print("\n[Paso 4/7] Minteando tokens de prueba para las 10 cuentas de Anvil...")
 for addr in ADDRS:
     send_tx(OWNER_KEY, tka, "mint(address,uint256)", addr, "1000000000000000000000")
     send_tx(OWNER_KEY, tkb, "mint(address,uint256)", addr, "1000000000000000000000")
@@ -159,50 +160,55 @@ for addr in ADDRS:
     send_tx(OWNER_KEY, brlt, "mint(address,uint256)", addr, "10000000000000000000000")
 print("  [+] 1000 TKA + 1000 TKB + 5000 USDT + 5 DELIVERY + 10000 BRLT asignados por cuenta")
 
-# 6. Inscribir Usuarios Particulares (Cuentas 1, 2, 3)
-print("\n[Paso 5/7] Inscribiendo 3 Usuarios Particulares en UserRegistry...")
-part_data = [
-    ("particular_alice", "alice@truekeate.com", "+584121112233", "Av. Principal 1, Higuerote", "729450", "1159800", "19", "true"),
-    ("particular_bob", "bob@truekeate.com", "+584122223344", "Calle Marina 12, Carenero", "731200", "1162400", "19", "true"),
-    ("particular_carol", "carol@truekeate.com", "+584123334455", "Sector Playa 4, Rio Chico", "735800", "1148900", "19", "true"),
+# 6. Configurar Cuentas 1 y 2: Usuarios Socios Certificados
+print("\n[Paso 5/7] Configurando 2 Usuarios Socios Certificados (Cuentas 1 y 2)...")
+soc_data = [
+    ("socio_juez_alpha", "juez.alpha@truekeate.com", "+584126667788", "Tribunal Comunitario Alpha, Barlovento", "729800", "1160100", "19", "true"),
+    ("socio_juez_beta", "juez.beta@truekeate.com", "+584127778899", "Tribunal Comunitario Beta, Caucagua", "725100", "1152000", "19", "true"),
 ]
-for i in [1, 2, 3]:
+for i in [1, 2]:
     addr = ADDRS[i]
     key = KEYS[i]
-    u, em, ph, loc, east, north, z, nhem = part_data[i - 1]
+    u, em, ph, loc, east, north, z, nhem = soc_data[i - 1]
     send_tx(key, registry, "register(string,string,string,string,int32,int32,uint8,bool)", u, em, ph, loc, east, north, z, nhem)
-    print(f"  [+] Cuenta {i} ({addr}) -> @{u} ({em}, {ph}, UTM Zone {z}N)")
+    send_tx(OWNER_KEY, governance, "setSocio(address,bool)", addr, "true")
+    send_tx(OWNER_KEY, registry, "setUserIdentificationLevel(address,uint8)", addr, "2")
+    send_tx(OWNER_KEY, trueke_sbt, "mint(address,string)", addr, "Certificacion Socio Comunitario")
+    print(f"  [+] Cuenta {i} ({addr}) -> @{u} (Socio: TRUE, Certificado N3 SBT: TRUE)")
 
-# 7. Inscribir y Configurar Comerciantes (Cuentas 4, 5)
-print("\n[Paso 6/7] Inscribiendo 2 Comerciantes y activando membresia BRLT...")
-com_data = [
-    ("tienda_tech", "tech@barloventas.com", "+584124445566", "Centro Comercial Barlovento Local 14", "728900", "1158500", "19", "true"),
-    ("mercado_central", "mercado@barloventas.com", "+584125556677", "Av. Comercio Local 3, Tacarigua", "727500", "1156200", "19", "true"),
+# 7. Configurar Cuentas 3 y 4: Usuarios Empresa Certificados
+print("\n[Paso 6/7] Configurando 2 Usuarios Empresa Certificados (Cuentas 3 y 4)...")
+emp_data = [
+    ("empresa_tech", "tech@barloventas.com", "+584124445566", "Centro Comercial Barlovento Local 14", "728900", "1158500", "19", "true"),
+    ("empresa_agro", "agro@barloventas.com", "+584125556677", "Av. Comercio Local 3, Tacarigua", "727500", "1156200", "19", "true"),
 ]
-for i in [4, 5]:
+for i in [3, 4]:
     addr = ADDRS[i]
     key = KEYS[i]
-    u, em, ph, loc, east, north, z, nhem = com_data[i - 4]
+    u, em, ph, loc, east, north, z, nhem = emp_data[i - 3]
     send_tx(key, registry, "register(string,string,string,string,int32,int32,uint8,bool)", u, em, ph, loc, east, north, z, nhem)
     send_tx(OWNER_KEY, subscription, "setBusiness(address,bool)", addr, "true")
     send_tx(key, brlt, "approve(address,uint256)", subscription, "1200000000000000000000")
     send_tx(key, subscription, "subscribe(uint256)", "12")
-    print(f"  [+] Cuenta {i} ({addr}) -> @{u} (Business: TRUE, Suscripcion: 12 meses activa)")
+    send_tx(OWNER_KEY, registry, "setUserIdentificationLevel(address,uint8)", addr, "2")
+    send_tx(OWNER_KEY, trueke_sbt, "mint(address,string)", addr, "Certificacion Empresa Verificada")
+    print(f"  [+] Cuenta {i} ({addr}) -> @{u} (Empresa: TRUE, Suscripción: 12 meses, Certificado N3 SBT: TRUE)")
 
-# 8. Inscribir y Configurar Socios (Cuentas 6, 7, 8)
-print("\n[Paso 7/7] Inscribiendo 3 Socios y asignando rol en Governance...")
-soc_data = [
-    ("socio_juez_alpha", "juez.alpha@truekeate.com", "+584126667788", "Tribunal Comunitario Alpha, Barlovento", "729800", "1160100", "19", "true"),
-    ("socio_juez_beta", "juez.beta@truekeate.com", "+584127778899", "Tribunal Comunitario Beta, Caucagua", "725100", "1152000", "19", "true"),
-    ("socio_juez_gamma", "juez.gamma@truekeate.com", "+584128889900", "Tribunal Comunitario Gamma, San Jose", "733000", "1157400", "19", "true"),
+# 8. Configurar Cuentas 5 y 6: Usuarios Particulares Verificados
+print("\n[Paso 7/7] Configurando 2 Usuarios Particulares Verificados (Cuentas 5 y 6)...")
+part_data = [
+    ("particular_carlos", "carlos@truekeate.com", "+584121112233", "Av. Principal 1, Higuerote", "729450", "1159800", "19", "true"),
+    ("particular_diana", "diana@truekeate.com", "+584122223344", "Calle Marina 12, Carenero", "731200", "1162400", "19", "true"),
 ]
-for i in [6, 7, 8]:
+for i in [5, 6]:
     addr = ADDRS[i]
     key = KEYS[i]
-    u, em, ph, loc, east, north, z, nhem = soc_data[i - 6]
+    u, em, ph, loc, east, north, z, nhem = part_data[i - 5]
     send_tx(key, registry, "register(string,string,string,string,int32,int32,uint8,bool)", u, em, ph, loc, east, north, z, nhem)
-    send_tx(OWNER_KEY, governance, "setSocio(address,bool)", addr, "true")
-    print(f"  [+] Cuenta {i} ({addr}) -> @{u} (Socio en Governance: TRUE)")
+    send_tx(OWNER_KEY, registry, "setUserIdentificationLevel(address,uint8)", addr, "1")
+    print(f"  [+] Cuenta {i} ({addr}) -> @{u} (Particular Verificado N2 - Cuota: 3 truekes)")
+
+print("\n  [+] Cuentas 7, 8 y 9 permanecen LIBRES (Sin registrar en UserRegistry) para pruebas de registro y acceso.")
 
 # 9. Actualizar web/.env.local
 env_path = os.path.join(ROOT, "web", ".env.local")
@@ -227,12 +233,12 @@ KYC_SECRET=truekeate-local-dev-secret-0123456789abcdef0123456789abcdef
 """
 with open(env_path, "w", encoding="utf-8") as f:
     f.write(env_content)
-print("\n[+] web/.env.local actualizado con nuevas direcciones y conexion PostgreSQL")
+print("\n[+] web/.env.local actualizado con direcciones de contratos y PostgreSQL")
 
 # 10. Actualizar deployment-info.txt
 info_path = os.path.join(ROOT, "deployment-info.txt")
 info_content = f"""=================================================================
-  DESPLIEGUE LOCAL ESCROW & TRUEKEATE — INFORME DE ROLES
+  DESPLIEGUE LOCAL ESCROW & TRUEKEATE — MATRIZ DE CUENTAS Y ROLES
 =================================================================
 
 CONTRATOS DESPLEGADOS:
@@ -245,56 +251,75 @@ CONTRATOS DESPLEGADOS:
   USDT Mock:     {usdt} (USDT, 6 dec)
   DELIVERY:      {delivery} (DELIVERY, 18 dec)
   BRLT:          {brlt} (BRLT Stablecoin, 18 dec)
+  TruekeSBT:     {trueke_sbt} (SBT ERC-5192)
+  SBTRegistry:   {sbt_registry}
+  TruekeRWA:     {trueke_rwa}
+  TruekeService: {trueke_service}
 
-CUENTAS Y ASIGNACIÓN DE ROLES:
+MATRIZ DE CUENTAS PRECONFIGURADAS (ANVIL):
 -----------------------------------------------------------------
-[0] SUPERUSUARIO (Owner, Árbitro, Socio, Relayer Gas, Admin):
+[0] SUPERUSUARIO OWNER (Deployer, Árbitro, Socio Fundador, Certificado N3 SBT):
     Dirección: {OWNER_ADDR}
     Username:  @superadmin
+    Rol:       Usuario Socio (Fundador) + Admin Supremo + Árbitro
+    Nivel:     Nivel 3 · Certificado (TruekeSBT on-chain)
     PrivKey:   {OWNER_KEY}
 
-[1] USUARIO PARTICULAR 1:
+[1] USUARIO SOCIO CERTIFICADO 1:
     Dirección: {ADDRS[1]}
-    Username:  @particular_alice
+    Username:  @socio_juez_alpha
+    Rol:       Usuario Socio (Gobernanza / Mediador de Disputas)
+    Nivel:     Nivel 3 · Certificado (TruekeSBT on-chain)
     PrivKey:   {KEYS[1]}
 
-[2] USUARIO PARTICULAR 2:
+[2] USUARIO SOCIO CERTIFICADO 2:
     Dirección: {ADDRS[2]}
-    Username:  @particular_bob
+    Username:  @socio_juez_beta
+    Rol:       Usuario Socio (Gobernanza / Mediador de Disputas)
+    Nivel:     Nivel 3 · Certificado (TruekeSBT on-chain)
     PrivKey:   {KEYS[2]}
 
-[3] USUARIO PARTICULAR 3:
+[3] USUARIO EMPRESA CERTIFICADO 1:
     Dirección: {ADDRS[3]}
-    Username:  @particular_carol
+    Username:  @empresa_tech
+    Rol:       Usuario Empresa (Suscripción BRLT 12 Meses Activa)
+    Nivel:     Nivel 3 · Certificado (TruekeSBT on-chain)
     PrivKey:   {KEYS[3]}
 
-[4] USUARIO COMERCIANTE 1 (Suscripción BRLT 12 Meses):
+[4] USUARIO EMPRESA CERTIFICADO 2:
     Dirección: {ADDRS[4]}
-    Username:  @tienda_tech
+    Username:  @empresa_agro
+    Rol:       Usuario Empresa (Suscripción BRLT 12 Meses Activa)
+    Nivel:     Nivel 3 · Certificado (TruekeSBT on-chain)
     PrivKey:   {KEYS[4]}
 
-[5] USUARIO COMERCIANTE 2 (Suscripción BRLT 12 Meses):
+[5] USUARIO PARTICULAR VERIFICADO 1:
     Dirección: {ADDRS[5]}
-    Username:  @mercado_central
+    Username:  @particular_carlos
+    Rol:       Usuario Particular
+    Nivel:     Nivel 2 · Verificado (Cuota: 3 Truekes Simultáneos)
     PrivKey:   {KEYS[5]}
 
-[6] USUARIO SOCIO 1 (Gobernanza / Mediador):
+[6] USUARIO PARTICULAR VERIFICADO 2:
     Dirección: {ADDRS[6]}
-    Username:  @socio_juez_alpha
+    Username:  @particular_diana
+    Rol:       Usuario Particular
+    Nivel:     Nivel 2 · Verificado (Cuota: 3 Truekes Simultáneos)
     PrivKey:   {KEYS[6]}
 
-[7] USUARIO SOCIO 2 (Gobernanza / Mediador):
+[7] CUENTA LIBRE 1 (Pruebas de Registro):
     Dirección: {ADDRS[7]}
-    Username:  @socio_juez_beta
+    Estado:    LIBRE / Sin Registrar en UserRegistry
     PrivKey:   {KEYS[7]}
 
-[8] USUARIO SOCIO 3 (Gobernanza / Mediador):
+[8] CUENTA LIBRE 2 (Pruebas de Registro):
     Dirección: {ADDRS[8]}
-    Username:  @socio_juez_gamma
+    Estado:    LIBRE / Sin Registrar en UserRegistry
     PrivKey:   {KEYS[8]}
 
-[9] CUENTA RESERVA:
+[9] CUENTA RESERVA (Libre):
     Dirección: {ADDRS[9]}
+    Estado:    LIBRE / Reserva
     PrivKey:   {KEYS[9]}
 =================================================================
 """
@@ -304,9 +329,10 @@ with open(info_path, "w", encoding="utf-8") as f:
 print("\n=================================================================")
 print("  [SUCCESS] DESPLIEGUE LOCAL Y ASIGNACION DE ROLES COMPLETADA")
 print("=================================================================")
-print("  - SuperUsuario: Cuenta 0 (@superadmin)")
-print("  - Particulares: Cuentas 1, 2, 3 (@particular_alice, @particular_bob, @particular_carol)")
-print("  - Comerciantes: Cuentas 4, 5 (@tienda_tech, @mercado_central con 12 meses activos)")
-print("  - Socios:       Cuentas 6, 7, 8 (@socio_juez_alpha, @socio_juez_beta, @socio_juez_gamma)")
+print("  - Cuenta 0: SuperUsuario Owner + Socio Certificado N3 (@superadmin)")
+print("  - Cuentas 1, 2: Socios Certificados N3 (@socio_juez_alpha, @socio_juez_beta)")
+print("  - Cuentas 3, 4: Empresas Certificadas N3 + BRLT (@empresa_tech, @empresa_agro)")
+print("  - Cuentas 5, 6: Particulares Verificados N2 (@particular_carlos, @particular_diana)")
+print("  - Cuentas 7, 8, 9: Cuentas LIBRES para pruebas de inscripción (/register)")
 print("\n  Configuracion guardada en: web/.env.local y deployment-info.txt")
 print("=================================================================")
