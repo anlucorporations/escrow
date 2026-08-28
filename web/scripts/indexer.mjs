@@ -349,6 +349,16 @@ async function main() {
     })
   }
 
+  if (TRUEKE_SBT_ADDRESS && loadAbi('TruekeSBT').length > 0) {
+    const sbtContract = new ethers.Contract(TRUEKE_SBT_ADDRESS, loadAbi('TruekeSBT'), provider)
+    contracts.push({ name: 'TruekeSBT', contract: sbtContract })
+
+    sbtContract.on('CredentialIssued', async (user, tokenId, originProvider, issuedAt) => {
+      console.log(`🎖️ Evento on-chain: TruekeSBT.CredentialIssued #${tokenId} -> ${user.slice(0, 6)}... (${originProvider})`)
+      await updateSBTInfo(user, originProvider, tokenId.toString())
+    })
+  }
+
   console.log(`\n👂 Indexador activo y sincronizando ${contracts.length} contratos inteligentes en tiempo real...`)
   console.log(`   (Todos los eventos modificarán automáticamente la base de datos "TrueKeate")\n`)
 }

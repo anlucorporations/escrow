@@ -624,18 +624,20 @@ export function useUserRole(): UserRoleInfo {
         let badgeBg = 'bg-blue-100 dark:bg-blue-900/30'
         let badgeText = 'text-blue-700 dark:text-blue-300'
 
-        if (isOwner) {
+        if (isSocio) {
+          roleKey = 'socio'
+          roleLabel = isOwner ? 'Usuario Socio (Fundador)' : 'Usuario Socio'
+          roleDescription = isOwner
+            ? 'Socio Fundador con plenas facultades de gobernanza, arbitraje y administración del protocolo.'
+            : 'Mediador de disputas autorizado con poder de resolución on-chain y voto en gobernanza.'
+          badgeBg = 'bg-purple-100 dark:bg-purple-900/30'
+          badgeText = 'text-purple-700 dark:text-purple-300'
+        } else if (isOwner) {
           roleKey = 'admin'
           roleLabel = 'Administrador Supremo'
           roleDescription = 'Control total sobre los tokens permitidos y la pausa del protocolo.'
           badgeBg = 'bg-fuchsia-100 dark:bg-fuchsia-900/30'
           badgeText = 'text-fuchsia-700 dark:text-fuchsia-300'
-        } else if (isSocio) {
-          roleKey = 'socio'
-          roleLabel = 'Socio Árbitro'
-          roleDescription = 'Mediador de disputas autorizado con poder de resolución on-chain.'
-          badgeBg = 'bg-red-100 dark:bg-red-900/30'
-          badgeText = 'text-red-700 dark:text-red-300'
         } else if (isBusiness) {
           roleKey = 'business'
           roleLabel = isBusinessActive ? 'Comerciante Verificado' : 'Comerciante (Inactivo)'

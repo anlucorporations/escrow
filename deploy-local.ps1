@@ -93,10 +93,14 @@ $Subscription = Deploy-Contract "Subscription" @($BRLT, "100000000000000000000")
 $Governance = Deploy-Contract "Governance"
 
 # Despliegue de SBTs, RWA y Vouchers
-$TruekeSBT = Deploy-Contract "TruekeSBT" @($OwnerAddr, "https://ipfs.io/ipfs/")
-$SBTRegistry = Deploy-Contract "SBTRegistry" @($OwnerAddr)
-$TruekeRWA = Deploy-Contract "TruekeRWA" @($OwnerAddr, $Registry, $SBTRegistry)
-$TruekeService = Deploy-Contract "TruekeService" @($OwnerAddr, $Registry, $SBTRegistry)
+$TruekeSBT = Deploy-Contract "TruekeSBT"
+$SBTRegistry = Deploy-Contract "SBTRegistry"
+$TruekeRWA = Deploy-Contract "TruekeRWA" @($SBTRegistry)
+$TruekeService = Deploy-Contract "TruekeService" @($SBTRegistry)
+
+# Vincular minter de SBT nativo
+cast send --rpc-url $RpcUrl --private-key $OwnerKey $TruekeSBT "setMinter(address)" $SBTRegistry | Out-Null
+cast send --rpc-url $RpcUrl --private-key $OwnerKey $SBTRegistry "setNativeSBT(address)" $TruekeSBT | Out-Null
 
 Write-Host "✓ Escrow:        $Escrow" -ForegroundColor Green
 Write-Host "✓ UserRegistry:  $Registry" -ForegroundColor Green
@@ -113,14 +117,20 @@ Write-Host "✓ TruekeRWA:     $TruekeRWA" -ForegroundColor Green
 Write-Host "✓ TruekeService: $TruekeService" -ForegroundColor Green
 
 # 4. Configurar SuperUsuario (Cuenta 0)
-Write-Host "`n👑 [Paso 3/7] Configurando SuperUsuario (Cuenta 0)..." -ForegroundColor Yellow
+Write-Host "`n👑 [Paso 3/7] Configurando SuperUsuario (Cuenta 0: Owner + Socio Certificado + SBT)..." -ForegroundColor Yellow
 foreach ($t in @($TKA, $TKB, $USDT, $DELIVERY)) {
     cast send --rpc-url $RpcUrl --private-key $OwnerKey $Escrow "addToken(address)" $t | Out-Null
 }
 cast send --rpc-url $RpcUrl --private-key $OwnerKey $Escrow "setArbiter(address)" $OwnerAddr | Out-Null
+cast send --rpc-url $RpcUrl --private-key $OwnerKey $Escrow "setUserRegistry(address)" $Registry | Out-Null
+cast send --rpc-url $RpcUrl --private-key $OwnerKey $Governance "setTreasury(address)" $OwnerAddr | Out-Null
 cast send --rpc-url $RpcUrl --private-key $OwnerKey $Governance "setSocio(address,bool)" $OwnerAddr $true | Out-Null
-try { cast send --rpc-url $RpcUrl --private-key $OwnerKey $Registry "register(string)" "superadmin" | Out-Null } catch {}
-Write-Host "✓ Cuenta 0 configurada como: Owner + Árbitro + Socio + superadmin on-chain" -ForegroundColor Green
+try {
+    cast send --rpc-url $RpcUrl --private-key $OwnerKey $Registry "register(string,string,string,string,int32,int32,uint8,bool)" "superadmin" "superadmin@truekeate.com" "+584120000000" "Sede Central TrueKeate, Barlovento, Miranda" 729000 1159000 19 $true | Out-Null
+} catch {}
+cast send --rpc-url $RpcUrl --private-key $OwnerKey $Registry "setUserIdentificationLevel(address,uint8)" $OwnerAddr 2 | Out-Null
+cast send --rpc-url $RpcUrl --private-key $OwnerKey $TruekeSBT "mint(address,string)" $OwnerAddr "Certificacion Fundador & Socio TrueKeate" | Out-Null
+Write-Host "✓ Cuenta 0 configurada como: Owner + Árbitro + Socio Certificado (Nivel 3 SBT) + @superadmin" -ForegroundColor Green
 
 # 5. Minteo de tokens de prueba
 Write-Host "`n💰 [Paso 4/7] Minteando tokens de prueba a las 10 cuentas de Anvil..." -ForegroundColor Yellow
@@ -135,27 +145,56 @@ Write-Host "✓ 1000 TKA + 1000 TKB + 5000 USDT + 5 DELIVERY + 10000 BRLT asigna
 
 # 6. Inscribir Usuarios Particulares (Cuentas 1, 2, 3)
 Write-Host "`n👤 [Paso 5/7] Inscribiendo 3 Usuarios Particulares en UserRegistry..." -ForegroundColor Yellow
-$partNames = @("particular_alice", "particular_bob", "particular_carol")
+$partData = @(
+    @("particular_alice", "alice@truekeate.com", "+584121112233", "Av. Principal 1, Higuerote", 729450, 1159800, 19, $true),
+    @("particular_bob", "bob@truekeate.com", "+584122223344", "Calle Marina 12, Carenero", 731200, 1162400, 19, $true),
+    @("particular_carol", "carol@truekeate.com", "+584123334455", "Sector Playa 4, Rio Chico", 735800, 1148900, 19, $true)
+)
 for ($i = 1; $i -le 3; $i++) {
     $a = $Addrs[$i]
     $k = $Keys[$i]
-    $u = $partNames[$i - 1]
-    try { cast send --rpc-url $RpcUrl --private-key $k $Registry "register(string)" $u | Out-Null } catch {}
-    Write-Host "  ✓ Cuenta $i ($a) -> @$u" -ForegroundColor Green
+    $d = $partData[$i - 1]
+    try {
+        cast send --rpc-url $RpcUrl --private-key $k $Registry "register(string,string,string,string,int32,int32,uint8,bool)" $d[0] $d[1] $d[2] $d[3] $d[4] $d[5] $d[6] $d[7] | Out-Null
+    } catch {}
+    Write-Host "  ✓ Cuenta $i ($a) -> @$($d[0])" -ForegroundColor Green
 }
 
 # 7. Inscribir y Configurar Comerciantes (Cuentas 4, 5)
 Write-Host "`n🏬 [Paso 6/7] Inscribiendo 2 Comerciantes y activando suscripción BRLT..." -ForegroundColor Yellow
-$comNames = @("tienda_tech", "mercado_central")
+$comData = @(
+    @("tienda_tech", "tech@barloventas.com", "+584124445566", "Centro Comercial Barlovento Local 14", 728900, 1158500, 19, $true),
+    @("mercado_central", "mercado@barloventas.com", "+584125556677", "Av. Comercio Local 3, Tacarigua", 727500, 1156200, 19, $true)
+)
 for ($i = 4; $i -le 5; $i++) {
     $a = $Addrs[$i]
     $k = $Keys[$i]
-    $u = $comNames[$i - 4]
-    try { cast send --rpc-url $RpcUrl --private-key $k $Registry "register(string)" $u | Out-Null } catch {}
+    $d = $comData[$i - 4]
+    try {
+        cast send --rpc-url $RpcUrl --private-key $k $Registry "register(string,string,string,string,int32,int32,uint8,bool)" $d[0] $d[1] $d[2] $d[3] $d[4] $d[5] $d[6] $d[7] | Out-Null
+    } catch {}
     cast send --rpc-url $RpcUrl --private-key $OwnerKey $Subscription "setBusiness(address,bool)" $a $true | Out-Null
     cast send --rpc-url $RpcUrl --private-key $k $BRLT "approve(address,uint256)" $Subscription 1200000000000000000000 | Out-Null
     cast send --rpc-url $RpcUrl --private-key $k $Subscription "subscribe(uint256)" 12 | Out-Null
-    Write-Host "  ✓ Cuenta $i ($a) -> @$u (Business: TRUE, Suscripción: 12 meses activa)" -ForegroundColor Green
+    Write-Host "  ✓ Cuenta $i ($a) -> @$($d[0]) (Business: TRUE, Suscripción: 12 meses activa)" -ForegroundColor Green
+}
+
+# 8. Inscribir y Configurar Socios (Cuentas 6, 7, 8)
+Write-Host "`n⚖️ [Paso 7/7] Inscribiendo 3 Socios y asignando rol en Governance..." -ForegroundColor Yellow
+$socData = @(
+    @("socio_juez_alpha", "juez.alpha@truekeate.com", "+584126667788", "Tribunal Comunitario Alpha, Barlovento", 729800, 1160100, 19, $true),
+    @("socio_juez_beta", "juez.beta@truekeate.com", "+584127778899", "Tribunal Comunitario Beta, Caucagua", 725100, 1152000, 19, $true),
+    @("socio_juez_gamma", "juez.gamma@truekeate.com", "+584128889900", "Tribunal Comunitario Gamma, San Jose", 733000, 1157400, 19, $true)
+)
+for ($i = 6; $i -le 8; $i++) {
+    $a = $Addrs[$i]
+    $k = $Keys[$i]
+    $d = $socData[$i - 6]
+    try {
+        cast send --rpc-url $RpcUrl --private-key $k $Registry "register(string,string,string,string,int32,int32,uint8,bool)" $d[0] $d[1] $d[2] $d[3] $d[4] $d[5] $d[6] $d[7] | Out-Null
+    } catch {}
+    cast send --rpc-url $RpcUrl --private-key $OwnerKey $Governance "setSocio(address,bool)" $a $true | Out-Null
+    Write-Host "  ✓ Cuenta $i ($a) -> @$($d[0]) (Socio en Governance: TRUE)" -ForegroundColor Green
 }
 
 # 8. Inscribir y Configurar Socios (Cuentas 6, 7, 8)

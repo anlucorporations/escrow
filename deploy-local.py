@@ -123,8 +123,8 @@ print(f"  [+] SBTRegistry:   {sbt_registry}")
 print(f"  [+] TruekeRWA:     {trueke_rwa}")
 print(f"  [+] TruekeService: {trueke_service}")
 
-# 4. Configurar Cuenta 0 (SuperUsuario)
-print("\n[Paso 3/7] Configurando SuperUsuario (Cuenta 0)...")
+# 4. Configurar Cuenta 0 (SuperUsuario Owner + Socio Certificado)
+print("\n[Paso 3/7] Configurando SuperUsuario (Cuenta 0: Owner + Socio Certificado + SBT)...")
 for t in [tka, tkb, usdt, delivery]:
     send_tx(OWNER_KEY, escrow, "addToken(address)", t)
 send_tx(OWNER_KEY, escrow, "setArbiter(address)", OWNER_ADDR)
@@ -144,7 +144,10 @@ send_tx(
     "19",
     "true",
 )
-print(f"  [+] Cuenta 0 ({OWNER_ADDR}) configurada como: Owner + Arbiter + Socio + @superadmin")
+# Asignar nivel 3 (Certificado on-chain) y emitir Soulbound Token
+send_tx(OWNER_KEY, registry, "setUserIdentificationLevel(address,uint8)", OWNER_ADDR, "2")
+send_tx(OWNER_KEY, trueke_sbt, "mint(address,string)", OWNER_ADDR, "Certificacion Fundador & Socio TrueKeate")
+print(f"  [+] Cuenta 0 ({OWNER_ADDR}) configurada como: Owner + Arbiter + Socio Certificado (Nivel 3 SBT) + @superadmin")
 
 # 5. Minteo de tokens para todas las 10 cuentas
 print("\n[Paso 4/7] Minteando tokens de prueba para las 10 cuentas...")
