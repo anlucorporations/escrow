@@ -5,13 +5,11 @@ import Link from 'next/link'
 import { useEthereum } from '@/lib/ethereum'
 import { useRegistration } from '@/lib/hooks'
 import { useRouter } from 'next/navigation'
-import { useRegisterModal } from '@/components/RegisterModal'
 
 export default function VelvetyLandingPage() {
   const { isConnected, connect } = useEthereum()
   const { isRegistered } = useRegistration()
   const router = useRouter()
-  const { openRegister } = useRegisterModal()
 
   // Redirigir automáticamente a la sección de Catálogo (/items) al conectar e inscribir la billetera
   useEffect(() => {
@@ -24,7 +22,7 @@ export default function VelvetyLandingPage() {
     if (!isConnected) {
       await connect()
     } else if (!isRegistered) {
-      openRegister()
+      router.push('/register')
     } else {
       router.push('/items')
     }

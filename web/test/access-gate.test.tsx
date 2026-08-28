@@ -74,7 +74,7 @@ describe('AccessGate & IdentityStatusBanner — Control de Acceso Web3', () => {
     )
 
     expect(screen.getByText('Inscripción Requerida en TrueKeate')).toBeInTheDocument()
-    expect(screen.getByText('Inscribirme Ahora (Elegir @username)')).toBeInTheDocument()
+    expect(screen.getByText(/Inscribirme Ahora/i)).toBeInTheDocument()
     expect(screen.queryByText('Contenido Privado de la Suite')).toBeNull()
   })
 

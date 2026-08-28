@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { useEthereum } from '@/lib/ethereum'
 import { useEscrow, useProfile, useRegistration, useUserRole } from '@/lib/hooks'
-import { useRegisterModal } from '@/components/RegisterModal'
 import { triggerHaptic } from '@/lib/mobile'
 
 /**
@@ -37,7 +36,6 @@ export function UserMenu() {
   const profile = profileResult?.profile ?? null
   const role = useUserRole()
   const { roles } = useEscrow()
-  const { openRegister } = useRegisterModal()
 
   const isAdmin = roles.isOwner
 
@@ -268,15 +266,13 @@ export function UserMenu() {
 
             {/* Prompt de inscripción si no está registrado */}
             {!isRegistered && !regLoading && (
-              <button
-                onClick={() => {
-                  setOpen(false)
-                  openRegister()
-                }}
-                className="w-full mt-3 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-semibold tracking-wide uppercase transition-all shadow-sm"
+              <Link
+                href="/register"
+                onClick={() => setOpen(false)}
+                className="w-full mt-3 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-semibold tracking-wide uppercase transition-all shadow-sm block text-center"
               >
                 Inscribir Billetera (@username)
-              </button>
+              </Link>
             )}
           </div>
 

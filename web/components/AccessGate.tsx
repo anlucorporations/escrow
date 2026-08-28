@@ -4,7 +4,6 @@ import { ReactNode } from 'react'
 import Link from 'next/link'
 import { useEthereum } from '@/lib/ethereum'
 import { useRegistration } from '@/lib/hooks'
-import { useRegisterModal } from '@/components/RegisterModal'
 
 /**
  * Puerta de Acceso a la Plataforma TrueKeate (Mobile & Desktop).
@@ -17,7 +16,6 @@ import { useRegisterModal } from '@/components/RegisterModal'
 export function AccessGate({ children }: { children: ReactNode }) {
   const { isConnected, connect } = useEthereum()
   const { isRegistered, loading } = useRegistration()
-  const { openRegister } = useRegisterModal()
 
   // 1. Estado: Sin billetera conectada
   if (!isConnected) {
@@ -120,12 +118,12 @@ export function AccessGate({ children }: { children: ReactNode }) {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={openRegister}
-              className="w-full sm:w-auto px-8 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-full text-xs font-semibold tracking-wide uppercase transition-all shadow-lg shadow-slate-900/10"
+            <Link
+              href="/register"
+              className="w-full sm:w-auto px-8 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-full text-xs font-semibold tracking-wide uppercase transition-all shadow-lg shadow-slate-900/10 text-center"
             >
-              Inscribirme Ahora (Elegir @username)
-            </button>
+              Inscribirme Ahora (Página Completa)
+            </Link>
             <Link
               href="/"
               className="w-full sm:w-auto px-8 py-4 bg-transparent border border-slate-200 hover:border-slate-400 text-slate-700 rounded-full text-xs font-semibold tracking-wide uppercase transition-all text-center"
