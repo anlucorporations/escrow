@@ -15,16 +15,17 @@ export async function PUT(request, { params }) {
     const body = await request.json()
     const { email, phone, documentHash, selfieHash } = body
 
-    if (!email || !phone) {
-      return NextResponse.json({ error: 'Faltan email y phone' }, { status: 400 })
-    }
-
-    const existing = await first('SELECT address FROM users WHERE address = ?', [address.toLowerCase()])
+    const existing = await first('SELECT address, email FROM users WHERE address = ?', [address.toLowerCase()])
     if (!existing) {
       return NextResponse.json({ error: 'Usuario no encontrado en la BD (¿indexador activo?)' }, { status: 404 })
     }
+    // email/phone son opcionales si el usuario ya tiene valores cifrados
+    // (p. ej. aprobación KYC del admin sin conocer sus datos privados)
+    if (!email && !phone && !existing.email) {
+      return NextResponse.json({ error: 'Faltan email y phone' }, { status: 400 })
+    }
 
-    await submitKyc(address, { email, phone, documentHash: documentHash || '', selfieHash: selfieHash || '' })
+    await submitKyc(address, { email: email || '', phone: phone || '', documentHash: documentHash || '', selfieHash: selfieHash || '' })
     return NextResponse.json({ ok: true, kycStatus: 'verified' })
   } catch (err) {
     return NextResponse.json({ error: err.message || 'Error al guardar KYC' }, { status: 400 })

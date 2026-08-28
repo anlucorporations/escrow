@@ -1,14 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { useEthereum } from '@/lib/ethereum'
-import { useAllowedTokens } from '@/lib/hooks'
 import Link from 'next/link'
 
 export default function CompanyFinancesPage() {
-  const { account } = useEthereum()
-  const { tokens, loading } = useAllowedTokens()
-
   const [sales] = useState([
     {
       id: 'tx-101',

@@ -3,8 +3,8 @@ import { ethers } from 'ethers'
 import { ESCROW_ADDRESS, ESCROW_ABI } from '@/lib/contracts'
 
 // RPC configurable vía variable de entorno (portable a otras redes).
-//   RPC_URL=http://localhost:8545  (por defecto)
-const RPC_URL = process.env.RPC_URL ?? 'http://localhost:8545'
+//   NEXT_PUBLIC_RPC_URL=http://127.0.0.1:8545  (por defecto)
+const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL ?? process.env.RPC_URL ?? 'http://127.0.0.1:8545'
 const provider = new ethers.JsonRpcProvider(RPC_URL)
 
 export async function GET(
@@ -16,6 +16,12 @@ export async function GET(
   try {
     const contract = new ethers.Contract(ESCROW_ADDRESS, ESCROW_ABI, provider)
     const operation = await contract.getOperation(BigInt(id))
+
+    // getOperation no revierte para IDs inexistentes: devuelve un struct vacío.
+    const ZERO = '0x0000000000000000000000000000000000000000'
+    if (operation.user1 === ZERO && operation.tokenA === ZERO && Number(operation.id) === 0) {
+      return NextResponse.json({ error: 'Operación no encontrada' }, { status: 404 })
+    }
 
     return NextResponse.json({
       id: operation.id.toString(),

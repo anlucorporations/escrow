@@ -122,7 +122,7 @@ export default function RegisterPage() {
       setTimeout(() => {
         router.push('/dashboard')
       }, 1500)
-    } catch (err: any) {
+    } catch (err) {
       setError(getFriendlyError(err))
     } finally {
       setLoading(false)

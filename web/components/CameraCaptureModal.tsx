@@ -96,6 +96,7 @@ export function CameraCaptureModal({
         ) : (
           <div className="space-y-4">
             <div className="relative rounded-2xl overflow-hidden shadow-md max-h-64 mx-auto border border-[#D4A373]/30">
+              {/* eslint-disable-next-line @next/next/no-img-element -- vista previa local (blob) de la cámara */}
               <img src={preview} alt="Captura" className="w-full h-full object-cover" />
             </div>
 

@@ -21,7 +21,6 @@ export function BrandLogo({
   className = '',
   href = '/',
   width,
-  height,
   priority = false,
 }: BrandLogoProps) {
   // Isotipo solo (Hexágono + flechas orbitales)
@@ -55,8 +54,6 @@ export function BrandLogo({
   }
 
   // Logotipo horizontal / completo
-  const logoWidth = width || (variant === 'full' ? 220 : 160)
-  const logoHeight = height || (variant === 'full' ? 110 : 48)
 
   const content = (
     <div className={`relative flex items-center gap-2.5 ${className}`}>

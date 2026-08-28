@@ -38,7 +38,7 @@ export const PERMIT_TYPES = {
 }
 
 export interface PermitData {
-  deadline: bigint
+  deadline: string
   v: number
   r: string
   s: string
@@ -92,7 +92,8 @@ export async function signPermit(
     deadline,
   })
   const sig = ethers.Signature.from(signature)
-  return { deadline, v: sig.v, r: sig.r, s: sig.s }
+  // deadline debe serializarse como string: JSON.stringify no admite bigint.
+  return { deadline: deadline.toString(), v: sig.v, r: sig.r, s: sig.s }
 }
 
 /** Construye la solicitud "crear operación sin gas" (intención + permit). */

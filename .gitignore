@@ -11,3 +11,7 @@ web/lib/contracts.ts.backup
 web/.env.local
 .env
 .env.local
+
+# SQLite local (raíz y web)
+/data/
+web/data/

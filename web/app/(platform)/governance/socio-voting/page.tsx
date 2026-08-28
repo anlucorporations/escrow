@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { ethers } from 'ethers'
 import { useEthereum } from '@/lib/ethereum'
 import { useUserRole, useSocioApplications } from '@/lib/hooks'
-import { BRLT_ADDRESS } from '@/lib/contracts'
+import { BRLT_ADDRESS, GOVERNANCE_ADDRESS, GOVERNANCE_ABI } from '@/lib/contracts'
 import Link from 'next/link'
 
 interface Application {
@@ -15,40 +16,82 @@ interface Application {
   noVotes: number
   daysLeft: number
   status: 'voting' | 'approved' | 'rejected'
+  executed: boolean
+  passed: boolean
+  canVote: boolean
+  hasVoted: boolean
 }
 
+const APPLICATION_WINDOW_SECONDS = 5n * 86400n
+
 export default function SocioVotingPage() {
-  const { account } = useEthereum()
+  const { account, provider } = useEthereum()
   const role = useUserRole()
-  const { applyForSocio, voteSocioApplication, resolveSocioApplication } = useSocioApplications()
+  const { applyForSocio, voteSocioApplication } = useSocioApplications()
 
-  const [applications, setApplications] = useState<Application[]>([
-    {
-      id: 0,
-      candidate: '0x976EA74026E726554dB657fA54763abd0C3a0aa9',
-      motivation: 'Abogado especialista en contratos mercantiles y arbitraje comercial en Barlovento. Compromiso con mediación justa.',
-      depositAmount: '500.00 BRLT',
-      yesVotes: 2,
-      noVotes: 0,
-      daysLeft: 3,
-      status: 'voting',
-    },
-    {
-      id: 1,
-      candidate: '0x14dC79964da2C08b23698B3D3cc7Ca32193d9955',
-      motivation: 'Empresario local con más de 1,200 truekes exitosos y 98% efectividad. Deseo apoyar en la resolución de disputas.',
-      depositAmount: '500.00 BRLT',
-      yesVotes: 2,
-      noVotes: 0,
-      daysLeft: 4,
-      status: 'voting',
-    },
-  ])
-
+  const [applications, setApplications] = useState<Application[]>([])
   const [motivation, setMotivation] = useState('')
   const [loading, setLoading] = useState(false)
+  const [loadingApps, setLoadingApps] = useState(true)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
+
+  // Carga las postulaciones REALES desde Governance (applicationCount + socioApplications)
+  const loadApplications = useCallback(async () => {
+    if (!provider) return
+    try {
+      const gov = new ethers.Contract(GOVERNANCE_ADDRESS, GOVERNANCE_ABI, provider)
+      const count = Number(await gov.applicationCount())
+      const now = BigInt(Math.floor(Date.now() / 1000))
+
+      const apps: Application[] = []
+      for (let i = 0; i < count; i++) {
+        const a = await gov.socioApplications(i)
+        if (!a.candidate || a.candidate === '0x0000000000000000000000000000000000000000') continue
+
+        const windowEnd = BigInt(a.createdAt) + APPLICATION_WINDOW_SECONDS
+        const daysLeft = windowEnd > now ? Math.max(1, Math.ceil(Number(windowEnd - now) / 86400)) : 0
+        let hasVoted = false
+        if (account) {
+          try {
+            hasVoted = Boolean(await gov.hasVotedApplication(i, account))
+          } catch {
+            hasVoted = false
+          }
+        }
+        const executed = Boolean(a.executed)
+        const passed = Boolean(a.passed)
+        apps.push({
+          id: Number(a.id),
+          candidate: a.candidate,
+          motivation: a.motivation || '',
+          depositAmount: ethers.formatUnits(a.depositAmount, 18),
+          yesVotes: Number(a.yes),
+          noVotes: Number(a.no),
+          daysLeft,
+          status: executed ? (passed ? 'approved' : 'rejected') : 'voting',
+          executed,
+          passed,
+          canVote: !executed && windowEnd >= now && !hasVoted,
+          hasVoted,
+        })
+      }
+      // Más recientes primero
+      apps.reverse()
+      setApplications(apps)
+    } catch (err) {
+      console.error('Error cargando postulaciones:', err)
+      setError('No se pudieron cargar las postulaciones on-chain')
+    } finally {
+      setLoadingApps(false)
+    }
+  }, [provider, account])
+
+  useEffect(() => {
+    if (provider) {
+      loadApplications()
+    }
+  }, [provider, loadApplications])
 
   const handleApply = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -63,6 +106,7 @@ export default function SocioVotingPage() {
       await applyForSocio(motivation, BRLT_ADDRESS, '500')
       setMessage('¡Postulación enviada exitosamente! Se ha abierto el periodo de votación de 5 días.')
       setMotivation('')
+      await loadApplications()
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -77,17 +121,7 @@ export default function SocioVotingPage() {
     try {
       await voteSocioApplication(appId, support)
       setMessage(`Voto ${support ? 'A FAVOR' : 'EN CONTRA'} registrado con éxito.`)
-      setApplications(prev =>
-        prev.map(a =>
-          a.id === appId
-            ? {
-                ...a,
-                yesVotes: support ? a.yesVotes + 1 : a.yesVotes,
-                noVotes: !support ? a.noVotes + 1 : a.noVotes,
-              }
-            : a
-        )
-      )
+      await loadApplications()
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -130,129 +164,152 @@ export default function SocioVotingPage() {
         )}
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* LISTA DE POSTULACIONES ACTIVAS */}
+          {/* LISTA DE POSTULACIONES REALES */}
           <div className="lg:col-span-2 space-y-6">
             <h2 className="text-2xl font-serif text-slate-900">
-              Postulaciones en Votación Activa ({applications.length})
+              Postulaciones en Votación ({applications.length})
             </h2>
 
-            <div className="space-y-6">
-              {applications.map((app) => (
-                <div
-                  key={app.id}
-                  className="bg-white rounded-[2rem] border border-slate-200 p-8 shadow-sm space-y-4"
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-sm font-bold text-slate-900">
-                          Postulación #{app.id}
-                        </span>
+            {loadingApps ? (
+              <div className="text-center py-12 text-slate-400 text-sm font-light">
+                Cargando postulaciones on-chain...
+              </div>
+            ) : applications.length === 0 ? (
+              <div className="text-center py-12 border border-dashed border-slate-300 rounded-[2rem] text-slate-400 text-sm font-light">
+                No hay postulaciones a Socio registradas en Governance.
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {applications.map((app) => (
+                  <div
+                    key={app.id}
+                    className="bg-white rounded-[2rem] border border-slate-200 p-8 shadow-sm space-y-4"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-sm font-bold text-slate-900">
+                            Postulación #{app.id}
+                          </span>
+                          {app.status === 'voting' ? (
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-semibold border border-amber-200">
+                              En Votación
+                            </span>
+                          ) : app.status === 'approved' ? (
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200">
+                              Aprobada
+                            </span>
+                          ) : (
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 font-semibold border border-rose-200">
+                              Rechazada
+                            </span>
+                          )}
+                        </div>
                         <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 font-semibold border border-purple-200">
-                          Ventana de 5 Días ({app.daysLeft} días restantes)
+                          {app.status === 'voting'
+                            ? `Ventana de 5 Días (${app.daysLeft} día(s) restante(s))`
+                            : 'Votación Cerrada'}
+                        </span>
+                        <p className="font-mono text-xs text-slate-500 mt-1">{app.candidate}</p>
+                      </div>
+
+                      <div className="text-right">
+                        <span className="text-xs font-bold text-slate-900 block">
+                          Depósito en Garantía
+                        </span>
+                        <span className="text-xs text-indigo-600 font-mono font-semibold">
+                          {app.depositAmount} BRLT
                         </span>
                       </div>
-                      <p className="font-mono text-xs text-slate-500">{app.candidate}</p>
                     </div>
 
-                    <div className="text-right">
-                      <span className="text-xs font-bold text-slate-900 block">
-                        Depósito en Garantía
-                      </span>
-                      <span className="text-xs text-indigo-600 font-mono font-semibold">
-                        {app.depositAmount}
-                      </span>
-                    </div>
-                  </div>
+                    <p className="text-xs text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-100 italic">
+                      &ldquo;{app.motivation}&rdquo;
+                    </p>
 
-                  <p className="text-xs text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-100 italic">
-                    "{app.motivation}"
-                  </p>
-
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-2">
-                    <div className="flex items-center gap-4 text-xs font-semibold">
-                      <span className="text-emerald-600 flex items-center gap-1">
-                        ✓ {app.yesVotes} A Favor
-                      </span>
-                      <span className="text-rose-600 flex items-center gap-1">
-                        ✗ {app.noVotes} En Contra
-                      </span>
-                    </div>
-
-                    {role.isSocio ? (
-                      <div className="flex gap-2 w-full sm:w-auto">
-                        <button
-                          onClick={() => handleVote(app.id, true)}
-                          disabled={loading}
-                          className="flex-1 sm:flex-none px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full text-xs font-semibold transition"
-                        >
-                          Votar A Favor (SÍ)
-                        </button>
-                        <button
-                          onClick={() => handleVote(app.id, false)}
-                          disabled={loading}
-                          className="flex-1 sm:flex-none px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-full text-xs font-semibold transition"
-                        >
-                          Votar En Contra (NO)
-                        </button>
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-2">
+                      <div className="flex items-center gap-4 text-xs font-semibold">
+                        <span className="text-emerald-600 flex items-center gap-1">
+                          ✓ {app.yesVotes} A Favor
+                        </span>
+                        <span className="text-rose-600 flex items-center gap-1">
+                          ✗ {app.noVotes} En Contra
+                        </span>
                       </div>
-                    ) : (
-                      <span className="text-[11px] text-slate-400 italic">
-                        Solo los Socios activos pueden emitir votos.
-                      </span>
-                    )}
+
+                      {app.status === 'voting' && role.isSocio ? (
+                        app.hasVoted ? (
+                          <span className="text-[11px] text-slate-400 italic">
+                            Ya votaste en esta postulación.
+                          </span>
+                        ) : app.canVote ? (
+                          <div className="flex gap-2 w-full sm:w-auto">
+                            <button
+                              onClick={() => handleVote(app.id, true)}
+                              disabled={loading}
+                              className="flex-1 sm:flex-none px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full text-xs font-semibold transition"
+                            >
+                              Votar A Favor (SÍ)
+                            </button>
+                            <button
+                              onClick={() => handleVote(app.id, false)}
+                              disabled={loading}
+                              className="flex-1 sm:flex-none px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-full text-xs font-semibold transition"
+                            >
+                              Votar En Contra (NO)
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-[11px] text-slate-400 italic">
+                            La ventana de votación cerró.
+                          </span>
+                        )
+                      ) : app.status === 'voting' ? (
+                        <span className="text-[11px] text-slate-400 italic">
+                          Solo los Socios activos pueden emitir votos.
+                        </span>
+                      ) : null}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* FORMULARIO POSTULACIÓN */}
-          <div>
-            <div className="bg-purple-50/50 rounded-[2rem] border border-purple-200/70 p-6 shadow-sm">
-              <h3 className="text-lg font-serif text-purple-950 mb-2">
-                Postularme como Socio Árbitro
-              </h3>
-              <p className="text-xs text-purple-900/70 mb-6 font-light">
-                Requiere nivel Certificado y depósito de <strong>500 BRLT</strong>. Si tu solicitud es aprobada por mayoría simple, el depósito pasa a la tesorería de la plataforma para gastos operativos.
+          {/* FORMULARIO DE POSTULACIÓN */}
+          <div className="space-y-6">
+            <div className="bg-white rounded-[2rem] border border-slate-200 p-8 shadow-sm">
+              <h2 className="text-xl font-serif text-slate-900 mb-2">Postularse como Socio</h2>
+              <p className="text-xs text-slate-500 font-light leading-relaxed mb-6">
+                Deposita 500 BRLT en garantía y comparte tu motivación. Los Socios actuales votarán tu admisión durante 5 días.
               </p>
 
               <form onSubmit={handleApply} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Motivación y Experiencia
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
+                    Motivación / Hoja de Vida
                   </label>
                   <textarea
-                    rows={4}
                     value={motivation}
                     onChange={(e) => setMotivation(e.target.value)}
-                    placeholder="Describe tu trayectoria comercial, capacidad de mediación y razones para ser Socio Árbitro..."
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="Explícale a la comunidad por qué deseas ser Socio y qué aportarás como mediador..."
+                    rows={5}
+                    minLength={10}
                     required
+                    className="w-full px-4 py-3 bg-slate-50/50 rounded-2xl border border-slate-200 text-slate-900 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-white transition resize-none"
                   />
                 </div>
 
-                <div className="p-3 bg-white rounded-xl border border-purple-100 text-[11px] text-slate-600 space-y-1">
-                  <div className="flex justify-between">
-                    <span>Depósito requerido:</span>
-                    <strong className="text-purple-700">500 BRLT</strong>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Ventana de votación:</span>
-                    <strong>5 días</strong>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Criterio:</span>
-                    <strong>Mayoría simple (&gt;50%)</strong>
-                  </div>
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600">
+                  <span className="font-bold text-slate-800">Depósito:</span> 500 BRLT (aprobado → tesorería; rechazado → reembolso)
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-semibold uppercase tracking-wider transition shadow-sm disabled:opacity-50"
+                  className="w-full py-3.5 bg-purple-700 hover:bg-purple-800 text-white rounded-full text-xs font-bold uppercase tracking-wider transition shadow-sm disabled:opacity-50"
                 >
-                  {loading ? 'Procesando...' : 'Enviar Solicitud On-Chain'}
+                  {loading ? 'Procesando...' : 'Enviar Postulación'}
                 </button>
               </form>
             </div>

@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { Item } from '@/lib/items'
 import { ReputationBadge } from '@/components/ReputationBadge'
@@ -14,7 +13,6 @@ export function AssetCard({ item, className = '' }: AssetCardProps) {
   // Determinar color de badge según categoría
   const isService = item.category.toLowerCase().includes('servicio')
   const isCrypto = item.category.toLowerCase().includes('cripto') || item.category.toLowerCase().includes('token')
-  const isProduct = !isService && !isCrypto
 
   const categoryLabel = isService ? 'Servicio SBT' : isCrypto ? 'Criptoactivo' : 'Producto RWA'
   const categoryBadgeClass = isService
@@ -37,6 +35,7 @@ export function AssetCard({ item, className = '' }: AssetCardProps) {
         {/* IMAGEN DEL ACTIVO / FOTOGRAFÍA RWA */}
         <div className="relative w-full h-48 sm:h-52 bg-slate-100 overflow-hidden">
           {imageCid ? (
+            // eslint-disable-next-line @next/next/no-img-element -- imágenes IPFS externas sin optimización local
             <img
               src={`https://ipfs.io/ipfs/${imageCid}`}
               alt={item.title}

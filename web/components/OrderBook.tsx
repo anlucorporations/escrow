@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useEthereum } from '@/lib/ethereum'
 import { EXCHANGE_ADDRESS, EXCHANGE_ABI, ERC20_ABI, USER_REGISTRY_ADDRESS, USER_REGISTRY_ABI } from '@/lib/contracts'
 import { ethers } from 'ethers'
@@ -17,16 +17,41 @@ export interface Order {
   filledAt: bigint
 }
 
+interface RawOrder {
+  id: bigint
+  maker: string
+  giveToken: string
+  takeToken: string
+  giveAmount: bigint
+  takeAmount: bigint
+  status: bigint | number | string
+  createdAt: bigint
+  filledAt: bigint
+}
+
+interface EthersError {
+  reason?: string
+  message?: string
+}
+
+function errorMessage(err: unknown, fallback: string): string {
+  const e = err as EthersError
+  return e?.reason || e?.message || fallback
+}
+
 function OrderCard({ order, onRefresh }: { order: Order; onRefresh: () => void }) {
   const { account, signer, provider } = useEthereum()
   const [giveSymbol, setGiveSymbol] = useState('')
   const [takeSymbol, setTakeSymbol] = useState('')
+  const [giveDecimals, setGiveDecimals] = useState(18)
+  const [takeDecimals, setTakeDecimals] = useState(18)
   const [makerHandle, setMakerHandle] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
   useEffect(() => {
+    let active = true
     const loadDetails = async () => {
       if (!provider) return
       try {
@@ -34,14 +59,19 @@ function OrderCard({ order, onRefresh }: { order: Order; onRefresh: () => void }
         const takeContract = new ethers.Contract(order.takeToken, ERC20_ABI, provider)
         const registryContract = new ethers.Contract(USER_REGISTRY_ADDRESS, USER_REGISTRY_ABI, provider)
 
-        const [gSym, tSym, profile] = await Promise.all([
+        const [gSym, tSym, gDec, tDec, profile] = await Promise.all([
           giveContract.symbol().catch(() => 'TKA'),
           takeContract.symbol().catch(() => 'TKB'),
-          registryContract.getUserProfile(order.maker).catch(() => null)
+          giveContract.decimals().catch(() => 18n),
+          takeContract.decimals().catch(() => 18n),
+          registryContract.getUserProfile(order.maker).catch(() => null),
         ])
 
+        if (!active) return
         setGiveSymbol(gSym)
         setTakeSymbol(tSym)
+        setGiveDecimals(Number(gDec))
+        setTakeDecimals(Number(tDec))
         if (profile && profile.username) {
           setMakerHandle(`@${profile.username}`)
         } else {
@@ -52,10 +82,13 @@ function OrderCard({ order, onRefresh }: { order: Order; onRefresh: () => void }
       }
     }
     loadDetails()
+    return () => {
+      active = false
+    }
   }, [order, provider])
 
   const handleFillOrder = async () => {
-    if (!signer) return
+    if (!signer || !EXCHANGE_ADDRESS) return
     setLoading(true)
     setError('')
     setSuccess(false)
@@ -76,16 +109,16 @@ function OrderCard({ order, onRefresh }: { order: Order; onRefresh: () => void }
         setSuccess(false)
         onRefresh()
       }, 2000)
-    } catch (err: any) {
+    } catch (err) {
       console.error('Fill order error:', err)
-      setError(err.reason || err.message || 'Transaction failed')
+      setError(errorMessage(err, 'Transaction failed'))
     } finally {
       setLoading(false)
     }
   }
 
   const handleCancelOrder = async () => {
-    if (!signer) return
+    if (!signer || !EXCHANGE_ADDRESS) return
     setLoading(true)
     setError('')
 
@@ -94,9 +127,9 @@ function OrderCard({ order, onRefresh }: { order: Order; onRefresh: () => void }
       const tx = await exchangeContract.cancelOrder(order.id)
       await tx.wait()
       onRefresh()
-    } catch (err: any) {
+    } catch (err) {
       console.error('Cancel order error:', err)
-      setError(err.reason || err.message || 'Cancel failed')
+      setError(errorMessage(err, 'Cancel failed'))
     } finally {
       setLoading(false)
     }
@@ -104,11 +137,12 @@ function OrderCard({ order, onRefresh }: { order: Order; onRefresh: () => void }
 
   const isMaker = account?.toLowerCase() === order.maker.toLowerCase()
   const statusLabel = order.status === 0 ? 'Abierta' : order.status === 1 ? 'Ejecutada' : 'Cancelada'
-  const statusColor = order.status === 0 
-    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' 
-    : order.status === 1 
-    ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20'
-    : 'bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/20'
+  const statusColor =
+    order.status === 0
+      ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+      : order.status === 1
+        ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20'
+        : 'bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/20'
 
   return (
     <div className="border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 bg-white dark:bg-zinc-900 shadow-sm hover:shadow-md transition">
@@ -128,13 +162,15 @@ function OrderCard({ order, onRefresh }: { order: Order; onRefresh: () => void }
         <div>
           <span className="text-xs text-gray-500 block mb-1">Entrega (Ofrece):</span>
           <span className="font-bold text-base text-zinc-900 dark:text-zinc-100">
-            {ethers.formatEther(order.giveAmount)} <span className="text-xs font-medium text-blue-500">{giveSymbol || '...'}</span>
+            {ethers.formatUnits(order.giveAmount, giveDecimals)}{' '}
+            <span className="text-xs font-medium text-blue-500">{giveSymbol || '...'}</span>
           </span>
         </div>
         <div>
           <span className="text-xs text-gray-500 block mb-1">Solicita (Pide):</span>
           <span className="font-bold text-base text-zinc-900 dark:text-zinc-100">
-            {ethers.formatEther(order.takeAmount)} <span className="text-xs font-medium text-emerald-500">{takeSymbol || '...'}</span>
+            {ethers.formatUnits(order.takeAmount, takeDecimals)}{' '}
+            <span className="text-xs font-medium text-emerald-500">{takeSymbol || '...'}</span>
           </span>
         </div>
       </div>
@@ -177,44 +213,50 @@ function OrderCard({ order, onRefresh }: { order: Order; onRefresh: () => void }
 export function OrderBook() {
   const [orders, setOrders] = useState<Order[]>([])
   const [filter, setFilter] = useState<'all' | 'open' | 'my'>('open')
+  const [refreshKey, setRefreshKey] = useState(0)
   const { provider, account } = useEthereum()
 
-  const loadOrders = useCallback(async () => {
-    if (!provider) return
-    try {
-      const exchangeContract = new ethers.Contract(EXCHANGE_ADDRESS, EXCHANGE_ABI, provider)
-      let rawOrders: any[] = []
-
-      try {
-        rawOrders = await exchangeContract.getOrdersPaged(0, 100)
-      } catch (err) {
-        console.error('Error loading orders:', err)
-        rawOrders = []
-      }
-
-      const formatted: Order[] = rawOrders.map((o: any) => ({
-        id: o.id,
-        maker: o.maker,
-        giveToken: o.giveToken,
-        takeToken: o.takeToken,
-        giveAmount: o.giveAmount,
-        takeAmount: o.takeAmount,
-        status: Number(o.status),
-        createdAt: o.createdAt,
-        filledAt: o.filledAt
-      }))
-
-      setOrders(formatted)
-    } catch (err) {
-      console.error('Error fetching order book:', err)
-    }
-  }, [provider])
-
   useEffect(() => {
+    let active = true
+
+    const loadOrders = async () => {
+      if (!provider || !EXCHANGE_ADDRESS) return
+      try {
+        const exchangeContract = new ethers.Contract(EXCHANGE_ADDRESS, EXCHANGE_ABI, provider)
+        let rawOrders: RawOrder[] = []
+
+        try {
+          rawOrders = await exchangeContract.getOrdersPaged(0, 100)
+        } catch (err) {
+          console.error('Error loading orders:', err)
+          rawOrders = []
+        }
+
+        const formatted: Order[] = rawOrders.map((o) => ({
+          id: o.id,
+          maker: o.maker,
+          giveToken: o.giveToken,
+          takeToken: o.takeToken,
+          giveAmount: o.giveAmount,
+          takeAmount: o.takeAmount,
+          status: Number(o.status),
+          createdAt: o.createdAt,
+          filledAt: o.filledAt,
+        }))
+
+        if (active) setOrders(formatted)
+      } catch (err) {
+        console.error('Error fetching order book:', err)
+      }
+    }
+
     loadOrders()
     const interval = setInterval(loadOrders, 5000)
-    return () => clearInterval(interval)
-  }, [loadOrders])
+    return () => {
+      active = false
+      clearInterval(interval)
+    }
+  }, [provider, refreshKey])
 
   const filteredOrders = orders.filter((o) => {
     if (filter === 'open') return o.status === 0
@@ -239,7 +281,7 @@ export function OrderBook() {
             onClick={() => setFilter('open')}
             className={`px-3 py-1.5 rounded-md transition ${filter === 'open' ? 'bg-white dark:bg-zinc-700 font-bold shadow-sm' : 'text-gray-500'}`}
           >
-            Abiertas ({orders.filter(o => o.status === 0).length})
+            Abiertas ({orders.filter((o) => o.status === 0).length})
           </button>
           <button
             onClick={() => setFilter('my')}
@@ -263,7 +305,11 @@ export function OrderBook() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredOrders.map((order) => (
-            <OrderCard key={order.id.toString()} order={order} onRefresh={loadOrders} />
+            <OrderCard
+              key={order.id.toString()}
+              order={order}
+              onRefresh={() => setRefreshKey((k) => k + 1)}
+            />
           ))}
         </div>
       )}

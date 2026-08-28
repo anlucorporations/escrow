@@ -90,6 +90,7 @@ echo ""
 echo "🔐 [Paso 2/7] Desplegando contratos (Owner = Cuenta 0: $OWNER_ADDR)..."
 ESCROW="$(cd "$ROOT/sc" && deploy Escrow)"
 REGISTRY="$(cd "$ROOT/sc" && deploy UserRegistry)"
+EXCHANGE="$(cd "$ROOT/sc" && deploy Exchange "$REGISTRY")"
 TKA="$(cd "$ROOT/sc" && deploy MockERC20 TokenA TKA 18)"
 TKB="$(cd "$ROOT/sc" && deploy MockERC20 TokenB TKB 18)"
 USDT="$(cd "$ROOT/sc" && deploy MockERC20 USDT USDT 6)"
@@ -109,6 +110,7 @@ TRUEKE_SERVICE="$(cd "$ROOT/sc" && deploy TruekeService "$SBT_REGISTRY")"
 
 echo "  ✓ Escrow:        $ESCROW"
 echo "  ✓ UserRegistry:  $REGISTRY"
+echo "  ✓ Exchange:      $EXCHANGE"
 echo "  ✓ Governance:    $GOVERNANCE"
 echo "  ✓ Subscription:  $SUBSCRIPTION"
 echo "  ✓ Token A:       $TKA"
@@ -126,6 +128,7 @@ echo ""
 echo "👑 [Paso 3/7] Configurando SuperUsuario (Cuenta 0: Owner + Socio Certificado + SBT)..."
 for t in "$TKA" "$TKB" "$USDT" "$DELIVERY"; do
   "$CAST" send --rpc-url "$RPC_URL" --private-key "$OWNER_KEY" "$ESCROW" "addToken(address)" "$t" >/dev/null 2>&1 || true
+  "$CAST" send --rpc-url "$RPC_URL" --private-key "$OWNER_KEY" "$EXCHANGE" "addToken(address)" "$t" >/dev/null 2>&1 || true
 done
 "$CAST" send --rpc-url "$RPC_URL" --private-key "$OWNER_KEY" "$ESCROW" "setArbiter(address)" "$OWNER_ADDR" >/dev/null 2>&1 || true
 "$CAST" send --rpc-url "$RPC_URL" --private-key "$OWNER_KEY" "$ESCROW" "setUserRegistry(address)" "$REGISTRY" >/dev/null 2>&1 || true
@@ -200,6 +203,7 @@ echo "  ✓ Cuentas 7, 8 y 9 permanecen LIBRES (Sin registrar) para pruebas de b
 cat > "$ROOT/web/.env.local" <<EOF
 NEXT_PUBLIC_ESCROW_ADDRESS=$ESCROW
 NEXT_PUBLIC_USER_REGISTRY_ADDRESS=$REGISTRY
+NEXT_PUBLIC_EXCHANGE_ADDRESS=$EXCHANGE
 NEXT_PUBLIC_GOVERNANCE_ADDRESS=$GOVERNANCE
 NEXT_PUBLIC_SUBSCRIPTION_ADDRESS=$SUBSCRIPTION
 NEXT_PUBLIC_TOKEN_A_ADDRESS=$TKA

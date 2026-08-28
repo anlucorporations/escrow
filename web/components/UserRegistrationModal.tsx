@@ -51,7 +51,19 @@ export function UserRegistrationModal() {
     try {
       const signer = await provider.getSigner()
       const registryContract = new ethers.Contract(USER_REGISTRY_ADDRESS, USER_REGISTRY_ABI, signer)
-      const tx = await registryContract.registerUser(username.trim())
+      // El registro on-chain requiere 8 parámetros; con solo el alias se usan
+      // valores por defecto para email/teléfono/ubicación/UTM (ver /register).
+      const uname = username.trim()
+      const tx = await registryContract.register(
+        uname,
+        `${uname.toLowerCase()}@truekeate.com`,
+        '+584120000000',
+        'Barlovento, Miranda, Venezuela',
+        729450,
+        1159800,
+        19,
+        true
+      )
       await tx.wait()
 
       setSuccess(true)
@@ -59,9 +71,10 @@ export function UserRegistrationModal() {
       setTimeout(() => {
         setSuccess(false)
       }, 2000)
-    } catch (err: any) {
+    } catch (err) {
       console.error('Registration failed:', err)
-      setError(err.reason || err.message || 'Transaction failed')
+      const e = err as { reason?: string; message?: string }
+      setError(e.reason || e.message || 'Transaction failed')
     } finally {
       setLoading(false)
     }

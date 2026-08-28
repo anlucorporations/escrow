@@ -95,6 +95,7 @@ print("[+] Contratos compilados correctamente")
 print(f"\n[Paso 2/7] Desplegando contratos (Owner = Cuenta 0: {OWNER_ADDR})...")
 escrow = deploy_contract("Escrow")
 registry = deploy_contract("UserRegistry")
+exchange = deploy_contract("Exchange", registry)
 tka = deploy_contract("MockERC20", "TokenA", "TKA", "18")
 tkb = deploy_contract("MockERC20", "TokenB", "TKB", "18")
 usdt = deploy_contract("MockERC20", "USDT", "USDT", "6")
@@ -113,6 +114,7 @@ send_tx(OWNER_KEY, sbt_registry, "setNativeSBT(address)", trueke_sbt)
 
 print(f"  [+] Escrow:        {escrow}")
 print(f"  [+] UserRegistry:  {registry}")
+print(f"  [+] Exchange:      {exchange}")
 print(f"  [+] Governance:    {governance}")
 print(f"  [+] Subscription:  {subscription}")
 print(f"  [+] Token A:       {tka}")
@@ -129,6 +131,7 @@ print(f"  [+] TruekeService: {trueke_service}")
 print("\n[Paso 3/7] Configurando SuperUsuario (Cuenta 0: Owner + Socio Certificado + SBT)...")
 for t in [tka, tkb, usdt, delivery]:
     send_tx(OWNER_KEY, escrow, "addToken(address)", t)
+    send_tx(OWNER_KEY, exchange, "addToken(address)", t)
 send_tx(OWNER_KEY, escrow, "setArbiter(address)", OWNER_ADDR)
 send_tx(OWNER_KEY, escrow, "setUserRegistry(address)", registry)
 send_tx(OWNER_KEY, governance, "setTreasury(address)", OWNER_ADDR)
@@ -214,6 +217,7 @@ print("\n  [+] Cuentas 7, 8 y 9 permanecen LIBRES (Sin registrar en UserRegistry
 env_path = os.path.join(ROOT, "web", ".env.local")
 env_content = f"""NEXT_PUBLIC_ESCROW_ADDRESS={escrow}
 NEXT_PUBLIC_USER_REGISTRY_ADDRESS={registry}
+NEXT_PUBLIC_EXCHANGE_ADDRESS={exchange}
 NEXT_PUBLIC_GOVERNANCE_ADDRESS={governance}
 NEXT_PUBLIC_SUBSCRIPTION_ADDRESS={subscription}
 NEXT_PUBLIC_TOKEN_A_ADDRESS={tka}
@@ -244,6 +248,7 @@ info_content = f"""=============================================================
 CONTRATOS DESPLEGADOS:
   Escrow:        {escrow}
   UserRegistry:  {registry}
+  Exchange:      {exchange}
   Governance:    {governance}
   Subscription:  {subscription}
   Token A:       {tka} (TKA, 18 dec)

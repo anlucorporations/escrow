@@ -6912,7 +6912,9 @@ export const USER_REGISTRY_ADDRESS: string =
   process.env.NEXT_PUBLIC_USER_REGISTRY_ADDRESS ?? '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512'
 
 export const EXCHANGE_ADDRESS: string =
-  process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS ?? '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0'
+  process.env.NEXT_PUBLIC_EXCHANGE_ADDRESS ?? ''
+// NOTA: sin NEXT_PUBLIC_EXCHANGE_ADDRESS la dirección queda vacía a propósito;
+// los componentes del Exchange deben guardar el caso (no apuntar a otro contrato).
 
 export const GOVERNANCE_ADDRESS: string =
   process.env.NEXT_PUBLIC_GOVERNANCE_ADDRESS ?? '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6'

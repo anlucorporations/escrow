@@ -18,12 +18,12 @@ async function run() {
     console.log('✓ Usuario anlucorporations actualizado.')
   }
 
-  await adminPool.query('GRANT ALL PRIVILEGES ON DATABASE truekeate TO anlucorporations')
+  await adminPool.query('GRANT ALL PRIVILEGES ON DATABASE "TrueKeate" TO anlucorporations')
   await adminPool.end()
 
-  console.log('Probando conexión directa como anlucorporations a la BD truekeate...')
+  console.log('Probando conexión directa como anlucorporations a la BD TrueKeate...')
   const userPool = new Pool({
-    connectionString: 'postgresql://anlucorporations:KeLuDa.2324@127.0.0.1:5432/truekeate',
+    connectionString: 'postgresql://anlucorporations:KeLuDa.2324@127.0.0.1:5432/TrueKeate',
   })
   const res = await userPool.query('SELECT current_user, current_database(), version()')
   console.log('✓ Conexión exitosa:', {

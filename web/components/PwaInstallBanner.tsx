@@ -3,11 +3,19 @@
 import React, { useState, useEffect } from 'react'
 import { isPwaInstalled, isIOS, isMobile, triggerHaptic } from '@/lib/mobile'
 
+/** Evento beforeinstallprompt (no tipado en lib.dom). */
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>
+}
+
 export function PwaInstallBanner() {
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showBanner, setShowBanner] = useState(false)
-  const [isIosDevice, setIsIosDevice] = useState(false)
   const [showIosGuide, setShowIosGuide] = useState(false)
+
+  // isIOS() es determinista: se calcula en render, sin estado.
+  const isIosDevice = isIOS()
 
   useEffect(() => {
     // Si ya está instalada o es escritorio, no mostrar banner
@@ -18,8 +26,7 @@ export function PwaInstallBanner() {
       return // Ocultar por 7 días si el usuario lo cerró
     }
 
-    if (isIOS()) {
-      setIsIosDevice(true)
+    if (isIosDevice) {
       // Mostrar banner tras 3 segundos de navegación en iOS
       const timer = setTimeout(() => setShowBanner(true), 3000)
       return () => clearTimeout(timer)
@@ -28,13 +35,13 @@ export function PwaInstallBanner() {
     // En Android / Chromium escuchar el evento de instalación nativo
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault()
-      setDeferredPrompt(e)
+      setDeferredPrompt(e as BeforeInstallPromptEvent)
       setShowBanner(true)
     }
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstall)
     return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall)
-  }, [])
+  }, [isIosDevice])
 
   const handleInstallClick = async () => {
     triggerHaptic('medium')
@@ -111,7 +118,7 @@ export function PwaInstallBanner() {
             <p className="text-xs text-[#2D2A26]/80 mb-4 leading-relaxed">
               1. Toca el botón <strong>Compartir</strong> (ícono con flecha hacia arriba) en la barra de Safari.
               <br />
-              2. Desplázate hacia abajo y selecciona <strong>"Añadir a la pantalla de inicio"</strong>.
+              2. Desplázate hacia abajo y selecciona <strong>&quot;Añadir a la pantalla de inicio&quot;</strong>.
             </p>
             <button
               onClick={() => {

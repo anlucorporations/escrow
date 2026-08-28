@@ -100,7 +100,7 @@ export async function hasRated(operationId, rater) {
 }
 
 /** Valida que una valoración sea legítima (operación completada y parte implicada). */
-export async function validateRating(operationId, rater) {
+export async function validateRating(operationId, rater, ratee) {
   const op = await first('SELECT * FROM operations WHERE id = ?', [operationId])
   if (!op) return { ok: false, error: 'Operación no encontrada' }
   if (Number(op.status) !== 1) return { ok: false, error: 'Solo se puede valorar operaciones completadas' }
@@ -108,6 +108,14 @@ export async function validateRating(operationId, rater) {
   const isParty = op.user1.toLowerCase() === lower || (op.user2 && op.user2.toLowerCase() === lower)
   if (!isParty) return { ok: false, error: 'Solo las partes de la operación pueden valorar' }
   if (await hasRated(operationId, rater)) return { ok: false, error: 'Ya valoraste esta operación' }
+  // La persona valorada debe ser la CONTRAPARTE (evita inflar reputación de terceros)
+  if (ratee) {
+    const rateeLower = ratee.toLowerCase()
+    const counterpart = op.user1.toLowerCase() === lower ? op.user2 : op.user1
+    if (!counterpart || counterpart.toLowerCase() !== rateeLower) {
+      return { ok: false, error: 'Solo puedes valorar a tu contraparte en la operación' }
+    }
+  }
   return { ok: true, op }
 }
 
@@ -521,7 +529,7 @@ export const MEETUP_WINDOW_MIN = 10
  * Abre el intercambio por una de las partes (M16):
  * - debe estar dentro de [scheduled_at - 10m, scheduled_at + 10m]
  * - al abrir ambas partes, la diferencia entre aperturas debe ser <= 10 min
- * - cualquier violación bloquea el encuentro (requiere autorización de cierre)
+ * - cada parte solo puede abrir UNA vez; cualquier violación bloquea el encuentro
  */
 export async function openMeetup(meetupId, address) {
   const m = await first('SELECT * FROM meetups WHERE id = ?', [meetupId])
@@ -543,25 +551,34 @@ export async function openMeetup(meetupId, address) {
     return { ok: false, error: 'Fuera de la ventana de 10 minutos (±10 min de la hora pautada)' }
   }
 
-  if (m.opened_at_user1 == null && m.opened_at_user2 == null) {
-    // primera apertura: registramos la parte (no sabemos cuál es user1/user2 aquí;
-    // la capa de datos guarda ambas columnas según quien abra primero)
-    await query('UPDATE meetups SET opened_at_user1 = ?, status = ? WHERE id = ?', [now, 'opened', meetupId])
-    return { ok: true, meetup: { ...m, opened_at_user1: now, status: 'opened' } }
+  // La misma parte no puede abrir dos veces (evita reiniciar la ventana)
+  if (m.opened_by && m.opened_by.toLowerCase() === lower) {
+    return { ok: false, error: 'Ya abriste el intercambio. Espera a que tu contraparte también lo abra.' }
   }
 
-  // segunda apertura: validar diferencia <= 10 min
+  const bothOpened = m.opened_at_user1 != null && m.opened_at_user2 != null
+  if (bothOpened && m.status === 'opened') {
+    return { ok: false, error: 'El intercambio ya fue abierto por ambas partes' }
+  }
+
+  if (m.opened_at_user1 == null && m.opened_at_user2 == null) {
+    // primera apertura
+    await query('UPDATE meetups SET opened_at_user1 = ?, opened_by = ?, status = ? WHERE id = ?', [now, lower, 'opened', meetupId])
+    return { ok: true, meetup: { ...m, opened_at_user1: now, opened_by: lower, status: 'opened' } }
+  }
+
+  // segunda apertura (parte distinta): validar diferencia <= 10 min
   const firstOpen = Number(m.opened_at_user1 ?? m.opened_at_user2)
   if (Math.abs(now - firstOpen) > windowMs) {
     await query(
-      "UPDATE meetups SET opened_at_user2 = ?, status = 'blocked', blocked_reason = 'Diferencia de apertura mayor a 10 minutos' WHERE id = ?",
-      [now, meetupId]
+      "UPDATE meetups SET opened_at_user2 = ?, opened_by = ?, status = 'blocked', blocked_reason = 'Diferencia de apertura mayor a 10 minutos' WHERE id = ?",
+      [now, lower, meetupId]
     )
     return { ok: false, error: 'Diferencia de apertura mayor a 10 minutos: intercambio bloqueado' }
   }
 
-  await query('UPDATE meetups SET opened_at_user2 = ?, status = ? WHERE id = ?', [now, 'opened', meetupId])
-  return { ok: true, meetup: { ...m, opened_at_user2: now, status: 'opened' } }
+  await query('UPDATE meetups SET opened_at_user2 = ?, opened_by = ?, status = ? WHERE id = ?', [now, lower, 'opened', meetupId])
+  return { ok: true, meetup: { ...m, opened_at_user2: now, opened_by: lower, status: 'opened' } }
 }
 
 export async function closeMeetup(meetupId) {
@@ -606,11 +623,14 @@ export function decryptField(enc) {
 /**
  * Registra la verificación KYC (M6): correo/teléfono CIFRADOS en la BD y
  * hashes de documento/selfie. El estado público es solo kyc_status.
+ * Si email/phone no se proveen, se conservan los valores ya cifrados
+ * (permite al admin aprobar sin conocer los datos privados del usuario).
  * (En producción la verificación requiere revisión; en demo se auto-aprueba.)
  */
 export async function submitKyc(address, { email, phone, documentHash = '', selfieHash = '' }) {
-  const encryptedEmail = encryptField(email || '')
-  const encryptedPhone = encryptField(phone || '')
+  const existing = await first('SELECT email, phone FROM users WHERE address = ?', [address.toLowerCase()])
+  const encryptedEmail = email ? encryptField(email) : (existing?.email || '')
+  const encryptedPhone = phone ? encryptField(phone) : (existing?.phone || '')
   await query(
     `UPDATE users SET email = ?, phone = ?, document_hash = ?, selfie_hash = ?, kyc_status = 'verified', identification_level = 'certificado' WHERE address = ?`,
     [encryptedEmail, encryptedPhone, documentHash, selfieHash, address.toLowerCase()]

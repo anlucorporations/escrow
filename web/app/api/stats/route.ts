@@ -9,8 +9,8 @@ import {
 import { PlatformStats } from '@/lib/stats'
 
 // RPC configurable vía variable de entorno (portable a otras redes).
-//   RPC_URL=http://localhost:8545  (por defecto)
-const RPC_URL = process.env.RPC_URL ?? 'http://localhost:8545'
+//   NEXT_PUBLIC_RPC_URL=http://localhost:8545  (por defecto)
+const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL ?? process.env.RPC_URL ?? 'http://127.0.0.1:8545'
 const provider = new ethers.JsonRpcProvider(RPC_URL)
 
 const PAGE_SIZE = 100

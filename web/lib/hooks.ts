@@ -378,7 +378,7 @@ export function useRegistration(): RegistrationState {
   const [loading, setLoading] = useState(true)
 
   const refresh = useCallback(async () => {
-    if (!provider || !account) {
+    if (!account) {
       setIsRegistered(false)
       setUsername(null)
       setLoading(false)
@@ -387,14 +387,56 @@ export function useRegistration(): RegistrationState {
     setLoading(true)
     try {
       const normalized = ethers.getAddress(account)
-      const c = new ethers.Contract(USER_REGISTRY_ADDRESS, USER_REGISTRY_ABI, provider)
-      const [registered, profile] = await Promise.all([
-        c.isRegistered(normalized).catch(() => false),
-        c.getUserProfile(normalized).catch(() => null),
-      ])
+      let isReg = false
+      let uname: string | null = null
 
-      const isReg = Boolean(registered || profile?.isRegistered || profile?.[3])
-      const uname = profile?.username || profile?.[1] || null
+      // 1. Intentar con provider de la billetera conectada
+      if (provider) {
+        try {
+          const c = new ethers.Contract(USER_REGISTRY_ADDRESS, USER_REGISTRY_ABI, provider)
+          const [registered, profile] = await Promise.all([
+            c.isRegistered(normalized).catch(() => false),
+            c.getUserProfile(normalized).catch(() => null),
+          ])
+          isReg = Boolean(registered || profile?.isRegistered || profile?.[10])
+          uname = profile?.username || profile?.[1] || null
+        } catch {
+          // fallback a RPC directo
+        }
+      }
+
+      // 2. Fallback a RPC directo si la billetera no respondió
+      if (!isReg) {
+        try {
+          const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || 'http://127.0.0.1:8545'
+          const fallbackProvider = new ethers.JsonRpcProvider(rpcUrl)
+          const fallbackContract = new ethers.Contract(USER_REGISTRY_ADDRESS, USER_REGISTRY_ABI, fallbackProvider)
+          const [registered, profile] = await Promise.all([
+            fallbackContract.isRegistered(normalized).catch(() => false),
+            fallbackContract.getUserProfile(normalized).catch(() => null),
+          ])
+          isReg = Boolean(registered || profile?.isRegistered || profile?.[10])
+          uname = profile?.username || profile?.[1] || null
+        } catch {
+          // fallback a BD off-chain
+        }
+      }
+
+      // 3. Fallback a API off-chain
+      if (!isReg) {
+        try {
+          const res = await fetch(`/api/identity/${normalized}`)
+          if (res.ok) {
+            const data = await res.json()
+            if (data?.user?.is_registered || data?.user?.username) {
+              isReg = true
+              uname = data.user.username || null
+            }
+          }
+        } catch {
+          // ignore
+        }
+      }
 
       setIsRegistered(isReg)
       setUsername(isReg ? uname : null)
@@ -598,17 +640,59 @@ export function useUserRole(): UserRoleInfo {
       }
 
       try {
-        const escrow = new ethers.Contract(ESCROW_ADDRESS, ESCROW_ABI, provider)
-        const gov = new ethers.Contract(GOVERNANCE_ADDRESS, GOVERNANCE_ABI, provider)
-        const sub = new ethers.Contract(SUBSCRIPTION_ADDRESS, SUBSCRIPTION_ABI, provider)
+        let owner = null
+        let arbiter = null
+        let isSocioRaw = false
+        let isBizRaw = false
+        let isBizActiveRaw = false
 
-        const [owner, arbiter, isSocioRaw, isBizRaw, isBizActiveRaw] = await Promise.all([
-          escrow.owner().catch(() => null),
-          escrow.arbiter().catch(() => null),
-          gov.isSocio(account).catch(() => false),
-          sub.businessFlag(account).catch(() => false),
-          sub.isActive(account).catch(() => false),
-        ])
+        if (provider) {
+          try {
+            const escrow = new ethers.Contract(ESCROW_ADDRESS, ESCROW_ABI, provider)
+            const gov = new ethers.Contract(GOVERNANCE_ADDRESS, GOVERNANCE_ABI, provider)
+            const sub = new ethers.Contract(SUBSCRIPTION_ADDRESS, SUBSCRIPTION_ABI, provider)
+
+            const res = await Promise.all([
+              escrow.owner().catch(() => null),
+              escrow.arbiter().catch(() => null),
+              gov.isSocio(account).catch(() => false),
+              sub.businessFlag(account).catch(() => false),
+              sub.isActive(account).catch(() => false),
+            ])
+            owner = res[0]
+            arbiter = res[1]
+            isSocioRaw = res[2]
+            isBizRaw = res[3]
+            isBizActiveRaw = res[4]
+          } catch {
+            // fallback
+          }
+        }
+
+        if (!owner) {
+          try {
+            const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || 'http://127.0.0.1:8545'
+            const fbProvider = new ethers.JsonRpcProvider(rpcUrl)
+            const escrow = new ethers.Contract(ESCROW_ADDRESS, ESCROW_ABI, fbProvider)
+            const gov = new ethers.Contract(GOVERNANCE_ADDRESS, GOVERNANCE_ABI, fbProvider)
+            const sub = new ethers.Contract(SUBSCRIPTION_ADDRESS, SUBSCRIPTION_ABI, fbProvider)
+
+            const res = await Promise.all([
+              escrow.owner().catch(() => null),
+              escrow.arbiter().catch(() => null),
+              gov.isSocio(account).catch(() => false),
+              sub.businessFlag(account).catch(() => false),
+              sub.isActive(account).catch(() => false),
+            ])
+            owner = res[0]
+            arbiter = res[1]
+            isSocioRaw = res[2]
+            isBizRaw = res[3]
+            isBizActiveRaw = res[4]
+          } catch {
+            // ignore
+          }
+        }
 
         if (cancelled) return
 

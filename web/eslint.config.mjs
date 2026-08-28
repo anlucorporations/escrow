@@ -13,6 +13,14 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    // En tests, los mocks de wallet/proveedor y resultados de BD se tipan
+    // deliberadamente con `any`; relajamos la regla solo en test/.
+    files: ["test/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

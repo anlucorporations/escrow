@@ -348,6 +348,9 @@ export async function initSchema() {
   await ensureColumn('operations', 'asset_b_type', 'TEXT NOT NULL DEFAULT \'ERC20\'')
   await ensureColumn('operations', 'asset_a_token_id', 'TEXT NOT NULL DEFAULT \'0\'')
   await ensureColumn('operations', 'asset_b_token_id', 'TEXT NOT NULL DEFAULT \'0\'')
+
+  // M16: qué parte abrió el intercambio (evita reaperturas de la misma parte)
+  await ensureColumn('meetups', 'opened_by', 'TEXT NOT NULL DEFAULT \'\'')
 }
 
 /**

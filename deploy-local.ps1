@@ -84,6 +84,7 @@ function Deploy-Contract {
 Write-Host "`n🔐 [Paso 2/7] Desplegando contratos (Owner = Cuenta 0: $OwnerAddr)..." -ForegroundColor Yellow
 $Escrow = Deploy-Contract "Escrow"
 $Registry = Deploy-Contract "UserRegistry"
+$Exchange = Deploy-Contract "Exchange" @($Registry)
 $TKA = Deploy-Contract "MockERC20" @("TokenA", "TKA", "18")
 $TKB = Deploy-Contract "MockERC20" @("TokenB", "TKB", "18")
 $USDT = Deploy-Contract "MockERC20" @("USDT", "USDT", "6")
@@ -104,6 +105,7 @@ cast send --rpc-url $RpcUrl --private-key $OwnerKey $SBTRegistry "setNativeSBT(a
 
 Write-Host "✓ Escrow:        $Escrow" -ForegroundColor Green
 Write-Host "✓ UserRegistry:  $Registry" -ForegroundColor Green
+Write-Host "✓ Exchange:      $Exchange" -ForegroundColor Green
 Write-Host "✓ Governance:    $Governance" -ForegroundColor Green
 Write-Host "✓ Subscription:  $Subscription" -ForegroundColor Green
 Write-Host "✓ Token A:       $TKA" -ForegroundColor Green
@@ -120,6 +122,7 @@ Write-Host "✓ TruekeService: $TruekeService" -ForegroundColor Green
 Write-Host "`n👑 [Paso 3/7] Configurando SuperUsuario (Cuenta 0: Owner + Socio Certificado + SBT)..." -ForegroundColor Yellow
 foreach ($t in @($TKA, $TKB, $USDT, $DELIVERY)) {
     cast send --rpc-url $RpcUrl --private-key $OwnerKey $Escrow "addToken(address)" $t | Out-Null
+    cast send --rpc-url $RpcUrl --private-key $OwnerKey $Exchange "addToken(address)" $t | Out-Null
 }
 cast send --rpc-url $RpcUrl --private-key $OwnerKey $Escrow "setArbiter(address)" $OwnerAddr | Out-Null
 cast send --rpc-url $RpcUrl --private-key $OwnerKey $Escrow "setUserRegistry(address)" $Registry | Out-Null
@@ -207,6 +210,7 @@ $envPath = "web/.env.local"
 $envContent = @"
 NEXT_PUBLIC_ESCROW_ADDRESS=$Escrow
 NEXT_PUBLIC_USER_REGISTRY_ADDRESS=$Registry
+NEXT_PUBLIC_EXCHANGE_ADDRESS=$Exchange
 NEXT_PUBLIC_GOVERNANCE_ADDRESS=$Governance
 NEXT_PUBLIC_SUBSCRIPTION_ADDRESS=$Subscription
 NEXT_PUBLIC_TOKEN_A_ADDRESS=$TKA
@@ -237,6 +241,7 @@ $infoContent = @"
 CONTRATOS DESPLEGADOS:
   Escrow:        $Escrow
   UserRegistry:  $Registry
+  Exchange:      $Exchange
   Governance:    $Governance
   Subscription:  $Subscription
   Token A:       $TKA (TKA, 18 dec)

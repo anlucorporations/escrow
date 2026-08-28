@@ -14,7 +14,7 @@ import { ESCROW_ADDRESS, ESCROW_ABI } from '@/lib/contracts'
  * La clave del relayer se configura con RELAYER_PRIVATE_KEY (por defecto la
  * cuenta #4 de Anvil, SOLO para desarrollo local).
  */
-const RPC_URL = process.env.RPC_URL ?? 'http://localhost:8545'
+const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL ?? process.env.RPC_URL ?? 'http://127.0.0.1:8545'
 const RELAYER_KEY =
   process.env.RELAYER_PRIVATE_KEY ?? '0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a'
 

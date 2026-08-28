@@ -1,8 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useEthereum } from '@/lib/ethereum'
-import { useUserRole } from '@/lib/hooks'
+import { useState } from 'react'
 import Link from 'next/link'
 
 interface Store {
@@ -17,8 +15,6 @@ interface Store {
 }
 
 export default function CompanyInventoryPage() {
-  const { account } = useEthereum()
-  const role = useUserRole()
   const [stores, setStores] = useState<Store[]>([
     {
       id: 'store-1',

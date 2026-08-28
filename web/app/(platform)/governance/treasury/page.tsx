@@ -1,14 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { useEthereum } from '@/lib/ethereum'
-import { useUserRole } from '@/lib/hooks'
 import Link from 'next/link'
 
 export default function TreasuryPage() {
-  const { account } = useEthereum()
-  const role = useUserRole()
-
   const [logs] = useState([
     {
       id: 'log-1',

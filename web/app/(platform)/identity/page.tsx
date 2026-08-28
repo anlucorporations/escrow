@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useEthereum } from '@/lib/ethereum'
-import { useRegistration } from '@/lib/hooks'
 
 function ShieldIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -101,10 +100,8 @@ interface IdentityState {
 
 export default function IdentityCenterPage() {
   const { account, isConnected, provider } = useEthereum()
-  const { isRegistered, username } = useRegistration()
 
   const [profile, setProfile] = useState<IdentityState | null>(null)
-  const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'overview' | 'contact' | '2fa' | 'sbt'>('overview')
 
   // Estados de formularios
@@ -114,7 +111,6 @@ export default function IdentityCenterPage() {
   const [phoneCode, setPhoneCode] = useState('')
   const [twoFactorCode, setTwoFactorCode] = useState('')
   const [twoFactorSecret, setTwoFactorSecret] = useState<string | null>(null)
-  const [otpUri, setOtpUri] = useState<string | null>(null)
   const [selectedExternalProvider, setSelectedExternalProvider] = useState('Binance BABT')
 
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
@@ -123,11 +119,9 @@ export default function IdentityCenterPage() {
   const loadIdentity = useCallback(async () => {
     if (!account) {
       setProfile(null)
-      setLoading(false)
       return
     }
     try {
-      setLoading(true)
       const res = await fetch(`/api/identity/${account}?requester=${account}`)
       const data = await res.json()
       if (data.profile) {
@@ -137,8 +131,6 @@ export default function IdentityCenterPage() {
       }
     } catch {
       setStatusMsg({ type: 'error', text: 'Error al cargar perfil de identidad' })
-    } finally {
-      setLoading(false)
     }
   }, [account])
 
@@ -165,8 +157,9 @@ export default function IdentityCenterPage() {
       } else {
         setStatusMsg({ type: 'error', text: data.error || 'Error al aceptar acuerdos' })
       }
-    } catch (err: any) {
-      setStatusMsg({ type: 'error', text: err.message || 'Error en la solicitud' })
+    } catch (err) {
+      const e = err as { message?: string }
+      setStatusMsg({ type: 'error', text: e.message || 'Error en la solicitud' })
     } finally {
       setProcessing(false)
     }
@@ -196,8 +189,9 @@ export default function IdentityCenterPage() {
       } else {
         setStatusMsg({ type: 'error', text: data.error || 'Error en la verificación' })
       }
-    } catch (err: any) {
-      setStatusMsg({ type: 'error', text: err.message || 'Error al validar canales' })
+    } catch (err) {
+      const e = err as { message?: string }
+      setStatusMsg({ type: 'error', text: e.message || 'Error al validar canales' })
     } finally {
       setProcessing(false)
     }
@@ -216,10 +210,10 @@ export default function IdentityCenterPage() {
       const data = await res.json()
       if (data.secret) {
         setTwoFactorSecret(data.secret)
-        setOtpUri(data.otpauthUri)
       }
-    } catch (err: any) {
-      setStatusMsg({ type: 'error', text: err.message })
+    } catch (err) {
+      const e = err as { message?: string }
+      setStatusMsg({ type: 'error', text: e.message || 'Error al iniciar 2FA' })
     } finally {
       setProcessing(false)
     }
@@ -244,8 +238,9 @@ export default function IdentityCenterPage() {
       } else {
         setStatusMsg({ type: 'error', text: data.error || 'Código 2FA incorrecto' })
       }
-    } catch (err: any) {
-      setStatusMsg({ type: 'error', text: err.message })
+    } catch (err) {
+      const e = err as { message?: string }
+      setStatusMsg({ type: 'error', text: e.message || 'Código 2FA incorrecto' })
     } finally {
       setProcessing(false)
     }
@@ -282,8 +277,9 @@ export default function IdentityCenterPage() {
       } else {
         setStatusMsg({ type: 'error', text: data.error || 'Error al validar SBT externo' })
       }
-    } catch (err: any) {
-      setStatusMsg({ type: 'error', text: err.message || 'Error en firma de verificación' })
+    } catch (err) {
+      const e = err as { message?: string }
+      setStatusMsg({ type: 'error', text: e.message || 'Error en firma de verificación' })
     } finally {
       setProcessing(false)
     }

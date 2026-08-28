@@ -1,8 +1,10 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { ethers } from 'ethers'
 import { useEthereum } from '@/lib/ethereum'
 import { useEscrow } from '@/lib/hooks'
+import { USER_REGISTRY_ADDRESS, USER_REGISTRY_ABI } from '@/lib/contracts'
 function ShieldIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -73,45 +75,57 @@ interface AdminUserRow {
 }
 
 export default function AdminIdentityPage() {
-  const { account, isConnected } = useEthereum()
+  const { account, isConnected, provider } = useEthereum()
   const { roles } = useEscrow()
 
   const [users, setUsers] = useState<AdminUserRow[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [filterLevel, setFilterLevel] = useState('all')
-
-  const [selectedUser, setSelectedUser] = useState<AdminUserRow | null>(null)
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [actionLoading, setActionLoading] = useState(false)
 
-  // Proveedores externos
-  const [newProviderAddr, setNewProviderAddr] = useState('')
-  const [newProviderName, setNewProviderName] = useState('')
-
   const loadUsers = useCallback(async () => {
+    if (!provider || !account) return
     try {
       setLoading(true)
-      const res = await fetch('/api/stats')
-      const data = await res.json()
-      // Si el endpoint de stats devuelve usuarios o consultamos lista de usuarios
-      const listRes = await fetch('/api/items?limit=100')
-      const itemsData = await listRes.json()
-      
-      // Consultar perfiles
-      if (account) {
-        const selfProfileRes = await fetch(`/api/identity/${account}?requester=${account}&isOwner=true`)
-        const selfData = await selfProfileRes.json()
-        if (selfData.profile) {
-          setUsers([selfData.profile])
-        }
-      }
+      // Directorio real on-chain (UserRegistry.getRegisteredWalletsPaged)
+      const registry = new ethers.Contract(USER_REGISTRY_ADDRESS, USER_REGISTRY_ABI, provider)
+      const profiles = await registry.getRegisteredWalletsPaged(0, 100)
+
+      // Enriquecer con la capa de datos (2FA, SBT, KYC) vía /api/identity
+      const rows = await Promise.all(
+        (profiles as Array<{ wallet: string; username: string; identificationLevel: number }>).map(async (p) => {
+          let extra: Record<string, unknown> = {}
+          try {
+            const res = await fetch(`/api/identity/${p.wallet}?requester=${account}`)
+            const data = await res.json()
+            if (data.profile) extra = data.profile
+          } catch {
+            // perfil off-chain no disponible: se muestran solo datos on-chain
+          }
+          const levelMap = ['inscrito', 'verificado', 'certificado'] as const
+          return {
+            address: p.wallet,
+            username: p.username || '',
+            identification_level:
+              (levelMap[Number(p.identificationLevel)] as AdminUserRow['identification_level']) ?? 'inscrito',
+            trust_level: (extra.trust_level as string) || 'iniciado',
+            terms_accepted: Boolean(extra.terms_accepted),
+            email_verified: Boolean(extra.email_verified),
+            two_factor_enabled: Boolean(extra.two_factor_enabled),
+            sbt_provider: (extra.sbt_provider as string) || '',
+            sbt_verified_at: Number(extra.sbt_verified_at) || 0,
+            kyc_status: (extra.kyc_status as string) || 'pending',
+          }
+        })
+      )
+      setUsers(rows)
     } catch {
       setStatusMsg({ type: 'error', text: 'Error al cargar datos de administración' })
     } finally {
       setLoading(false)
     }
-  }, [account])
+  }, [provider, account])
 
   useEffect(() => {
     if (isConnected && account) {
@@ -123,17 +137,20 @@ export default function AdminIdentityPage() {
     try {
       setActionLoading(true)
       const res = await fetch(`/api/users/${userAddress}/kyc`, {
-        method: 'POST',
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'aprobado@truekeate.com', phone: '+584120000000' }),
+        // El admin no conoce los datos privados del usuario: el servidor conserva
+        // los valores ya cifrados y solo aprueba el estado KYC/Nivel 3.
+        body: JSON.stringify({}),
       })
       const data = await res.json()
       if (data.ok) {
         setStatusMsg({ type: 'success', text: `KYC y Certificación Nivel 3 aprobados para ${userAddress.slice(0, 6)}... ✓` })
         await loadUsers()
       }
-    } catch (err: any) {
-      setStatusMsg({ type: 'error', text: err.message })
+    } catch (err) {
+      const e = err as { message?: string }
+      setStatusMsg({ type: 'error', text: e.message || 'Error al aprobar KYC' })
     } finally {
       setActionLoading(false)
     }

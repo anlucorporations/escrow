@@ -38,7 +38,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Faltan operationId, rater y ratee' }, { status: 400 })
     }
 
-    const check = await validateRating(operationId, rater)
+    const check = await validateRating(operationId, rater, ratee)
     if (!check.ok) {
       return NextResponse.json({ error: check.error }, { status: 400 })
     }

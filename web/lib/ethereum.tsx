@@ -150,9 +150,13 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
             method: 'wallet_switchEthereumChain',
             params: [{ chainId: '0x7a69' }],
           })
-        } catch (switchError: any) {
+        } catch (switchError) {
           // This error code indicates that the chain has not been added to MetaMask.
-          if (switchError.code === 4902) {
+          const code =
+            switchError && typeof switchError === 'object' && 'code' in switchError
+              ? (switchError as { code?: number }).code
+              : undefined
+          if (code === 4902) {
             await window.ethereum.request({
               method: 'wallet_addEthereumChain',
               params: [

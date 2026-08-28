@@ -19,20 +19,20 @@ async function testDatabaseCreationAndOperations() {
   const versionRes = await adminPool.query('SELECT version()')
   console.log('✓ Servidor activo:', versionRes.rows[0].version.split(',')[0])
 
-  const dbCheck = await adminPool.query("SELECT 1 FROM pg_database WHERE datname = 'truekeate'")
+  const dbCheck = await adminPool.query("SELECT 1 FROM pg_database WHERE datname = 'TrueKeate'")
   if (dbCheck.rows.length === 0) {
-    console.log('Creando base de datos truekeate...')
-    await adminPool.query('CREATE DATABASE truekeate')
-    console.log('✓ Base de datos truekeate creada con éxito.')
+    console.log('Creando base de datos TrueKeate...')
+    await adminPool.query('CREATE DATABASE "TrueKeate"')
+    console.log('✓ Base de datos TrueKeate creada con éxito.')
   } else {
-    console.log('✓ Base de datos truekeate detectada y disponible.')
+    console.log('✓ Base de datos TrueKeate detectada y disponible.')
   }
   await adminPool.end()
 
-  // 2. Conexión a la base de datos truekeate e inicialización del esquema
+  // 2. Conexión a la base de datos TrueKeate e inicialización del esquema
   console.log('\n[2/5] Inicializando tablas e índices...')
   process.env.DATABASE_URL = PG_CONFIG.connectionString
-  const { initSchema, query, first } = await import('../server/db.js')
+  const { initSchema, query } = await import('../server/db.js')
   const {
     acceptCommunityTerms,
     verifyContactChannels,
@@ -40,9 +40,6 @@ async function testDatabaseCreationAndOperations() {
     confirm2FA,
     verifyThirdPartySBT,
     getUserIdentityProfile,
-    createItem,
-    rateOperation,
-    getReputation,
     notify,
     listNotifications,
   } = await import('../server/lib.js')

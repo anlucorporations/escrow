@@ -51,8 +51,8 @@ export async function shareNative(options: { title: string; text: string; url?: 
       })
       triggerHaptic('success')
       return true
-    } catch (err: any) {
-      if (err.name !== 'AbortError') {
+    } catch (err) {
+      if (err instanceof DOMException && err.name !== 'AbortError') {
         console.warn('Error en Web Share API:', err)
       }
       return false
@@ -75,9 +75,10 @@ export async function shareNative(options: { title: string; text: string; url?: 
 export function isPwaInstalled(): boolean {
   if (typeof window === 'undefined') return false
   const matchMediaMatches = typeof window.matchMedia === 'function' ? window.matchMedia('(display-mode: standalone)').matches : false
+  const iosStandalone = 'standalone' in window.navigator && window.navigator.standalone === true
   return (
     matchMediaMatches ||
-    (window.navigator as any).standalone === true ||
+    iosStandalone ||
     (typeof document !== 'undefined' && document.referrer ? document.referrer.includes('android-app://') : false)
   )
 }
@@ -87,7 +88,7 @@ export function isPwaInstalled(): boolean {
  */
 export function isIOS(): boolean {
   if (typeof window === 'undefined') return false
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window)
 }
 
 /**

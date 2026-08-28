@@ -29,7 +29,7 @@ export function BottomNav() {
     },
     {
       label: 'Publicar',
-      href: '/items/create',
+      href: '/items/new',
       isCenterAction: true,
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

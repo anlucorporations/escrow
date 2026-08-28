@@ -14,6 +14,7 @@ interface FloatingToolDrawerProps {
 interface TokenBalance {
   address: string
   symbol: string
+  decimals: number
   balance: string
 }
 
@@ -82,7 +83,7 @@ export function FloatingToolDrawer({ onRegistrationChange }: FloatingToolDrawerP
   }, [provider, account, onRegistrationChange])
 
   const loadMetricsAndBalances = useCallback(async () => {
-    if (!provider || !account || !isRegistered) return
+    if (!provider || !account || !isRegistered || !EXCHANGE_ADDRESS) return
 
     try {
       const exchangeContract = new ethers.Contract(EXCHANGE_ADDRESS, EXCHANGE_ABI, provider)
@@ -99,24 +100,29 @@ export function FloatingToolDrawer({ onRegistrationChange }: FloatingToolDrawerP
         allowedTokens.map(async (addr: string) => {
           try {
             const tokenContract = new ethers.Contract(addr, ERC20_ABI, provider)
-            const [sym, bal] = await Promise.all([
+            const [sym, bal, dec] = await Promise.all([
               tokenContract.symbol().catch(() => addr.slice(0, 6)),
               tokenContract.balanceOf(account).catch(() => BigInt(0)),
+              tokenContract.decimals().catch(() => 18n),
             ])
             return {
               address: addr,
               symbol: sym,
-              balance: ethers.formatEther(bal),
+              decimals: Number(dec),
+              balance: ethers.formatUnits(bal, Number(dec)),
             }
           } catch {
-            return { address: addr, symbol: addr.slice(0, 6), balance: '0.0' }
+            return { address: addr, symbol: addr.slice(0, 6), decimals: 18, balance: '0.0' }
           }
         })
       )
       setTokenBalances(balances)
 
       // 2. Fetch user's orders metrics
-      let userOrders: any[] = []
+      interface RawOrderRow {
+        status: bigint | number | string
+      }
+      let userOrders: RawOrderRow[] = []
       try {
         userOrders = await exchangeContract.getOrdersByMaker(account)
       } catch {
@@ -127,7 +133,7 @@ export function FloatingToolDrawer({ onRegistrationChange }: FloatingToolDrawerP
       let completed = 0
       let cancelledOrDisputed = 0
 
-      userOrders.forEach((o: any) => {
+      userOrders.forEach((o) => {
         const st = Number(o.status)
         if (st === 0) activeCount++
         else if (st === 1) completed++
@@ -168,7 +174,19 @@ export function FloatingToolDrawer({ onRegistrationChange }: FloatingToolDrawerP
     try {
       const signer = await provider.getSigner()
       const registryContract = new ethers.Contract(USER_REGISTRY_ADDRESS, USER_REGISTRY_ABI, signer)
-      const tx = await registryContract.registerUser(usernameInput.trim())
+      // El registro on-chain requiere 8 parámetros (username, email, phone, dirección,
+      // coordenadas UTM). Con solo el alias, se usan valores por defecto locales.
+      const uname = usernameInput.trim()
+      const tx = await registryContract.register(
+        uname,
+        `${uname.toLowerCase()}@truekeate.com`,
+        '+584120000000',
+        'Barlovento, Miranda, Venezuela',
+        729450,
+        1159800,
+        19,
+        true
+      )
       await tx.wait()
 
       setSuccess(true)
@@ -177,9 +195,10 @@ export function FloatingToolDrawer({ onRegistrationChange }: FloatingToolDrawerP
         setSuccess(false)
         setIsOpen(false)
       }, 1500)
-    } catch (err: any) {
+    } catch (err) {
       console.error('Registration error:', err)
-      let msg = err.reason || err.message || 'Error en la transacción'
+      const e = err as { reason?: string; message?: string }
+      let msg = e.reason || e.message || 'Error en la transacción'
       if (msg.includes('Failed to fetch') || msg.includes('-32603') || msg.includes('coalesce')) {
         msg = 'Error de conexión RPC en MetaMask. Asegúrate de tener seleccionada la red Local Anvil (http://127.0.0.1:8545 - Chain ID 31337). Si el error persiste, en MetaMask ve a Ajustes ➔ Avanzado ➔ "Borrar datos de la actividad de la cuenta".'
       }
