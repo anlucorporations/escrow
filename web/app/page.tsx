@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useEthereum } from '@/lib/ethereum'
 import { useRegistration } from '@/lib/hooks'
 import { useRouter } from 'next/navigation'
+import { BrandLogo } from '@/components/BrandLogo'
 
 export default function VelvetyLandingPage() {
   const { isConnected, connect } = useEthereum()
@@ -28,22 +30,35 @@ export default function VelvetyLandingPage() {
     }
   }
 
-  // Velvety UI Design System:
-  // Fonts: Serif for headings, Sans for body.
-  // Colors: Warm Nudes (indigo-100), Soft Rose (purple-500), Sage (fuchsia-500), Charcoal (slate-900)
-
+  // Velvety UI Design System with Official TrueKeate Branding:
   return (
     <div className="min-h-screen bg-background font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-700">
       
       {/* HERO SECTION */}
-      <section className="relative pt-28 pb-32 overflow-hidden flex flex-col items-center text-center px-4">
+      <section className="relative pt-24 pb-32 overflow-hidden flex flex-col items-center text-center px-4">
         {/* Soft decorative background shapes */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
-          <div className="absolute -top-[20%] -right-[10%] w-[500px] h-[500px] rounded-full bg-indigo-100/60 blur-3xl mix-blend-multiply"></div>
-          <div className="absolute top-[20%] -left-[10%] w-[400px] h-[400px] rounded-full bg-purple-50/80 blur-3xl mix-blend-multiply"></div>
+          <div className="absolute -top-[20%] -right-[10%] w-[500px] h-[500px] rounded-full bg-cyan-100/40 blur-3xl mix-blend-multiply"></div>
+          <div className="absolute top-[20%] -left-[10%] w-[400px] h-[400px] rounded-full bg-amber-50/70 blur-3xl mix-blend-multiply"></div>
         </div>
 
-        <span className="text-xs tracking-[0.2em] uppercase text-slate-500 mb-6 font-medium">Eleva tus Intercambios</span>
+        {/* Isotipo 3D Hexagonal con Glow */}
+        <div className="mb-8 relative group">
+          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden shadow-2xl shadow-[#00E5FF]/20 border-2 border-slate-200/80 bg-white p-1 relative transform group-hover:scale-105 transition-all duration-300">
+            <Image
+              src="/images/truekeate-logo.jpg"
+              alt="TrueKeate Isotipo Oficial"
+              fill
+              priority
+              className="object-cover object-top scale-[1.75]"
+            />
+          </div>
+          <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-[#00E5FF]/20 to-amber-500/20 blur-lg -z-10 group-hover:opacity-100 transition-opacity"></div>
+        </div>
+
+        <span className="text-xs tracking-[0.2em] uppercase text-slate-500 mb-4 font-semibold">
+          El Universo del Intercambio Descentralizado
+        </span>
         
         <h1 className="text-5xl md:text-7xl font-serif text-slate-900 mb-8 max-w-4xl leading-tight">
           El arte del intercambio <br className="hidden md:block"/> 
@@ -173,9 +188,9 @@ export default function VelvetyLandingPage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-background py-16 border-t border-slate-200 text-center">
-        <h3 className="text-2xl font-serif text-slate-900 mb-4 italic">TrueKeate</h3>
-        <p className="text-slate-500 font-light text-sm">
+      <footer className="bg-white dark:bg-[#070D1E] py-16 border-t border-slate-200 text-center flex flex-col items-center justify-center">
+        <BrandLogo variant="full" className="mb-4" />
+        <p className="text-slate-500 font-light text-xs mt-2">
           &copy; {new Date().getFullYear()} Protocolo TrueKeate. El arte del intercambio y la confianza en Web3.
         </p>
       </footer>

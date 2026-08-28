@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { UserMenu } from '@/components/UserMenu'
+import { BrandLogo } from '@/components/BrandLogo'
 import { useEthereum } from '@/lib/ethereum'
 import { useEscrow, useRegistration } from '@/lib/hooks'
 
@@ -38,12 +39,8 @@ export function Header() {
     <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-slate-200">
       <div className="container mx-auto px-6 max-w-6xl">
         <div className="flex justify-between items-center h-20">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <span className="text-2xl font-serif font-semibold text-slate-900 tracking-tight italic">
-              TrueKeate.
-            </span>
-          </Link>
+          {/* Logo Oficial con Isotipo Hexagonal */}
+          <BrandLogo variant="full" priority />
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8">

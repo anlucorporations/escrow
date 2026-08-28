@@ -7,6 +7,7 @@ import { useEthereum } from '@/lib/ethereum'
 import { useRegistration } from '@/lib/hooks'
 import { getFriendlyError } from '@/lib/escrow'
 import { latLngToUtm, type UtmCoordinates } from '@/lib/utm'
+import { BrandLogo } from '@/components/BrandLogo'
 
 export default function RegisterPage() {
   const { isConnected, account, connect } = useEthereum()
@@ -132,10 +133,8 @@ export default function RegisterPage() {
   if (!isConnected) {
     return (
       <div className="min-h-screen bg-background pt-28 pb-20 flex flex-col items-center justify-center px-4">
-        <div className="max-w-xl w-full bg-white rounded-[2.5rem] border border-slate-200 p-8 sm:p-12 text-center shadow-2xl shadow-indigo-900/5">
-          <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-indigo-100">
-            <span className="text-3xl">🔑</span>
-          </div>
+        <div className="max-w-xl w-full bg-white rounded-[2.5rem] border border-slate-200 p-8 sm:p-12 text-center shadow-2xl shadow-indigo-900/5 flex flex-col items-center">
+          <BrandLogo variant="isotype" width={64} className="mb-6" />
 
           <span className="text-xs tracking-[0.2em] uppercase text-indigo-600 font-semibold block mb-2">
             Inscripción On-Chain
@@ -212,7 +211,8 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-background pt-28 pb-24">
       <div className="container mx-auto px-6 max-w-4xl">
         {/* ENCABEZADO */}
-        <div className="text-center max-w-2xl mx-auto mb-12">
+        <div className="text-center max-w-2xl mx-auto mb-12 flex flex-col items-center">
+          <BrandLogo variant="full" className="mb-6" />
           <span className="text-xs tracking-[0.2em] uppercase text-indigo-600 font-semibold block mb-2">
             Registro Oficial On-Chain
           </span>
