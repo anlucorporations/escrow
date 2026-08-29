@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
 import { EthereumProvider } from "@/lib/ethereum";
 import { RegisterProvider } from "@/components/RegisterModal";
@@ -13,19 +13,19 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "TrueKeate — Mercado Web3 & Trueke RWA",
-  description: "Intercambio seguro de tokens, bienes físicos y servicios entre pares",
+  title: "TrueKeat — Mercado Web3, Custodia Atómica & Trueke RWA",
+  description: "Intercambio seguro y descentralizado de tokens, bienes físicos RWA y servicios certificados entre pares",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "TrueKeate",
+    title: "TrueKeat",
   },
 };
 
@@ -35,7 +35,7 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true,
   viewportFit: "cover",
-  themeColor: "#FAF8F5",
+  themeColor: "#F8F9FA",
 };
 
 export default function RootLayout({
@@ -46,7 +46,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${inter.variable} ${playfair.variable} antialiased pb-20 md:pb-0 font-sans`}
+        className={`${inter.variable} ${montserrat.variable} bg-[#F8F9FA] text-[#1A2B4C] antialiased pb-20 md:pb-0 font-sans`}
       >
         <PwaRegister />
         <EthereumProvider>

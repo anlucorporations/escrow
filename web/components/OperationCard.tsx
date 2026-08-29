@@ -163,15 +163,15 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
       : 1
 
   return (
-    <div className="bg-white rounded-[2rem] border border-slate-200 shadow-md hover:shadow-2xl hover:shadow-cyan-500/10 transition-all duration-300 p-6 sm:p-8 space-y-6">
+    <div className="vault-card p-6 sm:p-8 space-y-6">
       {/* ENCABEZADO DE LA OPERACIÓN */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-100">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-[#0A1128] text-[#00E5FF] flex items-center justify-center font-bold text-sm shadow-xs">
+          <div className="w-10 h-10 rounded-2xl bg-[#1A2B4C] text-[#48CAE4] flex items-center justify-center font-extrabold text-sm shadow-xs font-heading">
             #{operation.id.toString()}
           </div>
           <div>
-            <h3 className="font-serif font-bold text-lg text-[#0A1128]">
+            <h3 className="font-heading font-bold text-lg text-[#1A2B4C]">
               Contrato de Trueque Bilateral
             </h3>
             <div className="flex items-center gap-2 text-xs text-slate-500">
@@ -188,16 +188,16 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
       </div>
 
       {/* SALA DE INTERCAMBIO BILATERAL (Smart Escrow 3-Column UI) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center bg-slate-50/80 rounded-2xl p-5 border border-slate-200/70">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center bg-slate-50/90 rounded-2xl p-5 border border-slate-200/70">
         {/* Lado Izquierdo: Tu Oferta / Token A */}
-        <div className="bg-white rounded-xl p-4 border border-slate-100 text-center space-y-1 shadow-xs">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+        <div className="bg-white rounded-2xl p-4 border border-slate-100 text-center space-y-1 shadow-xs">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block font-heading">
             {isCreator ? 'Tu Oferta en Custodia' : 'Ofrece el Creador'}
           </span>
-          <p className="font-serif font-extrabold text-xl text-[#0A1128]">
+          <p className="font-heading font-extrabold text-xl text-[#1A2B4C]">
             {formatUnits(operation.amountA, tokenA.info?.decimals ?? 18)}
           </p>
-          <p className="text-xs font-semibold text-cyan-600 font-mono">
+          <p className="text-xs font-bold text-[#2A9D8F] font-mono">
             {tokenA.info?.symbol ?? 'Token A'}
           </p>
           <span className="text-[10px] text-slate-400 font-mono block truncate">
@@ -205,33 +205,33 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
           </span>
         </div>
 
-        {/* Centro: Isotipo Orbital de TrueKeate */}
+        {/* Centro: Isotipo Orbital de TrueKeat */}
         <div className="flex flex-col items-center justify-center py-2 text-center">
-          <div className="relative w-14 h-14 rounded-2xl overflow-hidden shadow-lg shadow-[#00E5FF]/25 border-2 border-cyan-400/40 bg-white flex items-center justify-center group mb-2">
+          <div className="relative w-14 h-14 rounded-2xl overflow-hidden shadow-lg shadow-[#2A9D8F]/20 border-2 border-[#2A9D8F]/40 bg-white flex items-center justify-center group mb-2">
             <Image
               src="/images/truekeate-logo.jpg"
-              alt="TrueKeate Escrow"
+              alt="TrueKeat Escrow"
               fill
               className="object-cover object-top scale-[1.8] animate-spin-slow"
             />
           </div>
-          <span className="text-[11px] font-bold uppercase tracking-wider text-[#0A1128]">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[#1A2B4C] font-heading">
             Custodia Atómica
           </span>
-          <span className="text-[10px] text-slate-400 font-light">
+          <span className="text-[10px] text-slate-400 font-medium">
             Smart Escrow EIP-712
           </span>
         </div>
 
         {/* Lado Derecho: Lo que Recibes / Token B */}
-        <div className="bg-white rounded-xl p-4 border border-slate-100 text-center space-y-1 shadow-xs">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+        <div className="bg-white rounded-2xl p-4 border border-slate-100 text-center space-y-1 shadow-xs">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block font-heading">
             {isCreator ? 'Lo que Recibes a Cambio' : 'Tu Aporte Requerido'}
           </span>
-          <p className="font-serif font-extrabold text-xl text-[#0A1128]">
+          <p className="font-heading font-extrabold text-xl text-[#1A2B4C]">
             {formatUnits(operation.amountB, tokenB.info?.decimals ?? 18)}
           </p>
-          <p className="text-xs font-semibold text-amber-600 font-mono">
+          <p className="text-xs font-bold text-[#D4AF37] font-mono">
             {tokenB.info?.symbol ?? 'Token B'}
           </p>
           <span className="text-[10px] text-slate-400 font-mono block truncate">
@@ -242,32 +242,32 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
 
       {/* BARRA DE PROGRESO DE ESTADO (1. Creada -> 2. Aceptada -> 3. En Tránsito -> 4. Completada) */}
       <div className="space-y-2 pt-2">
-        <div className="flex justify-between text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-          <span className={currentStep >= 1 ? 'text-cyan-600 font-bold' : ''}>1. Creada</span>
-          <span className={currentStep >= 2 ? 'text-cyan-600 font-bold' : ''}>2. Aceptada</span>
-          <span className={currentStep >= 3 ? 'text-cyan-600 font-bold' : ''}>3. En Tránsito</span>
-          <span className={currentStep >= 4 ? 'text-emerald-600 font-bold' : ''}>4. Completada</span>
+        <div className="flex justify-between text-[11px] font-bold text-slate-500 uppercase tracking-wider font-heading">
+          <span className={currentStep >= 1 ? 'text-[#2A9D8F]' : ''}>1. Creada</span>
+          <span className={currentStep >= 2 ? 'text-[#2A9D8F]' : ''}>2. Aceptada</span>
+          <span className={currentStep >= 3 ? 'text-[#2A9D8F]' : ''}>3. En Tránsito</span>
+          <span className={currentStep >= 4 ? 'text-emerald-600' : ''}>4. Completada</span>
         </div>
-        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden flex">
+        <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden flex">
           <div
             className={`h-full transition-all duration-500 ${
               currentStep === 4
                 ? 'bg-emerald-500 w-full'
                 : currentStep === 3
-                ? 'bg-cyan-500 w-3/4'
+                ? 'bg-[#2A9D8F] w-3/4'
                 : currentStep === 2
-                ? 'bg-cyan-500 w-1/2'
-                : 'bg-cyan-500 w-1/4'
+                ? 'bg-[#2A9D8F] w-1/2'
+                : 'bg-[#2A9D8F] w-1/4'
             }`}
           ></div>
         </div>
       </div>
 
       {/* METADATOS Y PLAZOS */}
-      <div className="flex flex-wrap gap-4 text-xs text-slate-500 pt-2 border-t border-slate-100">
+      <div className="flex flex-wrap gap-4 text-xs text-slate-500 pt-2 border-t border-slate-100 font-medium">
         <span>Creada: {new Date(Number(operation.createdAt) * 1000).toLocaleString()}</span>
         {operation.deadline !== 0n && (
-          <span className={expired ? 'text-rose-500 font-bold' : ''}>
+          <span className={expired ? 'text-[#E63946] font-bold' : ''}>
             Vence: {new Date(Number(operation.deadline) * 1000).toLocaleString()}
           </span>
         )}
@@ -279,17 +279,17 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
       {/* PUNTOS DE ENCUENTRO PRESENCIAL */}
       {meetups.length > 0 && (
         <div className="pt-3 border-t border-slate-100 space-y-2">
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+          <p className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1 font-heading">
             <span>📍</span> Puntos de Encuentro Coordinados
           </p>
           <div className="space-y-2">
             {meetups.map((m) => (
               <div
                 key={m.id}
-                className="text-xs bg-slate-50 rounded-xl p-3 border border-slate-200/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3"
+                className="text-xs bg-slate-50 rounded-2xl p-3.5 border border-slate-200/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3"
               >
                 <div>
-                  <p className="font-semibold text-slate-800">
+                  <p className="font-bold text-[#1A2B4C]">
                     {new Date(Number(m.scheduled_at) * 1000).toLocaleString()}
                     {m.place_name ? ` — ${m.place_name}` : ''}
                   </p>
@@ -298,12 +298,12 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
                   </p>
                 </div>
                 <span
-                  className={`px-2.5 py-1 rounded-full font-bold text-[10px] uppercase tracking-wider ${
+                  className={`px-3 py-1 rounded-full font-bold text-[10px] uppercase tracking-wider ${
                     m.status === 'completed'
                       ? 'bg-emerald-100 text-emerald-800'
                       : m.status === 'blocked'
                       ? 'bg-rose-100 text-rose-800'
-                      : 'bg-cyan-100 text-cyan-800'
+                      : 'bg-teal-100 text-[#2A9D8F]'
                   }`}
                 >
                   {m.status === 'scheduled'
@@ -322,12 +322,12 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
 
       {/* FEEDBACK DE ESTADO */}
       {success && (
-        <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold text-center">
+        <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold text-center">
           {success}
         </div>
       )}
       {error && (
-        <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold text-center">
+        <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold text-center">
           Error: {error}
         </div>
       )}
@@ -338,7 +338,7 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
           <button
             onClick={handleAccept}
             disabled={loading}
-            className="w-full py-3.5 px-4 bg-gradient-to-r from-[#00E5FF] to-[#00B4D8] hover:from-[#00B4D8] hover:to-[#008BA3] text-[#0A1128] font-bold rounded-2xl text-xs uppercase tracking-wider transition-all duration-200 shadow-lg shadow-[#00E5FF]/20"
+            className="w-full btn-truekeat-primary py-3.5 px-4 text-xs uppercase tracking-wider"
           >
             🤝 Aceptar Operación (Acuerdo Bilateral)
           </button>
@@ -347,9 +347,9 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
         {canProposeMeetup && (
           <button
             onClick={() => setShowMeetup(true)}
-            className="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-2xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2"
+            className="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-[#1A2B4C] font-bold rounded-2xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2"
           >
-            <span>📍</span> Proponer Punto de Encuentro
+            <span>📍</span> Proponer Punto de Encuentro (≤ 10 km)
           </button>
         )}
 
@@ -358,14 +358,14 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
             <button
               onClick={handleComplete}
               disabled={loading}
-              className="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl text-xs uppercase tracking-wider transition shadow-md shadow-emerald-600/20"
+              className="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-full text-xs uppercase tracking-wider transition shadow-md shadow-emerald-600/20"
             >
               {loading ? 'Procesando...' : 'Completar Trueque'}
             </button>
             <button
               onClick={handleMetaComplete}
               disabled={loading}
-              className="w-full py-3.5 px-4 bg-[#0A1128] hover:bg-[#1C2541] text-[#00E5FF] font-bold rounded-2xl text-xs uppercase tracking-wider transition border border-cyan-400/30"
+              className="w-full btn-truekeat-primary py-3.5 px-4 text-xs uppercase tracking-wider"
             >
               ⚡ Firmar sin Gas (EIP-712)
             </button>
@@ -386,7 +386,7 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
           <button
             onClick={handleRefund}
             disabled={loading}
-            className="w-full py-3 px-4 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-2xl text-xs uppercase tracking-wider transition shadow-md"
+            className="w-full btn-gold-accent py-3.5 px-4 text-xs uppercase tracking-wider"
           >
             {loading ? 'Reclamando...' : 'Reclamar Fondos (Venció el Plazo)'}
           </button>
@@ -403,22 +403,22 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
         )}
 
         {canResolve && (
-          <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200 space-y-3">
-            <p className="text-xs font-bold text-amber-900 uppercase tracking-wider">
+          <div className="p-5 bg-amber-50 rounded-2xl border border-amber-200 space-y-3">
+            <p className="text-xs font-bold text-amber-900 uppercase tracking-wider font-heading">
               ⚖️ Panel de Árbitro — Resolver Disputa #{operation.id.toString()}
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <button
                 onClick={() => handleResolve(true)}
                 disabled={loading}
-                className="px-4 py-2.5 bg-emerald-600 text-white font-bold rounded-xl text-xs uppercase"
+                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs uppercase"
               >
                 A favor del Creador
               </button>
               <button
                 onClick={() => handleResolve(false)}
                 disabled={loading}
-                className="px-4 py-2.5 bg-[#0A1128] text-[#00E5FF] font-bold rounded-xl text-xs uppercase"
+                className="px-4 py-2.5 bg-[#1A2B4C] hover:bg-[#283B60] text-white font-bold rounded-xl text-xs uppercase"
               >
                 A favor de Contraparte
               </button>
@@ -429,9 +429,9 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
         {canRate && (
           <button
             onClick={() => setShowRate(true)}
-            className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-2xl text-xs uppercase tracking-wider transition shadow-md"
+            className="w-full btn-gold-accent py-3.5 px-4 text-xs uppercase tracking-wider"
           >
-            ⭐ Valorar Operación & Emitir Reputación
+            ⭐ Valorar Operación & Emitir Reputación (5D)
           </button>
         )}
       </div>

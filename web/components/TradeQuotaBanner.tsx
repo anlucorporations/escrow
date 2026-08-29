@@ -13,24 +13,24 @@ export function TradeQuotaBanner() {
 
   return (
     <div
-      className={`mb-6 p-4 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
+      className={`mb-6 p-4 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs ${
         isFull
-          ? 'bg-amber-500/10 border-amber-500/30 text-amber-900 dark:text-amber-200'
-          : 'bg-cream-50 dark:bg-card/40 border-primary/15 text-foreground'
+          ? 'bg-amber-50 border-[#D4AF37]/40 text-[#1A2B4C]'
+          : 'bg-white border-slate-200 text-[#1A2B4C]'
       }`}
     >
       <div className="flex items-center gap-3">
         <span className="text-2xl">{isFull ? '⏳' : '⚡'}</span>
         <div>
-          <div className="text-sm font-semibold flex items-center gap-2">
+          <div className="text-sm font-bold flex items-center gap-2 font-heading">
             <span>
               Capacidad de Truekes: {activeTrades} de {limit} simultáneo{limit > 1 ? 's' : ''}
             </span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-teal-50 text-[#2A9D8F] font-bold border border-[#2A9D8F]/30">
               Nivel: {levelName}
             </span>
           </div>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5">
             {isFull
               ? `Has alcanzado tu límite de ${limit} intercambio${limit > 1 ? 's' : ''} activo${limit > 1 ? 's' : ''}. Completa o cancela tu operación en curso para abrir una nueva.`
               : `Puedes tener hasta ${limit} intercambio${limit > 1 ? 's' : ''} activo${limit > 1 ? 's' : ''} al mismo tiempo.`}
@@ -42,7 +42,7 @@ export function TradeQuotaBanner() {
         {levelName === 'Inscrito' && (
           <Link
             href="/identity"
-            className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition shadow-sm"
+            className="btn-truekeat-primary px-4 py-2 text-xs uppercase tracking-wider font-heading"
           >
             Verificar 2FA (Hasta 3) →
           </Link>
@@ -50,7 +50,7 @@ export function TradeQuotaBanner() {
         {levelName === 'Verificado' && (
           <Link
             href="/identity"
-            className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition shadow-sm"
+            className="btn-gold-accent px-4 py-2 text-xs uppercase tracking-wider font-heading"
           >
             Obtener Certificado SBT (Ilimitados) →
           </Link>

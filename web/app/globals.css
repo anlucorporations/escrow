@@ -1,47 +1,41 @@
 @import "tailwindcss";
 
 :root {
-  --background: #F8F9FA; /* Snow White / Clean High-Tech */
-  --foreground: #0A1128; /* Deep Navy Primary Text */
+  --background: #F8F9FA; /* Smoke White / Clean High-Tech Canvas */
+  --foreground: #1A2B4C; /* Deep Navy Primary Text */
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading: var(--font-montserrat), var(--font-inter), sans-serif;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter), sans-serif;
-  --font-serif: var(--font-playfair), serif;
+  --font-sans: var(--font-sans);
+  --font-heading: var(--font-heading);
   
-  /* Paleta Oficial TrueKeate Web3 */
+  /* Paleta Oficial TrueKeate Design System 2.0 */
   --color-navy-950: #070D1E;
-  --color-navy-900: #0A1128; /* Azul Marino Profundo Principal */
-  --color-navy-800: #1C2541;
-  --color-navy-700: #2B3A67;
+  --color-navy-900: #0A1128; /* Midnight Navy */
+  --color-navy-800: #1A2B4C; /* Deep Navy Blue (Confianza & Base) */
+  --color-navy-700: #283B60;
   
-  --color-cyan-electric: #00E5FF; /* Turquesa Eléctrico de Acción */
-  --color-cyan-hover: #00B4D8;
-  --color-cyan-dim: rgba(0, 229, 255, 0.15);
+  --color-teal-500: #2A9D8F; /* Teal Energy (Acción & Éxito) */
+  --color-teal-600: #21867A;
+  --color-cyan-400: #48CAE4; /* Cyan Electric (Fluidez & Tech) */
+  --color-cyan-500: #00E5FF;
   
-  --color-gold-400: #FBBF24;
-  --color-gold-500: #F59E0B; /* Dorado de Prestigio y SBT */
-  --color-gold-600: #D97706;
+  --color-gold-400: #F3E5AB;
+  --color-gold-500: #D4AF37; /* Metallic Gold (Valor, Activos & SBT) */
+  --color-gold-600: #C5A065;
+  
+  --color-crimson-500: #E63946; /* Crimson Alert (Errores & Disputas) */
+  --color-coral-500: #F4A261; /* Coral Warning (Alertas de Plazo) */
 
   /* Compatibilidad y utilitarios */
-  --color-indigo-50: #F4F8FA;
-  --color-indigo-100: #E6F3F7;
-  --color-indigo-500: #00E5FF;
-  --color-indigo-600: #00B4D8;
-  --color-indigo-700: #0A1128;
-  
-  --color-purple-50: #FFFDF5;
-  --color-purple-500: #F59E0B;
-  --color-purple-600: #D97706;
-  
-  --color-fuchsia-500: #10B981; /* Emerald Success */
-  --color-fuchsia-600: #059669;
-
   --color-slate-50: #F8F9FA;
   --color-slate-100: #F1F5F9;
   --color-slate-200: #E2E8F0;
+  --color-slate-700: #334155;
   --color-slate-800: #1E293B;
   --color-slate-900: #0A1128;
 }
@@ -56,33 +50,188 @@ body {
   touch-action: manipulation;
 }
 
-/* Geometría Hexagonal (Blockchain Block Identity) */
+h1, h2, h3, .font-heading {
+  font-family: var(--font-heading);
+}
+
+/* ==========================================================================
+   BOTONES TRUEKEATE (PILL SHAPE & ACCENTS)
+   ========================================================================== */
+
+.btn-truekeat-primary {
+  background: linear-gradient(135deg, #1A2B4C 0%, #2A9D8F 100%);
+  border-radius: 9999px;
+  color: #FFFFFF;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  box-shadow: 0 4px 15px rgba(42, 157, 143, 0.35);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-truekeat-primary:hover {
+  box-shadow: 0 6px 20px rgba(42, 157, 143, 0.5);
+  transform: translateY(-1px);
+}
+.btn-truekeat-primary:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 10px rgba(42, 157, 143, 0.25);
+}
+
+.btn-gold-accent {
+  background: linear-gradient(135deg, #D4AF37 0%, #C5A065 100%);
+  border-radius: 9999px;
+  color: #1A2B4C;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.35);
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-gold-accent:hover {
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+  transform: translateY(-1px);
+}
+.btn-gold-accent:active {
+  transform: scale(0.96);
+}
+
+.btn-truekeat-secondary {
+  border: 2px solid #1A2B4C;
+  border-radius: 12px;
+  color: #1A2B4C;
+  background: transparent;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+.btn-truekeat-secondary:hover {
+  background: rgba(42, 157, 143, 0.08);
+  border-color: #2A9D8F;
+  color: #2A9D8F;
+}
+
+/* ==========================================================================
+   TARJETAS Y BÓVEDA DIGITAL (VAULT CARDS)
+   ========================================================================== */
+
+.vault-card {
+  background: #FFFFFF;
+  border-radius: 24px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 4px 20px rgba(26, 43, 76, 0.06);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+.vault-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 36px rgba(26, 43, 76, 0.12);
+}
+
+/* ==========================================================================
+   GEOMETRÍA Y AVATARES HEXAGONALES
+   ========================================================================== */
+
 .clip-hexagon {
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 }
 
-/* Efectos Glow Web3 */
-.glow-cyan {
-  box-shadow: 0 0 25px rgba(0, 229, 255, 0.35);
-}
-.glow-cyan-sm {
-  box-shadow: 0 0 12px rgba(0, 229, 255, 0.25);
-}
-.glow-gold {
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+.hexagon-badge {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 }
 
-/* Animación Orbital de Intercambio */
+/* ==========================================================================
+   ANIMACIONES Y MICROINTERACCIONES
+   ========================================================================== */
+
+/* Checkmark Drawing Animation */
+@keyframes checkDraw {
+  0% {
+    stroke-dashoffset: 50;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+.checkmark-anim {
+  stroke-dasharray: 50;
+  stroke-dashoffset: 0;
+  animation: checkDraw 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Dual Counter-Rotating Orbital Loader */
+@keyframes spinClockwise {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes spinCounterClockwise {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+.loader-outer {
+  animation: spinClockwise 2.5s linear infinite;
+}
+.loader-inner {
+  animation: spinCounterClockwise 1.8s linear infinite;
+}
+
+/* Error Shake */
+@keyframes shakeError {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+.input-shake {
+  animation: shakeError 0.4s ease-in-out;
+}
+
+/* Animación Orbital de Intercambio Lenta */
 @keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 .animate-spin-slow {
   animation: spin-slow 20s linear infinite;
+}
+
+/* ==========================================================================
+   FORMULARIOS Y ENTRADAS (TOUCH TARGETS 56px)
+   ========================================================================== */
+
+.input-truekeat {
+  width: 100%;
+  height: 52px;
+  padding: 0 16px 0 48px;
+  border: 2px solid #E2E8F0;
+  border-radius: 14px;
+  background: #FFFFFF;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  color: #1A2B4C;
+  transition: all 0.25s ease;
+  outline: none;
+}
+.input-truekeat:focus {
+  border-color: #2A9D8F;
+  box-shadow: 0 0 0 4px rgba(42, 157, 143, 0.12);
+  background: #F8FFFE;
+}
+.input-truekeat.error {
+  border-color: #E63946;
+  background: #FFF5F5;
+  animation: shakeError 0.4s ease-in-out;
+}
+.input-truekeat.success {
+  border-color: #D4AF37;
+  background: #FFFBF0;
 }
 
 /* Mobile-First Safe Areas */
@@ -101,7 +250,6 @@ input, select, textarea {
   font-size: 16px !important;
 }
 
-/* Área táctil mínima accesible para botones móviles */
 @media (max-width: 768px) {
   button, a {
     min-height: 40px;

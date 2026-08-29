@@ -50,7 +50,7 @@ export function CreateOperationModal({ isOpen, onClose }: CreateOperationModalPr
       const amountBUnits = parseUnits(amountB, infoB.info?.decimals ?? 18)
 
       if (metaTx) {
-        // M5: sin gas — el usuario solo firma (EIP-712 + permit); el relayer paga
+        // Sin gas: firma EIP-712 + permit
         if (!provider) throw new Error('Conecta tu billetera primero')
         const signer = await provider.getSigner()
         const req = await buildMetaCreate(signer, provider, {
@@ -81,7 +81,7 @@ export function CreateOperationModal({ isOpen, onClose }: CreateOperationModalPr
         setDeadlineDays('0')
         setSuccess(false)
         setTxHash('')
-        onClose() // el padre re-fetcha los datos (sin recargar la página)
+        onClose()
       }, 2000)
     } catch (err) {
       setError(getFriendlyError(err))
@@ -91,18 +91,23 @@ export function CreateOperationModal({ isOpen, onClose }: CreateOperationModalPr
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-[#1A2B4C]/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-md w-full max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="sticky top-0 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Crear operación
-          </h2>
+        <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-5 flex justify-between items-center z-10">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 hexagon-badge bg-gradient-to-tr from-[#1A2B4C] to-[#2A9D8F] flex items-center justify-center text-white text-xs font-bold">
+              ⇄
+            </div>
+            <h2 className="text-xl font-bold font-heading text-[#1A2B4C]">
+              Crear Operación Escrow
+            </h2>
+          </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition"
+            className="p-2 hover:bg-slate-100 text-slate-500 rounded-full transition"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -112,74 +117,69 @@ export function CreateOperationModal({ isOpen, onClose }: CreateOperationModalPr
         <div className="p-6">
           {!isConnected ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400">
-                Conecta tu wallet primero
+              <p className="text-slate-500 text-sm">
+                Conecta tu wallet primero para aperturar custodia.
               </p>
             </div>
           ) : (
-            <form onSubmit={handleCreate} className="space-y-5">
+            <form onSubmit={handleCreate} className="space-y-4">
               {/* Tipo de operación */}
               <div>
-                <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
-                  Tipo de operación
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2 font-heading">
+                  Tipo de Operación
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setKind('SWAP')}
-                    className={`px-4 py-2 rounded-lg border text-sm font-semibold transition ${
+                    className={`px-4 py-2.5 rounded-xl border text-xs font-bold uppercase tracking-wider transition ${
                       kind === 'SWAP'
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'border-gray-300 dark:border-zinc-600 text-gray-700 dark:text-gray-300'
+                        ? 'bg-[#1A2B4C] text-white border-[#1A2B4C] shadow-xs'
+                        : 'border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                   >
-                    SWAP (intercambio)
+                    SWAP (Intercambio)
                   </button>
                   <button
                     type="button"
                     onClick={() => setKind('PAGO')}
-                    className={`px-4 py-2 rounded-lg border text-sm font-semibold transition ${
+                    className={`px-4 py-2.5 rounded-xl border text-xs font-bold uppercase tracking-wider transition ${
                       kind === 'PAGO'
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'border-gray-300 dark:border-zinc-600 text-gray-700 dark:text-gray-300'
+                        ? 'bg-[#1A2B4C] text-white border-[#1A2B4C] shadow-xs'
+                        : 'border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                   >
-                    PAGO con garantía
+                    PAGO con Garantía
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  {kind === 'SWAP'
-                    ? 'Intercambio directo tokenA ↔ tokenB.'
-                    : 'tokenA = pago (ej. USDT), tokenB = recibo de entrega. Ideal con deadline y arbitraje.'}
-                </p>
               </div>
 
-              {/* M5: meta-transacción sin gas */}
-              <div className="p-3 bg-gray-50 dark:bg-zinc-800 rounded-lg">
+              {/* Meta-transacción sin gas */}
+              <div className="p-3.5 bg-teal-50/70 border border-[#2A9D8F]/30 rounded-2xl">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={metaTx}
                     onChange={(e) => setMetaTx(e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="w-4 h-4 rounded border-slate-300 text-[#2A9D8F] focus:ring-[#2A9D8F]"
                   />
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                    ⚡ Sin gas (meta-transacción)
+                  <span className="text-xs font-bold text-[#1A2B4C] font-heading">
+                    ⚡ Sin gas (Meta-transacción EIP-712)
                   </span>
                 </label>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Solo firmas (EIP-712 + permit); el relayer paga el gas por ti.
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Solo firmas con tu wallet; el relayer cubre las tarifas de red por ti.
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5 font-heading">
                   Token A (lo que depositas)
                 </label>
                 <select
                   value={tokenA}
                   onChange={(e) => setTokenA(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg dark:bg-zinc-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full h-12 px-4 border-2 border-slate-200 rounded-xl text-sm text-[#1A2B4C] focus:border-[#2A9D8F] focus:bg-[#F8FFFE] outline-none transition"
                   required
                 >
                   <option value="">Selecciona token...</option>
@@ -192,7 +192,7 @@ export function CreateOperationModal({ isOpen, onClose }: CreateOperationModalPr
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5 font-heading">
                   Cantidad A ({infoA.info?.symbol ?? 'token'})
                 </label>
                 <input
@@ -202,19 +202,19 @@ export function CreateOperationModal({ isOpen, onClose }: CreateOperationModalPr
                   value={amountA}
                   onChange={(e) => setAmountA(e.target.value)}
                   placeholder="0.0"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg dark:bg-zinc-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full h-12 px-4 border-2 border-slate-200 rounded-xl text-sm text-[#1A2B4C] focus:border-[#2A9D8F] focus:bg-[#F8FFFE] outline-none transition"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5 font-heading">
                   Token B (lo que recibes)
                 </label>
                 <select
                   value={tokenB}
                   onChange={(e) => setTokenB(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg dark:bg-zinc-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full h-12 px-4 border-2 border-slate-200 rounded-xl text-sm text-[#1A2B4C] focus:border-[#2A9D8F] focus:bg-[#F8FFFE] outline-none transition"
                   required
                 >
                   <option value="">Selecciona token...</option>
@@ -227,7 +227,7 @@ export function CreateOperationModal({ isOpen, onClose }: CreateOperationModalPr
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5 font-heading">
                   Cantidad B ({infoB.info?.symbol ?? 'token'})
                 </label>
                 <input
@@ -237,14 +237,14 @@ export function CreateOperationModal({ isOpen, onClose }: CreateOperationModalPr
                   value={amountB}
                   onChange={(e) => setAmountB(e.target.value)}
                   placeholder="0.0"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg dark:bg-zinc-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full h-12 px-4 border-2 border-slate-200 rounded-xl text-sm text-[#1A2B4C] focus:border-[#2A9D8F] focus:bg-[#F8FFFE] outline-none transition"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
-                  Plazo (deadline, en días) — 0 = sin expiración
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5 font-heading">
+                  Plazo (días) — 0 = sin expiración
                 </label>
                 <input
                   type="number"
@@ -252,35 +252,35 @@ export function CreateOperationModal({ isOpen, onClose }: CreateOperationModalPr
                   min="0"
                   value={deadlineDays}
                   onChange={(e) => setDeadlineDays(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg dark:bg-zinc-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full h-12 px-4 border-2 border-slate-200 rounded-xl text-sm text-[#1A2B4C] focus:border-[#2A9D8F] focus:bg-[#F8FFFE] outline-none transition"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-400 font-semibold transition-all duration-200"
+                className="w-full btn-truekeat-primary py-3.5 px-4 text-xs uppercase tracking-wider mt-2"
               >
                 {loading
                   ? metaTx
                     ? 'Firmando y enviando al relayer...'
-                    : 'Creando (approve + tx)...'
+                    : 'Creando custodia...'
                   : metaTx
-                    ? '⚡ Crear sin gas'
-                    : 'Crear operación'}
+                    ? '⚡ Crear sin Gas (EIP-712)'
+                    : 'Aperturar Custodia Escrow'}
               </button>
 
               {success && (
-                <div className="p-3 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-lg text-sm">
+                <div className="p-3.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-2xl text-xs font-bold text-center">
                   Operación creada correctamente.
                   {txHash && (
-                    <span className="block font-mono text-xs mt-1 break-all">tx: {txHash}</span>
+                    <span className="block font-mono text-[10px] mt-1 break-all">tx: {txHash}</span>
                   )}
                 </div>
               )}
 
               {error && (
-                <div className="p-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg text-sm">
+                <div className="p-3.5 bg-rose-50 text-rose-800 border border-rose-200 rounded-2xl text-xs font-bold text-center">
                   Error: {error}
                 </div>
               )}

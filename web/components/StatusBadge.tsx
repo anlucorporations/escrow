@@ -9,13 +9,20 @@ interface StatusBadgeProps {
 
 const STYLES: Record<OperationStatus, string> = {
   [OperationStatus.Active]:
-    'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200',
+    'bg-teal-50 text-[#2A9D8F] border border-[#2A9D8F]/30',
   [OperationStatus.Completed]:
-    'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200',
+    'bg-emerald-50 text-emerald-700 border border-emerald-500/30',
   [OperationStatus.Cancelled]:
-    'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-200',
+    'bg-slate-100 text-slate-600 border border-slate-200',
   [OperationStatus.Disputed]:
-    'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200',
+    'bg-amber-50 text-amber-800 border border-amber-500/30',
+}
+
+const ICONS: Record<OperationStatus, string> = {
+  [OperationStatus.Active]: '●',
+  [OperationStatus.Completed]: '✓',
+  [OperationStatus.Cancelled]: '✕',
+  [OperationStatus.Disputed]: '⚖',
 }
 
 const LABELS: Record<OperationStatus, string> = {
@@ -28,16 +35,18 @@ const LABELS: Record<OperationStatus, string> = {
 export function StatusBadge({ status, expired = false }: StatusBadgeProps) {
   if (expired) {
     return (
-      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200">
-        Vencida
+      <span className="px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-[#E63946] border border-[#E63946]/30 inline-flex items-center gap-1">
+        <span>⏱</span>
+        <span>Vencida</span>
       </span>
     )
   }
   return (
     <span
-      className={`px-3 py-1 rounded-full text-xs font-semibold ${STYLES[status] ?? STYLES[OperationStatus.Active]}`}
+      className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide inline-flex items-center gap-1 ${STYLES[status] ?? STYLES[OperationStatus.Active]}`}
     >
-      {LABELS[status] ?? 'Desconocida'}
+      <span>{ICONS[status] ?? '●'}</span>
+      <span>{LABELS[status] ?? 'Desconocida'}</span>
     </span>
   )
 }

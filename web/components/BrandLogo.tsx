@@ -13,7 +13,7 @@ interface BrandLogoProps {
 }
 
 /**
- * Logotipo e Isotipo Oficial de TrueKeate.
+ * Logotipo e Isotipo Oficial de TrueKeat.
  * Basado en la identidad visual de hexágono tridimensional con flechas de trueque orbitales.
  */
 export function BrandLogo({
@@ -28,10 +28,10 @@ export function BrandLogo({
     const isize = width || 40
     return href ? (
       <Link href={href} className={`inline-flex items-center group ${className}`}>
-        <div className="relative overflow-hidden rounded-xl" style={{ width: isize, height: isize }}>
+        <div className="relative overflow-hidden rounded-xl border border-slate-200/60 shadow-xs" style={{ width: isize, height: isize }}>
           <Image
             src="/images/truekeate-logo.jpg"
-            alt="TrueKeate Isotipo"
+            alt="TrueKeat Isotipo"
             fill
             sizes={`${isize}px`}
             priority={priority}
@@ -40,10 +40,10 @@ export function BrandLogo({
         </div>
       </Link>
     ) : (
-      <div className={`relative overflow-hidden rounded-xl inline-block ${className}`} style={{ width: isize, height: isize }}>
+      <div className={`relative overflow-hidden rounded-xl inline-block border border-slate-200/60 shadow-xs ${className}`} style={{ width: isize, height: isize }}>
         <Image
           src="/images/truekeate-logo.jpg"
-          alt="TrueKeate Isotipo"
+          alt="TrueKeat Isotipo"
           fill
           sizes={`${isize}px`}
           priority={priority}
@@ -54,14 +54,13 @@ export function BrandLogo({
   }
 
   // Logotipo horizontal / completo
-
   const content = (
     <div className={`relative flex items-center gap-2.5 ${className}`}>
       {/* Isotipo gráfico */}
-      <div className="relative w-10 h-10 overflow-hidden rounded-xl flex-shrink-0 shadow-sm shadow-[#00E5FF]/20 border border-slate-200/50">
+      <div className="relative w-10 h-10 overflow-hidden rounded-xl flex-shrink-0 shadow-sm border border-slate-200/80 bg-white">
         <Image
           src="/images/truekeate-logo.jpg"
-          alt="TrueKeate Isotipo"
+          alt="TrueKeat Isotipo"
           fill
           sizes="40px"
           priority={priority}
@@ -71,13 +70,13 @@ export function BrandLogo({
 
       {/* Tipografía de Marca */}
       <div className="flex flex-col justify-center leading-none">
-        <div className="flex items-center tracking-tight font-extrabold text-xl text-[#0A1128] dark:text-white">
+        <div className="flex items-center tracking-tight font-extrabold text-xl text-[#1A2B4C] font-heading">
           <span>TrueKeat</span>
-          <span className="text-[#00E5FF] ml-0.5">☑</span>
+          <span className="text-[#2A9D8F] ml-0.5 font-black">☑</span>
         </div>
         {variant === 'full' && (
-          <span className="text-[7.5px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold mt-0.5">
-            Productos · Servicios · Cripto
+          <span className="text-[8px] uppercase tracking-wider text-slate-500 font-bold mt-0.5">
+            Productos · Servicios · RWA
           </span>
         )}
       </div>
