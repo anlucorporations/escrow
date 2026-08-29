@@ -30,6 +30,7 @@ describe('RegisterPage (/register)', () => {
       isRegistered: false,
       username: null,
       loading: false,
+      error: null,
       register: mockRegister,
       refresh: vi.fn().mockResolvedValue(undefined),
     })
@@ -91,6 +92,7 @@ describe('RegisterPage (/register)', () => {
       isRegistered: true,
       username: 'usuario_activo',
       loading: false,
+      error: null,
       register: mockRegister,
       refresh: vi.fn().mockResolvedValue(undefined),
     })

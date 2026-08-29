@@ -1,4 +1,4 @@
-# deploy-local.ps1 — Despliegue local con matriz de roles completa (PowerShell)
+﻿# deploy-local.ps1 — Despliegue local con matriz de roles completa (PowerShell)
 param (
     [string]$RpcUrl = "http://127.0.0.1:8545"
 )
@@ -127,9 +127,9 @@ foreach ($t in @($TKA, $TKB, $USDT, $DELIVERY)) {
 cast send --rpc-url $RpcUrl --private-key $OwnerKey $Escrow "setArbiter(address)" $OwnerAddr | Out-Null
 cast send --rpc-url $RpcUrl --private-key $OwnerKey $Escrow "setUserRegistry(address)" $Registry | Out-Null
 cast send --rpc-url $RpcUrl --private-key $OwnerKey $Governance "setTreasury(address)" $OwnerAddr | Out-Null
-cast send --rpc-url $RpcUrl --private-key $OwnerKey $Governance "setSocio(address,bool)" $OwnerAddr $true | Out-Null
+cast send --rpc-url $RpcUrl --private-key $OwnerKey $Governance "setSocio(address,bool)" $OwnerAddr "true" | Out-Null
 try {
-    cast send --rpc-url $RpcUrl --private-key $OwnerKey $Registry "register(string,string,string,string,int32,int32,uint8,bool)" "superadmin" "superadmin@truekeate.com" "+584120000000" "Sede Central TrueKeate, Barlovento, Miranda" 729000 1159000 19 $true | Out-Null
+    cast send --rpc-url $RpcUrl --private-key $OwnerKey $Registry "register(string,string,string,string,int32,int32,uint8,bool)" "superadmin" "superadmin@truekeate.com" "+584120000000" "Sede Central TrueKeate, Barlovento, Miranda" 729000 1159000 19 "true" | Out-Null
 } catch {}
 cast send --rpc-url $RpcUrl --private-key $OwnerKey $Registry "setUserIdentificationLevel(address,uint8)" $OwnerAddr 2 | Out-Null
 cast send --rpc-url $RpcUrl --private-key $OwnerKey $TruekeSBT "mint(address,string)" $OwnerAddr "Certificacion Fundador & Socio TrueKeate" | Out-Null
@@ -149,8 +149,8 @@ Write-Host "✓ 1000 TKA + 1000 TKB + 5000 USDT + 5 DELIVERY + 10000 BRLT asigna
 # 6. Configurar Cuentas 1 y 2: Usuarios Socios Certificados
 Write-Host "`n⚖️ [Paso 5/7] Configurando 2 Usuarios Socios Certificados (Cuentas 1 y 2)..." -ForegroundColor Yellow
 $socData = @(
-    @("socio_juez_alpha", "juez.alpha@truekeate.com", "+584126667788", "Tribunal Comunitario Alpha, Barlovento", 729800, 1160100, 19, $true),
-    @("socio_juez_beta", "juez.beta@truekeate.com", "+584127778899", "Tribunal Comunitario Beta, Caucagua", 725100, 1152000, 19, $true)
+    @("socio_juez_alpha", "juez.alpha@truekeate.com", "+584126667788", "Tribunal Comunitario Alpha, Barlovento", 729800, 1160100, 19, "true"),
+    @("socio_juez_beta", "juez.beta@truekeate.com", "+584127778899", "Tribunal Comunitario Beta, Caucagua", 725100, 1152000, 19, "true")
 )
 for ($i = 1; $i -le 2; $i++) {
     $a = $Addrs[$i]
@@ -159,7 +159,7 @@ for ($i = 1; $i -le 2; $i++) {
     try {
         cast send --rpc-url $RpcUrl --private-key $k $Registry "register(string,string,string,string,int32,int32,uint8,bool)" $d[0] $d[1] $d[2] $d[3] $d[4] $d[5] $d[6] $d[7] | Out-Null
     } catch {}
-    cast send --rpc-url $RpcUrl --private-key $OwnerKey $Governance "setSocio(address,bool)" $a $true | Out-Null
+    cast send --rpc-url $RpcUrl --private-key $OwnerKey $Governance "setSocio(address,bool)" $a "true" | Out-Null
     cast send --rpc-url $RpcUrl --private-key $OwnerKey $Registry "setUserIdentificationLevel(address,uint8)" $a 2 | Out-Null
     cast send --rpc-url $RpcUrl --private-key $OwnerKey $TruekeSBT "mint(address,string)" $a "Certificacion Socio Comunitario" | Out-Null
     Write-Host "  ✓ Cuenta $i ($a) -> @$($d[0]) (Socio: TRUE, Certificado N3 SBT: TRUE)" -ForegroundColor Green
@@ -168,8 +168,8 @@ for ($i = 1; $i -le 2; $i++) {
 # 7. Configurar Cuentas 3 y 4: Usuarios Empresa Certificados
 Write-Host "`n🏬 [Paso 6/7] Configurando 2 Usuarios Empresa Certificados (Cuentas 3 y 4)..." -ForegroundColor Yellow
 $comData = @(
-    @("empresa_tech", "tech@barloventas.com", "+584124445566", "Centro Comercial Barlovento Local 14", 728900, 1158500, 19, $true),
-    @("empresa_agro", "agro@barloventas.com", "+584125556677", "Av. Comercio Local 3, Tacarigua", 727500, 1156200, 19, $true)
+    @("empresa_tech", "tech@barloventas.com", "+584124445566", "Centro Comercial Barlovento Local 14", 728900, 1158500, 19, "true"),
+    @("empresa_agro", "agro@barloventas.com", "+584125556677", "Av. Comercio Local 3, Tacarigua", 727500, 1156200, 19, "true")
 )
 for ($i = 3; $i -le 4; $i++) {
     $a = $Addrs[$i]
@@ -178,7 +178,7 @@ for ($i = 3; $i -le 4; $i++) {
     try {
         cast send --rpc-url $RpcUrl --private-key $k $Registry "register(string,string,string,string,int32,int32,uint8,bool)" $d[0] $d[1] $d[2] $d[3] $d[4] $d[5] $d[6] $d[7] | Out-Null
     } catch {}
-    cast send --rpc-url $RpcUrl --private-key $OwnerKey $Subscription "setBusiness(address,bool)" $a $true | Out-Null
+    cast send --rpc-url $RpcUrl --private-key $OwnerKey $Subscription "setBusiness(address,bool)" $a "true" | Out-Null
     cast send --rpc-url $RpcUrl --private-key $k $BRLT "approve(address,uint256)" $Subscription 1200000000000000000000 | Out-Null
     cast send --rpc-url $RpcUrl --private-key $k $Subscription "subscribe(uint256)" 12 | Out-Null
     cast send --rpc-url $RpcUrl --private-key $OwnerKey $Registry "setUserIdentificationLevel(address,uint8)" $a 2 | Out-Null
@@ -189,8 +189,8 @@ for ($i = 3; $i -le 4; $i++) {
 # 8. Configurar Cuentas 5 y 6: Usuarios Particulares Verificados
 Write-Host "`n👤 [Paso 7/7] Configurando 2 Usuarios Particulares Verificados (Cuentas 5 y 6)..." -ForegroundColor Yellow
 $partData = @(
-    @("particular_carlos", "carlos@truekeate.com", "+584121112233", "Av. Principal 1, Higuerote", 729450, 1159800, 19, $true),
-    @("particular_diana", "diana@truekeate.com", "+584122223344", "Calle Marina 12, Carenero", 731200, 1162400, 19, $true)
+    @("particular_carlos", "carlos@truekeate.com", "+584121112233", "Av. Principal 1, Higuerote", 729450, 1159800, 19, "true"),
+    @("particular_diana", "diana@truekeate.com", "+584122223344", "Calle Marina 12, Carenero", 731200, 1162400, 19, "true")
 )
 for ($i = 5; $i -le 6; $i++) {
     $a = $Addrs[$i]

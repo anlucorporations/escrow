@@ -35,6 +35,7 @@ describe('AccessGate & IdentityStatusBanner — Control de Acceso Web3', () => {
       isRegistered: false,
       username: null,
       loading: false,
+      error: null,
       refresh: vi.fn(),
       register: vi.fn(),
     })
@@ -63,6 +64,7 @@ describe('AccessGate & IdentityStatusBanner — Control de Acceso Web3', () => {
       isRegistered: false,
       username: null,
       loading: false,
+      error: null,
       refresh: vi.fn(),
       register: vi.fn(),
     })
@@ -91,6 +93,7 @@ describe('AccessGate & IdentityStatusBanner — Control de Acceso Web3', () => {
       isRegistered: true,
       username: 'usuario_demo',
       loading: false,
+      error: null,
       refresh: vi.fn(),
       register: vi.fn(),
     })
@@ -117,6 +120,7 @@ describe('AccessGate & IdentityStatusBanner — Control de Acceso Web3', () => {
       isRegistered: true,
       username: 'particular_alice',
       loading: false,
+      error: null,
       refresh: vi.fn(),
       register: vi.fn(),
     })

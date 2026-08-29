@@ -193,12 +193,12 @@ export function UserMenu() {
         </div>
 
         {/* Nombre / Identificador */}
-        <div className="text-left hidden sm:block">
+        <div className="text-left">
           <p className="text-xs font-bold text-[#0A1128] leading-tight flex items-center gap-1">
             <span>{regLoading ? 'Cargando...' : isRegistered && username ? `@${username}` : short}</span>
             {isRegistered && <span className="text-[#00E5FF] text-[10px]">☑</span>}
           </p>
-          <p className="text-[10px] text-slate-400 font-medium">
+          <p className="text-[10px] text-slate-400 font-medium hidden sm:block">
             {level >= 3 ? 'N3 · Certificado' : level === 2 ? 'N2 · Verificado' : isRegistered ? 'N1 · Inscrito' : 'Sin Registrar'}
           </p>
         </div>

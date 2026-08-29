@@ -11,6 +11,20 @@ The easiest way to get started:
 ./start.sh
 ```
 
+**Windows / PowerShell — servicios en ventanas separadas (monitoreo completo):**
+
+```powershell
+.\start-services.ps1              # Abre una ventana por servicio:
+                                  #   🟦 ANVIL      -> blockchain local
+                                  #   🟨 DESPLIEGUE -> contratos + matriz de roles
+                                  #   🟪 INDEXADOR  -> eventos on-chain -> PostgreSQL
+                                  #   🟩 WEB        -> http://localhost:3000
+.\start-services.ps1 -ForceDeploy   # Redesplegar contratos aunque Anvil ya corra
+.\start-services.ps1 -SkipDeploy    # Solo levantar servicios
+.\stop-services.ps1                 # Detener web + anvil + indexador
+.\stop-services.ps1 -IncludePostgres  # Además detiene PostgreSQL (requiere admin)
+```
+
 This script will:
 - Check if Anvil is running (starts it if not)
 - Deploy all contracts (Escrow + 2 mock tokens)

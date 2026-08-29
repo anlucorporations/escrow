@@ -55,6 +55,7 @@ describe('UserMenu — Menú Desplegable de Usuario y Balance', () => {
       isRegistered: false,
       username: null,
       loading: false,
+      error: null,
       refresh: vi.fn(),
       register: vi.fn(),
     })
@@ -81,6 +82,7 @@ describe('UserMenu — Menú Desplegable de Usuario y Balance', () => {
       isRegistered: true,
       username: 'particular_alice',
       loading: false,
+      error: null,
       refresh: vi.fn(),
       register: vi.fn(),
     })

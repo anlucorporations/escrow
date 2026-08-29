@@ -15,7 +15,53 @@ import { useRegistration } from '@/lib/hooks'
  */
 export function AccessGate({ children }: { children: ReactNode }) {
   const { isConnected, connect } = useEthereum()
-  const { isRegistered, loading } = useRegistration()
+  const { isRegistered, loading, error, refresh } = useRegistration()
+
+  // 0. Estado: No se pudo verificar la billetera (red/contratos no accesibles).
+  //    Se muestra el motivo real en lugar del formulario de inscripción (evita el bucle).
+  if (error && isConnected) {
+    return (
+      <div className="min-h-[80vh] bg-background flex flex-col items-center justify-center px-4 py-12">
+        <div className="max-w-xl w-full bg-white rounded-[2.5rem] border border-rose-200 p-8 sm:p-12 text-center shadow-2xl shadow-rose-900/5">
+          <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-rose-100">
+            <svg className="w-10 h-10 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+              />
+            </svg>
+          </div>
+
+          <span className="text-xs tracking-[0.2em] uppercase text-rose-600 font-semibold block mb-2">
+            Verificación de Billetera
+          </span>
+          <h1 className="text-3xl sm:text-4xl font-serif text-slate-900 mb-4 leading-tight">
+            No se pudo verificar la billetera
+          </h1>
+          <p className="text-slate-500 font-light mb-8 leading-relaxed text-sm sm:text-base">
+            {error}
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={() => refresh()}
+              className="w-full sm:w-auto px-8 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-full text-xs font-semibold tracking-wide uppercase transition-all shadow-lg shadow-slate-900/10"
+            >
+              Reintentar Verificación
+            </button>
+            <Link
+              href="/"
+              className="w-full sm:w-auto px-8 py-4 bg-transparent border border-slate-200 hover:border-slate-400 text-slate-700 rounded-full text-xs font-semibold tracking-wide uppercase transition-all text-center"
+            >
+              Volver al Inicio
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // 1. Estado: Sin billetera conectada
   if (!isConnected) {

@@ -362,6 +362,8 @@ export interface RegistrationState {
   isRegistered: boolean
   username: string | null
   loading: boolean
+  /** Error de verificación on-chain (red/contratos no accesibles). null = verificación OK. */
+  error: string | null
   /** Inscribe la billetera conectada y re-verifica on-chain con 4 datos únicos y coordenadas UTM. */
   register: (params: RegisterParams | string) => Promise<void>
   refresh: () => Promise<void>
@@ -370,18 +372,25 @@ export interface RegistrationState {
 /**
  * Hook de inscripción on-chain (UserRegistry): la fuente de verdad es el
  * contrato; tras cada transacción se re-verifica registered(address).
+ *
+ * IMPORTANTE: los fallos de red NO se confunden con "no inscrito". Si ninguna
+ * capa (billetera → RPC directo → API off-chain) puede verificar el estado, se
+ * expone `error` para que la UI avise (p. ej. Anvil reiniciado sin redesplegar),
+ * en lugar de pedir la inscripción en bucle.
  */
 export function useRegistration(): RegistrationState {
   const { provider, account, isConnected } = useEthereum()
   const [isRegistered, setIsRegistered] = useState(false)
   const [username, setUsername] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
     if (!account) {
       setIsRegistered(false)
       setUsername(null)
       setLoading(false)
+      setError(null)
       return
     }
     setLoading(true)
@@ -389,60 +398,75 @@ export function useRegistration(): RegistrationState {
       const normalized = ethers.getAddress(account)
       let isReg = false
       let uname: string | null = null
+      let lastError: unknown = null
 
-      // 1. Intentar con provider de la billetera conectada
+      // 1. Provider de la billetera conectada (red seleccionada en MetaMask)
       if (provider) {
         try {
           const c = new ethers.Contract(USER_REGISTRY_ADDRESS, USER_REGISTRY_ABI, provider)
           const [registered, profile] = await Promise.all([
-            c.isRegistered(normalized).catch(() => false),
+            c.isRegistered(normalized),
             c.getUserProfile(normalized).catch(() => null),
           ])
-          isReg = Boolean(registered || profile?.isRegistered || profile?.[10])
-          uname = profile?.username || profile?.[1] || null
-        } catch {
-          // fallback a RPC directo
+          isReg = Boolean(registered || profile?.isRegistered)
+          uname = profile?.username || null
+        } catch (err) {
+          lastError = err
         }
       }
 
       // 2. Fallback a RPC directo si la billetera no respondió
-      if (!isReg) {
+      if (!provider || lastError) {
         try {
           const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || 'http://127.0.0.1:8545'
           const fallbackProvider = new ethers.JsonRpcProvider(rpcUrl)
           const fallbackContract = new ethers.Contract(USER_REGISTRY_ADDRESS, USER_REGISTRY_ABI, fallbackProvider)
           const [registered, profile] = await Promise.all([
-            fallbackContract.isRegistered(normalized).catch(() => false),
+            fallbackContract.isRegistered(normalized),
             fallbackContract.getUserProfile(normalized).catch(() => null),
           ])
-          isReg = Boolean(registered || profile?.isRegistered || profile?.[10])
-          uname = profile?.username || profile?.[1] || null
-        } catch {
-          // fallback a BD off-chain
+          isReg = Boolean(registered || profile?.isRegistered)
+          uname = profile?.username || null
+        } catch (err) {
+          lastError = err
         }
       }
 
-      // 3. Fallback a API off-chain
+      // 3. Fallback a la capa de datos off-chain (último recurso)
       if (!isReg) {
         try {
           const res = await fetch(`/api/identity/${normalized}`)
           if (res.ok) {
             const data = await res.json()
-            if (data?.user?.is_registered || data?.user?.username) {
+            const profile = data?.profile
+            if (profile?.isRegistered && profile?.username) {
               isReg = true
-              uname = data.user.username || null
+              uname = profile.username
             }
           }
-        } catch {
-          // ignore
+        } catch (err) {
+          lastError = err
         }
+      }
+
+      // Distinguir "no inscrito" (verificación OK) de "no se pudo verificar" (entorno roto)
+      if (lastError && !isReg) {
+        setError(
+          'No se pudo verificar tu billetera en la blockchain. Revisa que Anvil esté corriendo con los contratos desplegados (.\setup.sh o .\start-services.ps1) y que MetaMask esté en la red local Anvil (Chain ID 31337).'
+        )
+      } else {
+        setError(null)
       }
 
       setIsRegistered(isReg)
       setUsername(isReg ? uname : null)
-    } catch {
+    } catch (err) {
+      console.error('Error verificando inscripción on-chain:', err)
       setIsRegistered(false)
       setUsername(null)
+      setError(
+        'No se pudo verificar tu billetera en la blockchain. Revisa que Anvil esté corriendo con los contratos desplegados (.\setup.sh o .\start-services.ps1) y que MetaMask esté en la red local Anvil (Chain ID 31337).'
+      )
     } finally {
       setLoading(false)
     }
@@ -455,6 +479,7 @@ export function useRegistration(): RegistrationState {
       setIsRegistered(false)
       setUsername(null)
       setLoading(false)
+      setError(null)
     }
 
     // Escuchar evento global de registro para sincronizar otros componentes
@@ -516,10 +541,48 @@ export function useRegistration(): RegistrationState {
 
       const signer = await provider.getSigner()
       const c = new ethers.Contract(USER_REGISTRY_ADDRESS, USER_REGISTRY_ABI, signer)
-      
+
+      // Guardia: el contrato debe existir en la red conectada. Si Anvil se
+      // reinició sin redesplegar, la transacción "tendría éxito" sin efecto
+      // (llamada a una dirección sin código) y el bucle de inscripción
+      // seguiría para siempre. Aquí se corta con un mensaje claro.
+      const registryCode = await provider.getCode(USER_REGISTRY_ADDRESS).catch(() => '0x')
+      if (!registryCode || registryCode === '0x') {
+        // ¿El contrato existe en el RPC directo (anvil local)? Si sí, el
+        // problema es la red seleccionada en la billetera, no el despliegue.
+        let rpcHasCode = false
+        try {
+          const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || 'http://127.0.0.1:8545'
+          const fallbackProvider = new ethers.JsonRpcProvider(rpcUrl)
+          rpcHasCode = (await fallbackProvider.getCode(USER_REGISTRY_ADDRESS)) !== '0x'
+        } catch {
+          // RPC directo no disponible: se asume que el contrato no está
+        }
+
+        if (rpcHasCode) {
+          let walletNetwork = 'desconocida'
+          try {
+            walletNetwork = String((await provider.getNetwork()).chainId)
+          } catch {
+            // no se pudo leer la red de la billetera
+          }
+          const msg =
+            `Tu billetera está en la red ${walletNetwork} y no ve los contratos. ` +
+            'Selecciona o agrega en MetaMask la red local "Anvil Localhost" (RPC http://127.0.0.1:8545, Chain ID 31337) y vuelve a intentar la inscripción.'
+          setError(msg)
+          throw new Error(msg)
+        }
+
+        const msg =
+          'No se encontró el contrato UserRegistry en la red conectada. Si reiniciaste Anvil, vuelve a desplegar los contratos (.\setup.sh o .\start-services.ps1) y reinicia el servidor web.'
+        setError(msg)
+        throw new Error(msg)
+      }
+
       // Verificar si ya está inscrito
       const already = await c.isRegistered(account).catch(() => false)
       if (already) {
+        setError(null)
         await refresh()
         window.dispatchEvent(new Event('user-registered'))
         return
@@ -536,10 +599,22 @@ export function useRegistration(): RegistrationState {
         p.isNorthernHemisphere
       )
       await tx.wait()
-      
+
+      // Verificación REAL post-transacción: si la inscripción no quedó
+      // registrada on-chain, avisamos en lugar de fingir éxito.
+      const confirmed = await c.isRegistered(account).catch(() => false)
+      if (!confirmed) {
+        const msg =
+          'La transacción se confirmó pero la billetera no quedó inscrita. Revisa la red de MetaMask (debe ser Anvil 31337) y que los contratos estén desplegados.'
+        setError(msg)
+        setIsRegistered(false)
+        throw new Error(msg)
+      }
+
       // Actualizar estado local inmediatamente
       setIsRegistered(true)
       setUsername(p.username)
+      setError(null)
       await refresh()
       
       // Notificar a otras instancias del hook (ej. AccessGate, Header, UserMenu)
@@ -548,7 +623,7 @@ export function useRegistration(): RegistrationState {
     [provider, account, refresh]
   )
 
-  return { isRegistered, username, loading, register, refresh }
+  return { isRegistered, username, loading, error, register, refresh }
 }
 
 /**
