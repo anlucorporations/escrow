@@ -4,6 +4,7 @@ import { ReactNode } from 'react'
 import Link from 'next/link'
 import { useEthereum } from '@/lib/ethereum'
 import { useRegistration } from '@/lib/hooks'
+import { HexLoader } from '@/components/HexLoader'
 
 /**
  * Puerta de Acceso a la Plataforma TrueKeate (Mobile & Desktop).
@@ -37,7 +38,7 @@ export function AccessGate({ children }: { children: ReactNode }) {
           <span className="text-xs tracking-[0.2em] uppercase text-rose-600 font-semibold block mb-2">
             Verificación de Billetera
           </span>
-          <h1 className="text-3xl sm:text-4xl font-serif text-slate-900 mb-4 leading-tight">
+          <h1 className="text-3xl sm:text-4xl font-heading text-slate-900 mb-4 leading-tight">
             No se pudo verificar la billetera
           </h1>
           <p className="text-slate-500 font-light mb-8 leading-relaxed text-sm sm:text-base">
@@ -82,7 +83,7 @@ export function AccessGate({ children }: { children: ReactNode }) {
           <span className="text-xs tracking-[0.2em] uppercase text-indigo-600 font-semibold block mb-2">
             Suite Privada
           </span>
-          <h1 className="text-3xl sm:text-4xl font-serif text-slate-900 mb-4 leading-tight">
+          <h1 className="text-3xl sm:text-4xl font-heading text-slate-900 mb-4 leading-tight">
             Acceso Reservado a la Suite TrueKeate
           </h1>
           <p className="text-slate-500 font-light mb-8 leading-relaxed text-sm sm:text-base">
@@ -93,17 +94,17 @@ export function AccessGate({ children }: { children: ReactNode }) {
           <div className="grid grid-cols-3 gap-3 mb-8 text-left">
             <div className="p-3 bg-indigo-50/50 rounded-2xl border border-slate-100">
               <span className="text-[10px] font-semibold uppercase text-indigo-600 block mb-1">Nivel 1</span>
-              <p className="text-xs font-serif font-bold text-slate-900">Inscrito</p>
+              <p className="text-xs font-heading font-bold text-slate-900">Inscrito</p>
               <p className="text-[10px] text-slate-500 font-light mt-0.5">Truekes P2P</p>
             </div>
             <div className="p-3 bg-purple-50/50 rounded-2xl border border-slate-100">
               <span className="text-[10px] font-semibold uppercase text-purple-600 block mb-1">Nivel 2</span>
-              <p className="text-xs font-serif font-bold text-slate-900">Verificado</p>
+              <p className="text-xs font-heading font-bold text-slate-900">Verificado</p>
               <p className="text-[10px] text-slate-500 font-light mt-0.5">2FA & Campañas</p>
             </div>
             <div className="p-3 bg-[#F2F5ED] rounded-2xl border border-slate-100">
               <span className="text-[10px] font-semibold uppercase text-[#8A9A70] block mb-1">Nivel 3</span>
-              <p className="text-xs font-serif font-bold text-slate-900">Certificado</p>
+              <p className="text-xs font-heading font-bold text-slate-900">Certificado</p>
               <p className="text-[10px] text-slate-500 font-light mt-0.5">SBT & RWA</p>
             </div>
           </div>
@@ -131,8 +132,7 @@ export function AccessGate({ children }: { children: ReactNode }) {
   if (loading) {
     return (
       <div className="min-h-[80vh] bg-background flex flex-col items-center justify-center px-4">
-        <div className="w-12 h-12 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p className="text-sm text-slate-500 font-light">Verificando nivel de identidad en la blockchain...</p>
+        <HexLoader label="Verificando identidad on-chain" />
       </div>
     )
   }
@@ -156,7 +156,7 @@ export function AccessGate({ children }: { children: ReactNode }) {
           <span className="text-xs tracking-[0.2em] uppercase text-amber-600 font-semibold block mb-2">
             Paso 1 Obligatorio
           </span>
-          <h1 className="text-3xl sm:text-4xl font-serif text-slate-900 mb-4 leading-tight">
+          <h1 className="text-3xl sm:text-4xl font-heading text-slate-900 mb-4 leading-tight">
             Inscripción Requerida en TrueKeate
           </h1>
           <p className="text-slate-500 font-light mb-8 leading-relaxed text-sm sm:text-base">

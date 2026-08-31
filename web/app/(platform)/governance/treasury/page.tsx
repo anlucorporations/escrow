@@ -49,7 +49,7 @@ export default function TreasuryPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 pb-8 border-b border-slate-200">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Link href="/dashboard" className="text-xs text-indigo-600 hover:underline">
+              <Link href="/dashboard" className="text-xs text-teal-600 hover:underline">
                 ← Volver al Panel
               </Link>
               <span className="text-xs text-slate-400">•</span>
@@ -57,7 +57,7 @@ export default function TreasuryPage() {
                 Suite de Gobernanza
               </span>
             </div>
-            <h1 className="text-4xl font-serif text-slate-900 leading-tight">
+            <h1 className="text-4xl font-heading text-slate-900 leading-tight">
               Finanzas Globales & Fondo Operativo
             </h1>
             <p className="text-slate-500 font-light mt-1">
@@ -72,7 +72,7 @@ export default function TreasuryPage() {
             <span className="text-xs tracking-wider uppercase text-slate-400 font-medium block mb-2">
               Fondo de Tesorería BRLT
             </span>
-            <div className="text-3xl font-serif text-purple-700 font-bold mb-1">
+            <div className="text-3xl font-heading text-purple-700 font-bold mb-1">
               34,500 <span className="text-sm font-sans text-slate-500">BRLT</span>
             </div>
             <p className="text-xs text-slate-500 font-light">Fondos comunitarios de gobernanza</p>
@@ -82,7 +82,7 @@ export default function TreasuryPage() {
             <span className="text-xs tracking-wider uppercase text-slate-400 font-medium block mb-2">
               Fondo de Gas Relayer
             </span>
-            <div className="text-3xl font-serif text-indigo-600 font-bold mb-1">
+            <div className="text-3xl font-heading text-teal-600 font-bold mb-1">
               2.45 <span className="text-sm font-sans text-slate-500">ETH</span>
             </div>
             <p className="text-xs text-slate-500 font-light">Meta-transacciones sin costo al usuario</p>
@@ -92,7 +92,7 @@ export default function TreasuryPage() {
             <span className="text-xs tracking-wider uppercase text-slate-400 font-medium block mb-2">
               Reserva de Contingencia
             </span>
-            <div className="text-3xl font-serif text-emerald-600 font-bold mb-1">
+            <div className="text-3xl font-heading text-emerald-600 font-bold mb-1">
               $15,000 <span className="text-sm font-sans text-slate-500">USDT</span>
             </div>
             <p className="text-xs text-slate-500 font-light">Respaldo ante disputas complejas</p>
@@ -101,7 +101,7 @@ export default function TreasuryPage() {
 
         {/* TABLA DE AUDITORÍA GLOBAL */}
         <div className="bg-white rounded-[2rem] border border-slate-200 p-8 shadow-sm">
-          <h2 className="text-2xl font-serif text-slate-900 mb-6">
+          <h2 className="text-2xl font-heading text-slate-900 mb-6">
             Auditoría de Movimientos & Gastos de Operación
           </h2>
 

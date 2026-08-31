@@ -113,7 +113,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-background pt-28">
       <div className="container mx-auto px-6 max-w-4xl pb-20">
-        <h1 className="text-4xl md:text-5xl font-serif text-slate-900 mb-2">Mi perfil</h1>
+        <h1 className="text-4xl md:text-5xl font-heading text-slate-900 mb-2">Mi perfil</h1>
         <p className="text-slate-500 font-mono text-xs mb-8">
           {profile.username ? `@${profile.username}` : profile.address}
         </p>
@@ -125,7 +125,7 @@ export default function ProfilePage() {
               Nivel: {profile.levelLabel}
             </span>
             {profile.isBusiness && (
-              <span className="px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase bg-indigo-100 text-indigo-700">
+              <span className="px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase bg-indigo-100 text-teal-700">
                 Empresa
               </span>
             )}
@@ -148,8 +148,8 @@ export default function ProfilePage() {
               ['Completados', String(profile.stats.completed)],
               ['Artículos', String(profile.stats.items)],
             ].map(([label, value]) => (
-              <div key={label} className="p-5 bg-indigo-50/30 rounded-[2rem] border border-slate-200/60">
-                <p className="text-3xl font-serif text-slate-900">{value}</p>
+              <div key={label} className="p-5 bg-teal-50/30 rounded-[2rem] border border-slate-200/60">
+                <p className="text-3xl font-heading text-slate-900">{value}</p>
                 <p className="text-[10px] tracking-wider uppercase text-slate-400 mt-2 font-medium">{label}</p>
               </div>
             ))}
@@ -163,16 +163,16 @@ export default function ProfilePage() {
               ['Confiabilidad', profile.reputation.reliability],
               ['Compromiso', profile.reputation.commitment],
             ].map(([label, value]) => (
-              <div key={label as string} className="p-3 bg-indigo-50/10 rounded-2xl text-center border border-slate-100">
+              <div key={label as string} className="p-3 bg-teal-50/10 rounded-2xl text-center border border-slate-100">
                 <p className="text-slate-400 mb-1 font-light">{label}</p>
-                <p className="font-semibold text-slate-800 font-serif">{(value as number).toFixed(1)}</p>
+                <p className="font-semibold text-slate-800 font-heading">{(value as number).toFixed(1)}</p>
               </div>
             ))}
           </div>
         </div>
 
         {msg && (
-          <div className="mb-6 p-4 bg-indigo-50/60 border border-indigo-100 text-indigo-700 rounded-2xl text-sm">
+          <div className="mb-6 p-4 bg-teal-50/60 border border-teal-100 text-teal-700 rounded-2xl text-sm">
             ✓ {msg}
           </div>
         )}
@@ -185,7 +185,7 @@ export default function ProfilePage() {
         <div className="grid md:grid-cols-2 gap-8">
           {/* Ubicación (M7) */}
           <div className="bg-white rounded-[2rem] border border-slate-200 p-8 shadow-sm">
-            <h2 className="text-2xl font-serif text-slate-900 mb-2">Ubicación</h2>
+            <h2 className="text-2xl font-heading text-slate-900 mb-2">Ubicación</h2>
             <p className="text-xs text-slate-500 font-light mb-6">
               Necesaria para proponer encuentros: la distancia con tu contraparte debe ser ≤ 10 km.
             </p>
@@ -199,7 +199,7 @@ export default function ProfilePage() {
                     value={lat}
                     onChange={(e) => setLat(e.target.value)}
                     placeholder="10.4806"
-                    className="w-full px-5 py-3 border border-slate-200 rounded-full text-sm bg-white focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400"
+                    className="w-full px-5 py-3 border border-slate-200 rounded-full text-sm bg-white focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
                     required
                   />
                 </div>
@@ -211,7 +211,7 @@ export default function ProfilePage() {
                     value={lng}
                     onChange={(e) => setLng(e.target.value)}
                     placeholder="-66.9036"
-                    className="w-full px-5 py-3 border border-slate-200 rounded-full text-sm bg-white focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400"
+                    className="w-full px-5 py-3 border border-slate-200 rounded-full text-sm bg-white focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
                     required
                   />
                 </div>
@@ -220,7 +220,7 @@ export default function ProfilePage() {
                 <button
                   type="button"
                   onClick={useMyLocation}
-                  className="flex-1 px-6 py-3.5 text-xs font-semibold tracking-wide uppercase bg-indigo-50 text-indigo-700 rounded-full border border-indigo-100 hover:bg-indigo-100 transition-all"
+                  className="flex-1 px-6 py-3.5 text-xs font-semibold tracking-wide uppercase bg-indigo-50 text-teal-700 rounded-full border border-teal-100 hover:bg-indigo-100 transition-all"
                 >
                   📍 Usar mi ubicación
                 </button>
@@ -237,7 +237,7 @@ export default function ProfilePage() {
 
           {/* KYC (M6) */}
           <div className="bg-white rounded-[2rem] border border-slate-200 p-8 shadow-sm">
-            <h2 className="text-2xl font-serif text-slate-900 mb-2">Verificación KYC</h2>
+            <h2 className="text-2xl font-heading text-slate-900 mb-2">Verificación KYC</h2>
             <p className="text-xs text-slate-500 font-light mb-6">
               Correo y teléfono se guardan cifrados (AES-256-GCM). Solo el estado de verificación es público.
             </p>
@@ -249,7 +249,7 @@ export default function ProfilePage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-5 py-3 border border-slate-200 rounded-full text-sm bg-white focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400"
+                  className="w-full px-5 py-3 border border-slate-200 rounded-full text-sm bg-white focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
                   placeholder="usuario@correo.com"
                 />
               </div>
@@ -260,7 +260,7 @@ export default function ProfilePage() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required
-                  className="w-full px-5 py-3 border border-slate-200 rounded-full text-sm bg-white focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400"
+                  className="w-full px-5 py-3 border border-slate-200 rounded-full text-sm bg-white focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
                   placeholder="+58 412 000 0000"
                 />
               </div>

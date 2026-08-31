@@ -73,27 +73,27 @@ export function PwaInstallBanner() {
   return (
     <>
       {/* Banner flotante en la parte inferior sobre la barra de navegación */}
-      <div className="fixed bottom-20 left-4 right-4 z-40 max-w-md mx-auto bg-[#2D2A26] text-[#FAF8F5] p-4 rounded-2xl shadow-xl border border-[#D4A373]/40 flex items-center justify-between gap-3 animate-in slide-in-from-bottom duration-300">
+      <div className="fixed bottom-20 left-4 right-4 z-40 max-w-md mx-auto bg-navy-800 text-white p-4 rounded-2xl shadow-xl border border-gold-500/40 flex items-center justify-between gap-3 animate-in slide-in-from-bottom duration-300">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#D4A373] text-[#2D2A26] flex items-center justify-center font-bold font-serif text-lg shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-gold-500 text-navy-900 flex items-center justify-center font-bold font-heading text-lg shrink-0">
             TK
           </div>
           <div>
-            <h4 className="font-serif font-bold text-sm text-[#FAF8F5]">Instalar TrueKeate</h4>
-            <p className="text-xs text-[#FAF8F5]/70">Accede como app móvil a pantalla completa</p>
+            <h4 className="font-heading font-bold text-sm text-white">Instalar TrueKeate</h4>
+            <p className="text-xs text-slate-300">Accede como app móvil a pantalla completa</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             onClick={handleInstallClick}
-            className="px-3 py-1.5 bg-[#D4A373] hover:bg-[#c59263] text-[#2D2A26] font-medium text-xs rounded-xl shadow-xs transition-colors shrink-0"
+            className="px-3 py-1.5 bg-gold-500 hover:bg-gold-600 text-navy-900 font-medium text-xs rounded-xl shadow-xs transition-colors shrink-0"
           >
             Instalar
           </button>
           <button
             onClick={handleDismiss}
-            className="p-1.5 text-[#FAF8F5]/50 hover:text-[#FAF8F5] transition-colors"
+            className="p-1.5 text-slate-400 hover:text-white transition-colors"
             aria-label="Cerrar"
           >
             ✕
@@ -104,18 +104,18 @@ export function PwaInstallBanner() {
       {/* Guía modal específica para usuarios de iPhone / Safari */}
       {showIosGuide && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="w-full max-w-sm bg-[#FAF8F5] text-[#2D2A26] p-6 rounded-3xl shadow-2xl border border-[#D4A373]/30 text-center relative safe-area-pb">
+          <div className="w-full max-w-sm bg-white text-navy-900 p-6 rounded-3xl shadow-2xl border border-gold-500/30 text-center relative safe-area-pb">
             <button
               onClick={() => setShowIosGuide(false)}
-              className="absolute top-4 right-4 p-2 text-[#2D2A26]/50 hover:text-[#2D2A26]"
+              className="absolute top-4 right-4 p-2 text-navy-900/50 hover:text-navy-900"
             >
               ✕
             </button>
-            <div className="w-12 h-12 bg-[#D4A373]/20 rounded-full flex items-center justify-center mx-auto mb-3 text-[#D4A373]">
+            <div className="w-12 h-12 bg-gold-500/20 rounded-full flex items-center justify-center mx-auto mb-3 text-gold-500">
               📲
             </div>
-            <h3 className="font-serif text-lg font-bold text-[#2D2A26] mb-2">Instalar en tu iPhone</h3>
-            <p className="text-xs text-[#2D2A26]/80 mb-4 leading-relaxed">
+            <h3 className="font-heading text-lg font-bold text-navy-900 mb-2">Instalar en tu iPhone</h3>
+            <p className="text-xs text-navy-900/80 mb-4 leading-relaxed">
               1. Toca el botón <strong>Compartir</strong> (ícono con flecha hacia arriba) en la barra de Safari.
               <br />
               2. Desplázate hacia abajo y selecciona <strong>&quot;Añadir a la pantalla de inicio&quot;</strong>.
@@ -125,7 +125,7 @@ export function PwaInstallBanner() {
                 triggerHaptic('light')
                 setShowIosGuide(false)
               }}
-              className="w-full py-2.5 bg-[#2D2A26] text-[#FAF8F5] text-xs font-semibold rounded-xl"
+              className="w-full py-2.5 bg-navy-800 text-white text-xs font-semibold rounded-xl"
             >
               Entendido
             </button>

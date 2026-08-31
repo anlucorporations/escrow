@@ -38,6 +38,26 @@
   --color-slate-700: #334155;
   --color-slate-800: #1E293B;
   --color-slate-900: #0A1128;
+
+  /* Gradientes de identidad (Design System 2.0) */
+  --gradient-primary-cta: linear-gradient(135deg, #1A2B4C 0%, #2A9D8F 100%);
+  --gradient-cyan-glow: linear-gradient(90deg, #2A9D8F 0%, #48CAE4 100%);
+  --gradient-gold-badge: linear-gradient(135deg, #D4AF37 0%, #F3E5AB 50%, #C5A065 100%);
+  --gradient-card-border: linear-gradient(90deg, #1A2B4C 0%, #2A9D8F 50%, #D4AF37 100%);
+
+  /* Curvas de aceleración y tiempos estándar */
+  --ease-natural: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-page: 400ms;
+  --duration-slow: 600ms;
+
+  /* Radios de superficie */
+  --radius-pill: 9999px;
+  --radius-card: 16px;
+  --radius-modal: 24px;
 }
 
 body {
@@ -208,7 +228,7 @@ h1, h2, h3, .font-heading {
 
 .input-truekeat {
   width: 100%;
-  height: 52px;
+  height: 56px; /* Touch target 56px (prototipo §4.3) */
   padding: 0 16px 0 48px;
   border: 2px solid #E2E8F0;
   border-radius: 14px;
@@ -216,7 +236,7 @@ h1, h2, h3, .font-heading {
   font-family: var(--font-sans);
   font-size: 15px;
   color: #1A2B4C;
-  transition: all 0.25s ease;
+  transition: all 0.25s var(--ease-natural);
   outline: none;
 }
 .input-truekeat:focus {
@@ -256,3 +276,237 @@ input, select, textarea {
     touch-action: manipulation;
   }
 }
+
+/* ==========================================================================
+   COMPONENTES DESIGN SYSTEM 2.0 (prototipo truekeate_visual_design.html)
+   ========================================================================== */
+
+/* Cápsula de identidad de la barra superior (@username + check dorado) */
+.identity-capsule {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(10, 17, 40, 0.55);
+  border: 1px solid rgba(42, 157, 143, 0.4);
+  border-radius: 9999px;
+  padding: 4px 12px 4px 6px;
+  color: #FFFFFF;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(10, 17, 40, 0.25);
+  transition: all 0.25s var(--ease-natural);
+  cursor: pointer;
+}
+.identity-capsule:hover {
+  background: rgba(10, 17, 40, 0.75);
+  border-color: rgba(72, 202, 228, 0.6);
+}
+
+/* Campana de notificaciones */
+.notification-bell {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  background: rgba(10, 17, 40, 0.55);
+  border: 1px solid rgba(30, 41, 59, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #CBD5E1;
+  transition: all 0.25s var(--ease-natural);
+  cursor: pointer;
+}
+.notification-bell:hover {
+  background: rgba(10, 17, 40, 0.8);
+  color: #FFFFFF;
+}
+.notification-bell .badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  min-width: 15px;
+  height: 15px;
+  border-radius: 9999px;
+  background: var(--color-cyan-400);
+  color: #0A1128;
+  font-size: 9px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  box-shadow: 0 0 0 2px rgba(10, 17, 40, 0.9);
+}
+
+/* Stepper de estados (Sala de Intercambio Atómico) */
+.tk-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.tk-stepper .step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+.tk-stepper .step .dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  border: 3px solid #E2E8F0;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 800;
+  color: #94A3B8;
+  transition: all 0.3s var(--ease-natural);
+}
+.tk-stepper .step.active .dot {
+  border-color: var(--color-teal-500);
+  color: var(--color-teal-500);
+}
+.tk-stepper .step.done .dot {
+  border-color: var(--color-gold-500);
+  background: var(--color-gold-500);
+  color: #FFFFFF;
+}
+.tk-stepper .step .label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #94A3B8;
+}
+.tk-stepper .step.active .label,
+.tk-stepper .step.done .label {
+  color: var(--color-navy-800);
+}
+.tk-stepper .line {
+  flex: 1;
+  height: 2px;
+  background: #E2E8F0;
+  margin: 0 -8px;
+  z-index: 0;
+  border-radius: 2px;
+}
+.tk-stepper .line.filled {
+  background: linear-gradient(90deg, var(--color-teal-500), var(--color-cyan-400));
+}
+
+/* Navegación inferior flotante */
+.bottom-nav-float {
+  position: fixed;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  z-index: 40;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(26, 43, 76, 0.18);
+  padding: 6px 12px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+}
+.bottom-nav-float .nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 4px 6px;
+  color: #64748B;
+  font-size: 9px;
+  font-weight: 700;
+  transition: all 0.25s var(--ease-natural);
+}
+.bottom-nav-float .nav-item.active {
+  color: var(--color-teal-500);
+}
+.bottom-nav-float .nav-item .icon {
+  font-size: 16px;
+  line-height: 1;
+}
+/* Botón central hexagonal elevado */
+.tk-center-btn {
+  margin-top: -24px;
+  width: 46px;
+  height: 46px;
+  background: linear-gradient(135deg, #1A2B4C 0%, #2A9D8F 100%);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  font-size: 18px;
+  font-weight: 800;
+  box-shadow: 0 8px 20px rgba(42, 157, 143, 0.45);
+  transition: transform 0.2s var(--ease-bounce), box-shadow 0.25s var(--ease-natural);
+}
+.tk-center-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 10px 26px rgba(42, 157, 143, 0.55);
+}
+.tk-center-btn:active {
+  transform: scale(0.94);
+}
+
+/* Tarjeta de activo RWA: borde lateral dorado */
+.asset-rwa {
+  border-left: 4px solid var(--color-gold-500);
+}
+.asset-gold-badge {
+  background: linear-gradient(135deg, #D4AF37 0%, #F3E5AB 50%, #C5A065 100%);
+  color: #1A2B4C;
+}
+
+/* Loader hexagonal orbital dual como componente */
+.tk-loader {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tk-loader .ring-outer {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  border: 4px solid transparent;
+  border-top-color: var(--color-teal-500);
+  border-bottom-color: var(--color-cyan-400);
+  border-radius: 9999px;
+  animation: spinClockwise 2.5s linear infinite;
+}
+.tk-loader .ring-inner {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border: 4px solid transparent;
+  border-right-color: var(--color-gold-500);
+  border-left-color: var(--color-gold-600);
+  border-radius: 9999px;
+  animation: spinCounterClockwise 1.8s linear infinite;
+}
+.tk-loader .core {
+  width: 26px;
+  height: 26px;
+  background: var(--color-navy-800);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 800;
+}
+

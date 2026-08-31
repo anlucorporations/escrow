@@ -240,26 +240,23 @@ export function OperationCard({ operation, onRefresh }: OperationCardProps) {
         </div>
       </div>
 
-      {/* BARRA DE PROGRESO DE ESTADO (1. Creada -> 2. Aceptada -> 3. En Tránsito -> 4. Completada) */}
-      <div className="space-y-2 pt-2">
-        <div className="flex justify-between text-[11px] font-bold text-slate-500 uppercase tracking-wider font-heading">
-          <span className={currentStep >= 1 ? 'text-[#2A9D8F]' : ''}>1. Creada</span>
-          <span className={currentStep >= 2 ? 'text-[#2A9D8F]' : ''}>2. Aceptada</span>
-          <span className={currentStep >= 3 ? 'text-[#2A9D8F]' : ''}>3. En Tránsito</span>
-          <span className={currentStep >= 4 ? 'text-emerald-600' : ''}>4. Completada</span>
-        </div>
-        <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden flex">
-          <div
-            className={`h-full transition-all duration-500 ${
-              currentStep === 4
-                ? 'bg-emerald-500 w-full'
-                : currentStep === 3
-                ? 'bg-[#2A9D8F] w-3/4'
-                : currentStep === 2
-                ? 'bg-[#2A9D8F] w-1/2'
-                : 'bg-[#2A9D8F] w-1/4'
-            }`}
-          ></div>
+      {/* STEppER DE ESTADOS (prototipo §6: Creado -> En Tránsito -> Liquidado) */}
+      <div className="pt-2">
+        <div className="tk-stepper">
+          <div className={`step ${currentStep >= 1 ? (currentStep >= 2 ? 'done' : 'active') : ''}`}>
+            <span className="dot">{currentStep >= 2 ? '✓' : '1'}</span>
+            <span className="label">Creado</span>
+          </div>
+          <div className={`line ${currentStep >= 2 ? 'filled' : ''}`}></div>
+          <div className={`step ${currentStep >= 2 ? (currentStep >= 3 ? 'done' : 'active') : ''}`}>
+            <span className="dot">{currentStep >= 3 ? '✓' : '2'}</span>
+            <span className="label">En Tránsito</span>
+          </div>
+          <div className={`line ${currentStep >= 3 ? 'filled' : ''}`}></div>
+          <div className={`step ${currentStep >= 3 ? (currentStep === 4 ? 'done' : 'active') : ''}`}>
+            <span className="dot">{currentStep === 4 ? '✓' : '3'}</span>
+            <span className="label">Liquidado</span>
+          </div>
         </div>
       </div>
 

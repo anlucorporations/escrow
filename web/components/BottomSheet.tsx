@@ -43,20 +43,20 @@ export function BottomSheet({
 
       {/* Contenedor de la Hoja Inferior */}
       <div
-        className={`relative z-10 w-full max-w-lg bg-[#FAF8F5] text-[#2D2A26] rounded-t-3xl shadow-2xl border-t border-[#D4A373]/30 overflow-hidden flex flex-col ${maxHeight} animate-in slide-in-from-bottom duration-300 safe-area-pb`}
+        className={`relative z-10 w-full max-w-lg bg-background text-navy-800 rounded-t-3xl shadow-2xl border-t border-gold-500/30 overflow-hidden flex flex-col ${maxHeight} animate-in slide-in-from-bottom duration-300 safe-area-pb`}
       >
         {/* Barra superior / Indicador de arrastre */}
-        <div className="flex flex-col items-center pt-3 pb-2 px-6 cursor-grab active:cursor-grabbing border-b border-[#2D2A26]/5">
-          <div className="w-12 h-1.5 bg-[#D4A373]/60 rounded-full mb-2" />
+        <div className="flex flex-col items-center pt-3 pb-2 px-6 cursor-grab active:cursor-grabbing border-b border-navy-800/5">
+          <div className="w-12 h-1.5 bg-gold-500/60 rounded-full mb-2" />
           {title && (
             <div className="w-full flex items-center justify-between">
-              <h3 className="font-serif text-lg font-bold text-[#2D2A26] tracking-wide">{title}</h3>
+              <h3 className="font-heading text-lg font-bold text-navy-800 tracking-wide">{title}</h3>
               <button
                 onClick={() => {
                   triggerHaptic('light')
                   onClose()
                 }}
-                className="p-1.5 rounded-full text-[#2D2A26]/60 hover:text-[#2D2A26] hover:bg-[#2D2A26]/5 transition-colors"
+                className="p-1.5 rounded-full text-navy-800/60 hover:text-navy-800 hover:bg-navy-800/5 transition-colors"
                 aria-label="Cerrar"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

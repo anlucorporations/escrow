@@ -51,10 +51,10 @@ export default function ItemsPage() {
         {/* ENCABEZADO */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10 pb-8 border-b border-slate-200">
           <div>
-            <span className="text-xs tracking-[0.2em] uppercase text-cyan-600 font-semibold block mb-2">
+            <span className="text-xs tracking-[0.2em] uppercase text-teal-600 font-semibold block mb-2">
               Mercado Descentralizado
             </span>
-            <h1 className="text-4xl md:text-5xl font-serif text-[#0A1128] mb-2 leading-tight">
+            <h1 className="text-4xl md:text-5xl font-heading text-navy-900 mb-2 leading-tight">
               Catálogo de Activos & Truekes
             </h1>
             <p className="text-slate-500 font-light text-sm sm:text-base">
@@ -64,7 +64,7 @@ export default function ItemsPage() {
 
           <Link
             href="/items/new"
-            className="px-8 py-4 bg-[#0A1128] hover:bg-[#1C2541] text-white hover:text-[#00E5FF] rounded-full text-xs font-bold tracking-wider uppercase transition-all shadow-lg shadow-[#0A1128]/10 flex items-center gap-2"
+            className="px-8 py-4 btn-truekeat-primary text-white rounded-full text-xs font-bold tracking-wider uppercase transition-all shadow-lg shadow-teal-500/20 flex items-center gap-2"
           >
             <span>+</span>
             <span>Acuñar Nuevo Activo</span>
@@ -88,12 +88,12 @@ export default function ItemsPage() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Busca por producto, servicio, marca o ubicación..."
-                className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-full text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-xs"
+                className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-full text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 shadow-xs"
               />
             </div>
             <button
               type="submit"
-              className="px-7 py-3 bg-[#0A1128] hover:bg-[#1C2541] text-white rounded-full text-xs font-bold tracking-wider uppercase transition-all shadow-sm"
+              className="px-7 py-3 bg-navy-800 hover:bg-navy-700 text-white rounded-full text-xs font-bold tracking-wider uppercase transition-all shadow-sm"
             >
               Buscar
             </button>
@@ -107,7 +107,7 @@ export default function ItemsPage() {
                 onClick={() => setCategory(c.key)}
                 className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all flex items-center gap-1.5 ${
                   category === c.key
-                    ? 'bg-[#0A1128] text-[#00E5FF] shadow-sm shadow-[#0A1128]/20 border border-[#0A1128]'
+                    ? 'bg-navy-800 text-cyan-400 shadow-sm shadow-navy-900/20 border border-navy-800'
                     : 'bg-white text-slate-600 hover:bg-slate-100/80 border border-slate-200'
                 }`}
               >
@@ -141,13 +141,13 @@ export default function ItemsPage() {
         ) : items.length === 0 ? (
           <div className="text-center py-24 bg-white rounded-[2.5rem] border border-slate-200 p-12 max-w-xl mx-auto shadow-sm">
             <span className="text-4xl mb-3 block">📦</span>
-            <h3 className="text-xl font-serif text-slate-800 mb-2">No se encontraron activos</h3>
+            <h3 className="text-xl font-heading text-slate-800 mb-2">No se encontraron activos</h3>
             <p className="text-xs text-slate-500 font-light mb-6">
               No hay artículos disponibles en esta categoría o con los términos buscados.
             </p>
             <Link
               href="/items/new"
-              className="px-6 py-3 bg-[#0A1128] hover:bg-[#1C2541] text-white rounded-full text-xs font-bold uppercase tracking-wider transition"
+              className="px-6 py-3 bg-navy-800 hover:bg-navy-700 text-white rounded-full text-xs font-bold uppercase tracking-wider transition"
             >
               Publicar el Primer Activo
             </Link>

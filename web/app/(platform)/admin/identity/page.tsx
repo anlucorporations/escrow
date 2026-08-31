@@ -160,7 +160,7 @@ export default function AdminIdentityPage() {
     return (
       <div className="max-w-xl mx-auto py-16 px-4 text-center space-y-4">
         <AlertTriangleIcon className="w-12 h-12 text-amber-600 mx-auto" />
-        <h2 className="text-2xl font-serif font-bold text-gray-900">Acceso Restringido al Administrador</h2>
+        <h2 className="text-2xl font-heading font-bold text-gray-900">Acceso Restringido al Administrador</h2>
         <p className="text-sm text-gray-600">
           Este módulo solo puede ser administrado por el Owner de TrueKeate o por el contrato de Gobernanza.
         </p>
@@ -177,7 +177,7 @@ export default function AdminIdentityPage() {
             <ShieldIcon className="w-4 h-4 text-amber-700" />
             Panel Exclusivo de Administración
           </div>
-          <h1 className="text-3xl font-serif font-bold text-gray-900">Gestión Global de Identidades y SBTs</h1>
+          <h1 className="text-3xl font-heading font-bold text-gray-900">Gestión Global de Identidades y SBTs</h1>
         </div>
 
         <button
@@ -205,7 +205,7 @@ export default function AdminIdentityPage() {
       {/* Grid de Proveedores SBT y Auditoría */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm space-y-4 md:col-span-1">
-          <h3 className="text-base font-serif font-bold text-gray-900 flex items-center gap-2">
+          <h3 className="text-base font-heading font-bold text-gray-900 flex items-center gap-2">
             <AwardIcon className="w-5 h-5 text-amber-700" />
             Proveedores de SBTs de Terceros
           </h3>
@@ -243,7 +243,7 @@ export default function AdminIdentityPage() {
         {/* Tabla de Usuarios Registrados */}
         <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm space-y-4 md:col-span-2">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <h3 className="text-base font-serif font-bold text-gray-900 flex items-center gap-2">
+            <h3 className="text-base font-heading font-bold text-gray-900 flex items-center gap-2">
               <UsersIcon className="w-5 h-5 text-amber-700" />
               Directorio de Identidades TrueKeate
             </h3>

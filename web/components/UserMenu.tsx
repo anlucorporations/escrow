@@ -133,7 +133,7 @@ export function UserMenu() {
               if (!notifOpen) markRead()
             }}
             aria-label="Notificaciones"
-            className="p-2.5 rounded-full bg-white border border-slate-200 hover:border-[#2A9D8F] text-slate-700 transition-colors relative shadow-xs"
+            className="notification-bell"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -144,9 +144,7 @@ export function UserMenu() {
               />
             </svg>
             {unread > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#2A9D8F] text-white text-[9px] font-bold flex items-center justify-center animate-pulse">
-                {unread}
-              </span>
+              <span className="badge">{unread}</span>
             )}
           </button>
 
@@ -174,7 +172,7 @@ export function UserMenu() {
         </div>
       )}
 
-      {/* Botón Disparador del Menú de Usuario (Píldora con @username) */}
+      {/* Botón Disparador del Menú de Usuario (Cápsula @username del prototipo) */}
       <button
         onClick={() => {
           triggerHaptic('light')
@@ -182,29 +180,24 @@ export function UserMenu() {
           setNotifOpen(false)
         }}
         aria-label="Menú desplegable de usuario"
-        className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-full border border-slate-200 hover:border-[#2A9D8F] transition-all shadow-xs group"
+        className="identity-capsule"
       >
-        {/* Avatar Hexagonal / Indicador de Nivel */}
-        <div className={`w-7 h-7 hexagon-badge flex items-center justify-center text-[10px] font-bold text-white shadow-xs ${
-          level >= 3 ? 'bg-[#D4AF37]' : level === 2 ? 'bg-[#2A9D8F]' : isRegistered ? 'bg-[#1A2B4C]' : 'bg-slate-400'
+        {/* Avatar Hexagonal / Indicador de Nivel (gradiente teal->cyan con check dorado) */}
+        <div className={`w-7 h-7 hexagon-badge bg-gradient-to-tr from-[#2A9D8F] to-[#48CAE4] flex items-center justify-center text-[10px] font-bold text-white shadow-xs ${
+          level >= 3 ? 'ring-2 ring-[#D4AF37]' : ''
         }`}>
           {isRegistered && username ? username.slice(0, 1).toUpperCase() : '0x'}
         </div>
 
         {/* Nombre de Usuario (@username) */}
-        <div className="text-left">
-          <p className="text-xs font-bold text-[#1A2B4C] leading-tight flex items-center gap-1 font-heading">
-            <span>{regLoading ? 'Cargando...' : isRegistered && username ? `@${username}` : short}</span>
-            {isRegistered && <span className="text-[#D4AF37] text-[11px] font-black">✓</span>}
-          </p>
-          <p className="text-[10px] text-slate-400 font-medium hidden sm:block">
-            {level >= 3 ? 'N3 · Certificado' : level === 2 ? 'N2 · Verificado' : isRegistered ? 'N1 · Inscrito' : 'Sin Registrar'}
-          </p>
-        </div>
+        <span className="text-[#48CAE4] font-heading font-bold leading-none">
+          {regLoading ? '...' : isRegistered && username ? `@${username}` : short}
+        </span>
+        {isRegistered && <span className="text-[#D4AF37] text-[11px] font-black leading-none">✓</span>}
 
         {/* Flecha Chevron */}
         <svg
-          className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${open ? 'rotate-180 text-[#2A9D8F]' : 'group-hover:text-slate-600'}`}
+          className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${open ? 'rotate-180 text-[#48CAE4]' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -307,6 +300,25 @@ export function UserMenu() {
 
           {/* SECCIÓN 2: Enlaces de Navegación de Usuario */}
           <div className="space-y-0.5 px-2 py-1 border-t border-slate-100">
+            {/* Publicar Artículo */}
+            <Link
+              href="/items/new"
+              onClick={() => setOpen(false)}
+              className="flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-teal-50/70 transition-colors group"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-[#2A9D8F]">➕</span>
+                <div>
+                  <p className="text-xs font-semibold text-slate-800 group-hover:text-[#2A9D8F] transition-colors">
+                    Publicar Artículo
+                  </p>
+                  <p className="text-[10px] text-slate-400 font-light">
+                    Acuñar activo certificado con firma ECDSA
+                  </p>
+                </div>
+              </div>
+            </Link>
+
             {/* Centro de Identidad & 2FA */}
             <Link
               href="/identity"

@@ -59,7 +59,7 @@ export default function CompanyInventoryPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 pb-8 border-b border-slate-200">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Link href="/dashboard" className="text-xs text-indigo-600 hover:underline">
+              <Link href="/dashboard" className="text-xs text-teal-600 hover:underline">
                 ← Volver al Panel
               </Link>
               <span className="text-xs text-slate-400">•</span>
@@ -67,7 +67,7 @@ export default function CompanyInventoryPage() {
                 Suite Empresa
               </span>
             </div>
-            <h1 className="text-4xl font-serif text-slate-900 leading-tight">
+            <h1 className="text-4xl font-heading text-slate-900 leading-tight">
               Gestión de Inventario & Locales Fijos
             </h1>
             <p className="text-slate-500 font-light mt-1">
@@ -86,7 +86,7 @@ export default function CompanyInventoryPage() {
         {/* TIENDAS Y SUCURSALES COMERCIALES */}
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <h2 className="text-2xl font-serif text-slate-900">
+            <h2 className="text-2xl font-heading text-slate-900">
               Puntos de Entrega & Locales Comerciales ({stores.length})
             </h2>
 
@@ -111,7 +111,7 @@ export default function CompanyInventoryPage() {
                       <span>📍 UTM {s.utm_zone}N {s.utm_easting}E, {s.utm_northing}N</span>
                     </div>
                   </div>
-                  <span className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700">
+                  <span className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-50 text-teal-700">
                     Punto Seguro ✓
                   </span>
                 </div>
@@ -122,7 +122,7 @@ export default function CompanyInventoryPage() {
           {/* FORMULARIO AGREGAR LOCAL */}
           <div>
             <div className="bg-amber-50/50 rounded-[2rem] border border-amber-200/70 p-6 shadow-sm">
-              <h3 className="text-lg font-serif text-amber-950 mb-2">Registrar Sucursal / Local</h3>
+              <h3 className="text-lg font-heading text-amber-950 mb-2">Registrar Sucursal / Local</h3>
               <p className="text-xs text-amber-900/70 mb-6 font-light">
                 Los compradores podrán retirar productos en este punto fijo sin citas previas.
               </p>

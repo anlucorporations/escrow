@@ -17,7 +17,7 @@ export function ShareTradeButton({
   title,
   text,
   url,
-  className = 'px-4 py-2 bg-[#FAF8F5] border border-[#D4A373]/40 text-[#2D2A26] rounded-xl text-xs font-semibold flex items-center gap-2 shadow-xs active:scale-95 transition-transform',
+  className = 'px-4 py-2 bg-background border border-gold-500/40 text-navy-800 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-xs active:scale-95 transition-transform',
 }: ShareTradeButtonProps) {
   const [copied, setCopied] = useState(false)
 
@@ -32,7 +32,7 @@ export function ShareTradeButton({
 
   return (
     <button onClick={handleShare} className={className} aria-label="Compartir trueke">
-      <svg className="w-4 h-4 text-[#D4A373]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-4 h-4 text-gold-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"

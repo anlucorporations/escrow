@@ -78,31 +78,31 @@ export function CameraCaptureModal({
         />
 
         {!preview ? (
-          <div className="p-8 border-2 border-dashed border-[#D4A373]/50 rounded-2xl bg-[#FAF8F5] flex flex-col items-center justify-center gap-3">
-            <div className="w-16 h-16 rounded-full bg-[#D4A373]/20 flex items-center justify-center text-3xl text-[#D4A373]">
+          <div className="p-8 border-2 border-dashed border-gold-500/50 rounded-2xl bg-background flex flex-col items-center justify-center gap-3">
+            <div className="w-16 h-16 rounded-full bg-gold-500/20 flex items-center justify-center text-3xl text-gold-500">
               📷
             </div>
-            <p className="text-sm text-[#2D2A26]/80 font-medium">
+            <p className="text-sm text-navy-800/80 font-medium">
               Toma una foto clara del producto para generar su hash inmutable
             </p>
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isProcessing}
-              className="mt-2 px-6 py-3 bg-[#D4A373] text-[#2D2A26] font-semibold text-sm rounded-xl shadow-md transition-transform active:scale-95 flex items-center gap-2"
+              className="mt-2 px-6 py-3 bg-gold-500 text-navy-800 font-semibold text-sm rounded-xl shadow-md transition-transform active:scale-95 flex items-center gap-2"
             >
               {isProcessing ? 'Procesando Hash...' : 'Abrir Cámara del Teléfono'}
             </button>
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="relative rounded-2xl overflow-hidden shadow-md max-h-64 mx-auto border border-[#D4A373]/30">
+            <div className="relative rounded-2xl overflow-hidden shadow-md max-h-64 mx-auto border border-gold-500/30">
               {/* eslint-disable-next-line @next/next/no-img-element -- vista previa local (blob) de la cámara */}
               <img src={preview} alt="Captura" className="w-full h-full object-cover" />
             </div>
 
-            <div className="p-3 bg-[#2D2A26]/5 rounded-xl text-left text-xs space-y-1">
-              <p className="font-semibold text-[#2D2A26]">Compromiso Criptográfico SHA-256:</p>
-              <p className="font-mono text-[11px] text-[#2D2A26]/70 break-all">{hash}</p>
+            <div className="p-3 bg-navy-800/5 rounded-xl text-left text-xs space-y-1">
+              <p className="font-semibold text-navy-800">Compromiso Criptográfico SHA-256:</p>
+              <p className="font-mono text-[11px] text-navy-800/70 break-all">{hash}</p>
             </div>
 
             <div className="flex gap-3">
@@ -112,13 +112,13 @@ export function CameraCaptureModal({
                   setHash(null)
                   fileInputRef.current?.click()
                 }}
-                className="flex-1 py-3 bg-[#2D2A26]/10 text-[#2D2A26] text-xs font-semibold rounded-xl"
+                className="flex-1 py-3 bg-navy-800/10 text-navy-800 text-xs font-semibold rounded-xl"
               >
                 Volver a Tomar
               </button>
               <button
                 onClick={handleConfirm}
-                className="flex-1 py-3 bg-[#D4A373] text-[#2D2A26] text-xs font-bold rounded-xl shadow-md"
+                className="flex-1 py-3 bg-gold-500 text-navy-800 text-xs font-bold rounded-xl shadow-md"
               >
                 Confirmar y Usar
               </button>

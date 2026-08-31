@@ -45,13 +45,18 @@ export function AssetCard({ item, className = '' }: AssetCardProps) {
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-50 to-slate-200/70 relative">
-              <div className="w-14 h-14 rounded-2xl bg-white shadow-xs flex items-center justify-center text-2xl border border-slate-200">
+            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#1A2B4C] to-[#0A1128] relative">
+              <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-2xl backdrop-blur-sm">
                 {categoryIcon}
               </div>
-              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mt-2 font-heading">
+              <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider mt-2 font-heading">
                 {item.category}
               </span>
+              {isRWA && (
+                <span className="absolute top-3 left-3 asset-gold-badge text-[9px] font-extrabold uppercase px-2.5 py-1 rounded-full shadow-sm">
+                  🛡️ RWA Tokenizado
+                </span>
+              )}
             </div>
           )}
 

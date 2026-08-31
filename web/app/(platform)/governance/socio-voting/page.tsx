@@ -135,7 +135,7 @@ export default function SocioVotingPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 pb-8 border-b border-slate-200">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Link href="/dashboard" className="text-xs text-indigo-600 hover:underline">
+              <Link href="/dashboard" className="text-xs text-teal-600 hover:underline">
                 ← Volver al Panel
               </Link>
               <span className="text-xs text-slate-400">•</span>
@@ -143,7 +143,7 @@ export default function SocioVotingPage() {
                 Suite de Gobernanza
               </span>
             </div>
-            <h1 className="text-4xl font-serif text-slate-900 leading-tight">
+            <h1 className="text-4xl font-heading text-slate-900 leading-tight">
               Admisión de Nuevos Socios & Votaciones
             </h1>
             <p className="text-slate-500 font-light mt-1">
@@ -166,7 +166,7 @@ export default function SocioVotingPage() {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* LISTA DE POSTULACIONES REALES */}
           <div className="lg:col-span-2 space-y-6">
-            <h2 className="text-2xl font-serif text-slate-900">
+            <h2 className="text-2xl font-heading text-slate-900">
               Postulaciones en Votación ({applications.length})
             </h2>
 
@@ -217,7 +217,7 @@ export default function SocioVotingPage() {
                         <span className="text-xs font-bold text-slate-900 block">
                           Depósito en Garantía
                         </span>
-                        <span className="text-xs text-indigo-600 font-mono font-semibold">
+                        <span className="text-xs text-teal-600 font-mono font-semibold">
                           {app.depositAmount} BRLT
                         </span>
                       </div>
@@ -279,7 +279,7 @@ export default function SocioVotingPage() {
           {/* FORMULARIO DE POSTULACIÓN */}
           <div className="space-y-6">
             <div className="bg-white rounded-[2rem] border border-slate-200 p-8 shadow-sm">
-              <h2 className="text-xl font-serif text-slate-900 mb-2">Postularse como Socio</h2>
+              <h2 className="text-xl font-heading text-slate-900 mb-2">Postularse como Socio</h2>
               <p className="text-xs text-slate-500 font-light leading-relaxed mb-6">
                 Deposita 500 BRLT en garantía y comparte tu motivación. Los Socios actuales votarán tu admisión durante 5 días.
               </p>

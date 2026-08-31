@@ -295,7 +295,7 @@ export default function IdentityCenterPage() {
           <ShieldIcon className="w-4 h-4 text-amber-700" />
           Módulo de Identidad Web3
         </div>
-        <h1 className="text-3xl font-serif font-bold text-gray-900">Centro de Identidad y Certificación</h1>
+        <h1 className="text-3xl font-heading font-bold text-gray-900">Centro de Identidad y Certificación</h1>
         <p className="text-sm text-gray-600 max-w-xl mx-auto">
           Gestiona tus credenciales, activa la seguridad de dos factores y certifica tu cuenta para desbloquear
           la tokenización RWA y Vouchers en TrueKeate.
@@ -330,7 +330,7 @@ export default function IdentityCenterPage() {
               <span className="text-xs font-bold px-2 py-0.5 rounded bg-amber-200 text-amber-900">Nivel 1</span>
               <CheckCircleIcon className="w-5 h-5 text-emerald-600" />
             </div>
-            <h4 className="font-serif font-bold text-gray-900 text-base">Inscrito</h4>
+            <h4 className="font-heading font-bold text-gray-900 text-base">Inscrito</h4>
             <p className="text-xs text-gray-600 mt-1">Billetera conectada y acuerdos de convivencia aceptados.</p>
           </div>
 
@@ -350,7 +350,7 @@ export default function IdentityCenterPage() {
                 <SmartphoneIcon className="w-5 h-5 text-stone-400" />
               )}
             </div>
-            <h4 className="font-serif font-bold text-gray-900 text-base">Verificado</h4>
+            <h4 className="font-heading font-bold text-gray-900 text-base">Verificado</h4>
             <p className="text-xs text-gray-600 mt-1">Correo, teléfono y 2FA confirmados para publicar y calificar.</p>
           </div>
 
@@ -370,7 +370,7 @@ export default function IdentityCenterPage() {
                 <SparklesIcon className="w-5 h-5 text-stone-400" />
               )}
             </div>
-            <h4 className="font-serif font-bold text-gray-900 text-base">Certificado (SBT)</h4>
+            <h4 className="font-heading font-bold text-gray-900 text-base">Certificado (SBT)</h4>
             <p className="text-xs text-gray-600 mt-1">
               {profile?.sbt_provider ? `SBT: ${profile.sbt_provider}` : 'SBT Nativo o Externo verificado.'}
             </p>
@@ -411,7 +411,7 @@ export default function IdentityCenterPage() {
         {/* TAB: Resumen & Acuerdos */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
-            <h3 className="text-lg font-serif font-bold text-gray-900">Términos de Convivencia y Estado General</h3>
+            <h3 className="text-lg font-heading font-bold text-gray-900">Términos de Convivencia y Estado General</h3>
             <div className="p-4 bg-stone-50 rounded-xl space-y-2 border border-stone-200 text-xs text-stone-700 leading-relaxed">
               <p className="font-semibold text-stone-900">Compromiso Comunitario TrueKeate:</p>
               <ul className="list-disc pl-5 space-y-1">
@@ -441,7 +441,7 @@ export default function IdentityCenterPage() {
         {/* TAB: Contacto */}
         {activeTab === 'contact' && (
           <form onSubmit={handleVerifyContact} className="space-y-6">
-            <h3 className="text-lg font-serif font-bold text-gray-900">Validación de Correo y Teléfono</h3>
+            <h3 className="text-lg font-heading font-bold text-gray-900">Validación de Correo y Teléfono</h3>
             <p className="text-xs text-stone-600">
               Tus datos de contacto se almacenan cifrados con AES-256 y solo son accesibles por ti.
             </p>
@@ -515,7 +515,7 @@ export default function IdentityCenterPage() {
         {/* TAB: 2FA */}
         {activeTab === '2fa' && (
           <div className="space-y-6">
-            <h3 className="text-lg font-serif font-bold text-gray-900">Autenticación de Dos Factores (2FA TOTP)</h3>
+            <h3 className="text-lg font-heading font-bold text-gray-900">Autenticación de Dos Factores (2FA TOTP)</h3>
             <p className="text-xs text-stone-600">
               Protege tus transacciones y autorizaciones importantes vinculando tu aplicación Authenticator (Google Authenticator, Authy).
             </p>
@@ -571,7 +571,7 @@ export default function IdentityCenterPage() {
         {/* TAB: SBT (Nivel 3) */}
         {activeTab === 'sbt' && (
           <div className="space-y-6">
-            <h3 className="text-lg font-serif font-bold text-gray-900">Certificación Nivel 3 con Soulbound Tokens (SBT)</h3>
+            <h3 className="text-lg font-heading font-bold text-gray-900">Certificación Nivel 3 con Soulbound Tokens (SBT)</h3>
             <p className="text-xs text-stone-600">
               Desbloquea la capacidad de tokenizar productos físicos (RWA) y emitir vouchers de servicios.
             </p>
@@ -589,7 +589,7 @@ export default function IdentityCenterPage() {
             ) : (
               <div className="space-y-4">
                 <div className="p-5 border border-stone-200 rounded-xl space-y-3 bg-stone-50/50">
-                  <h4 className="font-serif font-bold text-gray-900 text-sm flex items-center gap-2">
+                  <h4 className="font-heading font-bold text-gray-900 text-sm flex items-center gap-2">
                     <SparklesIcon className="w-4 h-4 text-amber-600" />
                     Opción A: Verificar Credencial de Terceros (Binance BABT, WorldID, etc.)
                   </h4>

@@ -40,7 +40,7 @@ export default function CompanyFinancesPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 pb-8 border-b border-slate-200">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Link href="/dashboard" className="text-xs text-indigo-600 hover:underline">
+              <Link href="/dashboard" className="text-xs text-teal-600 hover:underline">
                 ← Volver al Panel
               </Link>
               <span className="text-xs text-slate-400">•</span>
@@ -48,7 +48,7 @@ export default function CompanyFinancesPage() {
                 Suite Empresa
               </span>
             </div>
-            <h1 className="text-4xl font-serif text-slate-900 leading-tight">
+            <h1 className="text-4xl font-heading text-slate-900 leading-tight">
               Finanzas Comerciales & Flujo de Caja
             </h1>
             <p className="text-slate-500 font-light mt-1">
@@ -63,7 +63,7 @@ export default function CompanyFinancesPage() {
             <span className="text-xs tracking-wider uppercase text-slate-400 font-medium block mb-2">
               Ingresos Totales (Mes)
             </span>
-            <div className="text-3xl font-serif text-emerald-600 font-bold mb-1">
+            <div className="text-3xl font-heading text-emerald-600 font-bold mb-1">
               $970.00 <span className="text-sm font-sans text-slate-500">USDT eq.</span>
             </div>
             <p className="text-xs text-slate-500 font-light">+18% respecto al mes anterior</p>
@@ -73,7 +73,7 @@ export default function CompanyFinancesPage() {
             <span className="text-xs tracking-wider uppercase text-slate-400 font-medium block mb-2">
               Saldos en Custodia
             </span>
-            <div className="text-3xl font-serif text-amber-600 font-bold mb-1">
+            <div className="text-3xl font-heading text-amber-600 font-bold mb-1">
               $0.00 <span className="text-sm font-sans text-slate-500">USDT</span>
             </div>
             <p className="text-xs text-slate-500 font-light">Todas las operaciones cerradas</p>
@@ -83,7 +83,7 @@ export default function CompanyFinancesPage() {
             <span className="text-xs tracking-wider uppercase text-slate-400 font-medium block mb-2">
               Membresía BRLT Activa
             </span>
-            <div className="text-3xl font-serif text-indigo-600 font-bold mb-1">
+            <div className="text-3xl font-heading text-teal-600 font-bold mb-1">
               12 Meses
             </div>
             <p className="text-xs text-slate-500 font-light">Comisiones reducidas (0.5%)</p>
@@ -92,7 +92,7 @@ export default function CompanyFinancesPage() {
 
         {/* TABLA DE HISTORIAL DE VENTAS */}
         <div className="bg-white rounded-[2rem] border border-slate-200 p-8 shadow-sm">
-          <h2 className="text-2xl font-serif text-slate-900 mb-6">Registro de Ventas & Cobros Cripto</h2>
+          <h2 className="text-2xl font-heading text-slate-900 mb-6">Registro de Ventas & Cobros Cripto</h2>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
