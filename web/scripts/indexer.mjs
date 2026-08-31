@@ -236,7 +236,9 @@ const escrowHandlers = {
 
   OperationDisputed: async (operationId, disputer) => {
     console.log(`⚠️ Evento on-chain: Escrow.OperationDisputed #${operationId}`)
-    await upsertOperation({ id: Number(operationId), status: 3 })
+    // La contraparte que abre la disputa queda registrada como user2 on-chain;
+    // el indexador debe reflejarlo para que las valoraciones post-disputa funcionen.
+    await upsertOperation({ id: Number(operationId), user2: disputer, status: 3 })
     const op = await first('SELECT user1, user2 FROM operations WHERE id = ?', [Number(operationId)])
     const targets = new Set([disputer])
     if (op) {
