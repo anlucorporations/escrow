@@ -92,12 +92,19 @@ export default function AdminIdentityPage() {
       const registry = new ethers.Contract(USER_REGISTRY_ADDRESS, USER_REGISTRY_ABI, provider)
       const profiles = await registry.getRegisteredWalletsPaged(0, 100)
 
+      // Q1/H-02: el admin firma UNA vez (prueba de posesión de su wallet) y
+      // reutiliza la firma dentro de la ventana de 5 min para enriquecer perfiles.
+      const timestamp = Date.now()
+      const signer = await provider.getSigner()
+      const signature = await signer.signMessage(`TrueKeateIdentity:${account.toLowerCase()}:${timestamp}`)
+      const authQuery = `requester=${account}&signature=${encodeURIComponent(signature)}&timestamp=${timestamp}`
+
       // Enriquecer con la capa de datos (2FA, SBT, KYC) vía /api/identity
       const rows = await Promise.all(
         (profiles as Array<{ wallet: string; username: string; identificationLevel: number }>).map(async (p) => {
           let extra: Record<string, unknown> = {}
           try {
-            const res = await fetch(`/api/identity/${p.wallet}?requester=${account}`)
+            const res = await fetch(`/api/identity/${p.wallet}?${authQuery}`)
             const data = await res.json()
             if (data.profile) extra = data.profile
           } catch {

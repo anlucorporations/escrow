@@ -30,7 +30,7 @@ describe('Módulo de Identidad en 3 Niveles & SBTs', () => {
     const res = await acceptCommunityTerms(user1)
     expect(res.ok).toBe(true)
 
-    const profile: any = await getUserIdentityProfile(user1, user1)
+    const profile: any = await getUserIdentityProfile(user1, user1, false, true)
     expect(profile.terms_accepted).toBe(true)
     expect(profile.identification_level).toBe('inscrito')
   })
@@ -54,8 +54,8 @@ describe('Módulo de Identidad en 3 Niveles & SBTs', () => {
     expect(confirm.ok).toBe(true)
     expect(confirm.identificationLevel).toBe('verificado')
 
-    // Verificar perfil actualizado
-    const profile: any = await getUserIdentityProfile(user1, user1)
+    // Verificar perfil actualizado (self con propiedad probada por firma)
+    const profile: any = await getUserIdentityProfile(user1, user1, false, true)
     expect(profile.identification_level).toBe('verificado')
     expect(profile.email_verified).toBe(true)
     expect(profile.phone_verified).toBe(true)
@@ -110,8 +110,13 @@ describe('Módulo de Identidad en 3 Niveles & SBTs', () => {
     expect(publicView.phone).toBeUndefined()
     expect(publicView.two_factor_secret).toBeUndefined()
 
-    // Consulta del propio usuario (self)
-    const selfView: any = await getUserIdentityProfile(user1, user1, false)
+    // Q1/H-02 (IDOR): pasar requester=<victima> SIN firma NO otorga datos privados.
+    const spoofedView: any = await getUserIdentityProfile(user1, user1, false, false)
+    expect(spoofedView.email).toBeUndefined()
+    expect(spoofedView.phone).toBeUndefined()
+
+    // Consulta del propio usuario (self) CON propiedad probada por firma (verifiedSelf)
+    const selfView: any = await getUserIdentityProfile(user1, user1, false, true)
     expect(selfView.email).toBe('privado@truekeate.com')
     expect(selfView.phone).toBe('+584149999999')
 

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { initSchema, first } from '../../../../../server/db.js'
 import { submitKyc } from '../../../../../server/lib.js'
+import { applyRateLimit, rateLimitHeaders } from '../../../../../server/rate-limit.js'
 
 /**
  * KYC del usuario (M6): correo/teléfono cifrados en BD; hashes de documento
@@ -10,6 +11,10 @@ import { submitKyc } from '../../../../../server/lib.js'
  */
 export async function PUT(request, { params }) {
   try {
+    const rl = applyRateLimit(request, { scope: 'kyc', limit: 15 })
+    if (!rl.allowed) {
+      return NextResponse.json({ error: 'Demasiadas peticiones. Intenta en unos segundos.' }, { status: 429, headers: rateLimitHeaders(rl, 15, 60000) })
+    }
     await initSchema()
     const { address } = await params
     const body = await request.json()

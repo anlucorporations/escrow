@@ -122,7 +122,16 @@ export default function IdentityCenterPage() {
       return
     }
     try {
-      const res = await fetch(`/api/identity/${account}?requester=${account}`)
+      // Q1/H-02: probar posesión de la wallet firmando el payload de acceso
+      // (el endpoint solo entrega PII con firma fresca del solicitante).
+      const timestamp = Date.now()
+      const signer = await provider?.getSigner()
+      const signature = signer
+        ? await signer.signMessage(`TrueKeateIdentity:${account.toLowerCase()}:${timestamp}`)
+        : ''
+      const res = await fetch(
+        `/api/identity/${account}?requester=${account}&signature=${encodeURIComponent(signature)}&timestamp=${timestamp}`
+      )
       const data = await res.json()
       if (data.profile) {
         setProfile(data.profile)
@@ -132,7 +141,7 @@ export default function IdentityCenterPage() {
     } catch {
       setStatusMsg({ type: 'error', text: 'Error al cargar perfil de identidad' })
     }
-  }, [account])
+  }, [account, provider])
 
   useEffect(() => {
     if (isConnected && account) {

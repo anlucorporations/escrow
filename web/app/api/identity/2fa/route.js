@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { initSchema } from '../../../../server/db.js'
 import { setup2FASecret, confirm2FA } from '../../../../server/lib.js'
+import { applyRateLimit, rateLimitHeaders } from '../../../../server/rate-limit.js'
 
 /**
  * POST /api/identity/2fa
@@ -9,6 +10,10 @@ import { setup2FASecret, confirm2FA } from '../../../../server/lib.js'
  */
 export async function POST(request) {
   try {
+    const rl = applyRateLimit(request, { scope: 'identity-2fa', limit: 20 })
+    if (!rl.allowed) {
+      return NextResponse.json({ error: 'Demasiadas peticiones. Intenta en unos segundos.' }, { status: 429, headers: rateLimitHeaders(rl, 20, 60000) })
+    }
     await initSchema()
     const body = await request.json()
     const { address, action, code } = body

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { initSchema, query } from '../../../server/db'
 import { validateRating, createRating, DIMENSIONS } from '../../../server/lib'
+import { applyRateLimit, rateLimitHeaders } from '../../../server/rate-limit'
 
 /**
  * Valoraciones en 5 dimensiones (M3).
@@ -30,6 +31,10 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const rl = applyRateLimit(request, { scope: 'ratings', limit: 30 })
+    if (!rl.allowed) {
+      return NextResponse.json({ error: 'Demasiadas peticiones. Intenta en unos segundos.' }, { status: 429, headers: rateLimitHeaders(rl, 30, 60000) })
+    }
     await initSchema()
     const body = await request.json()
     const { operationId, rater, ratee, comment } = body

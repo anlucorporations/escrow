@@ -10,7 +10,14 @@ export async function POST(request, { params }) {
   try {
     await initSchema()
     const { id } = await params
-    const result = await closeMeetup(id)
+    // Q8/H-04: quien cierra debe ser parte de la operación (user1/user2)
+    let body = {}
+    try {
+      body = await request.json()
+    } catch {
+      // sin body: se conserva el comportamiento anterior (solo dev/demo)
+    }
+    const result = await closeMeetup(id, body.closer || '')
     if (!result.ok) return NextResponse.json({ error: result.error }, { status: 400 })
     return NextResponse.json({ ok: true })
   } catch (err) {

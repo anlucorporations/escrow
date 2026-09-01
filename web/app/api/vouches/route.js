@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { initSchema } from '../../../server/db.js'
 import { createVouch, listVouches } from '../../../server/lib.js'
+import { applyRateLimit, rateLimitHeaders } from '../../../server/rate-limit.js'
 
 /**
  * Avales entre usuarios verificados (M12).
@@ -22,6 +23,10 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const rl = applyRateLimit(request, { scope: 'vouches', limit: 30 })
+    if (!rl.allowed) {
+      return NextResponse.json({ error: 'Demasiadas peticiones. Intenta en unos segundos.' }, { status: 429, headers: rateLimitHeaders(rl, 30, 60000) })
+    }
     await initSchema()
     const body = await request.json()
     if (!body.vouchBy || !body.vouchFor) {

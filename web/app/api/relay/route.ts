@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { ethers } from 'ethers'
 import { ESCROW_ADDRESS, ESCROW_ABI } from '@/lib/contracts'
 import { envOrThrow } from '@/server/secrets'
+import { applyRateLimit, rateLimitHeaders } from '@/server/rate-limit'
 
 /**
  * Relayer de meta-transacciones (M5).
@@ -66,6 +67,15 @@ interface CompleteBody {
 }
 
 export async function POST(request: Request) {
+  // Q4/H-12: rate-limit básico por IP — el relayer quema gas del operador.
+  const rl = applyRateLimit(request, { scope: 'relay', limit: 10, windowMs: 60_000 })
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: 'Demasiadas peticiones al relayer. Intenta en unos segundos.' },
+      { status: 429, headers: rateLimitHeaders(rl, 10, 60_000) }
+    )
+  }
+
   let body: Record<string, unknown>
   try {
     body = await request.json()

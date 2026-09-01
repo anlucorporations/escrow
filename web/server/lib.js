@@ -6,7 +6,7 @@
 import { verifyMessage } from 'ethers'
 import crypto from 'node:crypto'
 import { query, first } from './db.js'
-import { envOrThrow } from './secrets.js'
+import { envOrThrow, isProduction } from './secrets.js'
 
 export const DIMENSIONS = ['acceptance', 'honesty', 'security', 'reliability', 'commitment']
 
@@ -293,6 +293,102 @@ export function verifySignature(payload, signature, expectedAddress) {
   } catch {
     return false
   }
+}
+
+/* ------------------------------------------------------------------ *
+ *  Control de acceso criptográfico a PII (H-02 / Q1)
+ * ------------------------------------------------------------------ */
+
+/** Payload canónico que el SOLICITANTE firma para probar que posee su wallet. */
+export function identityAccessPayload(requester, timestamp) {
+  return `TrueKeateIdentity:${String(requester).toLowerCase()}:${timestamp}`
+}
+
+/**
+ * Verifica que `requester` posee la wallet que declara (firma ECDSA fresca).
+ * Con esto, /api/identity/[address] puede distinguir:
+ *  - titular (requester == target) con prueba de posesión -> datos privados
+ *  - owner de la plataforma (on-chain) con prueba de posesión -> PII de terceros
+ *  - cualquier otro -> solo datos públicos (sin IDOR: ya no basta pasar
+ *    requester=<victima> en el query string).
+ */
+export function verifyIdentityAccess(requester, signature, timestamp) {
+  if (!requester || !signature || !timestamp) return false
+  const ts = Number(timestamp)
+  if (!Number.isFinite(ts) || Math.abs(Date.now() - ts) > 5 * 60 * 1000) return false
+  const payload = identityAccessPayload(requester, timestamp)
+  return verifySignature(payload, signature, requester)
+}
+
+/* ------------------------------------------------------------------ *
+ *  TOTP real (RFC 6238) — sin dependencias (H-01 / Q2)
+ * ------------------------------------------------------------------ */
+
+const BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
+
+function base32Decode(input) {
+  const clean = String(input).toUpperCase().replace(/=+$/, '').replace(/\s/g, '')
+  let bits = 0
+  let value = 0
+  const out = []
+  for (const ch of clean) {
+    const idx = BASE32_ALPHABET.indexOf(ch)
+    if (idx === -1) continue
+    value = (value << 5) | idx
+    bits += 5
+    if (bits >= 8) {
+      out.push((value >>> (bits - 8)) & 0xff)
+      bits -= 8
+    }
+  }
+  return Buffer.from(out)
+}
+
+/** Genera un secreto base32 de 160 bits compatible con apps Authenticator. */
+export function generateTotpSecret() {
+  const bytes = crypto.randomBytes(20) // 160 bits
+  let bits = 0
+  let value = 0
+  let out = ''
+  for (const b of bytes) {
+    value = (value << 8) | b
+    bits += 8
+    while (bits >= 5) {
+      out += BASE32_ALPHABET[(value >>> (bits - 5)) & 31]
+      bits -= 5
+    }
+  }
+  if (bits > 0) out += BASE32_ALPHABET[(value << (5 - bits)) & 31]
+  return out
+}
+
+/** Código TOTP para un secreto base32 (ventana en pasos de 30 s). */
+export function totpCode(secret, { window = 0, timeStep = 30, digits = 6 } = {}) {
+  let key
+  try {
+    key = base32Decode(secret)
+  } catch {
+    // Secreto legacy en hex: se usa como bytes directamente
+    key = Buffer.from(String(secret).replace(/^0x/i, ''), 'hex')
+  }
+  if (!key || key.length === 0) throw new Error('Secreto 2FA inválido')
+  const counter = Math.floor(Date.now() / 1000 / timeStep) + window
+  const buf = Buffer.alloc(8)
+  buf.writeBigUInt64BE(BigInt(counter))
+  const hmac = crypto.createHmac('sha1', key).update(buf).digest()
+  const offset = hmac[hmac.length - 1] & 0x0f
+  const bin =
+    ((hmac[offset] & 0x7f) << 24) | (hmac[offset + 1] << 16) | (hmac[offset + 2] << 8) | hmac[offset + 3]
+  return String(bin % 10 ** digits).padStart(digits, '0')
+}
+
+/** Valida un código TOTP permitiendo ±`window` pasos de 30 s. */
+export function verifyTotp(secret, code, { window = 1 } = {}) {
+  if (!code || !/^\d{6}$/.test(String(code))) return false
+  for (let w = -window; w <= window; w++) {
+    if (totpCode(secret, { window: w }) === String(code)) return true
+  }
+  return false
 }
 
 /**
@@ -582,10 +678,22 @@ export async function openMeetup(meetupId, address) {
   return { ok: true, meetup: { ...m, opened_at_user2: now, opened_by: lower, status: 'opened' } }
 }
 
-export async function closeMeetup(meetupId) {
+export async function closeMeetup(meetupId, closer = '') {
   const m = await first('SELECT * FROM meetups WHERE id = ?', [meetupId])
   if (!m) return { ok: false, error: 'Encuentro no encontrado' }
   if (m.status === 'blocked') return { ok: false, error: 'El encuentro está bloqueado' }
+
+  // Q8/H-04: solo las partes de la operación pueden cerrar el intercambio.
+  if (closer) {
+    const op = await first('SELECT user1, user2 FROM operations WHERE id = ?', [Number(m.operation_id)])
+    const lower = String(closer).toLowerCase()
+    const isParty =
+      op && (op.user1?.toLowerCase() === lower || op.user2?.toLowerCase() === lower)
+    if (!isParty) {
+      return { ok: false, error: 'Solo las partes de la operación pueden cerrar el intercambio' }
+    }
+  }
+
   await query("UPDATE meetups SET status = 'completed' WHERE id = ?", [meetupId])
   return { ok: true }
 }
@@ -626,18 +734,30 @@ export function decryptField(enc) {
 /**
  * Registra la verificación KYC (M6): correo/teléfono CIFRADOS en la BD y
  * hashes de documento/selfie. El estado público es solo kyc_status.
- * Si email/phone no se proveen, se conservan los valores ya cifrados
- * (permite al admin aprobar sin conocer los datos privados del usuario).
- * (En producción la verificación requiere revisión; en demo se auto-aprueba.)
+ * Si email/phone no se proveen, se conservan los valores ya cifrados.
+ * (Q2/H-01) En PRODUCCIÓN no existe auto-aprobación: el KYC queda en
+ * 'submitted' a la espera de un rol verificador real; en dev/demo se
+ * auto-aprueba (comportamiento heredado).
  */
 export async function submitKyc(address, { email, phone, documentHash = '', selfieHash = '' }) {
   const existing = await first('SELECT email, phone FROM users WHERE address = ?', [address.toLowerCase()])
   const encryptedEmail = email ? encryptField(email) : (existing?.email || '')
   const encryptedPhone = phone ? encryptField(phone) : (existing?.phone || '')
+
+  if (isProduction()) {
+    // Sin auto-aprobación: marca como enviado, pendiente de verificación real
+    await query(
+      `UPDATE users SET email = ?, phone = ?, document_hash = ?, selfie_hash = ?, kyc_status = 'submitted' WHERE address = ?`,
+      [encryptedEmail, encryptedPhone, documentHash, selfieHash, address.toLowerCase()]
+    )
+    return { ok: true, kycStatus: 'submitted', message: 'KYC enviado; pendiente de verificación' }
+  }
+
   await query(
     `UPDATE users SET email = ?, phone = ?, document_hash = ?, selfie_hash = ?, kyc_status = 'verified', identification_level = 'certificado' WHERE address = ?`,
     [encryptedEmail, encryptedPhone, documentHash, selfieHash, address.toLowerCase()]
   )
+  return { ok: true, kycStatus: 'verified' }
 }
 
 /* ------------------------------------------------------------------ *
@@ -654,9 +774,16 @@ export async function acceptCommunityTerms(address) {
 /** Nivel 2: Validar contacto (correo y teléfono con código OTP) */
 export async function verifyContactChannels(address, { email, phone, emailCode, phoneCode }) {
   const addr = address.toLowerCase()
-  // En entorno dev/demo los códigos de prueba son '123456' o no vacíos
-  const validEmailCode = !emailCode || emailCode === '123456' || emailCode.length === 6
-  const validPhoneCode = !phoneCode || phoneCode === '123456' || phoneCode.length === 6
+  // Q2/H-01: en PRODUCCIÓN se rechazan códigos vacíos y el valor por defecto
+  // '123456'; se exige un código OTP real de 6 dígitos (M2: servicio OTP).
+  // En dev/demo se conserva el comportamiento de prueba heredado.
+  const validCode = (code) => {
+    if (!code) return false
+    if (isProduction()) return /^\d{6}$/.test(code) && code !== '123456'
+    return code === '123456' || (code.length === 6 && /^\d{6}$/.test(code))
+  }
+  const validEmailCode = validCode(emailCode)
+  const validPhoneCode = validCode(phoneCode)
 
   if (!validEmailCode || !validPhoneCode) {
     throw new Error('Código de verificación incorrecto')
@@ -679,11 +806,11 @@ export async function verifyContactChannels(address, { email, phone, emailCode, 
   return { ok: true, emailVerified: true, phoneVerified: true }
 }
 
-/** Nivel 2: Iniciar configuración 2FA (TOTP) */
+/** Nivel 2: Iniciar configuración 2FA (TOTP RFC 6238) */
 export async function setup2FASecret(address) {
   const addr = address.toLowerCase()
-  // Generar secreto seguro de 32 caracteres
-  const secret = crypto.randomBytes(20).toString('hex').toUpperCase().slice(0, 32)
+  // Q2/H-01: secreto base32 de 160 bits real (compatible con Google Authenticator)
+  const secret = generateTotpSecret()
   const encryptedSecret = encryptField(secret)
 
   await query('UPDATE users SET two_factor_secret = ? WHERE address = ?', [encryptedSecret, addr])
@@ -701,9 +828,12 @@ export async function confirm2FA(address, code) {
     throw new Error('No se ha iniciado la configuración de 2FA')
   }
 
-  // Validación de código TOTP (en dev acepta '123456' o 6 dígitos numéricos)
-  if (!code || code.length !== 6 || !/^\d{6}$/.test(code)) {
-    throw new Error('Código 2FA inválido (debe tener 6 dígitos numéricos)')
+  // Q2/H-01: en PRODUCCIÓN se valida TOTP real contra el secreto (RFC 6238);
+  // en dev se acepta además el código de prueba '123456'.
+  const secret = decryptField(u.two_factor_secret)
+  const valid = isProduction() ? verifyTotp(secret, code) : code === '123456' || verifyTotp(secret, code)
+  if (!valid) {
+    throw new Error('Código 2FA inválido')
   }
 
   await query("UPDATE users SET two_factor_enabled = 1 WHERE address = ?", [addr])
@@ -751,10 +881,11 @@ export async function verifyThirdPartySBT(address, { sbtContract, sbtProviderNam
 }
 
 /** Consulta del perfil de identidad con estricta segregación de privacidad (Usuario vs. Owner vs. Público) */
-export async function getUserIdentityProfile(targetAddress, requestingAddress = '', isOwner = false) {
+export async function getUserIdentityProfile(targetAddress, requestingAddress = '', isOwner = false, verifiedSelf = false) {
   const target = targetAddress.toLowerCase()
-  const requester = requestingAddress ? requestingAddress.toLowerCase() : ''
-  const isSelf = requester === target
+  // Q1/H-02: los datos privados solo se entregan si la ruta verificó la firma
+  // del titular (verifiedSelf) o del owner de la plataforma (isOwner).
+  const isSelf = Boolean(verifiedSelf)
 
   const u = await first('SELECT * FROM users WHERE address = ?', [target])
   if (!u) {
