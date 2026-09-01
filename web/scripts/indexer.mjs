@@ -45,10 +45,16 @@ function loadEnvLocal() {
 }
 loadEnvLocal()
 
+// GCP: precargar secretos críticos (DATABASE_URL, RPC_URL, KYC_SECRET) desde
+// Secret Manager cuando no vienen inyectados por --set-secrets (ej. Cloud Run
+// Jobs/VM). No-op si ya están en el entorno.
+const { loadSecrets } = await import('../server/secrets.js')
+await loadSecrets()
+
 const { initSchema, query, first } = await import('../server/db.js')
 const { encryptField } = await import('../server/lib.js')
 
-const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || process.env.RPC_URL || 'http://127.0.0.1:8545'
+const RPC_URL = (process.env.NEXT_PUBLIC_RPC_URL || process.env.RPC_URL || 'http://127.0.0.1:8545').trim()
 const ESCROW_ADDRESS = process.env.NEXT_PUBLIC_ESCROW_ADDRESS
 const REGISTRY_ADDRESS = process.env.NEXT_PUBLIC_USER_REGISTRY_ADDRESS
 const SBT_REGISTRY_ADDRESS = process.env.NEXT_PUBLIC_SBT_REGISTRY_ADDRESS
@@ -328,7 +334,12 @@ async function main() {
   console.log(`=============================================================`)
   console.log(`📡 INDEXADOR DE EVENTOS ON-CHAIN -> POSTGRESQL ("TrueKeate")`)
   console.log(`=============================================================`)
-  console.log(`📦 Base de datos conectada: ${process.env.DATABASE_URL || 'SQLite'}`)
+  // Redactar credenciales: nunca imprimir la URL completa (contiene password)
+  const dbUrl = process.env.DATABASE_URL || ''
+  const dbLabel = dbUrl
+    ? dbUrl.replace(/\/\/([^:@\/]+):([^@\/]+)@/, '//[usuario]:[REDACTADO]@')
+    : 'SQLite'
+  console.log(`📦 Base de datos conectada: ${dbLabel}`)
 
   const provider = new ethers.JsonRpcProvider(RPC_URL)
   const network = await provider.getNetwork()

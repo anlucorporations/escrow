@@ -1,0 +1,17 @@
+# gcloud builds submit — contexto de build del indexador (raíz del repo)
+# Al existir este archivo, gcloud NO usa .gitignore, por lo que sc/out/
+# (gitignored pero necesario para los ABIs del indexador) SÍ se sube.
+
+.git
+.gitignore
+**/node_modules
+**/.next
+web/.env*
+.env
+.env.local
+deployment-info*.txt
+anvil.log
+data/
+web/data/
+web/scripts/e2e/shots/
+*.tsbuildinfo

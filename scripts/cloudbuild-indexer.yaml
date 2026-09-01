@@ -1,0 +1,21 @@
+# ============================================================================
+# TrueKeate — Cloud Build del INDEXADOR (Cloud Run Jobs)
+# ============================================================================
+# Contexto de build: RAÍZ del repo (necesita sc/out con los ABIs compilados):
+#   gcloud builds submit --config scripts/cloudbuild-indexer.yaml .
+# ============================================================================
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-f'
+      - 'web/Dockerfile.indexer'
+      - '-t'
+      - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/truekeate-repo/truekeate-indexer'
+      - '.'
+
+images:
+  - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/truekeate-repo/truekeate-indexer'
+
+options:
+  logging: CLOUD_LOGGING_ONLY

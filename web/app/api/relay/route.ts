@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { ethers } from 'ethers'
 import { ESCROW_ADDRESS, ESCROW_ABI } from '@/lib/contracts'
+import { envOrThrow } from '@/server/secrets'
 
 /**
  * Relayer de meta-transacciones (M5).
@@ -11,14 +12,29 @@ import { ESCROW_ADDRESS, ESCROW_ABI } from '@/lib/contracts'
  *
  *   POST /api/relay  { kind: 'create'|'complete', ...intención firmada }
  *
- * La clave del relayer se configura con RELAYER_PRIVATE_KEY (por defecto la
- * cuenta #4 de Anvil, SOLO para desarrollo local).
+ * La clave del relayer se configura con RELAYER_PRIVATE_KEY.
+ *  - Producción (GCP): se inyecta desde Secret Manager (`--set-secrets`);
+ *    si falta, la PRIMERA petición falla con error claro (fail-fast en
+ *    runtime, no en build). NUNCA usa un valor por defecto en producción.
+ *  - Desarrollo: fallback explícito a la cuenta #4 de Anvil (solo local).
+ *
+ * Los secretos se leen de forma perezosa (primer request) para que `next build`
+ * pueda compilar sin variables de entorno y la imagen no hornee secretos.
  */
-const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL ?? process.env.RPC_URL ?? 'http://127.0.0.1:8545'
-const RELAYER_KEY =
-  process.env.RELAYER_PRIVATE_KEY ?? '0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a'
+let relay: { provider: ethers.JsonRpcProvider; wallet: ethers.Wallet } | null = null
 
-const provider = new ethers.JsonRpcProvider(RPC_URL)
+function getRelay() {
+  if (!relay) {
+    const rpcUrl =
+      process.env.NEXT_PUBLIC_RPC_URL ?? envOrThrow('RPC_URL', { devFallback: 'http://127.0.0.1:8545' })
+    const relayerKey = envOrThrow('RELAYER_PRIVATE_KEY', {
+      devFallback: '0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a',
+    })
+    const provider = new ethers.JsonRpcProvider(rpcUrl)
+    relay = { provider, wallet: new ethers.Wallet(relayerKey, provider) }
+  }
+  return relay
+}
 
 interface PermitBody {
   deadline: string
@@ -58,7 +74,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const wallet = new ethers.Wallet(RELAYER_KEY, provider)
+    const { wallet } = getRelay()
     const escrow = new ethers.Contract(ESCROW_ADDRESS, ESCROW_ABI, wallet)
 
     if (body.kind === 'create') {

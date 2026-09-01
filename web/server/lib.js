@@ -6,6 +6,7 @@
 import { verifyMessage } from 'ethers'
 import crypto from 'node:crypto'
 import { query, first } from './db.js'
+import { envOrThrow } from './secrets.js'
 
 export const DIMENSIONS = ['acceptance', 'honesty', 'security', 'reliability', 'commitment']
 
@@ -594,8 +595,10 @@ export async function closeMeetup(meetupId) {
  * ------------------------------------------------------------------ */
 
 function kycKey() {
-  // Clave derivada de KYC_SECRET (en producción: Secret Manager de GCP)
-  const secret = process.env.KYC_SECRET || 'truekeate-dev-secret-0123456789abcdef'
+  // Clave derivada de KYC_SECRET.
+  // Producción: obligatoria vía GCP Secret Manager (fail-fast si falta).
+  // Desarrollo: fallback de prueba explícito, NUNCA usado en producción.
+  const secret = envOrThrow('KYC_SECRET', { devFallback: 'truekeate-dev-secret-0123456789abcdef' })
   return crypto.createHash('sha256').update(secret).digest()
 }
 

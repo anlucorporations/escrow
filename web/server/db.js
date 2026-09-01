@@ -19,7 +19,7 @@ let sqliteDb = null
 let pgPool = null
 
 export function isPostgres() {
-  const url = process.env.DATABASE_URL || ''
+  const url = (process.env.DATABASE_URL || '').trim()
   return url.startsWith('postgres://') || url.startsWith('postgresql://')
 }
 
@@ -42,9 +42,33 @@ async function getPg() {
   if (!pgPool) {
     const mod = 'pg'
     const { Pool } = await import(/* webpackIgnore: true */ mod)
-    pgPool = new Pool({ connectionString: process.env.DATABASE_URL })
+    const url = (process.env.DATABASE_URL || '').trim()
+    const ssl = pgSslFromUrl(url)
+    pgPool = new Pool({ connectionString: url, ...(ssl ? { ssl } : {}) })
   }
   return pgPool
+}
+
+/**
+ * Traduce los parámetros de conexión Cloud SQL a la config SSL de node-postgres.
+ *  - ?host=/cloudsql/<CONN>   → socket Unix privado (VPC): sin SSL necesario.
+ *  - ?sslmode=require|verify-* → TLS hacia la IP pública de Cloud SQL.
+ *  - ?ssl=true                 → equivalente a sslmode=require.
+ * Nota: para verificación completa de certificado en producción se recomienda
+ * el socket Unix de Cloud Run (--add-cloudsql-instances), que no expone IP.
+ */
+function pgSslFromUrl(url) {
+  const qIndex = url.indexOf('?')
+  if (qIndex === -1) return undefined
+  const params = new URLSearchParams(url.slice(qIndex + 1))
+  const mode = params.get('sslmode')
+  if (mode === 'require' || mode === 'verify-ca' || mode === 'verify-full') {
+    // Cloud SQL firma con CA pública; con PGSSLROOTCERT se puede endurecer.
+    const ca = process.env.PGSSLROOTCERT
+    return ca ? { ca: fs.readFileSync(ca) } : { rejectUnauthorized: false }
+  }
+  if (params.get('ssl') === 'true') return { rejectUnauthorized: false }
+  return undefined
 }
 
 /** Convierte placeholders `?` a `$n` para PostgreSQL. */

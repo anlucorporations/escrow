@@ -1,0 +1,27 @@
+# ============================================================================
+# TrueKeate — Dockerfile del INDEXADOR (Cloud Run Jobs / VM)
+# ============================================================================
+# Construir desde la RAÍZ del repo (necesita sc/out con los ABIs compilados):
+#   docker build -f web/Dockerfile.indexer -t gcr.io/<PROYECTO>/truekeate-indexer .
+#
+# Los secretos (DATABASE_URL, RPC_URL, KYC_SECRET) se inyectan en runtime vía
+# Secret Manager; la imagen NO contiene claves.
+# ============================================================================
+
+FROM node:22-alpine
+
+WORKDIR /app
+ENV NODE_ENV=production
+
+# Dependencias de la app (incluye pg)
+COPY web/package.json web/package-lock.json ./
+RUN npm ci
+
+# Código de la app (scripts + server) y ABIs compilados por Foundry
+COPY web ./web
+COPY sc/out ./sc/out
+
+WORKDIR /app/web
+
+# Sincronización histórica + suscripción en tiempo real a eventos on-chain
+CMD ["node", "scripts/indexer.mjs"]
