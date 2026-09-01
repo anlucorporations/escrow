@@ -232,8 +232,8 @@ NEXT_PUBLIC_TRUEKE_SERVICE_ADDRESS={trueke_service}
 NEXT_PUBLIC_RPC_URL={RPC_URL}
 NEXT_PUBLIC_CHAIN_ID=31337
 RELAYER_PRIVATE_KEY={OWNER_KEY}
-DATABASE_URL=postgresql://anlucorporations:KeLuDa.2324@127.0.0.1:5432/TrueKeate
-KYC_SECRET=truekeate-local-dev-secret-0123456789abcdef0123456789abcdef
+DATABASE_URL={os.environ.get("DATABASE_URL", "postgresql://localhost:5432/TrueKeate")}
+KYC_SECRET={os.environ.get("KYC_SECRET", "truekeate-local-dev-secret-0123456789abcdef0123456789abcdef")}
 """
 with open(env_path, "w", encoding="utf-8") as f:
     f.write(env_content)

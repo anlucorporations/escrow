@@ -1,8 +1,12 @@
 import pg from 'pg'
 const { Pool } = pg
 
+// ⚠️ SEGURIDAD: sin credenciales hardcodeadas. Se leen del entorno.
+//   ADMIN_DATABASE_URL → conexión de administrador (crear base si falta).
+//   DATABASE_URL       → base objetivo de la prueba.
+const ADMIN_URL = process.env.ADMIN_DATABASE_URL || 'postgresql://postgres@127.0.0.1:5432/postgres'
 const PG_CONFIG = {
-  connectionString: 'postgresql://anlucorporations:KeLuDa.2324@127.0.0.1:5432/TrueKeate',
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres@127.0.0.1:5432/TrueKeate',
 }
 
 async function testDatabaseCreationAndOperations() {
@@ -12,9 +16,7 @@ async function testDatabaseCreationAndOperations() {
 
   // 1. Conexión de administración para verificar/crear base de datos
   console.log('\n[1/5] Verificando conexión al servidor PostgreSQL...')
-  const adminPool = new Pool({
-    connectionString: 'postgresql://postgres:KeLuDa.2324@127.0.0.1:5432/postgres',
-  })
+  const adminPool = new Pool({ connectionString: ADMIN_URL })
   
   const versionRes = await adminPool.query('SELECT version()')
   console.log('✓ Servidor activo:', versionRes.rows[0].version.split(',')[0])

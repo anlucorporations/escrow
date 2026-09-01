@@ -1,4 +1,4 @@
-﻿# deploy-local.ps1 — Despliegue local con matriz de roles completa (PowerShell)
+# deploy-local.ps1 — Despliegue local con matriz de roles completa (PowerShell)
 param (
     [string]$RpcUrl = "http://127.0.0.1:8545"
 )
@@ -225,8 +225,8 @@ NEXT_PUBLIC_TRUEKE_SERVICE_ADDRESS=$TruekeService
 NEXT_PUBLIC_RPC_URL=$RpcUrl
 NEXT_PUBLIC_CHAIN_ID=31337
 RELAYER_PRIVATE_KEY=$OwnerKey
-DATABASE_URL=postgresql://anlucorporations:KeLuDa.2324@127.0.0.1:5432/TrueKeate
-KYC_SECRET=truekeate-local-dev-secret-0123456789abcdef0123456789abcdef
+DATABASE_URL=$($env:DATABASE_URL ?? 'postgresql://localhost:5432/TrueKeate')
+KYC_SECRET=$($env:KYC_SECRET ?? 'truekeate-local-dev-secret-0123456789abcdef0123456789abcdef')
 "@
 [System.IO.File]::WriteAllText($envPath, $envContent, [System.Text.Encoding]::UTF8)
 Write-Host "✓ web/.env.local actualizado con direcciones de contratos y PostgreSQL" -ForegroundColor Green
