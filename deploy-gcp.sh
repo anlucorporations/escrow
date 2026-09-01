@@ -42,8 +42,10 @@ PROJECT_ID="${GCP_PROJECT_ID:-}"
 REGION="${GCP_REGION:-us-central1}"
 CLOUDSQL_INSTANCE="${CLOUDSQL_INSTANCE:-}"
 SERVICE_ACCOUNT="${GCP_SERVICE_ACCOUNT:-}"
-IMAGE="${GCP_IMAGE:-gcr.io/$PROJECT_ID/truekeate:latest}"
-INDEXER_IMAGE="${GCP_INDEXER_IMAGE:-gcr.io/$PROJECT_ID/truekeate-indexer:latest}"
+# Q8/H-13: referencias de imagen UNIFICADAS en Artifact Registry regional
+# (mismo repositorio que usan los cloudbuilds; evita el footgun gcr.io vs AR).
+IMAGE="${GCP_IMAGE:-southamerica-east1-docker.pkg.dev/$PROJECT_ID/truekeate-repo/truekeate-web:latest}"
+INDEXER_IMAGE="${GCP_INDEXER_IMAGE:-southamerica-east1-docker.pkg.dev/$PROJECT_ID/truekeate-repo/truekeate-indexer:latest}"
 RPC_URL="${RPC_URL:-}"
 
 command -v gcloud >/dev/null 2>&1 || { echo "❌ gcloud no instalado."; exit 1; }

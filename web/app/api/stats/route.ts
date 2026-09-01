@@ -7,10 +7,11 @@ import {
   USER_REGISTRY_ABI,
 } from '@/lib/contracts'
 import { PlatformStats } from '@/lib/stats'
+import { envOrThrow } from '@/server/secrets'
 
-// RPC configurable vía variable de entorno (portable a otras redes).
-//   NEXT_PUBLIC_RPC_URL=http://localhost:8545  (por defecto)
-const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL ?? process.env.RPC_URL ?? 'http://127.0.0.1:8545'
+// Q5/H-13: fail-fast en producción (nada de degradación silenciosa a localhost)
+const RPC_URL =
+  process.env.NEXT_PUBLIC_RPC_URL ?? envOrThrow('RPC_URL', { devFallback: 'http://127.0.0.1:8545' })
 const provider = new ethers.JsonRpcProvider(RPC_URL)
 
 const PAGE_SIZE = 100

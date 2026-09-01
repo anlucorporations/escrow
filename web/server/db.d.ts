@@ -11,3 +11,6 @@ export declare function query(sql: string, params?: unknown[]): Promise<DbRow[] 
 export declare function first(sql: string, params?: unknown[]): Promise<DbRow | null>
 
 export declare function initSchema(): Promise<void>
+
+/** Fail-fast: en producción exige PostgreSQL global (Cloud SQL). */
+export declare function assertProdDatabase(): void

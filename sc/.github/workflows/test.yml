@@ -67,5 +67,78 @@ jobs:
       - name: Unit tests (Vitest)
         run: npm test
 
+      - name: Coverage (Vitest, umbrales no-regresión)
+        run: npm run test:coverage
+
       - name: Build
         run: npm run build
+
+  e2e:
+    name: E2E (Playwright + Anvil + PostgreSQL)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: anlucorporations
+          POSTGRES_PASSWORD: e2e_password
+          POSTGRES_DB: TrueKeate
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U anlucorporations"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Start Anvil
+        run: anvil --port 8545 --chain-id 31337 > /tmp/anvil.log 2>&1 &
+
+      - name: Deploy contracts + rol matrix (local)
+        env:
+          RPC_URL: http://127.0.0.1:8545
+          DATABASE_URL: postgresql://anlucorporations:e2e_password@127.0.0.1:5432/TrueKeate
+        run: |
+          bash ../deploy-local.sh
+
+      - name: Start indexer
+        run: npm run indexer > /tmp/indexer.log 2>&1 &
+
+      - name: Build Next.js
+        run: npm run build
+
+      - name: Start Next.js
+        run: (npx next start -p 3000 > /tmp/next.log 2>&1 &) && sleep 8
+
+      - name: Run E2E suite
+        run: node scripts/e2e/run-e2e.mjs
+
+      - name: Upload E2E report (siempre)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-report
+          path: web/scripts/e2e/

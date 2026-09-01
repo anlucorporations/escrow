@@ -2,12 +2,14 @@ import { NextResponse } from 'next/server'
 import { ethers } from 'ethers'
 import { initSchema } from '../../../../../server/db.js'
 import { approveCampaign } from '../../../../../server/lib.js'
+import { envOrThrow } from '../../../../../server/secrets.js'
 
 /**
  * Aprobación de campañas (M11): solo Socios, verificado on-chain contra
  * Governance.isSocio(). POST /api/campaigns/[id]/approve  { approver }
  */
-const RPC_URL = process.env.RPC_URL ?? 'http://localhost:8545'
+// Q5/H-13: fail-fast en producción
+const RPC_URL = envOrThrow('RPC_URL', { devFallback: 'http://127.0.0.1:8545' })
 const GOVERNANCE = process.env.NEXT_PUBLIC_GOVERNANCE_ADDRESS ?? '0x0000000000000000000000000000000000000000'
 const provider = new ethers.JsonRpcProvider(RPC_URL)
 

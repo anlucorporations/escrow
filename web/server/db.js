@@ -303,6 +303,13 @@ const SCHEMA = [
     description TEXT NOT NULL DEFAULT '',
     created_at  INTEGER NOT NULL DEFAULT 0
   )`,
+  // Checkpoint del indexador (Q6/H-06): último bloque sincronizado por contrato.
+  // Evita re-escaneos desde el bloque 0 y la pérdida de eventos entre reinicios.
+  `CREATE TABLE IF NOT EXISTS sync_state (
+    contract   TEXT PRIMARY KEY,
+    last_block INTEGER NOT NULL DEFAULT 0,
+    updated_at INTEGER NOT NULL DEFAULT 0
+  )`,
 ]
 
 /** Crea las tablas si no existen. Idempotente. */

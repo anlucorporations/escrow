@@ -48,7 +48,7 @@ loadEnvLocal()
 // GCP: precargar secretos críticos (DATABASE_URL, RPC_URL, KYC_SECRET) desde
 // Secret Manager cuando no vienen inyectados por --set-secrets (ej. Cloud Run
 // Jobs/VM). No-op si ya están en el entorno.
-const { loadSecrets } = await import('../server/secrets.js')
+const { loadSecrets, envOrThrow } = await import('../server/secrets.js')
 await loadSecrets()
 
 const { initSchema, query, first, assertProdDatabase } = await import('../server/db.js')
@@ -58,7 +58,10 @@ const { encryptField } = await import('../server/lib.js')
 // (Cloud SQL). En producción, si DATABASE_URL no es postgres -> fail-fast.
 assertProdDatabase()
 
-const RPC_URL = (process.env.NEXT_PUBLIC_RPC_URL || process.env.RPC_URL || 'http://127.0.0.1:8545').trim()
+// Q5/H-13: en producción el RPC es obligatorio (fail-fast, sin localhost)
+const RPC_URL = (
+  process.env.NEXT_PUBLIC_RPC_URL || envOrThrow('RPC_URL', { devFallback: 'http://127.0.0.1:8545' })
+).trim()
 const ESCROW_ADDRESS = process.env.NEXT_PUBLIC_ESCROW_ADDRESS
 const REGISTRY_ADDRESS = process.env.NEXT_PUBLIC_USER_REGISTRY_ADDRESS
 const SBT_REGISTRY_ADDRESS = process.env.NEXT_PUBLIC_SBT_REGISTRY_ADDRESS
@@ -80,6 +83,14 @@ function loadAbi(contract) {
 
 async function createNotification(user, type, message, refId = '') {
   try {
+    // Q6/H-06: deduplicación — no repetir la misma notificación (user+type+ref)
+    if (String(refId) !== '') {
+      const exists = await first(
+        'SELECT 1 FROM notifications WHERE "user" = ? AND type = ? AND ref_id = ? LIMIT 1',
+        [user.toLowerCase(), type, String(refId)]
+      )
+      if (exists) return
+    }
     const id = ethers.hexlify(ethers.randomBytes(16)).replace('0x', '')
     const now = Math.floor(Date.now() / 1000)
     await query(
@@ -282,12 +293,38 @@ const escrowHandlers = {
 let CHUNK_OVERRIDE = 0
 const chunkSize = () => (CHUNK_OVERRIDE > 0 ? CHUNK_OVERRIDE : CHUNK)
 
+/* ------------------------- checkpoint (Q6/H-06) ------------------------- */
+
+/** Último bloque sincronizado para un contrato (START_BLOCK si nunca corrió). */
+async function getCheckpoint(label) {
+  try {
+    const row = await first('SELECT last_block FROM sync_state WHERE contract = ?', [label])
+    return row ? Number(row.last_block) : START_BLOCK
+  } catch {
+    return START_BLOCK
+  }
+}
+
+/** Persiste el último bloque procesado del backfill de un contrato. */
+async function saveCheckpoint(label, block) {
+  try {
+    await query(
+      `INSERT INTO sync_state (contract, last_block, updated_at) VALUES (?, ?, ?)
+       ON CONFLICT(contract) DO UPDATE SET last_block = excluded.last_block, updated_at = excluded.updated_at`,
+      [label, Number(block), Math.floor(Date.now() / 1000)]
+    )
+  } catch (err) {
+    console.error(`⚠️ No se pudo guardar checkpoint de ${label}:`, err.message)
+  }
+}
+
 /**
  * Backfill histórico: procesa los logs de `fromBlock` a `toBlock` en chunks y
  * despacha cada evento al handler correspondiente (mismo código que el listener).
+ * Con checkpoint: continúa desde el último bloque sincronizado y lo persiste.
  */
-async function backfillLogs(contract, iface, topics, handlerMap, label) {
-  let from = START_BLOCK
+async function backfillLogs(contract, iface, topics, handlerMap, label, checkpointLabel = '') {
+  let from = checkpointLabel ? await getCheckpoint(checkpointLabel) : START_BLOCK
   const latest = await contract.runner.provider.getBlockNumber()
   if (from > latest) return 0
   let processed = 0
@@ -310,6 +347,7 @@ async function backfillLogs(contract, iface, topics, handlerMap, label) {
         }
         processed++
       }
+      if (checkpointLabel) await saveCheckpoint(checkpointLabel, to)
       if (from === latest) break
       from = to + 1
     } catch (err) {
@@ -347,7 +385,8 @@ async function main() {
 
   const provider = new ethers.JsonRpcProvider(RPC_URL)
   const network = await provider.getNetwork()
-  console.log(`⛓  Conectado a RPC: ${RPC_URL} (Chain ID: ${network.chainId})`)
+  // Q7/H-23: no exponer la URL del RPC en logs (puede contener credenciales)
+  console.log(`⛓  Conectado a RPC (Chain ID: ${network.chainId})`)
 
   // Contratos a indexar
   const contracts = []
@@ -363,7 +402,7 @@ async function main() {
       try {
         const topic = escrowIface.getEvent(eventName)?.topicHash
         if (topic) {
-          const n = await backfillLogs(escrow, escrowIface, topic, { [eventName]: handler }, `Escrow.${eventName}`)
+          const n = await backfillLogs(escrow, escrowIface, topic, { [eventName]: handler }, `Escrow.${eventName}`, 'Escrow')
           if (n > 0) console.log(`  ↻ Backfill Escrow.${eventName}: ${n} evento(s) procesado(s)`)
         }
       } catch (err) {
@@ -403,9 +442,8 @@ async function main() {
       const lvlNum = Number(level)
       const lvlStr = lvlNum === 1 ? 'verificado' : lvlNum === 2 ? 'certificado' : 'inscrito'
       const hemStr = isNorthernHemisphere ? 'N' : 'S'
-      console.log(
-        `👤 Evento on-chain: UserRegistry.UserRegistered -> @${username} (${wallet.slice(0, 6)}...) [${lvlStr}] (UTM: ${utmZone}${hemStr} ${utmEasting}m E, ${utmNorthing}m N)`
-      )
+      // Q7/H-23: sin PII en logs — sin username completo ni coordenadas UTM
+      console.log(`👤 Evento on-chain: UserRegistry.UserRegistered -> ${wallet.slice(0, 6)}... [${lvlStr}]`)
       await upsertUser(
         wallet,
         username,
@@ -436,14 +474,14 @@ async function main() {
       if (regTopic) {
         const n = await backfillLogs(registry, registryIface, regTopic, {
           UserRegistered: handleUserRegistered,
-        }, 'UserRegistry.UserRegistered')
+        }, 'UserRegistry.UserRegistered', 'UserRegistry')
         if (n > 0) console.log(`  ↻ Backfill UserRegistry.UserRegistered: ${n} evento(s) procesado(s)`)
       }
       const lvlTopic = registryIface.getEvent('IdentificationLevelUpdated')?.topicHash
       if (lvlTopic) {
         const n = await backfillLogs(registry, registryIface, lvlTopic, {
           IdentificationLevelUpdated: handleLevelUpdated,
-        }, 'UserRegistry.IdentificationLevelUpdated')
+        }, 'UserRegistry.IdentificationLevelUpdated', 'UserRegistry')
         if (n > 0) console.log(`  ↻ Backfill UserRegistry.IdentificationLevelUpdated: ${n} evento(s) procesado(s)`)
       }
     } catch (err) {
