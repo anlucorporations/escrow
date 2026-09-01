@@ -172,6 +172,29 @@ curl https://<SERVICE_URL>/api/stats   # API + BD (PostgreSQL vía socket)
 # Probar /api/relay con una intención firmada (ver README_CASO_PRACTICO)
 ```
 
+## 9. Idempotencia y no-destrucción de servicios globales
+
+> El nodo Foundry y Cloud SQL son **servicios globales compartidos** (otros
+> proyectos se conectan a ellos). `deploy-gcp.sh` está diseñado para **no
+> reiniciarlos ni modificarlos** al desplegar o re-desplegar:
+
+| Recurso | Comportamiento del despliegue |
+|---|---|
+| **Cloud SQL (instancia/BD/usuario)** | Solo se crea si NO existe (`gcloud sql instances describe` / `create` guardado). Las tablas usan `CREATE TABLE/INDEX IF NOT EXISTS` y `ALTER TABLE` solo si la columna falta. Nunca se borra ni se recrea. |
+| **Nodo Foundry remoto** | No se reinicia ni se apaga. Solo recibe transacciones de despliegue de contratos. |
+| **Secret Manager** | `ensure_secret` **no sobrescribe** secretos existentes (solo crea los que faltan). |
+| **Contratos en el nodo** | Si `web/.env.gcp` ya existe, `deploy-gcp.sh` **omite el re-despliegue** (evita duplicados en el nodo compartido) salvo confirmación explícita o `--force-contracts`. |
+| **Job indexador** | `jobs create ... || jobs update` — idempotente. El backfill usa upserts (`ON CONFLICT DO UPDATE`), no duplica datos. |
+
+### Garantía de uso del servicio global de BD (fail-fast)
+
+En producción (`NODE_ENV=production`) el proyecto **solo** acepta PostgreSQL
+global (Cloud SQL): si `DATABASE_URL` no es `postgres://...` (o falta), la app
+y el indexador **fallan al arrancar** en lugar de caer silenciosamente a una
+SQLite local efímera. Guard: `assertProdDatabase()` en `web/server/db.js`,
+invocado por `initSchema()` y por `scripts/indexer.mjs`. SQLite queda
+exclusivamente para desarrollo local.
+
 > Todos los cambios de infraestructura GCP requieren autorización previa
 > (según escrow-TrueKeate.md: "se solicitara autorizacion para la creacion o
 > despliege de servicios globales").

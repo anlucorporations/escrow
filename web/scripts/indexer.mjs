@@ -51,8 +51,12 @@ loadEnvLocal()
 const { loadSecrets } = await import('../server/secrets.js')
 await loadSecrets()
 
-const { initSchema, query, first } = await import('../server/db.js')
+const { initSchema, query, first, assertProdDatabase } = await import('../server/db.js')
 const { encryptField } = await import('../server/lib.js')
+
+// Garantía: el indexador SIEMPRE escribe en el servicio global PostgreSQL
+// (Cloud SQL). En producción, si DATABASE_URL no es postgres -> fail-fast.
+assertProdDatabase()
 
 const RPC_URL = (process.env.NEXT_PUBLIC_RPC_URL || process.env.RPC_URL || 'http://127.0.0.1:8545').trim()
 const ESCROW_ADDRESS = process.env.NEXT_PUBLIC_ESCROW_ADDRESS

@@ -23,6 +23,23 @@ export function isPostgres() {
   return url.startsWith('postgres://') || url.startsWith('postgresql://')
 }
 
+/**
+ * GARANTÍA DEL SERVICIO GLOBAL DE BD (GCP):
+ * En producción el proyecto DEBE usar PostgreSQL (Cloud SQL). Si DATABASE_URL
+ * no apunta a PostgreSQL, la app falla al arrancar en lugar de caer
+ * silenciosamente a una SQLite local efímera (que no es el servicio global y
+ * además sería inconsistente entre instancias de Cloud Run).
+ */
+export function assertProdDatabase() {
+  if (process.env.NODE_ENV === 'production' && !isPostgres()) {
+    throw new Error(
+      'Producción requiere el servicio global PostgreSQL (Cloud SQL): DATABASE_URL ' +
+        'debe ser postgres://... (inyectado vía Secret Manager). SQLite solo está ' +
+        'permitido en desarrollo local.'
+    )
+  }
+}
+
 export function sqliteFile() {
   return process.env.SQLITE_PATH || path.join(process.cwd(), 'data', 'truekeate.db')
 }
@@ -290,6 +307,9 @@ const SCHEMA = [
 
 /** Crea las tablas si no existen. Idempotente. */
 export async function initSchema() {
+  // En producción: solo PostgreSQL global (Cloud SQL). Fail-fast si no.
+  assertProdDatabase()
+
   for (const sql of SCHEMA) {
     await query(sql)
   }

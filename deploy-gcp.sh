@@ -25,13 +25,14 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT"
 
-SKIP_DB=0; SKIP_CONTRACTS=0; WITH_INDEXER=0; PREVIEW=0
+SKIP_DB=0; SKIP_CONTRACTS=0; WITH_INDEXER=0; PREVIEW=0; FORCE_CONTRACTS=0
 for arg in "$@"; do
   case "$arg" in
     --skip-db) SKIP_DB=1 ;;
     --skip-contracts) SKIP_CONTRACTS=1 ;;
     --with-indexer) WITH_INDEXER=1 ;;
     --preview) PREVIEW=1 ;;
+    --force-contracts) FORCE_CONTRACTS=1 ;;
     *) echo "⚠️  Argumento desconocido: $arg" ;;
   esac
 done
@@ -126,6 +127,19 @@ if [ "$SKIP_DB" = "0" ] && [ -n "$CLOUDSQL_INSTANCE" ]; then
   echo "     (o gcloud sql connect $INSTANCE_NAME --user=postgres --command='CREATE EXTENSION IF NOT EXISTS postgis;')"
 fi
 
+# ------------------------------------------------- coherencia BD global (no-destrucción)
+# Verifica que el DATABASE_URL de Secret Manager apunte a la instancia Cloud SQL
+# esperada. Si apunta a otra, se advierte: NO se crea ni se toca la otra BD.
+if [ -n "$CLOUDSQL_INSTANCE" ] && gcloud secrets describe DATABASE_URL --project="$PROJECT_ID" >/dev/null 2>&1; then
+  DB_URL_SECRET="$(gcloud secrets versions access latest --secret=DATABASE_URL --project="$PROJECT_ID" 2>/dev/null | tr -d '\r\n' || true)"
+  if [ -n "$DB_URL_SECRET" ] && [ "${DB_URL_SECRET#*host=/cloudsql/$CLOUDSQL_INSTANCE}" = "$DB_URL_SECRET" ]; then
+    echo ""
+    echo "⚠️  AVISO: el DATABASE_URL en Secret Manager NO apunta a $CLOUDSQL_INSTANCE."
+    echo "    El despliegue NO creará ni modificará otras bases de datos."
+    echo "    Revisa el secreto antes de continuar (el indexador y la web usan ese DATABASE_URL)."
+  fi
+fi
+
 # ---------------------------------------------------------------- 4. contratos
 if [ "$SKIP_CONTRACTS" = "0" ]; then
   echo ""
@@ -134,10 +148,31 @@ if [ "$SKIP_CONTRACTS" = "0" ]; then
     echo "❌ RPC_URL requerida para desplegar contratos (usa --skip-contracts si ya están desplegados)."
     exit 1
   fi
-  CONTRACTS_ARGS=""
-  [ "$PREVIEW" = "1" ] && CONTRACTS_ARGS="--allow-anvil-keys"
-  RPC_URL="$RPC_URL" OWNER_PRIVATE_KEY="${OWNER_PRIVATE_KEY:-}" \
-    bash "$ROOT/scripts/deploy-contracts-gcp.sh" $CONTRACTS_ARGS
+  # Salvaguarda: si ya hay contratos desplegados (web/.env.gcp), NO re-desplegar
+  # por accidente: `forge create` duplicaría contratos en el nodo compartido
+  # (otros proyectos usan los servicios globales). Requiere --force-contracts.
+  if [ -f "$ROOT/web/.env.gcp" ] && [ "$FORCE_CONTRACTS" = "0" ]; then
+    echo "⚠️  web/.env.gcp ya existe (contratos ya desplegados en el nodo global)."
+    echo "    Re-desplegar contratos crearía DUPLICADOS en el servicio compartido."
+    if [ -t 0 ]; then
+      read -r -p "    ¿Re-desplegar contratos de todos modos? [s/N] " ans
+      case "$ans" in
+        s|S|y|Y) ;;
+        *) echo "    Omitiendo contratos. Usa --force-contracts para forzar."; SKIP_CONTRACTS=1 ;;
+      esac
+    else
+      echo "    Omitiendo contratos (modo no interactivo). Usa --force-contracts para forzar."
+      SKIP_CONTRACTS=1
+    fi
+  fi
+  if [ "$SKIP_CONTRACTS" = "1" ]; then
+    [ -f "$ROOT/web/.env.gcp" ] || { echo "❌ web/.env.gcp no existe (despliega contratos antes)."; exit 1; }
+  else
+    CONTRACTS_ARGS=""
+    [ "$PREVIEW" = "1" ] && CONTRACTS_ARGS="--allow-anvil-keys"
+    RPC_URL="$RPC_URL" OWNER_PRIVATE_KEY="${OWNER_PRIVATE_KEY:-}" \
+      bash "$ROOT/scripts/deploy-contracts-gcp.sh" $CONTRACTS_ARGS
+  fi
 else
   echo ""
   echo "⛓️ [3/7] Omitiendo despliegue de contratos (--skip-contracts)."
@@ -227,4 +262,10 @@ echo "  🎉 TRUEKEATE DESPLEGADO EN GCP"
 echo "  Web:       ${SERVICE_URL:-<ver gcloud run services describe truekeate-web>}"
 echo "  Contratos: deployment-info-gcp.txt"
 echo "  Secretos:  Secret Manager (proyecto $PROJECT_ID)"
+echo "-----------------------------------------------------------------"
+echo "  🔒 SERVICIOS GLOBALES INTACTOS (no-destrucción):"
+echo "     - Cloud SQL: NO se recrea/borra (solo CREATE TABLE IF NOT EXISTS)."
+echo "     - Nodo Foundry: NO se reinicia (solo transacciones de contratos)."
+echo "     - Secret Manager: NO se sobrescribe (los existentes se conservan)."
+echo "     - El proyecto usa SIEMPRE PostgreSQL global (fail-fast si no)."
 echo "================================================================="
