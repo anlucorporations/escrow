@@ -257,3 +257,46 @@ NEXT_PUBLIC_TRUEKE_SERVICE_ADDRESS=0x2279B7A0a67E14118866570202273010b9195b05
 NEXT_PUBLIC_CHAIN_ID=31337
 NEXT_PUBLIC_RPC_URL=http://127.0.0.1:8545
 ```
+
+---
+
+## 🆕 5. Actualización — Manejo Seguro de Claves e Integración GCP (v2)
+
+> **Fecha:** 31 de Agosto de 2026 — Adaptación del proyecto a los servicios
+> globales de GCP (Foundry + PostgreSQL) y a las condiciones de manejo de
+> claves e información sensible.
+
+### 📦 Nuevos archivos
+
+| Archivo | Propósito |
+| :--- | :--- |
+| `web/server/secrets.js` | Módulo central de secretos: env → Secret Manager (metadata server) → gcloud CLI. **Fail-fast en producción.** |
+| `web/.env.gcp.example` | Documentación de variables GCP (secretos + públicas + infraestructura). |
+| `web/Dockerfile` | Imagen Cloud Run (Next.js standalone, incluye `pg` vía `outputFileTracingIncludes`). |
+| `web/Dockerfile.indexer` | Imagen del indexador (Cloud Run Jobs), con `sc/out` para ABIs. |
+| `deploy-gcp.sh` | Orquestador: secretos → Cloud SQL → contratos remotos → Cloud Run → indexador. |
+| `scripts/deploy-contracts-gcp.sh` | Despliegue de contratos al nodo Foundry remoto (claves vía env/Secret Manager, bloqueo de claves Anvil por defecto). |
+| `scripts/cloudbuild.yaml`, `scripts/cloudbuild-indexer.yaml` | Builds de Cloud Build. |
+| `web/scripts/setup-gcp-db.mjs` | Habilita PostGIS + esquema en Cloud SQL. |
+
+### 🔒 Cambios de seguridad aplicados
+
+1. **Eliminadas credenciales hardcodeadas** de `init-pg.js`,
+   `create-truekeate-db.mjs`, `test-local-db.mjs` y de los templates de
+   `deploy-local.sh/.py/.ps1` (la contraseña PostgreSQL local ya no se
+   escribe en `.env.local`; se lee de `ADMIN_DATABASE_URL`/`DATABASE_URL`).
+2. **`KYC_SECRET` (lib.js):** en producción es obligatoria (Secret Manager);
+   el fallback de desarrollo solo aplica con `NODE_ENV != production`.
+3. **`RELAYER_PRIVATE_KEY` y `RPC_URL` (relay/route.ts):** igual, fail-fast en
+   producción — eliminado el fallback a la clave de Anvil #4.
+4. **Cloud Run:** los secretos se inyectan con `--set-secrets`; la imagen
+   Docker no contiene claves.
+5. **Bloqueo de claves Anvil por defecto** en `deploy-contracts-gcp.sh`
+   (aborta salvo `--allow-anvil-keys`, solo preview de desarrollo remoto).
+6. **`.gitignore`:** añadidos `deployment-info-gcp.txt`, `web/.env.gcp`
+   (y excepción para `.env.gcp.example`).
+
+> [!IMPORTANT]
+> Los secretos `DATABASE_URL`, `RPC_URL`, `KYC_SECRET` y `RELAYER_PRIVATE_KEY`
+> se gestionan EXCLUSIVAMENTE en GCP Secret Manager para cualquier despliegue
+> en la nube. `deploy-gcp.sh` los crea idempotentemente si no existen.

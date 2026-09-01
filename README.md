@@ -44,6 +44,26 @@ This script will:
 ./stop.sh
 ```
 
+**Deploy on Google Cloud (GCP) — Cloud Run + Cloud SQL + Foundry remoto:**
+
+```bash
+# Configura el entorno (ver web/.env.gcp.example)
+export GCP_PROJECT_ID=truekeate-main
+export GCP_REGION=us-central1
+export CLOUDSQL_INSTANCE=truekeate-main:us-central1:truekeate-db-prod
+export GCP_SERVICE_ACCOUNT=truekeate-app-sa@truekeate-main.iam.gserviceaccount.com
+export RPC_URL=http://<IP-NODO-FOUNDRY>:8545
+export OWNER_PRIVATE_KEY=0x...
+
+# Despliega todo: Secret Manager + Cloud SQL + contratos + Cloud Run (+ indexador)
+./deploy-gcp.sh --with-indexer
+```
+
+> 🔐 **Claves en GCP:** todos los secretos (`DATABASE_URL`, `RPC_URL`,
+> `KYC_SECRET`, `RELAYER_PRIVATE_KEY`) se inyectan desde **Secret Manager**
+> (`--set-secrets`). Ninguna clave se hardcodea ni se hornea en la imagen.
+> Ver `RepoTecnico/GCP_DEPLOY.md` para la guía completa.
+
 **View available accounts:**
 ```bash
 ./accounts.sh  # Show all Anvil test accounts and private keys
@@ -54,7 +74,7 @@ source ./accounts.sh  # Load as environment variables
 
 After running `./setup.sh` or `./start.sh`, you'll have access to 3 pre-funded accounts.
 
-See [ACCOUNTS.md](RepoTecno/ACCOUNTS.md) for detailed information about accessing and using the test accounts.
+See [ACCOUNTS.md](RepoTecnico/ACCOUNTS.md) for detailed information about accessing and using the test accounts.
 
 Quick access:
 - All accounts have 10,000 ETH for gas
