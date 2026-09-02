@@ -149,12 +149,13 @@ criterios Gherkin/EARS alineados), `arquitectura_tecnica.md` (secciones 1–10, 
   - [x] `api/lib/reputacion.js` + router `/reputacion`: fórmula D12/D30 (insumos 0–100, recálculo mensual), Oro histórico (RF-07.4), penalización inactividad (D19/CU-21)
   - [x] Router `/subastas`: solo Empresa crea (RF-17.1), solo Certificado puja (RF-17.2), mayor valor gana con desempate por nivel (D27/CU-25/26)
   - [x] Tests: 7/7 C8 (suite backend **26/26**; suite Foundry **61/61**; total plataforma 87 tests)
-- [ ] (Fase 3) Push a GitHub/GitLab pendiente (orden del director)
+- [x] **Push realizado** ✅: rama `escrow-dsh-GCP` en `2340fac` publicada en **GitHub** (`anlucorporations/escrow`) y **GitLab.com** — `5020be0..2340fac`
+- [ ] `gitlab.codecrypto.academy` pendiente de acceso SSH (D11)
 - [ ] (Fase 4) Pruebas E2E · (Fase 5) Manuales
 
 ## Próximos pasos
 
-1. **Fase 3 completa**: 8 ciclos ejecutados con pruebas (Foundry 61/61, backend 26/26, frontend build OK).
-2. Pendiente: push de los commits locales a GitHub/GitLab (`/push` — orden del director) y preview en anvil/GCP.
-3. Siguiente: Fase 4 (pruebas E2E con navegador) y Fase 5 (manuales).
+1. **Fase 3 completa y publicada** (rama `escrow-dsh-GCP` en `2340fac` — GitHub + GitLab.com).
+2. Siguiente: **Fase 4** (pruebas E2E con navegador + pruebas exhaustivas Forge) y **Fase 5** (manuales).
+3. Pendiente operativo: acceso a `gitlab.codecrypto.academy` (D11) para el tercer remoto.
 3. Los commits se crean localmente en `escrow-dsh-GCP`; el push a GitHub/GitLab se hace solo por orden del director (`/push`).
