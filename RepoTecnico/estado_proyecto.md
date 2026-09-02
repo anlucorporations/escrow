@@ -127,11 +127,19 @@ criterios Gherkin/EARS alineados), `arquitectura_tecnica.md` (secciones 1–10, 
   - [x] `backend/relayer.js`: relayer que envía meta-tx asumiendo el gas (RF-09.2) desde la cuenta 1 (RF-15.2); 4 protecciones D16 (nonce+chainId, allowlist de verificados con chequeo on-chain D28, límite diario 20/día D29, endpoint autenticado — rate-limit en C6); bloqueo 1h tras 3 fallos/10 min (D29); health-check SLA (D15)
   - [x] Tests: 7/7 (node:test con provider mock): intent verificado, rechazo no-verificado, nonce repetido, chainId, límite diario, bloqueo por fallos, health
   - [x] Integración E2E real en anvil: SmartAccount marcada VERIFICADO (D28) + meta-tx enviada por cuenta 1 con nonce incrementado ✅
-- [ ] (Fase 3) **Ciclo 6 — Backend API** (pendiente de confirmación)
+- [x] **Ciclo 6 — Backend API REST** ✅
+  - [x] `api/app.js`: Express con rate-limiting global (D16/RF-09.6), /healthz, manejo de errores
+  - [x] `api/routes/auth.js`: connect (inscripción RF-01.4), register (GDPR D17), session por firma EIP-191
+  - [x] `api/routes/kyc.js`: escalera D28 (códigos→VERIFICADO; documento+selfie + revisión Owner→CERTIFICADO, RF-18.4)
+  - [x] `api/routes/catalog.js`: publicaciones AtoA con límites por nivel (D14/RF-04.2), encargos (CU-07)
+  - [x] `api/routes/truekes.js`: creación (Verificado, máx 3 activos RF-14.4), custodiar, firma, valoración 1-5 (D18/D36)
+  - [x] `api/routes/admin.js`: dashboard Owner (RF-13.1): usuarios, contratos, KPIs disputas, db, infra/health
+  - [x] Tests: 7/7 (supertest + almacén en memoria); suite backend **19/19**
+- [ ] (Fase 3) **Ciclo 7 — Frontend suite + landing** (pendiente de confirmación)
 - [ ] (Fase 4) Pruebas E2E · (Fase 5) Manuales
 
 ## Próximos pasos
 
-1. Confirmar los **Ciclos 1-5** y avanzar al **Ciclo 6** (Backend API REST, Node.js).
-2. Ejecutar cada ciclo C6–C8 con unit + fuzz + invariantes + cobertura ≥80 % (D38) y preview en anvil/GCP.
+1. Confirmar los **Ciclos 1-6** y avanzar al **Ciclo 7** (Frontend Next.js 16 + sistema de diseño RNF-08).
+2. Ejecutar cada ciclo C7–C8 con unit + fuzz + invariantes + cobertura ≥80 % (D38) y preview en anvil/GCP.
 3. Los commits se crean localmente en `escrow-dsh-GCP`; el push a GitHub/GitLab se hace solo por orden del director (`/push`).

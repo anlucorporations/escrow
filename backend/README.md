@@ -1,4 +1,4 @@
-# TrueKeate — Backend (Ciclos 4-5, Fase 3)
+# TrueKeate — Backend (Ciclos 4-6, Fase 3)
 
 Backend off-chain del proyecto: base de datos PostgreSQL (lectura impulsada por eventos) e
 **indexador de eventos propio** (listener Node.js — D25).
@@ -81,9 +81,33 @@ la cuenta 1 con nonce incrementado ✅ (`test/integracion-relayer.js`).
 
 ## Roadmap
 
-| Ciclo | Contenido backend |
+## Backend API REST (`api/` — Ciclo 6)
+
+Express con rate-limiting global y por usuario (D16/RF-09.6). Módulos:
+
+| Router | Endpoints | Función / CU |
+|---|---|---|
+| `/auth` | connect, register (GDPR D17), session (firma EIP-191) | Inscripción automática (RF-01.4, CU-01) |
+| `/kyc` | init, verify-codes, submit, status, review | Escalera D28 (CU-02); revisión humana Owner (RF-18.4) |
+| `/catalog` | articulos (AtoA), encargos, catálogo | RF-04 (CU-06/07/08) |
+| `/truekes` | crear, custodiar, firma-recepcion, valoracion | Orquesta intents hacia Escrow vía relayer (CU-11…15) |
+| `/admin` | usuarios, contratos, kpis-disputas, db, infra/health | Dashboard Owner (RF-13.1) |
+
+```bash
+npm run api        # arranca en http://127.0.0.1:4000 (PORT configurable)
+npm test           # 19/19 tests (indexador + relayer + API)
+```
+
+> Los datos viven en un almacén en memoria (puente a PostgreSQL en C8). La autenticación por
+> firma de sesión se implementa con EIP-191; el flujo completo de meta-tx (firma EIP-712 del
+> usuario → relayer paga gas) se valida en `test/integracion-relayer.js`.
+
+## Roadmap
+
+| Ciclo | Contenido |
 |---|---|
-| C6 | Backend API REST (auth, KYC, publicaciones, trueques, puntos de encuentro, etc.) |
+| C7 | Frontend Next.js 16 (landing + suite por rol, sistema de diseño RNF-08) |
+| C8 | Integración E2E completa |
 | C8 | Integración E2E + reconciliación fina por trueke |
 
 > Referencia: `../RepoTecnico/arquitectura_tecnica.md` §4 (modelo BD) y §5 (indexador).
