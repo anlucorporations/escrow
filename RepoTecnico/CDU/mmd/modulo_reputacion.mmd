@@ -1,0 +1,48 @@
+flowchart TD
+    subgraph CU20["CU-20 Calcular nivel y medalla por fórmula (D12)"]
+        r1["Ocurre un evento de reputación: valoración registrada (CU-15) o resolución de anulación / disputa"]
+        r2["El Sistema recalcula el puntaje con la fórmula aprobada D12: puntaje = 0.5 x reputación + 0.3 x volumen_efectivo + 0.2 x (1 - ratio_apelaciones)"]
+        r3["Normaliza cada insumo a escala 0 a 100: reputación media 1 a 5 x 20; volumen efectivo relativo al máximo del sistema x 100; apelaciones 100 x (1 - apelaciones / efectivos)"]
+        r4{"¿En qué umbral queda el puntaje?"}
+        r5["0 a 25: nivel Iniciado, medalla Bronce"]
+        r6["26 a 50: nivel Común, medalla Plata"]
+        r7["51 a 75: nivel Frecuente, medalla Oro"]
+        r8["76 o mas: habilita la solicitud formal de Socio (CU-03) que exige votación 2/3 de los Socios"]
+        r9["Medalla Oro (cómputo acumulativo histórico): +1000 intercambios efectivos y ratio de efectividad >= 90%: requisito para la clasificación Empresa"]
+        r10["Actualiza nivel y medalla y ajusta las capacidades del usuario: rubros, lugares y campañas. El descenso de nivel revoca las capacidades superiores"]
+        r11["Recálculo mensual de todos los usuarios como lote programado, además del recálculo por evento"]
+        r1 --> r2 --> r3 --> r4
+        r4 -->|"0 a 25"| r5
+        r4 -->|"26 a 50"| r6
+        r4 -->|"51 a 75"| r7
+        r4 -->|"76 o mas"| r8
+        r1 --> r9
+        r5 --> r10
+        r6 --> r10
+        r7 --> r10
+        r10 --> r11
+    end
+
+    subgraph CU21["CU-21 Penalización automática por inactividad prolongada (nivel Común)"]
+        q1["El Sistema monitorea la actividad del usuario de nivel Común (Plata)"]
+        q2{"¿180 días consecutivos sin actividad y participación mayor al 5% del volumen de artículos publicados del mercado?"}
+        q3["Sí: ejecuta la penalización: degradación a nivel Iniciado y suspensión de nuevas publicaciones"]
+        q4["Notifica al usuario y registra la penalización en el registro auditable con fecha, condiciones verificadas y resultado"]
+        q5["El usuario apela a soporte o los Socios evalúan la sanción: si procede, se revierte o ajusta (A1)"]
+        q6["No: no aplica penalización. El usuario conserva su nivel y su capacidad de publicar (A2)"]
+        q1 --> q2
+        q2 -->|"Sí"| q3 --> q4 --> q5
+        q2 -->|"No"| q6
+    end
+
+    subgraph CU22["CU-22 Registrar establecimiento de retiro (aprobación de Socios)"]
+        t1["Usuario Frecuente (Oro) o Empresa registra el establecimiento con dirección y geolocalización"]
+        t2["El Sistema valida los datos y somete el establecimiento a aprobación de los Socios (RF-03.9)"]
+        t3{"¿Aprobado por los Socios?"}
+        t4["Sí: el establecimiento queda disponible como punto de retiro / entrega para sus intercambios"]
+        t5["El usuario puede ofrecer la modalidad de envíos / delivery desde ese establecimiento"]
+        t6["No: el establecimiento no se habilita y se notifica el motivo al solicitante (A1)"]
+        t1 --> t2 --> t3
+        t3 -->|"Sí"| t4 --> t5
+        t3 -->|"No"| t6
+    end

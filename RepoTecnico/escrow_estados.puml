@@ -1,0 +1,71 @@
+@startuml
+' ============================================================
+' TrueKeate — Máquina de Estados del Escrow (trueque)
+' Fuente de verdad on-chain (RNF-01.1) · RF-05, RF-06, D13, D21
+' ============================================================
+title TrueKeate — Escrow: máquina de estados del trueque
+caption Contrato escrow on-chain (única fuente de verdad) · quórums y timelocks según RF-05.2b, RF-06, D13 y D21
+
+' ============ ESTADOS TERMINALES ============
+state "COMPLETADO\n(fondos liberados)" as COMPLETADO
+state "ANULADO\n(fondos devueltos)" as ANULADO
+state "BLOQUEADO\n(violación de norma)" as BLOQUEADO
+
+' ============ ESTADOS DEL CICLO ============
+state "CREADO / ACTIVO" as CREADO_ACTIVO
+state "CUSTODIADO" as CUSTODIADO
+state "APERTURA\n(ventana 10 min)" as APERTURA
+state "EN_DISPUTA" as EN_DISPUTA
+state "RESOLUCION_SOCIOS" as RESOLUCION_SOCIOS
+
+' ============ TRANSICIONES (con guardas) ============
+[*] --> CREADO_ACTIVO : "Acuerdo de trueque creado\n[solo usuarios inscritos y verificados (D14 / RF-01.2)]"
+
+CREADO_ACTIVO --> CUSTODIADO : "Custodiar NFTs/criptos en el escrow (RF-05.2)\n[al custodiar los activos ofrecidos]"
+
+CUSTODIADO --> APERTURA : "Apertura dual (RF-05.7)\n[≤10 min de la hora pautada y ≤10 min de diferencia entre aperturas]"
+
+CUSTODIADO --> BLOQUEADO : "Violación de norma detectada (RF-05.8)\n[moderación: bloqueo + solicitud de cierre irregular]"
+
+APERTURA --> COMPLETADO : "Firmas de recepción de A y B (RF-05.2)\n[verificación KYC (D14) + valoración obligatoria 1–5 (RF-07.1 / R8)]"
+
+APERTURA --> EN_DISPUTA : "Recepción insatisfecha / rechazada\n[solicitud de anulación justificada (RF-06.1)]"
+
+APERTURA --> BLOQUEADO : "Violación de norma (RF-05.8)\n[bloqueo del intercambio]"
+
+EN_DISPUTA --> RESOLUCION_SOCIOS : "Abrir votación de Socios\n[un voto por Socio · quórum ≥2/3 · plazo máx 5 días (D13, D21)]"
+
+RESOLUCION_SOCIOS --> ANULADO : "Quórum ≥2/3 aprueba la anulación\n[devolución de fondos a las billeteras (RF-06.1/D13)]"
+
+RESOLUCION_SOCIOS --> ANULADO : "Vence el plazo de 5 días sin quórum\n[ANULADO por defecto (D26): NFTs devueltos a ambas partes]"
+
+RESOLUCION_SOCIOS --> COMPLETADO : "Quórum rechaza la anulación\n[continúa el cierre: firmas de ambas partes + valoración]"
+
+RESOLUCION_SOCIOS --> BLOQUEADO : "Sanción evaluada por los Socios (RF-06.3)\n[ejecución on-chain de la sanción tras timelock 6h]"
+
+COMPLETADO --> [*]
+ANULADO --> [*]
+BLOQUEADO --> [*]
+
+' ============ NOTAS ============
+note right of RESOLUCION_SOCIOS
+  **Gobernanza (D21):** un voto por Socio, sin ponderación por nivel.
+  Plazo máximo **5 días** desde la solicitud de anulación (D13).
+  **Sin quórum al vencer → ANULADO por defecto (D26):** NFTs
+  devueltos a las billeteras de ambas partes (cierre en tiempo finito).
+end note
+
+note bottom of ANULADO
+  **Anulación (D13/D26):** la devolución de fondos se ejecuta al resolver la
+  anulación, sin timelock adicional. El **timelock de 6 h (D21)** aplica
+  únicamente a la **ejecución de sanciones** (RF-06.3), no a la devolución.
+end note
+
+note top of CREADO_ACTIVO
+  La **blockchain es la única fuente de verdad** de los estados del
+  escrow (RNF-01.1); PostgreSQL se actualiza por eventos vía indexador
+  propio (D25). Las subastas anuladas o sin ganador devuelven los NFTs
+  custodiados a sus billeteras (RF-17.5).
+end note
+
+@enduml

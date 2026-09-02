@@ -1,0 +1,30 @@
+flowchart TD
+    subgraph CU25["CU-25 Crear subasta de empresa (artículo custodiado en escrow)"]
+        k1["Solo una cuenta clasificada como Empresa con suscripción activa crea la subasta (paga su propio gas)"]
+        k2["Define: artículo ofrecido, plazo de duración, puja inicial, incremento mínimo de puja y artículos que acepta recibir"]
+        k3["El artículo ofrecido se custodia en el contrato escrow al crearse la subasta"]
+        k4["El Sistema valida y publica la subasta en estado ABIERTA"]
+        k5["Durante el plazo, solo los usuarios Certificados pujan (CU-26)"]
+        k6["Al cierre del plazo: se determina el ganador. Sin ganador o subasta anulada: los NFTs custodiados vuelven a las billeteras de sus dueños"]
+        k1 --> k2 --> k3 --> k4 --> k5 --> k6
+    end
+
+    subgraph CU26["CU-26 Pujar y adjudicar una subasta de empresa (prioridad por nivel)"]
+        j1["El postor Certificado registra su puja respetando la puja inicial y el incremento mínimo"]
+        j2{"¿El postor es Certificado y la puja es válida?"}
+        j2n["No: la puja se rechaza: postor no Certificado o puja por debajo del mínimo / incremento (A1 y A2)"]
+        j3["Sí: las pujas se registran hasta el vencimiento del plazo de duración"]
+        j4["Al cierre, el Sistema determina el ganador: el postor que ofrece el mayor valor"]
+        j5{"¿Hay empate de valor?"}
+        j6["Sí: prevalece el postor de mayor nivel (desempate por nivel, D27)"]
+        j7["El ganador pasa al flujo estándar de escrow (RF-05) para completar el trueque con la Empresa"]
+        j8["Los NFTs de los postores no ganadores se liberan de la subasta"]
+        j1 --> j2
+        j2 -->|"No"| j2n
+        j2 -->|"Sí"| j3 --> j4 --> j5
+        j5 -->|"Sí"| j6 --> j7
+        j5 -->|"No"| j7
+        j7 --> j8
+    end
+
+    k5 --> j1

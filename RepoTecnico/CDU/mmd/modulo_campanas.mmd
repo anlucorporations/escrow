@@ -1,0 +1,34 @@
+flowchart TD
+    subgraph CU09["CU-09 Crear y aprobar campaña de venta masiva"]
+        f1["Usuario de nivel Frecuente con medalla Oro (mayormente Empresa, con suscripción activa) crea la campaña de venta masiva con sus artículos"]
+        f2["Opcional: define modalidad de envíos / delivery y establecimiento para retiro"]
+        f3{"¿El establecimiento de retiro definido está aprobado por los Socios?"}
+        f3n["No: la campaña no se activa hasta que el establecimiento sea aprobado por los Socios (RF-03.9)"]
+        f4["Sí o sin delivery: el Sistema somete la campaña a aprobación de los Socios"]
+        f5{"¿Los Socios aprueban la campaña?"}
+        f5n["No: la campaña no se publica y se notifica al creador con el motivo (A1)"]
+        f6["Sí: la campaña se activa y los interesados participan. El nivel Frecuente puede ofrecer artículos por BRLT"]
+        f7["Al finalizar: el Sistema cierra los intercambios pendientes y calcula resultados y reputación"]
+        f1 --> f2 --> f3
+        f3 -->|"No"| f3n
+        f3 -->|"Sí"| f4 --> f5
+        f5 -->|"No"| f5n
+        f5 -->|"Sí"| f6 --> f7
+    end
+
+    subgraph CU10["CU-10 Crear campaña de recolecta por una causa"]
+        g1["Usuario Socio crea la campaña de recolecta definiendo la causa y los artículos necesarios"]
+        g2["El Sistema valida y publica la campaña"]
+        g3["Los participantes intercambian sus artículos a favor de la causa"]
+        g4["El Sistema acredita puntos de reputación a los participantes y descuenta los artículos recibidos"]
+        g5["Al alcanzar el objetivo o vencer el plazo: la campaña se cierra y se registra el resultado"]
+        g1 --> g2 --> g3 --> g4 --> g5
+    end
+
+    h1["Moderador / Owner bloquea la campaña si viola las normas (CU-09 A2 y CU-10 A1, RF-18.2)"]
+    h2["Violación de norma durante la campaña: los trueques afectados se bloquean y derivan al bloqueo por violación de norma (CU-17)"]
+    h3["Recolecta sin completar al cierre: los artículos ya recibidos se gestionan conforme a la causa y se informa a los participantes (CU-10 A2)"]
+    f1 -.->|"moderación"| h1
+    g1 -.->|"moderación"| h1
+    f6 -.->|"CU-09 A3"| h2
+    g5 -.-> h3

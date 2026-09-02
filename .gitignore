@@ -1,0 +1,24 @@
+# Entorno
+.env
+.env.local
+*.log
+deployment-info.txt
+
+# Node (futuro frontend/backend)
+node_modules/
+.next/
+dist/
+build/
+
+# Foundry (futuros contratos)
+cache/
+out/
+broadcast/
+
+# Datos locales
+/data/
+web/data/
+
+# Sistema
+.DS_Store
+Thumbs.db

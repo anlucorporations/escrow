@@ -1,0 +1,34 @@
+graph LR
+    subgraph Personas["Usuarios de la plataforma"]
+        UP["Usuario Particular"]
+        IN["Inscrito (AU-1)"]
+        VE["Verificado (AU-2)"]
+        CE["Certificado (AU-3)"]
+        EM["Usuario Empresa (AU-4)"]
+        SO["Usuario Socio (AU-5)"]
+    end
+    subgraph Gobierno["Gobierno y operación"]
+        OW["Owner (AU-6)"]
+        MO["Moderador (AU-7)"]
+    end
+    subgraph Infra["Infraestructura automatizada"]
+        RB["Relayer / Backend (AU-8)"]
+        SI["Sistema (AU-9)"]
+    end
+
+    IN -->|"es un (hereda de)"| UP
+    VE -->|"es un (hereda de)"| UP
+    CE -->|"es un (hereda de)"| UP
+
+    IN -->|"etapa 1: confirma códigos de correo y teléfono"| VE
+    VE -->|"etapa 2: KYC con documento y selfie"| CE
+
+    CE -->|"clasificación Empresa: Certificado + Oro + paga inscripción"| EM
+    VE -->|"clasificación Socio: puntaje >= 76 y votación 2/3"| SO
+    CE -->|"clasificación Socio: puntaje >= 76 y votación 2/3"| SO
+
+    MO -->|"rol designado por el Owner"| OW
+    OW -->|"opera infraestructura y custodia claves RELAYER / ADMIN"| RB
+    RB -->|"envía meta-txs EIP-712 asumiendo el gas"| SI
+    EM -->|"paga su propio gas, regla R1"| SI
+    SI -->|"despliega Smart Accounts y verifica estados on-chain"| UP

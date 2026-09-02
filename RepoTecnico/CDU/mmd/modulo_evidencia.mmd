@@ -1,0 +1,18 @@
+flowchart TD
+    e1["El auditor (Owner, auditoría externa o Socios revisores) o el Sistema solicita verificar la evidencia de una imagen certificada: de publicación (CU-06) o de recepción (CU-14)"]
+    e2["Toma la imagen y su metadata: refId, wallet y tipo PUBLICACION o RECEPCION"]
+    e3["El Sistema recupera el archivo desde IPFS con pinning propio"]
+    e4{"¿El archivo IPFS está disponible?"}
+    e5["No: no se puede recomputar el hash. La evidencia queda pendiente de verificación y se notifica al solicitante (A2)"]
+    e6["Sí: recalcula el hash SHA-256 de la imagen con la metadata y la wallet declaradas"]
+    e7["Verifica la firma ECDSA del hash contra la wallet del usuario"]
+    e8["Verifica la inclusión del hash en la raíz merkle anclada on-chain: prueba de inclusión en el acumulador"]
+    e9{"¿Las tres comprobaciones son válidas?"}
+    e10["Sí: la evidencia queda certificada como inmutable y auditable (RNF-01.5)"]
+    e11["El resultado se registra y, en disputas, se incorpora a la deliberación de los Socios con mayor peso según el nivel del aportante"]
+    e12["No: hash, firma o inclusión no coinciden: evidencia no válida, posible manipulación. Se reporta a moderación / soporte y puede motivar sanción de los Socios"]
+    e1 --> e2 --> e3 --> e4
+    e4 -->|"No"| e5
+    e4 -->|"Sí"| e6 --> e7 --> e8 --> e9
+    e9 -->|"Hash coincide, firma válida e inclusión confirmada"| e10 --> e11
+    e9 -->|"Alguna comprobación no coincide"| e12

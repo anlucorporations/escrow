@@ -1,0 +1,99 @@
+flowchart TD
+    subgraph CU11["CU-11 Crear un intercambio (trueque)"]
+        a1["Usuario A Verificado (max 3 intercambios activos) selecciona su artículo ofrecido y el artículo que quiere recibir de la publicación AtoA de B"]
+        a2["Validaciones: usuario verificado on-chain, límite de 3 activos, rubros y nivel, artículo disponible y no comprometido"]
+        a3{"¿Validaciones OK?"}
+        a3n["No: se rechaza la creación (no verificado, 3 activos alcanzados, doble oferta o nivel no habilitado)"]
+        a4["Sí: las partes pactan el punto de encuentro y la hora pautada (CU-16)"]
+        a5["A ofrece su NFT / cripto: pasa a custodia del escrow. El trueque queda ACTIVE on-chain y visible para B"]
+        a6["Cancelación unilateral SOLO antes de la custodia: sin penalización para ninguna parte (CU-11 A5, D31)"]
+        a1 --> a2 --> a3
+        a3 -->|"No"| a3n
+        a3 -->|"Sí"| a4 --> a5
+        a2 -.-> a6
+    end
+
+    subgraph CU16["CU-16 Establecer punto de encuentro con mapa (max 10 km)"]
+        p1["Proponente con nivel Común o superior elige en el mapa una zona registrada (propia o de la contraparte)"]
+        p2["El Sistema calcula con PostGIS la distancia entre las direcciones de inscripción de ambas partes (off-chain)"]
+        p3{"¿Distancia entre las partes <= 10 km?"}
+        p3n["No: se rechaza el punto y se sugieren zonas dentro del radio (A1). El nivel Iniciado solo acepta zonas de la contraparte (A2). Zonas deben estar registradas (A3)"]
+        p4["Sí: la contraparte acepta el punto y se fija la hora pautada. Se asocia el punto de encuentro al trueque"]
+        p5["Versión móvil: el Sistema ofrece la ruta de cómo llegar al punto de encuentro"]
+        p1 --> p2 --> p3
+        p3 -->|"No"| p3n
+        p3 -->|"Sí"| p4 --> p5
+    end
+
+    subgraph CU12["CU-12 Custodia en escrow al ofrecer o completar el trueque"]
+        b1["B completa el intercambio depositando el NFT / cripto requerido. A ya depositó el suyo"]
+        b2["El contrato escrow custodia ambos activos: estado ACTIVE on-chain como única fuente de verdad (RNF-01.1)"]
+        b3["El contrato emite el evento de custodia y el indexador propio actualiza PostgreSQL"]
+        b4["Activos custodiados sin retiro unilateral hasta: firmas de recepción de ambas partes, anulación aprobada o resolución de disputa"]
+        b1 --> b2 --> b3 --> b4
+    end
+
+    subgraph CU13["CU-13 Apertura dual del intercambio (ventanas de 10 minutos)"]
+        c1["Ambas partes aperturan el intercambio en sus dispositivos en el punto de encuentro"]
+        c2{"¿Cada apertura ocurre a no mas de 10 minutos de la hora pautada?"}
+        c2n["No: el contrato rechaza la apertura tardía y registra la inasistencia o incumplimiento (A1)"]
+        c3{"¿Hay no mas de 10 minutos de diferencia entre la apertura de ambas partes?"}
+        c3n["No: se rechaza la segunda apertura y el proceso no avanza: queda pendiente y habilita anulación justificada o disputa (A2)"]
+        c4["Sí: aperturaA y aperturaB registradas on-chain: intercambio habilitado para la entrega y la certificación de recepción"]
+        c1 --> c2
+        c2 -->|"No"| c2n
+        c2 -->|"Sí"| c3
+        c3 -->|"No"| c3n
+        c3 -->|"Sí"| c4
+    end
+
+    subgraph CU14["CU-14 Completar el intercambio: certificación y firma de recepción"]
+        d1["Cada parte certifica si recibió o no lo negociado"]
+        d2["Para certificar, cada parte sube la imagen de recepción: hash SHA-256 + IPFS con pinning + firma ECDSA, agregada al acumulador merkle anclado on-chain"]
+        d3{"¿Ambas partes confirman la recepción correcta?"}
+        d3n["No: la parte afectada declara recepción insatisfecha o rechazada y no firma: habilita la solicitud de anulación justificada o la disputa (A2)"]
+        d4["Sí: ambas partes firman la recepción de lo negociado"]
+        d5["El Sistema verifica on-chain el estado Verificado de ambas partes y el contrato escrow libera los activos custodiados (transferencia cruzada)"]
+        d6["El trueque queda pendiente únicamente del cierre con valoración obligatoria"]
+        d1 --> d2 --> d3
+        d3 -->|"No"| d3n
+        d3 -->|"Sí"| d4 --> d5 --> d6
+    end
+
+    subgraph CU15["CU-15 Valoración mutua al cierre del trueque (escala 1 a 5)"]
+        e1["Cada parte valora a la contraparte en los 5 renglones: aceptación del producto, honestidad publicitaria, seguridad, confiabilidad y compromiso"]
+        e2["El Sistema valida que cada renglón esté en la escala 1 a 5 y que ambas valoraciones existan"]
+        e3{"¿Valoraciones completas y en rango?"}
+        e3n["No: el cierre no procede y se solicita completar los 5 renglones. Sin valoración de ambas partes no hay COMPLETED (A1 y A2)"]
+        e4["Sí: el contrato escrow cierra el trueque como COMPLETED: firma de ambas partes + valoración registrada"]
+        e5["El Sistema actualiza la reputación y recalcula nivel / medalla. Deduce la comisión base del 1% del valor al fondo de valor"]
+        e1 --> e2 --> e3
+        e3 -->|"No"| e3n
+        e3 -->|"Sí"| e4 --> e5
+    end
+
+    subgraph CU17["CU-17 Bloqueo del intercambio por violación de norma"]
+        k1["Moderador / Owner identifica la violación de norma, o alerta automática del Sistema (RF-05.8)"]
+        k2["El contrato escrow bloquea el intercambio en estado BLOCKED y congela los activos custodiados: sin retiros ni nuevas transacciones"]
+        k3{"¿Ambas partes autorizan el cierre como irregular y no efectivo?"}
+        k4["Sí: el trueque se cierra como irregular / no efectivo: no incrementa el contador de intercambios efectivos. Libera conforme a lo resuelto"]
+        k5["No o hay desacuerdo: el caso se eleva a disputa de los Socios (CU-19). La sanción se ejecuta on-chain solo tras el timelock de 6 horas"]
+        k6["Se registran en el registro auditable: motivo, evidencias y resolución con sello de tiempo"]
+        k1 --> k2 --> k3
+        k3 -->|"Sí"| k4
+        k3 -->|"No"| k5
+        k4 --> k6
+        k5 --> k6
+    end
+
+    t1["Módulo Anulación y disputas: CU-18 solicitud de anulación con quórum 2/3 y CU-19 resolución de disputa con timelock 6 h"]
+    t2["Evidencia de recepción inválida contra el acumulador merkle: la certificación se rechaza y la recepción no se registra (CU-14 A3)"]
+
+    a4 -->|"CU-16"| p1
+    a5 -->|"CU-12"| b1
+    b2 -.->|"CU-17: violación de norma"| k1
+    b4 -->|"CU-13"| c1
+    c4 -->|"CU-14"| d1
+    d6 -->|"CU-15"| e1
+    d3n -->|"deriva a"| t1
+    d2 -.-> t2

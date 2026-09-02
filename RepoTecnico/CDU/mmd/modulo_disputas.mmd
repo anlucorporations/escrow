@@ -1,0 +1,36 @@
+flowchart TD
+    q0["Entradas del módulo: recepción insatisfecha o rechazada, bloqueo del trueque (CU-17), anulación vencida u otra controversia"]
+
+    subgraph CU18["CU-18 Solicitar anulación justificada (quórum de Socios 2/3, max 5 días)"]
+        n1["La parte insatisfecha solicita la anulación del trueque justificando el motivo"]
+        n2["El contrato registra solicitudAnulacion y solicitanteAnulacion y fija el plazo máximo de resolución: 5 días desde la solicitud"]
+        n3["El Sistema somete la solicitud a votación de los Socios: un voto por Socio, sin ponderación"]
+        n4{"¿Quórum >= 2/3 aprueba la anulación dentro del plazo?"}
+        n5["Sí: el contrato escrow libera los activos y los NFTs vuelven a las billeteras de sus dueños. Trueque CANCELLED / ANULADO: no cuenta como intercambio efectivo"]
+        n6["No y vencen los 5 días sin quórum: ANULADO por defecto (D26). Los NFTs vuelven a las billeteras de ambas partes: cierre en tiempo finito"]
+        n7["No dentro del plazo vigente: la anulación no procede por quórum y el trueque continúa su curso o deriva a disputa formal (CU-19)"]
+        n8["La recepción se regulariza y el solicitante retira la solicitud: el trueque queda habilitado para completarse por el flujo estándar (CU-14)"]
+        n1 --> n2 --> n3 --> n4
+        n4 -->|"Sí, dentro del plazo"| n5
+        n4 -->|"Vence sin quórum"| n6
+        n4 -->|"No y plazo vigente"| n7
+        n2 -.->|"recepción regularizada"| n8
+    end
+
+    subgraph CU19["CU-19 Resolución de disputa por los Socios (timelock 6 horas)"]
+        m1["El conflicto ingresa a disputa con sus evidencias: certificaciones de imagen (hash + firma + raíz merkle), mensajes y valoraciones"]
+        m2["Los Socios actúan como mediadores y jueces (RF-06.2). La evidencia del usuario de mayor nivel tiene mayor peso; el voto de cada Socio es único, sin ponderación"]
+        m3{"¿Quórum >= 2/3 de resolución?"}
+        m3n["No: la disputa permanece abierta con seguimiento de moderación / soporte, sin ejecutar liberación, anulación ni sanción (A2)"]
+        m4["Sí: resolución aprobada según el caso: liberación a favor de una parte, anulación con devolución de activos y / o sanción"]
+        m5["Las sanciones se ejecutan on-chain por el contrato tras la resolución con timelock de 6 horas. Los Socios pueden ajustarlas o revocarlas antes del vencimiento"]
+        m6["El Sistema registra la resolución, actualiza el estado del trueque (COMPLETED / CANCELLED) y la reputación de los implicados"]
+        m1 --> m2 --> m3
+        m3 -->|"No"| m3n
+        m3 -->|"Sí"| m4 --> m5 --> m6
+    end
+
+    q0 --> n1
+    q0 --> m1
+    n7 -->|"deriva a disputa formal"| m1
+    m5 -->|"parte sancionada apela: revisión de los Socios (A3)"| m2

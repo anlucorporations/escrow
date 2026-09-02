@@ -1,0 +1,38 @@
+flowchart TD
+    subgraph CU23["CU-23 Pago de gas de particulares: meta-transacción EIP-712 vía relayer"]
+        g1["El Particular Verificado con Smart Account ERC-4337 firma su intent (meta-transacción EIP-712) con dominio chainId y nonce"]
+        g2["El backend recibe el intent por endpoint autenticado con rate-limiting y claves rotadas"]
+        g3["El Relayer valida el nonce EIP-712 único por cuenta: anti-replay (protección 1 de D16)"]
+        g4["El Relayer valida on-chain que la cuenta es una Smart Account de un particular verificado"]
+        g5{"¿Se respeta el límite diario de 20 meta-transacciones por usuario?"}
+        g5n["No: el intent se rechaza hasta el día siguiente (A3)"]
+        g6["Sí: el backend envía la transacción a la blockchain asumiendo el gas desde la cuenta relayer / general"]
+        g7["El contrato verifica firma y nonce, ejecuta la operación y el indexador propio actualiza PostgreSQL"]
+        g8["Falla reiterada del signer: 3 fallos en 10 minutos generan bloqueo temporal de las meta-transacciones por 1 hora (A7)"]
+        g9["Otros rechazos: nonce duplicado, cuenta no verificada o no particular, petición sin autenticación o sobre la tasa (A1, A2 y A4)"]
+        g10["Falla de infraestructura: la cola de reintentos y la segunda instancia absorben el fallo; el fondo de valor financia el gas y alerta saldo bajo (A5)"]
+        g1 --> g2 --> g3 --> g4 --> g5
+        g5 -->|"No"| g5n
+        g5 -->|"Sí"| g6 --> g7
+        g6 -.-> g8
+        g4 -.-> g9
+        g2 -.-> g10
+    end
+
+    subgraph CU24["CU-24 Suscripción de empresa con cobro automático (cada 30 días)"]
+        h1["Empresa clasificada (CU-05) con suscripción activa: paga el gas de sus propias transacciones"]
+        h2["El contrato de suscripción implementa el patrón EIP-1337 o staking bloqueado (RF-10.1)"]
+        h3["Cada 30 días el contrato ejecuta el cobro automático sin requerir una firma manual de la empresa por período"]
+        h4["El Sistema registra el cobro: fecha, monto y txHash"]
+        h5["El contrato transfiere el 10% del cobro de la suscripción al fondo de valor"]
+        h6{"¿El cobro falla de forma reiterada?"}
+        h7["Sí: la suscripción pasa a estado irregular y el caso se escala al soporte de empresas (Owner + moderador)"]
+        h8["Baja de suscripción solicitada: el contrato detiene los cobros automáticos siguientes y la cuenta pierde las funciones premium asociadas"]
+        h1 --> h2 --> h3 --> h4 --> h5
+        h3 -.-> h6
+        h6 -->|"Sí"| h7
+        h5 -.-> h8
+    end
+
+    nota1["Regla R1: la Empresa paga el gas de sus transacciones y no usa el flujo gratuito de meta-transacciones (CU-23 A6)"]
+    h1 -.-> nota1

@@ -1,0 +1,215 @@
+@startuml
+' ============================================================
+' TrueKeate — Diagrama de Casos de Uso
+' DApp Web3 de trueques con escrow (RF-01 … RF-18, D1…D25)
+' ============================================================
+title TrueKeate — Casos de Uso del sistema de trueques con escrow
+caption DApp Web3 (Smart Account ERC-4337 · relayer EIP-712 · escrow on-chain) — fuentes: RepoTecnico/requerimientos.md, diccionario_datos.md
+
+' ============ ACTORES ============
+actor "Usuario\nParticular" as UsuarioParticular
+actor "Inscrito" as Inscrito
+actor "Verificado" as Verificado
+actor "Certificado" as Certificado
+actor "Usuario\nEmpresa" as UsuarioEmpresa
+actor "Usuario\nSocio" as UsuarioSocio
+actor "Owner" as Owner
+actor "Moderador" as Moderador
+actor "Relayer\n(Backend)" as Relayer
+actor "Sistema" as Sistema
+
+' Generalización de actores: Inscrito, Verificado y Certificado son tipos de Usuario Particular (RF-01)
+UsuarioParticular <|-- Inscrito
+UsuarioParticular <|-- Verificado
+UsuarioParticular <|-- Certificado
+
+' ============ CASOS DE USO ============
+usecase "Registrar usuario\n(inscripción + Smart Account ERC-4337)" as UC1
+usecase "Verificar KYC\n(correo + teléfono + documento + selfie)" as UC2
+usecase "Publicar artículo\n(Artículo por Artículo — AtoA)" as UC3
+usecase "Crear trueque\n(acuerdo de intercambio)" as UC4
+usecase "Custodiar NFTs/criptos\nen escrow" as UC5
+usecase "Completar trueque\n(firma de recepción)" as UC6
+usecase "Apertura dual del intercambio\n(ventana 10 min)" as UC7
+usecase "Solicitar anulación\n(quórum Socios 2/3 · ≤5 días)" as UC8
+usecase "Valorar al cierre\n(5 renglones · escala 1–5)" as UC9
+usecase "Calcular nivel / medalla\nde reputación" as UC10
+usecase "Establecer punto de encuentro\n(≤10 km)" as UC11
+usecase "Meta-transacción vía relayer\n(EIP-712 · sin gas)" as UC12
+usecase "Suscripción de empresa\n(cobro automático 30 días)" as UC13
+usecase "Crear subasta\n(solo Empresa)" as UC14
+usecase "Pujar en subasta\n(solo Certificado · prioridad por nivel)" as UC15
+usecase "Resolver disputa\n(quórum 2/3 · timelock 6h)" as UC16
+usecase "Bloquear por violación\nde norma (moderación)" as UC17
+usecase "Campaña de venta masiva / recolecta\n(por una causa)" as UC18
+usecase "Dashboard Owner\n(administración global)" as UC19
+usecase "Encargo\n(artículo fuera del mercado)" as UC20
+usecase "Recuperar Smart Account\n(social / vinculada a KYC)" as UC21
+usecase "Verificar evidencia de imagen\non-chain (hash + firma + merkle)" as UC22
+
+' ============ ASOCIACIONES ============
+' --- Identidad, registro y KYC ---
+UsuarioParticular --> UC1
+UsuarioEmpresa --> UC1
+Sistema --> UC1 : despliega Smart Account (RF-02, D22)
+Inscrito --> UC2
+Sistema --> UC2 : verificación automática (D24)
+Owner --> UC2 : revisión humana / apelaciones (RF-18.4)
+
+' --- Catálogo y publicaciones (RF-04) ---
+Verificado --> UC3
+Certificado --> UC3
+UsuarioEmpresa --> UC3
+
+' --- Trueques (RF-05) ---
+Verificado --> UC4
+Certificado --> UC4
+UsuarioEmpresa --> UC4
+Sistema --> UC5 : contrato escrow (RNF-01.1)
+Verificado -- UC5
+Certificado -- UC5
+UsuarioEmpresa -- UC5
+Verificado --> UC6
+Certificado --> UC6
+UsuarioEmpresa --> UC6
+Sistema -- UC6 : libera al verificarse firmas + valoración
+Verificado --> UC7
+Certificado --> UC7
+UsuarioEmpresa --> UC7
+Sistema -- UC7 : controla ventana ≤10 min (RNF-06.2)
+
+' --- Anulación y disputas (RF-06) ---
+Verificado --> UC8
+Certificado --> UC8
+UsuarioEmpresa --> UC8
+UsuarioSocio -- UC8 : quórum ≥2/3 decide
+Sistema -- UC8 : devuelve fondos tras resolución (timelock 6h)
+UsuarioSocio --> UC16
+Sistema --> UC16 : ejecuta sanción on-chain tras timelock 6h (D21)
+
+' --- Valoración y reputación (RF-07) ---
+Verificado --> UC9
+Certificado --> UC9
+UsuarioEmpresa --> UC9
+Sistema --> UC10 : algoritmo unificado (D3, D12)
+
+' --- Geolocalización (RF-08) ---
+Verificado --> UC11
+Certificado --> UC11
+UsuarioEmpresa --> UC11
+Sistema -- UC11 : valida ≤10 km con PostGIS (off-chain)
+
+' --- Gas / meta-transacciones (RF-09) ---
+UsuarioParticular --> UC12
+Relayer --> UC12 : envía la tx asumiendo el gas (RF-09.2)
+
+' --- Suscripciones de empresa (RF-10) ---
+UsuarioEmpresa --> UC13
+Sistema --> UC13 : cobro automático EIP-1337 / staking (RF-10.1)
+
+' --- Subastas (RF-17) ---
+UsuarioEmpresa --> UC14
+Sistema -- UC14 : custodia el artículo al crearse la subasta
+Certificado --> UC15
+Sistema -- UC15 : cierre → flujo estándar de escrow
+
+' --- Moderación (RF-05.8, RF-18.2) ---
+Moderador --> UC17
+Owner --> UC17
+Sistema --> UC17 : bloqueo on-chain + cierre irregular (RF-05.8)
+
+' --- Campañas (RF-03.8, RF-03.9) ---
+UsuarioEmpresa --> UC18 : venta masiva (Frecuente)
+UsuarioSocio --> UC18 : recolecta por causa / aprueba venta masiva
+Moderador -- UC18 : modera campañas (D24)
+
+' --- Owner (RF-13, RF-18) ---
+Owner --> UC19
+
+' --- Encargos (RF-04.3) ---
+UsuarioParticular --> UC20
+
+' --- Recuperación de cuenta (RF-02.2) ---
+UsuarioParticular --> UC21
+Sistema --> UC21 : recuperación social / KYC
+Owner -- UC21 : soporte por pérdida de acceso (D24)
+
+' --- Evidencia de imágenes (RF-11, D23) ---
+Sistema --> UC22 : ancla raíz merkle on-chain (D23)
+Verificado -- UC22 : certifica imágenes (publicación/recepción)
+Certificado -- UC22
+UsuarioEmpresa -- UC22
+
+' ============ NOTAS DE REGLAS CLAVE ============
+note right of UC8
+  **Anulación (RF-05.2b / RF-06.1 / D13):**
+  * Recepción insatisfecha o rechazada, con motivo justificado.
+  * Quórum de Socios **≥ 2/3** para liberar los fondos.
+  * Plazo máximo **5 días** desde la solicitud; si expira sin
+    resolución, se resuelve **por defecto** (RF-05.2b).
+end note
+
+note left of UC6
+  **Regla clave (D14 / RF-01.2):** completar un trueque exige
+  usuario **Verificado**; el **Inscrito** solo puede **ver** ofertas.
+end note
+
+note left of UC9
+  **Cierre (R8 / RF-07):** la **valoración es obligatoria** para
+  cerrar el trueque: 5 renglones (aceptación, honestidad, seguridad,
+  confiabilidad, compromiso) en escala **1–5**.
+end note
+
+note right of UC14
+  **Subastas (RF-17):** solo las **Empresas** crean subastas;
+  solo los usuarios **Certificados** pujan, con **prioridad según
+  su nivel** (mayor nivel → mayor prioridad).
+end note
+
+note right of UC16
+  **Disputas (RF-06 / D21):** los Socios actúan como mediadores y
+  jueces con **quórum 2/3** y **un voto por Socio** (sin ponderación).
+  Las sanciones se ejecutan **on-chain por el contrato** tras la
+  resolución con **timelock de 6h**.
+end note
+
+note left of UC11
+  Puntos de encuentro a **≤ 10 km** entre las partes (RF-08.3),
+  validados **off-chain** con PostGIS. El nivel **Iniciado** no puede
+  determinar lugares de intercambio (RF-03.6); el **Común** solo
+  propone/acepta zonas registradas (RF-03.7).
+end note
+
+note right of UC12
+  Particulares firman intents **EIP-712 sin coste de gas**; el relayer
+  (backend) envía la transacción y asume el gas (RF-09). Las **Empresas
+  pagan su propio gas** (R1). Protecciones anti-abuso: nonce único,
+  solo Smart Accounts de particulares verificados, límite diario y
+  rate-limiting (D16).
+end note
+
+note right of UC10
+  Sistema de niveles **unificado** (D3/D12): puntaje =
+  0,5·reputación + 0,3·volumen + 0,2·(1 − ratio_apelaciones);
+  medallas Bronce=Iniciado, Plata=Común, Oro=Frecuente y Socio por
+  solicitud + votación (D4).
+end note
+
+note right of UC18
+  **Venta masiva:** nivel Frecuente / Empresa (RF-03.8), aprobada por
+  Socios. **Recolecta por una causa:** creada por **Socios**, artículos
+  por puntos de reputación (RF-03.9).
+end note
+
+note left of UC7
+  Invariante (R5 / RNF-06.2): apertura **≤ 10 min** de la hora pautada
+  y **≤ 10 min** de diferencia entre la apertura de ambas partes.
+end note
+
+note right of UC1
+  Toda billetera conectada se inscribe automáticamente como Usuario
+  Particular (RF-01.4); la plataforma despliega su **Smart Account
+  ERC-4337** (RF-02, D22).
+end note
+
+@enduml

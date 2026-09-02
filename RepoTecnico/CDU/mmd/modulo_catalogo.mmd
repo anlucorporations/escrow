@@ -1,0 +1,48 @@
+flowchart TD
+    subgraph CU06["CU-06 Publicar artículo (AtoA) con certificación de imagen"]
+        x01["Usuario Verificado / Certificado / Empresa crea la publicación Artículo por Artículo (AtoA): indica el artículo que quiere recibir e información de confianza"]
+        x02["El Sistema valida el rubro y los límites del nivel: Particular max 5 artículos, nivel Común amplía a 50, Empresa puede ofrecer mas de 5"]
+        x03{"¿Rubro y límites válidos? Nota para Iniciado: rubros de alta disponibilidad (>= 10 publicaciones activas de >= 5 usuarios en 30 días) y participación >= 3% en 90 días"}
+        x04["No: se rechaza la publicación hasta liberar cupo o cumplir el rubro (A1 y A2)"]
+        x05["Sí: el usuario sube la imagen de la publicación"]
+        x06["El Sistema calcula el hash SHA-256 de imagen + metadata + wallet y la almacena en IPFS con pinning propio"]
+        x07["La wallet del usuario firma el hash con ECDSA"]
+        x08["Persiste firma y hash en PostgreSQL en imagenes_certificadas"]
+        x09["Agrega la certificación al acumulador merkle y ancla la raíz on-chain en el contrato escrow"]
+        x10["Publica el artículo como disponible en el catálogo"]
+        x11["Fallo de certificación (hash / IPFS / firma): la imagen no queda certificada y la publicación no se habilita (A3)"]
+        x01 --> x02 --> x03
+        x03 -->|"No"| x04
+        x03 -->|"Sí"| x05 --> x06 --> x07 --> x08 --> x09 --> x10
+        x05 -.->|"A3"| x11
+    end
+
+    subgraph CU07["CU-07 Solicitar encargo de un artículo no disponible en el mercado"]
+        y01["Usuario Verificado busca un artículo sin publicación activa en el mercado"]
+        y02["Crea la solicitud de encargo ofreciendo un artículo propio a cambio"]
+        y03["El Sistema valida la oferta: artículo propio, rubro y límites del nivel"]
+        y04["Publica el encargo como pedido activo en el mercado"]
+        y05{"¿Otro usuario ofrece el artículo solicitado?"}
+        y06["No por ahora: el encargo sigue activo. El solicitante puede retirarlo o ajustar la oferta (A1)"]
+        y07["Sí: el Sistema deriva el caso a la creación de un intercambio (CU-11) entre solicitante y oferente"]
+        y08["Si el artículo aparece luego publicado, el Sistema lo sugiere al solicitante para un intercambio directo (A2)"]
+        y01 --> y02 --> y03 --> y04 --> y05
+        y05 -->|"No"| y06
+        y05 -->|"Sí"| y07
+        y04 -.-> y08
+    end
+
+    subgraph CU08["CU-08 Consultar catálogo y ofertas de intercambio (Usuario Particular Inscrito)"]
+        z01["Usuario Particular Inscrito accede al catálogo y a las ofertas de intercambio"]
+        z02["El Sistema muestra publicaciones e intercambios activos con toda la información de confianza"]
+        z03["Señala qué es on-chain y qué off-chain. Perfiles: solo información pública autorizada, sin identidad real"]
+        z04{"¿El Inscrito intenta crear o completar un trueque?"}
+        z05["Sí: el Sistema bloquea la operación y ofrece el flujo de verificación KYC (CU-02). Sin verificar solo puede ver"]
+        z01 --> z02 --> z03 --> z04
+        z04 -->|"Sí"| z05
+    end
+
+    p01["Penalización por inactividad: nivel Común con nuevas publicaciones suspendidas: se bloquea la creación (A5)"]
+    m01["Moderador / Owner detecta publicación que viola normas: la bloquea y notifica al autor (A4, RF-18.2)"]
+    x01 -.->|"A5"| p01
+    x10 -.->|"A4"| m01

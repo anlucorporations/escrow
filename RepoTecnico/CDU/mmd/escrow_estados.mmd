@@ -1,0 +1,30 @@
+stateDiagram-v2
+    state "CREADO / ACTIVO" as CREADO_ACTIVO
+    state "CUSTODIADO" as CUSTODIADO
+    state "APERTURA (ventana 10 min)" as APERTURA
+    state "EN_DISPUTA" as EN_DISPUTA
+    state "RESOLUCION_SOCIOS" as RESOLUCION_SOCIOS
+    state "COMPLETADO (fondos liberados)" as COMPLETADO
+    state "ANULADO (fondos devueltos)" as ANULADO
+    state "BLOQUEADO (violación de norma)" as BLOQUEADO
+    state "CANCELADO (pre-custodia)" as CANCELADO
+
+    [*] --> CREADO_ACTIVO : Acuerdo de trueque creado con partes verificadas on-chain (D14 / RF-01.2)
+
+    CREADO_ACTIVO --> CUSTODIADO : Custodiar NFTs / criptos en el escrow (RF-05.2)
+    CREADO_ACTIVO --> CANCELADO : Cancelación unilateral antes de la custodia, sin penalización (D31)
+    CUSTODIADO --> APERTURA : Apertura dual válida: cada apertura a no mas de 10 min de la hora pautada y no mas de 10 min de diferencia entre aperturas (RNF-06.2)
+    CUSTODIADO --> EN_DISPUTA : Sin apertura dual: una parte no apertura o diferencia mayor a 10 min: anulación justificada o disputa (CU-13 A2 y A3)
+    CUSTODIADO --> BLOQUEADO : Violación de norma detectada por moderación o alerta del Sistema (RF-05.8)
+    APERTURA --> COMPLETADO : Firmas de recepción de ambas partes y valoración 1 a 5 registrada (CU-14 y CU-15)
+    APERTURA --> EN_DISPUTA : Recepción insatisfecha o rechazada: solicitud de anulación justificada (RF-06.1)
+    APERTURA --> BLOQUEADO : Violación de norma durante la entrega (RF-05.8)
+    EN_DISPUTA --> RESOLUCION_SOCIOS : Abrir votación de los Socios: un voto por Socio, sin ponderación (D21)
+    RESOLUCION_SOCIOS --> ANULADO : Quórum 2/3 aprueba la anulación, o vencen los 5 días sin quórum con ANULADO por defecto (D26). Devolución de NFTs a ambas billeteras tras timelock de 6 h
+    RESOLUCION_SOCIOS --> COMPLETADO : Quórum rechaza la anulación: continúa el cierre con firmas de recepción y valoración
+    RESOLUCION_SOCIOS --> BLOQUEADO : Sanción evaluada por los Socios: ejecución on-chain de la sanción tras timelock de 6 h (RF-06.3)
+
+    COMPLETADO --> [*]
+    ANULADO --> [*]
+    BLOQUEADO --> [*]
+    CANCELADO --> [*]

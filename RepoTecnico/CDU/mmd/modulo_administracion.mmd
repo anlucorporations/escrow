@@ -1,0 +1,61 @@
+flowchart TD
+    subgraph CU28["CU-28 Dashboard de administración del Owner"]
+        A1["El Owner se autentica: acceso exclusivo al dashboard. Cualquier otro usuario es denegado (RNF-01.6)"]
+        A2["Secciones gestionadas: contratos desplegados, finanzas generales con porcentajes del fondo (D7), usuarios inscritos, KPIs de disputas, base de datos off-chain y sub-módulos"]
+        A3["Opera y monitorea la infraestructura como Operador: relayer + indexador + backend con health-check, cola de reintentos y saldo del fondo de gas"]
+        A4["Ante health-check fallido o saldo bajo del fondo de gas: el dashboard muestra la instancia afectada y el saldo, y registra la acción de monitoreo"]
+        A5["Custodia las claves RELAYER / ADMIN_PRIVATE_KEY en Secret Manager con política de rotación y separación de funciones"]
+        A6["Rotación de claves ante sospecha de compromiso: registra cada rotación en el registro auditable (A2)"]
+        A7["Toda acción relevante del Owner queda en el registro auditable"]
+        A1 --> A2 --> A3 --> A4
+        A3 --> A5 --> A7
+        A5 -.-> A6
+    end
+
+    subgraph CU29["CU-29 Moderación de publicaciones y campañas"]
+        B1["El Moderador / Owner revisa contenido reportado o alertado: publicaciones (CU-06), encargos (CU-07), campañas (CU-09 / CU-10) o subastas (CU-25)"]
+        B2{"¿El contenido viola las normas?"}
+        B3["Sí: bloquea el contenido: deja de ser visible u operativo"]
+        B4["El Sistema notifica al autor con el motivo y registra la acción en el registro auditable: contenido, motivo, moderador actuante y fecha / hora"]
+        B5["El autor puede apelar vía soporte al usuario (Owner + moderador)"]
+        B6{"¿Apelación aceptada?"}
+        B7["Sí: el contenido se restaura a su estado activo previo (A3)"]
+        B8["No: el bloqueo se mantiene y queda registrado"]
+        B9["No: el reporte se descarta y el contenido permanece activo (A1)"]
+        B10["Violación dentro de un trueque activo con activos custodiados: aplica el bloqueo del intercambio en estado BLOCKED (CU-17)"]
+        B1 --> B2
+        B2 -->|"Sí"| B3 --> B4 --> B5 --> B6
+        B6 -->|"Sí"| B7
+        B6 -->|"No"| B8
+        B2 -->|"No"| B9
+        B2 -.-> B10
+    end
+
+    subgraph CU30["CU-30 Finanzas globales y fondo de valor (Owner + Socios)"]
+        C1["El Owner configura desde su dashboard los porcentajes del fondo de valor (D7)"]
+        C2["Tres fuentes del fondo: 1% del valor de cada trueque completado (CU-15), 10% de cada suscripción de empresa (CU-24) y 5% de cada emisión de BRLT (CU-31)"]
+        C3["El Sistema aplica las contribuciones automáticamente en cada evento y registra el cambio de porcentajes para eventos posteriores"]
+        C4["El fondo cubre los gastos de operación: hosting, gas y red de despliegue. Financia el gas del relayer"]
+        C5["Saldo bajo del fondo de gas: el Sistema alerta al Owner para la recarga desde el fondo (A1)"]
+        C6["Los Socios acceden a Finanzas Globales: gastos de mantenimiento, gastos de gas y contribuciones al fondo (RF-14.8)"]
+        C7["Saldo BRLT: solo visible y gestionable para Socios y Owner (D5, RF-14.7)"]
+        C1 --> C2 --> C3 --> C4 --> C5
+        C3 --> C6
+        C2 --> C7
+    end
+
+    subgraph CU31["CU-31 Emisión y administración de la stablecoin BRLT (Socios)"]
+        D1["Los Socios proponen la operación sobre BRLT: emisión o ajuste de valor"]
+        D2["El contrato de Socios valida la autorización y ejecuta la operación en el contrato BRLT (ERC-20)"]
+        D3{"¿La cuenta está autorizada con rol Socio?"}
+        D4["No: la operación se rechaza y no se modifica el contrato BRLT (A1)"]
+        D5["Sí: el contrato BRLT actualiza totalSupply y valor. El Sistema aplica el 5% de la emisión al fondo de valor"]
+        D6["El nivel Frecuente puede ofrecer artículos a cambio de BRLT, liquidando en el intercambio correspondiente"]
+        D7["Cada emisión y ajuste queda en el registro auditable con monto, autorización y sello de tiempo"]
+        D1 --> D2 --> D3
+        D3 -->|"No"| D4
+        D3 -->|"Sí"| D5 --> D6 --> D7
+    end
+
+    C7 -.-> D5
+    A7 -.-> B4

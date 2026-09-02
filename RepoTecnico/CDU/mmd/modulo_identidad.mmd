@@ -1,0 +1,74 @@
+flowchart TD
+    subgraph CU01["CU-01 Registro e inscripción de Usuario Particular (ERC-4337)"]
+        N01["Usuario conecta su wallet compatible (MetaMask)"]
+        N02["El Sistema inscribe automáticamente la billetera como Usuario Particular"]
+        N03["Formaliza la inscripción: aporta correo, teléfono y dirección de inscripción"]
+        N04{"¿Otorga el consentimiento GDPR explícito?"}
+        N05["No: no se crea la cuenta ni se despliega la Smart Account (A2)"]
+        N06["Sí: se despliega la Smart Account ERC-4337 como wallet de identidad vía meta-tx EIP-712 del relayer, sin gas para el usuario"]
+        N07["Se crea el registro: nivel Iniciado, medalla Bronce, verificación pendiente. PII cifrada en reposo"]
+        N08["Habilita acceso restringido del Inscrito: solo ver ofertas y catálogo (RF-14.3)"]
+        N01 --> N02 --> N03 --> N04
+        N04 -->|"No"| N05
+        N04 -->|"Sí"| N06 --> N07 --> N08
+    end
+
+    subgraph CU02["CU-02 Verificación en dos etapas: Verificado y Certificado"]
+        Q01["El Inscrito inicia la verificación desde su suite"]
+        Q02["El Sistema envía un código al correo y un código al teléfono"]
+        Q03["El usuario ingresa correctamente ambos códigos"]
+        Q04["Clasifica como Verificado: crea y completa trueques, máx. 3 activos. Certifica el estado on-chain en la Smart Account"]
+        Q05["Etapa 2: inicia el proceso KYC cargando documento de identidad y selfie"]
+        Q06["Servicio verificador valida de forma automática + revisión humana del Owner (RF-18.4)"]
+        Q07{"¿Documento y selfie validados?"}
+        Q08["No: se mantiene Verificado sin Certificar. Notifica el motivo. Apelación gestionada por el Owner"]
+        Q09["Sí: almacena metadata KYC cifrada y actualiza hash / raíz merkle en la Smart Account, sin revelar la identidad real"]
+        Q10["Clasifica como Certificado: todas las operaciones de intercambio y la participación en subastas (RF-14.5, RF-17.2)"]
+        Q01 --> Q02 --> Q03 --> Q04 --> Q05 --> Q06 --> Q07
+        Q07 -->|"No"| Q08
+        Q07 -->|"Sí"| Q09 --> Q10
+    end
+
+    subgraph CU03["CU-03 Solicitud y votación de clasificación como Usuario Socio"]
+        S01["Usuario con puntaje >= 76 presenta la solicitud formal de clasificación como Socio"]
+        S02["El Sistema valida puntaje >= 76 y ausencia de sanciones relevantes, y somete la solicitud a votación"]
+        S03["Cada Socio emite un voto, sin ponderación por nivel (D21)"]
+        S04{"¿Quórum >= 2/3 de los Socios a favor?"}
+        S05["No: se rechaza la solicitud. Conserva nivel y medalla actuales y puede volver a postularse (A1)"]
+        S06["Sí: clasifica como Usuario Socio: mediador y juez en disputas, administra BRLT, finanzas globales y campañas"]
+        S01 --> S02 --> S03 --> S04
+        S04 -->|"No"| S05
+        S04 -->|"Sí"| S06
+    end
+
+    subgraph CU04["CU-04 Recuperación de Smart Account (social / KYC)"]
+        R01["Usuario perdió el acceso a su Smart Account y lo reporta indicando identidad o correo o teléfono"]
+        R02{"¿Vía de recuperación disponible?"}
+        R03["Social: los guardianes designados en la Smart Account aprueban la recuperación"]
+        R04["KYC: aporta documento de identidad y selfie; servicio verificador valida y el Owner hace revisión humana"]
+        R05["La Smart Account restablece el owner / acceso sin mover los fondos custodiados"]
+        R06["Se registra la recuperación y se notifica al usuario. Los fondos permanecen intactos"]
+        R07["Sin vía acreditable: se rechaza y el caso pasa a soporte al usuario (Owner + moderador)"]
+        R01 --> R02
+        R02 -->|"Social"| R03 --> R05
+        R02 -->|"KYC"| R04 --> R05
+        R02 -->|"Ninguna"| R07
+        R05 --> R06
+    end
+
+    subgraph CU05["CU-05 Clasificación como Usuario Empresa"]
+        E01["Usuario Certificado con clasificación Oro solicita la clasificación como Empresa"]
+        E02{"¿Cumple Certificado y Oro? Requisitos Oro: +1000 intercambios efectivos y ratio de efectividad >= 90%"}
+        E03["No: la solicitud se rechaza hasta cumplir los requisitos (A1)"]
+        E04["Sí: paga la inscripción con su propio gas y acepta la suscripción automática cada 30 días"]
+        E05["Owner / Sistema confirma la clasificación y habilita la suite de Empresa: inventario, encuentros, finanzas, promociones y subastas"]
+        E01 --> E02
+        E02 -->|"No"| E03
+        E02 -->|"Sí"| E04 --> E05
+    end
+
+    N08 -->|"CU-02"| Q01
+    Q04 -->|"CU-03: puntaje >= 76"| S01
+    Q10 -->|"CU-03: puntaje >= 76"| S01
+    Q10 -->|"CU-05"| E01
+    N06 -.->|"CU-04: ante pérdida de acceso"| R01
