@@ -3,12 +3,15 @@ pragma solidity ^0.8.24;
 
 import {Script, console2} from "forge-std/Script.sol";
 import {Escrow} from "../src/Escrow.sol";
+import {SmartAccount} from "../src/SmartAccount.sol";
+import {SmartAccountFactory} from "../src/SmartAccountFactory.sol";
 import {TrueKeateToken} from "../src/mocks/TrueKeateToken.sol";
 import {TrueKeateNFT} from "../src/mocks/TrueKeateNFT.sol";
 
 /**
- * @title Deploy — Ciclo 1 (Fase 3)
- * @notice Despliega Escrow + tokens de prueba en anvil (cuenta 0 = EO owner, RF-15.1).
+ * @title Deploy — Ciclos 1-2 (Fase 3)
+ * @notice Despliega Escrow + SmartAccountFactory + tokens de prueba en anvil
+ *         (cuenta 0 = EO owner, RF-15.1).
  *
  * Uso:
  *   anvil                                    # nodo local chain 31337
@@ -26,16 +29,20 @@ contract Deploy is Script {
         // 1) Escrow (deployer = owner)
         Escrow escrow = new Escrow();
 
-        // 2) Tokens de prueba (criptos ofrecidos en trueques)
+        // 2) SmartAccountFactory (despliega wallets de identidad ERC-4337 inspiradas, D35)
+        SmartAccountFactory factory = new SmartAccountFactory();
+
+        // 3) Tokens de prueba (criptos ofrecidos en trueques)
         TrueKeateToken tka = new TrueKeateToken("TrueKeate Token A", "TKA");
         TrueKeateToken tkb = new TrueKeateToken("TrueKeate Token B", "TKB");
 
-        // 3) NFT de prueba
+        // 4) NFT de prueba
         TrueKeateNFT nft = new TrueKeateNFT("TrueKeate NFT", "TKANFT");
 
         vm.stopBroadcast();
 
         console2.log("Escrow desplegado en:", address(escrow));
+        console2.log("SmartAccountFactory en:", address(factory));
         console2.log("TKA:", address(tka));
         console2.log("TKB:", address(tkb));
         console2.log("NFT:", address(nft));

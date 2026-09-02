@@ -105,11 +105,16 @@ criterios Gherkin/EARS alineados), `arquitectura_tecnica.md` (secciones 1–10, 
   - [x] `Escrow.sol` base: CREADO/ACTIVO → CUSTODIADO → APERTURA → COMPLETADO (ventanas 10 min/10 min, firmas duales, cancelación pre-custodia D31, marcador de valoración D36)
   - [x] Tests unit + fuzz: **18/18 verdes**; cobertura **94.96 % líneas** (gate D38 ≥80 % OK); invariantes I1/I2/I3 cubiertos
   - [x] Despliegue en anvil (cuenta 0 Owner): Escrow `0x5fbdb2…aa3` + mocks TKA/TKB/NFT
-- [ ] (Fase 3) **Ciclo 2 — SmartAccount ERC-4337 + KYC estados** (pendiente de confirmación)
+- [x] **Ciclo 2 — SmartAccount ERC-4337 + KYC estados** ✅
+  - [x] `SmartAccount.sol`: wallet de identidad ERC-4337 inspirada (D35, sin EntryPoint), ejecución por firma EIP-712 con nonce (D16), escalera INSCRITO/VERIFICADO/CERTIFICADO por merkle root (D28, RF-01.7), recuperación social 3 guardianes / umbral 2/3 / timelock 48h (D34)
+  - [x] `SmartAccountFactory.sol`: despliegue CREATE2 one-per-owner (CU-01)
+  - [x] Tests: 14 nuevos (32/32 totales verdes); cobertura SmartAccount 95.12%, Factory 100%
+  - [x] Despliegue anvil verificado: Factory + cuenta desplegada OK
+- [ ] (Fase 3) **Ciclo 3 — BRLT + Suscripciones + Fondo** (pendiente de confirmación)
 - [ ] (Fase 4) Pruebas E2E · (Fase 5) Manuales
 
 ## Próximos pasos
 
-1. Confirmar el **Ciclo 1** y avanzar al **Ciclo 2** (SmartAccount ERC-4337 + KYC estados, D28).
-2. Ejecutar cada ciclo C2–C8 con unit + fuzz + invariantes + cobertura ≥80 % (D38) y preview en anvil/GCP.
+1. Confirmar los **Ciclos 1-2** y avanzar al **Ciclo 3** (BRLT + Suscripciones + Fondo, D32/D33/D7).
+2. Ejecutar cada ciclo C3–C8 con unit + fuzz + invariantes + cobertura ≥80 % (D38) y preview en anvil/GCP.
 3. Los commits se crean localmente en `escrow-dsh-GCP`; el push a GitHub/GitLab se hace solo por orden del director (`/push`).
