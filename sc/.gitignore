@@ -1,0 +1,9 @@
+# Foundry build artifacts y cache
+out/
+cache/
+broadcast/*/31337/run-latest.json
+broadcast/*/31337/dry-run/
+
+# Datos de despliegue con claves sensibles
+*.local.env
+.env

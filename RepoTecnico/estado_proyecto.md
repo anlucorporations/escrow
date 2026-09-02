@@ -4,8 +4,8 @@
 |---|---|
 | Proyecto | **TrueKeate** (DApp Web3 de trueques con escrow) |
 | Archivo | `RepoTecnico/estado_proyecto.md` |
-| Fase actual | **2 — Auditoría completada** (documentación sincronizada) → transición a **Fase 3** (inicio por confirmar) |
-| Última actualización | Fase 2 — sincronía de documentos tras incorporar estilo visual RNF-08/RF-19 (D41); coherencia verificada (6 lentes) |
+| Fase actual | **3 — Desarrollo** (Ciclo 1 completado: Escrow base + tests verdes en anvil) |
+| Última actualización | Fase 3 — Ciclo 1 terminado (18/18 tests, cobertura 94.96%, despliegue anvil OK) |
 
 ---
 
@@ -99,13 +99,17 @@ criterios Gherkin/EARS alineados), `arquitectura_tecnica.md` (secciones 1–10, 
 ## Pendientes
 
 - [ ] Acceso SSH a `gitlab.codecrypto.academy` (D11 — pospuesto)
-- [ ] **Cierre formal de la Fase 2** (confirmación del usuario tras revisar informes y casos de uso) → paso a Fase 3
-- [ ] **Inicio de Fase 3 — Desarrollo** (Ciclo 1: setup Foundry + Escrow base) — pendiente de confirmación
-- [ ] (Fase 3) Plan de desarrollo vertical en ciclos C1–C8 + esquema SQL definitivo (diccionario → modelo PostgreSQL)
+- [x] **Ciclo 1 — Setup Foundry + Escrow base** ✅
+  - [x] Instalar Foundry (forge/anvil 1.8.1)
+  - [x] Proyecto Foundry en `sc/` + OpenZeppelin v5.0.2 + forge-std
+  - [x] `Escrow.sol` base: CREADO/ACTIVO → CUSTODIADO → APERTURA → COMPLETADO (ventanas 10 min/10 min, firmas duales, cancelación pre-custodia D31, marcador de valoración D36)
+  - [x] Tests unit + fuzz: **18/18 verdes**; cobertura **94.96 % líneas** (gate D38 ≥80 % OK); invariantes I1/I2/I3 cubiertos
+  - [x] Despliegue en anvil (cuenta 0 Owner): Escrow `0x5fbdb2…aa3` + mocks TKA/TKB/NFT
+- [ ] (Fase 3) **Ciclo 2 — SmartAccount ERC-4337 + KYC estados** (pendiente de confirmación)
+- [ ] (Fase 4) Pruebas E2E · (Fase 5) Manuales
 
 ## Próximos pasos
 
-1. Confirmación del usuario para cerrar la Fase 2 y aprobar el plan de ciclos C1–C8 (`arquitectura_tecnica.md` §10).
-2. Iniciar la Fase 3 con el Ciclo 1 (setup Foundry + Escrow base) en la rama `escrow-dsh-GCP`.
-3. Ejecutar cada ciclo con unit + fuzz + invariantes + cobertura ≥80 % (D38) y desplegar preview en anvil/GCP.
-4. Al completar todos los ciclos, pasar a la Fase 4 (pruebas) y luego a la Fase 5 (manuales).
+1. Confirmar el **Ciclo 1** y avanzar al **Ciclo 2** (SmartAccount ERC-4337 + KYC estados, D28).
+2. Ejecutar cada ciclo C2–C8 con unit + fuzz + invariantes + cobertura ≥80 % (D38) y preview en anvil/GCP.
+3. Los commits se crean localmente en `escrow-dsh-GCP`; el push a GitHub/GitLab se hace solo por orden del director (`/push`).
