@@ -21,6 +21,8 @@ import { crearRouterKyc } from './routes/kyc.js';
 import { crearRouterCatalog } from './routes/catalog.js';
 import { crearRouterTruekes } from './routes/truekes.js';
 import { crearRouterAdmin } from './routes/admin.js';
+import { crearRouterReputacion } from './routes/reputacion.js';
+import { crearRouterSubastas } from './routes/subastas.js';
 
 /**
  * Crea la aplicación Express.
@@ -48,6 +50,8 @@ export function crearApp(deps = {}) {
   app.use('/catalog', crearRouterCatalog(deps));
   app.use('/truekes', crearRouterTruekes(deps));
   app.use('/admin', crearRouterAdmin(deps));
+  app.use('/reputacion', crearRouterReputacion(deps));
+  app.use('/subastas', crearRouterSubastas(deps));
 
   // 404 y manejo de errores
   app.use((_req, res) => res.status(404).json({ error: 'not_found' }));

@@ -144,11 +144,17 @@ criterios Gherkin/EARS alineados), `arquitectura_tecnica.md` (secciones 1–10, 
   - [x] Suite por estado/rol (RF-14.2-14.8): dashboard con escalera D28 + 4 módulos
   - [x] Assets de marca copiados a `web/public/brand` y `web/public/hero` (RF-19)
   - [x] Manifest PWA instalable (D40); build OK (9 páginas estáticas)
-- [ ] (Fase 3) **Ciclo 8 — Integración E2E + dashboard Owner** (pendiente de confirmación)
+- [x] **Ciclo 8 — Cierre vertical: disputas + reputación + subastas** ✅
+  - [x] `Escrow.sol` ampliado: CU-17 bloqueo (RF-05.8), CU-18 anulación con quórum ≥2/3 (D13) y ANULADO por defecto a los 5 días (D26), CU-19 sanción con timelock 6h (D21); vinculación a SociosRegistry; 9/9 tests nuevos (suite Foundry 61/61)
+  - [x] `api/lib/reputacion.js` + router `/reputacion`: fórmula D12/D30 (insumos 0–100, recálculo mensual), Oro histórico (RF-07.4), penalización inactividad (D19/CU-21)
+  - [x] Router `/subastas`: solo Empresa crea (RF-17.1), solo Certificado puja (RF-17.2), mayor valor gana con desempate por nivel (D27/CU-25/26)
+  - [x] Tests: 7/7 C8 (suite backend **26/26**; suite Foundry **61/61**; total plataforma 87 tests)
+- [ ] (Fase 3) Push a GitHub/GitLab pendiente (orden del director)
 - [ ] (Fase 4) Pruebas E2E · (Fase 5) Manuales
 
 ## Próximos pasos
 
-1. Confirmar los **Ciclos 1-7** y avanzar al **Ciclo 8** (Integración E2E completa).
-2. Ejecutar el Ciclo 8 con unit + fuzz + invariantes + cobertura ≥80 % (D38) y preview en anvil/GCP.
+1. **Fase 3 completa**: 8 ciclos ejecutados con pruebas (Foundry 61/61, backend 26/26, frontend build OK).
+2. Pendiente: push de los commits locales a GitHub/GitLab (`/push` — orden del director) y preview en anvil/GCP.
+3. Siguiente: Fase 4 (pruebas E2E con navegador) y Fase 5 (manuales).
 3. Los commits se crean localmente en `escrow-dsh-GCP`; el push a GitHub/GitLab se hace solo por orden del director (`/push`).

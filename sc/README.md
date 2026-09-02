@@ -3,7 +3,7 @@
 Contratos inteligentes del proyecto **TrueKeate** (Fase 3 — Desarrollo), construidos con
 [Foundry](https://book.getfoundry.sh/).
 
-## Estado — Ciclos 1-3 completados ✅
+## Estado — Ciclos 1-8 completados ✅ (Fase 3 completa)
 
 **Escrow base** operativo y probado:
 
@@ -55,9 +55,12 @@ Despliegue del Ciclo 1 (anvil, cuenta 0 `0xf39F…2266`):
 | C2 | `SmartAccount.sol`, `SmartAccountFactory.sol` (ERC-4337 inspirado, D35) | ✅ 14 tests |
 | C3 | `BRLT.sol`, `SociosRegistry.sol`, `FondoDeValor.sol`, `SuscripcionEmpresa.sol` | ✅ 20 tests |
 
-Suite total: **52/52 tests verdes**. Cobertura de líneas (gate D38 ≥80 %): Escrow 94.64%,
+Suite total: **61/61 tests verdes** (C1 18 + C2 14 + C3 20 + C8-escrow 9). El Escrow del C8
+incorpora: bloqueo por violación de norma (CU-17), anulación con quórum de Socios ≥2/3 y plazo
+≤5 días con ANULADO por defecto (CU-18, D13/D26) y sanción on-chain con timelock de 6 h
+(CU-19, D21), vinculado al SociosRegistry. Cobertura de líneas (gate D38 ≥80 %): Escrow 94.12%,
 SmartAccount 95.12%, Factory 100%, BRLT 90%, FondoDeValor 100%, SociosRegistry 94.03%,
-SuscripcionEmpresa 81.82% — **Total 89.72%**.
+SuscripcionEmpresa 81.82% — **Total 87.70%**.
 
 ## Roadmap (ciclos siguientes)
 
@@ -67,6 +70,6 @@ SuscripcionEmpresa 81.82% — **Total 89.72%**.
 | C5 | Relayer EIP-712 (4 protecciones D16, límite 20/día D29, fallback D39) |
 | C6 | Backend API (Node.js) |
 | C7 | Frontend Next.js 16 (sistema de diseño RNF-08, assets RF-19) |
-| C8 | Disputas/anulación quórum 2/3 (D13/D26), subastas (D27), sanciones timelock 6h (D21), dashboard Owner |
+| C8 | ✅ Disputas/anulación quórum 2/3 (D13/D26), sanciones timelock 6h (D21) en el escrow |
 
 > Referencia completa: `../RepoTecnico/arquitectura_tecnica.md` (§3 contratos, §10 ciclos).

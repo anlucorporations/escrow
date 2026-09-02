@@ -73,11 +73,21 @@ contract Escrow is Ownable, ReentrancyGuard {
         bool valoracionB;       // B marcó su valoración (requisito de COMPLETADO, D36)
         bool activoCustodiadoA; // el activo de A está en el escrow
         bool activoCustodiadoB; // el activo de B está en el escrow
+        // --- Ciclo 8: anulación/disputa/bloqueo (CU-17/18/19) ---
+        address solicitanteAnulacion;  // quien solicitó la anulación (0 = sin solicitud)
+        string motivoAnulacion;        // justificación (RF-06.1)
+        uint256 plazoAnulacion;        // timestamp límite de la votación (≤5 días — D13)
+        uint256 votosAFavor;           // votos de Socios a favor de anular
+        uint256 votosEnContra;         // votos de Socios en contra
+        bool socioVotoRegistrado;      // marca de votación registrada (espejo on-chain)
+        uint256 resolucionTimestamp;   // cuando se resolvió la disputa (timelock 6h — D21)
+        uint256 sancionTimestamp;      // cuando se programó una sanción
     }
 
     // ------------------------------------------------------------------ estado
     uint256 private _siguienteId;
     mapping(uint256 => Trueke) private _truekes;
+    mapping(bytes32 => bool) private _votoEmitido; // (truekeId, socio) → ya votó (D21)
 
     // ------------------------------------------------------------------ eventos (para el indexador, §5)
     event TruekeCreado(uint256 indexed id, address parteA, address parteB, address tokenA, address tokenB, uint256 horaPautada);
@@ -91,7 +101,12 @@ contract Escrow is Ownable, ReentrancyGuard {
     event ValoracionMarcadaB(uint256 indexed id);
     event TruekeCompletado(uint256 indexed id);
     event TruekeCancelado(uint256 indexed id);
-    event EscrowBloqueado(uint256 indexed id); // reservado (C8)
+    event EscrowBloqueado(uint256 indexed id);
+    event AnulacionSolicitada(uint256 indexed id, address solicitante, string motivo, uint256 plazo);
+    event VotoSocio(uint256 indexed id, bool aFavor);
+    event ResolucionEjecutada(uint256 indexed id, bool anulada);
+    event ResolucionPorDefecto(uint256 indexed id);
+    event SancionProgramada(uint256 indexed id, uint256 ejecutaEn);
 
     // ------------------------------------------------------------------ errores
     error NoAutorizado(uint256 id);
@@ -101,9 +116,46 @@ contract Escrow is Ownable, ReentrancyGuard {
     error ActivoYaCustodiado();
     error SinCustodiaCompleta();
     error ActivoNoPermitido();
+    error SinSolicitudAnulacion();
+    error AnulacionYaSolicitada();
+    error PlazoAnulacionVencido();
+    error SoloSocio();
+    error QuorumNoAlcanzado();
+    error TimelockNoVencido(uint256 falta);
+    error SinSancionProgramada();
 
     // ------------------------------------------------------------------ constructor
     constructor() Ownable(msg.sender) {}
+
+    // ------------------------------------------------------------------ configuración (C8)
+    address public sociosRegistry; // padrón de Socios (quórum ≥2/3 — D21)
+    uint256 public plazoAnulacionMax = 5 days;   // D13
+    uint256 public timelockSanciones = 6 hours;  // D21 (solo sanciones)
+
+    /// @notice Vincula el SociosRegistry (solo owner).
+    function vincularSociosRegistry(address registry_) external onlyOwner {
+        sociosRegistry = registry_;
+    }
+
+    function _esSocio(address quien) private view returns (bool) {
+        if (sociosRegistry == address(0)) return false;
+        (bool ok, bytes memory data) = sociosRegistry.staticcall(
+            abi.encodeWithSignature("esSocio(address)", quien)
+        );
+        return ok && data.length >= 32 && abi.decode(data, (bool));
+    }
+
+    function _esQuorum(uint256 aFavor, uint256 enContra) private view returns (bool) {
+        // quórum ≥2/3 del padrón: se consulta totalSocios() del registry
+        (bool ok, bytes memory data) = sociosRegistry.staticcall(
+            abi.encodeWithSignature("totalSocios()")
+        );
+        uint256 total = ok && data.length >= 32 ? abi.decode(data, (uint256)) : 0;
+        if (total == 0) return false;
+        uint256 votados = aFavor + enContra;
+        // mayoría cualificada: aFavor * 3 >= total * 2 (sobre el padrón vigente)
+        return aFavor * 3 >= total * 2 && aFavor > 0;
+    }
 
     // ------------------------------------------------------------------ vistas
     function siguienteId() external view returns (uint256) { return _siguienteId; }
@@ -152,7 +204,15 @@ contract Escrow is Ownable, ReentrancyGuard {
             valoracionA: false,
             valoracionB: false,
             activoCustodiadoA: false,
-            activoCustodiadoB: false
+            activoCustodiadoB: false,
+            solicitanteAnulacion: address(0),
+            motivoAnulacion: "",
+            plazoAnulacion: 0,
+            votosAFavor: 0,
+            votosEnContra: 0,
+            socioVotoRegistrado: false,
+            resolucionTimestamp: 0,
+            sancionTimestamp: 0
         });
         emit TruekeCreado(id, parteA, parteB, activoA.token, activoB.token, horaPautada);
     }
@@ -313,6 +373,123 @@ contract Escrow is Ownable, ReentrancyGuard {
 
         t.estado = Estado.ANULADO; // cancelación pre-custodia (sin penalización)
         emit TruekeCancelado(id);
+    }
+
+    // ------------------------------------------------------------------ CU-17 bloqueo por violación de norma (RF-05.8)
+    /**
+     * @notice Moderación/Owner bloquea el intercambio por violación de norma: los activos
+     *         quedan congelados (BLOQUEADO). La salida exige resolución de Socios (C8).
+     */
+    function bloquear(uint256 id) external onlyOwner {
+        Trueke storage t = _truekes[id];
+        if (t.estado == Estado.COMPLETADO || t.estado == Estado.ANULADO) revert EstadoInvalido(id, t.estado);
+        t.estado = Estado.BLOQUEADO;
+        emit EscrowBloqueado(id);
+    }
+
+    // ------------------------------------------------------------------ CU-18 solicitud de anulación (RF-06.1, D13/D26)
+    /**
+     * @notice Una parte insatisfecha solicita la anulación justificada. Se fija el plazo de
+     *         votación de ≤5 días (D13). Si vence sin quórum → ANULADO por defecto (D26).
+     */
+    function solicitarAnulacion(uint256 id, string calldata motivo) external {
+        Trueke storage t = _truekes[id];
+        if (msg.sender != t.parteA && msg.sender != t.parteB) revert NoAutorizado(id);
+        if (t.estado != Estado.CUSTODIADO && t.estado != Estado.APERTURA) revert EstadoInvalido(id, Estado.APERTURA);
+        if (t.solicitanteAnulacion != address(0)) revert AnulacionYaSolicitada();
+
+        t.solicitanteAnulacion = msg.sender;
+        t.motivoAnulacion = motivo;
+        t.plazoAnulacion = block.timestamp + plazoAnulacionMax;
+        t.estado = Estado.EN_DISPUTA;
+        emit AnulacionSolicitada(id, msg.sender, motivo, t.plazoAnulacion);
+    }
+
+    /**
+     * @notice Un Socio vota la anulación (1 voto por Socio — D21). Al alcanzar quórum ≥2/3,
+     *         la anulación se aprueba y se devuelven los activos a ambas partes (RF-06.1).
+     */
+    function votarSocio(uint256 id, bool aFavor) external {
+        Trueke storage t = _truekes[id];
+        if (!_esSocio(msg.sender)) revert SoloSocio();
+        if (t.estado != Estado.EN_DISPUTA && t.estado != Estado.RESOLUCION_SOCIOS) {
+            revert EstadoInvalido(id, Estado.RESOLUCION_SOCIOS);
+        }
+        if (block.timestamp >= t.plazoAnulacion) revert PlazoAnulacionVencido();
+
+        // voto único por Socio: se marca en un slot derivado (id, socio)
+        bytes32 slot = keccak256(abi.encodePacked(id, msg.sender));
+        if (_votoEmitido[slot]) revert QuorumNoAlcanzado(); // reuse: ya votó
+        _votoEmitido[slot] = true;
+
+        if (aFavor) t.votosAFavor++;
+        else t.votosEnContra++;
+        t.estado = Estado.RESOLUCION_SOCIOS;
+        emit VotoSocio(id, aFavor);
+
+        if (_esQuorum(t.votosAFavor, t.votosEnContra)) {
+            t.resolucionTimestamp = block.timestamp;
+            _anular(t, false); // anulación aprobada por quórum — devolución inmediata (D13/D21: sin timelock para devolución)
+        }
+    }
+
+    /**
+     * @notice Si vencen los 5 días sin quórum → ANULADO por defecto (D26): los activos
+     *         vuelven a ambas billeteras (cierre en tiempo finito). Invocable por cualquiera.
+     */
+    function resolverPorDefecto(uint256 id) external {
+        Trueke storage t = _truekes[id];
+        if (t.estado != Estado.EN_DISPUTA && t.estado != Estado.RESOLUCION_SOCIOS) {
+            revert EstadoInvalido(id, Estado.RESOLUCION_SOCIOS);
+        }
+        if (block.timestamp < t.plazoAnulacion) revert PlazoAnulacionVencido();
+
+        // si el quórum ya se alcanzó pero no se anuló (caso sanciones), resolver aquí
+        if (_esQuorum(t.votosAFavor, t.votosEnContra)) {
+            _anular(t, false);
+        } else {
+            _anular(t, true); // por defecto (D26)
+        }
+    }
+
+    // ------------------------------------------------------------------ CU-19 sanción con timelock 6h (D21)
+    /**
+     * @notice Los Socios programan una sanción on-chain; se ejecuta solo tras el timelock
+     *         de 6 horas (D21). La devolución por anulación NO lleva timelock (RF-06.1/D26).
+     */
+    function programarSancion(uint256 id) external {
+        Trueke storage t = _truekes[id];
+        if (!_esSocio(msg.sender)) revert SoloSocio();
+        if (t.estado != Estado.BLOQUEADO && t.estado != Estado.RESOLUCION_SOCIOS) {
+            revert EstadoInvalido(id, t.estado);
+        }
+        t.sancionTimestamp = block.timestamp + timelockSanciones;
+        t.estado = Estado.RESOLUCION_SOCIOS;
+        emit SancionProgramada(id, t.sancionTimestamp);
+    }
+
+    /// @notice Ejecuta la sanción programada tras el timelock de 6 h (solo sanciones — D21).
+    function ejecutarSancion(uint256 id) external {
+        Trueke storage t = _truekes[id];
+        if (t.sancionTimestamp == 0) revert SinSancionProgramada();
+        if (block.timestamp < t.sancionTimestamp) {
+            revert TimelockNoVencido(t.sancionTimestamp - block.timestamp);
+        }
+        // sanción = bloqueo definitivo sin liberación (la ejecución on-chain la realiza el contrato)
+        t.estado = Estado.BLOQUEADO;
+        t.sancionTimestamp = 0;
+        emit EscrowBloqueado(id);
+    }
+
+    function _anular(Trueke storage t, bool porDefecto) private {
+        // devolver activos custodiados a sus dueños (RF-06.1 / D26)
+        if (t.activoCustodiadoA) _liberar(t.activoA, t.parteA);
+        if (t.activoCustodiadoB) _liberar(t.activoB, t.parteB);
+        t.activoCustodiadoA = false;
+        t.activoCustodiadoB = false;
+        t.estado = Estado.ANULADO;
+        if (porDefecto) emit ResolucionPorDefecto(t.id);
+        else emit ResolucionEjecutada(t.id, true);
     }
 
     // ------------------------------------------------------------------ utilidades
