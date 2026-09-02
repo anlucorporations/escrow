@@ -4,8 +4,8 @@
 |---|---|
 | Proyecto | **TrueKeate** (DApp Web3 de trueques con escrow) |
 | Archivo | `RepoTecnico/estado_proyecto.md` |
-| Fase actual | **3 — Desarrollo** (Ciclo 1 completado: Escrow base + tests verdes en anvil) |
-| Última actualización | Fase 3 — Ciclo 1 terminado (18/18 tests, cobertura 94.96%, despliegue anvil OK) |
+| Fase actual | **4 — Pruebas** (E2E 18/18 · backend 26/26 · Foundry 62/62 con invariantes) |
+| Última actualización | Fase 4 completada: suite E2E Playwright **18/18**, backend **26/26**, Foundry **62/62** (61 unit/fuzz + invariantes I1/I2/I4/I5/I7), cobertura Forge global ≥80 % (gate D38) |
 
 ---
 
@@ -40,6 +40,25 @@
 - [x] **Auditoría de coherencia (6 lentes C1–C6)** — sincronía entre documentos verificada y
   correcciones aplicadas (cabeceras, CU-04/18/23/24/31, diccionario, estados del escrow,
   nomenclatura unificada, informes marcados históricos).
+
+## ✅ Cierre de la Fase 4 — Pruebas
+
+| Suit de pruebas | Resultado | Cobertura / detalle |
+|---|---|---|
+| **Foundry (smart contracts)** | **62/62 verdes** | 61 unit/fuzz + 1 suite de invariantes handler-based |
+| Invariantes (EscrowInvariants) | **5/5** | I1 conservación de activos · I2 sin cancelación con custodia · I4 anulaciones resueltas en plazo · I5 sanción solo tras timelock · I7 completado requiere firmas + valoración |
+| **Backend (Node, node:test)** | **26/26 verdes** | indexador 5/5 · relayer 7/7 · API 7/7 · ciclo8 7/7 |
+| **Frontend E2E (Playwright)** | **18/18 verdes** | 9 casos × 2 proyectos (chromium + mobile-chrome Pixel 5, RNF-02.3) |
+| Cobertura Forge (gate D38 ≥80 %) | **OK — 89.55 % líneas** (497/555) | Escrow 95.19 % · SmartAccount 95.12 % · Factory 100 % · BRLT 90 % · Fondo 100 % · Registry 94.03 % · Suscripción 81.82 % · Handler invariantes 100 % |
+
+Detalle E2E (9 casos × 2 proyectos):
+- Landing pública RF-14.1: hero + título + CTA → suite, métricas, ventajas (3 casos).
+- Suite RF-14.2: barra superior `@usuario` (RNF-08.4), escalera D28 (INSCRITO → VERIFICADO → CERTIFICADO), módulos atenuados para Inscrito (RF-14.3), botón Conectar MetaMask sin sesión (RF-16), navegación móvil hexagonal (5 casos).
+- Entorno de ejecución: Chromium headless con librerías del sistema extraídas + fontconfig/DejaVu (fuentes del sistema indisponibles en el sandbox); servidor `npm run start` en :3000 (reuseExistingServer).
+
+**Hallazgos corregidos durante Fase 4** (ninguno funcional):
+- E2E fallaba por fonts del sistema ausentes en el entorno headless → resuelto instalando fuentes DejaVu + fontconfig (no es defecto de la app).
+- Locator de la escalera D28 en strict mode (texto `INSCRITO` presente en escalón y badge) → acotado a `getByRole("list")` (práctica Playwright).
 
 ## ✅ Cierre de la Fase 2 — Documentación sincronizada
 
@@ -151,11 +170,11 @@ criterios Gherkin/EARS alineados), `arquitectura_tecnica.md` (secciones 1–10, 
   - [x] Tests: 7/7 C8 (suite backend **26/26**; suite Foundry **61/61**; total plataforma 87 tests)
 - [x] **Push realizado en los 3 repos** ✅: rama `escrow-dsh-GCP` en `0f5e521` publicada en **GitHub**, **GitLab.com** y **gitlab.codecrypto.academy** (token HTTPS configurado globalmente; contenido heredado reemplazado por lo construido con forced update)
 - [x] **D11 resuelto**: acceso a `gitlab.codecrypto.academy` habilitado vía token (credential helper global)
-- [ ] (Fase 4) Pruebas E2E · (Fase 5) Manuales
+- [x] **Fase 4 — Pruebas completadas** ✅: Foundry 62/62 (unit/fuzz + invariantes), backend 26/26, E2E Playwright 18/18 (chromium + mobile-chrome); cobertura Forge ≥80 % (D38) verificada
+- [ ] (Fase 5) Manuales de uso y técnicos
 
 ## Próximos pasos
 
-1. **Fase 3 completa y publicada** (rama `escrow-dsh-GCP` en `2340fac` — GitHub + GitLab.com).
-2. Siguiente: **Fase 4** (pruebas E2E con navegador + pruebas exhaustivas Forge) y **Fase 5** (manuales).
-3. Pendiente operativo resuelto: los 3 remotos sincronizados (D11 cerrado).
+1. **Fase 4 completa**: todas las pruebas de la plataforma en verde — Foundry 62/62, backend 26/26, E2E 18/18.
+2. Siguiente: **Fase 5** (manuales de uso + técnicos, skill `@manuales`).
 3. Los commits se crean localmente en `escrow-dsh-GCP`; el push a GitHub/GitLab se hace solo por orden del director (`/push`).
