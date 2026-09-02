@@ -3,7 +3,7 @@
 Contratos inteligentes del proyecto **TrueKeate** (Fase 3 — Desarrollo), construidos con
 [Foundry](https://book.getfoundry.sh/).
 
-## Estado — Ciclo 1 completado ✅
+## Estado — Ciclos 1-3 completados ✅
 
 **Escrow base** operativo y probado:
 
@@ -47,12 +47,22 @@ Despliegue del Ciclo 1 (anvil, cuenta 0 `0xf39F…2266`):
 | `TrueKeateToken` TKB | `0x0165878a594ca255338adfa4d48449f69242eb8f` |
 | `TrueKeateNFT` | `0xa513e6e4b8f2a923d98304ec87f64353c4d5c853` |
 
+## Ciclos completados
+
+| Ciclo | Contratos | Estado |
+|---|---|---|
+| C1 | `Escrow.sol` (máquina de estados base) | ✅ 18 tests |
+| C2 | `SmartAccount.sol`, `SmartAccountFactory.sol` (ERC-4337 inspirado, D35) | ✅ 14 tests |
+| C3 | `BRLT.sol`, `SociosRegistry.sol`, `FondoDeValor.sol`, `SuscripcionEmpresa.sol` | ✅ 20 tests |
+
+Suite total: **52/52 tests verdes**. Cobertura de líneas (gate D38 ≥80 %): Escrow 94.64%,
+SmartAccount 95.12%, Factory 100%, BRLT 90%, FondoDeValor 100%, SociosRegistry 94.03%,
+SuscripcionEmpresa 81.82% — **Total 89.72%**.
+
 ## Roadmap (ciclos siguientes)
 
 | Ciclo | Contenido |
 |---|---|
-| C2 | SmartAccount ERC-4337 + escalera KYC INSCRITO/VERIFICADO/CERTIFICADO (D28) |
-| C3 | BRLT (tope 1M, quórum 2/3 — D32) + SuscripcionEmpresa (staking D33) + fondo 1%/10%/5% (D7) |
 | C4 | Indexador Node.js (D25) + PostgreSQL + PostGIS (en `../backend`) |
 | C5 | Relayer EIP-712 (4 protecciones D16, límite 20/día D29, fallback D39) |
 | C6 | Backend API (Node.js) |

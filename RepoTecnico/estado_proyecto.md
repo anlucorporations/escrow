@@ -110,11 +110,18 @@ criterios Gherkin/EARS alineados), `arquitectura_tecnica.md` (secciones 1–10, 
   - [x] `SmartAccountFactory.sol`: despliegue CREATE2 one-per-owner (CU-01)
   - [x] Tests: 14 nuevos (32/32 totales verdes); cobertura SmartAccount 95.12%, Factory 100%
   - [x] Despliegue anvil verificado: Factory + cuenta desplegada OK
-- [ ] (Fase 3) **Ciclo 3 — BRLT + Suscripciones + Fondo** (pendiente de confirmación)
+- [x] **Ciclo 3 — BRLT + Suscripciones + Fondo** ✅
+  - [x] `SociosRegistry.sol`: padrón de Socios + votación de admisión con quórum ≥2/3 (D21, CU-03) + propuestas económicas (emisión/tope BRLT) con quórum 2/3 (D32)
+  - [x] `BRLT.sol`: ERC-20 BorloTokens controlado por el registry (D6), tope inicial 1M (D32), registro con propósito, 5% al fondo (D7)
+  - [x] `FondoDeValor.sol`: fondo de operación (D7), porcentajes 1%/10%/5% configurables por Owner, retiros para operación (D15)
+  - [x] `SuscripcionEmpresa.sol`: staking bloqueado 30 días, plan 100 BRLT/mes configurable (D33), 10% al fondo (D7), cancelación con devolución (CU-24)
+  - [x] Tests: 20 nuevos (52/52 totales verdes); cobertura líneas: BRLT 90%, Fondo 100%, Registry 94%, Suscripción 82%
+  - [x] Despliegue anvil verificado: BRLT/Fondo/Registry/Suscripcion OK
+- [ ] (Fase 3) **Ciclo 4 — Indexador + PostgreSQL + PostGIS** (pendiente de confirmación)
 - [ ] (Fase 4) Pruebas E2E · (Fase 5) Manuales
 
 ## Próximos pasos
 
-1. Confirmar los **Ciclos 1-2** y avanzar al **Ciclo 3** (BRLT + Suscripciones + Fondo, D32/D33/D7).
-2. Ejecutar cada ciclo C3–C8 con unit + fuzz + invariantes + cobertura ≥80 % (D38) y preview en anvil/GCP.
+1. Confirmar los **Ciclos 1-3** y avanzar al **Ciclo 4** (Indexador Node.js + PostgreSQL + PostGIS, D25).
+2. Ejecutar cada ciclo C4–C8 con unit + fuzz + invariantes + cobertura ≥80 % (D38) y preview en anvil/GCP.
 3. Los commits se crean localmente en `escrow-dsh-GCP`; el push a GitHub/GitLab se hace solo por orden del director (`/push`).

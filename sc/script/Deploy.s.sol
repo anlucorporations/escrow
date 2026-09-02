@@ -5,6 +5,10 @@ import {Script, console2} from "forge-std/Script.sol";
 import {Escrow} from "../src/Escrow.sol";
 import {SmartAccount} from "../src/SmartAccount.sol";
 import {SmartAccountFactory} from "../src/SmartAccountFactory.sol";
+import {BRLT} from "../src/BRLT.sol";
+import {FondoDeValor} from "../src/FondoDeValor.sol";
+import {SociosRegistry} from "../src/SociosRegistry.sol";
+import {SuscripcionEmpresa} from "../src/SuscripcionEmpresa.sol";
 import {TrueKeateToken} from "../src/mocks/TrueKeateToken.sol";
 import {TrueKeateNFT} from "../src/mocks/TrueKeateNFT.sol";
 
@@ -39,6 +43,20 @@ contract Deploy is Script {
         // 4) NFT de prueba
         TrueKeateNFT nft = new TrueKeateNFT("TrueKeate NFT", "TKANFT");
 
+        // 5) Ciclo 3: BRLT + FondoDeValor + SociosRegistry + SuscripcionEmpresa (gobernanza)
+        BRLT brlt = new BRLT();
+        FondoDeValor fondo = new FondoDeValor();
+        SociosRegistry registry = new SociosRegistry();
+        SuscripcionEmpresa suscripcion = new SuscripcionEmpresa();
+
+        // vinculaciones
+        brlt.vincularRegistry(address(registry));
+        brlt.vincularFondo(address(fondo));
+        fondo.vincularBrlt(address(brlt));
+        registry.vincularBrlt(address(brlt));
+        suscripcion.vincularBrlt(address(brlt));
+        suscripcion.vincularFondo(address(fondo));
+
         vm.stopBroadcast();
 
         console2.log("Escrow desplegado en:", address(escrow));
@@ -46,6 +64,10 @@ contract Deploy is Script {
         console2.log("TKA:", address(tka));
         console2.log("TKB:", address(tkb));
         console2.log("NFT:", address(nft));
+        console2.log("BRLT:", address(brlt));
+        console2.log("FondoDeValor:", address(fondo));
+        console2.log("SociosRegistry:", address(registry));
+        console2.log("SuscripcionEmpresa:", address(suscripcion));
         console2.log("Owner:", owner);
     }
 }
