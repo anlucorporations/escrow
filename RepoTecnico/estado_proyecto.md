@@ -135,11 +135,20 @@ criterios Gherkin/EARS alineados), `arquitectura_tecnica.md` (secciones 1–10, 
   - [x] `api/routes/truekes.js`: creación (Verificado, máx 3 activos RF-14.4), custodiar, firma, valoración 1-5 (D18/D36)
   - [x] `api/routes/admin.js`: dashboard Owner (RF-13.1): usuarios, contratos, KPIs disputas, db, infra/health
   - [x] Tests: 7/7 (supertest + almacén en memoria); suite backend **19/19**
-- [ ] (Fase 3) **Ciclo 7 — Frontend suite + landing** (pendiente de confirmación)
+- [x] **Ciclo 7 — Frontend suite + landing** ✅
+  - [x] Next.js 16.3.4 + TypeScript + Tailwind v4 + ethers v6 (D1/RT-04)
+  - [x] `lib/ethereum.tsx`: context provider MetaMask (RT-04.4): provider/signer/account + auto-reconexión (RF-16.2)
+  - [x] `lib/contracts.ts`: ABIs de los 6 contratos + direcciones anvil (RT-04.5)
+  - [x] Sistema de diseño RNF-08 en `globals.css`: tokens @theme (paleta Bóveda Digital, gradientes, curvas) + componentes Button/Card/BottomNav/StatusBadge
+  - [x] Landing (RF-14.1) con assets hero + logo/título (RF-19)
+  - [x] Suite por estado/rol (RF-14.2-14.8): dashboard con escalera D28 + 4 módulos
+  - [x] Assets de marca copiados a `web/public/brand` y `web/public/hero` (RF-19)
+  - [x] Manifest PWA instalable (D40); build OK (9 páginas estáticas)
+- [ ] (Fase 3) **Ciclo 8 — Integración E2E + dashboard Owner** (pendiente de confirmación)
 - [ ] (Fase 4) Pruebas E2E · (Fase 5) Manuales
 
 ## Próximos pasos
 
-1. Confirmar los **Ciclos 1-6** y avanzar al **Ciclo 7** (Frontend Next.js 16 + sistema de diseño RNF-08).
-2. Ejecutar cada ciclo C7–C8 con unit + fuzz + invariantes + cobertura ≥80 % (D38) y preview en anvil/GCP.
+1. Confirmar los **Ciclos 1-7** y avanzar al **Ciclo 8** (Integración E2E completa).
+2. Ejecutar el Ciclo 8 con unit + fuzz + invariantes + cobertura ≥80 % (D38) y preview en anvil/GCP.
 3. Los commits se crean localmente en `escrow-dsh-GCP`; el push a GitHub/GitLab se hace solo por orden del director (`/push`).

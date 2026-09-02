@@ -1,0 +1,21 @@
+{
+  "name": "TrueKeate — Trueke Central",
+  "short_name": "TrueKeate",
+  "description": "Plataforma Web3 de trueque con custodia atómica, reputación y meta-transacciones sin gas.",
+  "start_url": "/suite/dashboard",
+  "display": "standalone",
+  "background_color": "#f8f9fa",
+  "theme_color": "#1a2b4c",
+  "icons": [
+    {
+      "src": "/brand/TrueKeate_logo.png",
+      "sizes": "983x881",
+      "type": "image/png"
+    },
+    {
+      "src": "/brand/TrueKeate_logo.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}

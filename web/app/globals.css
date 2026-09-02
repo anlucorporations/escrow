@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+/* =============================================================================
+   TrueKeate — Sistema de diseño (RNF-08)
+   Concepto: "Bóveda Digital Moderna" (PROPUESTA_ENTORNO_VISUAL_TRUEKEAT.md)
+   Paleta: Navy #1A2B4C/#0A1128 · Teal #2A9D8F · Cyan #48CAE4 · Gold #D4AF37
+           Lienzo #F8F9FA · Error #E63946 · Warning #F4A261
+   Tipografía: Montserrat/Poppins (títulos) · Inter/Roboto (cuerpo)
+   Tailwind v4: tokens en CSS @theme (RNF-08.7)
+   ============================================================================= */
+
+:root {
+  /* RNF-08.1 Paleta */
+  --navy-900: #0a1128;
+  --navy-800: #1a2b4c;
+  --teal-500: #2a9d8f;
+  --cyan-400: #48cae4;
+  --gold-500: #d4af37;
+  --gold-300: #f3e5ab;
+  --gold-600: #c5a065;
+  --smoke: #f8f9fa;
+  --white: #ffffff;
+  --crimson: #e63946;
+  --coral: #f4a261;
+
+  /* RNF-08.2 Gradientes */
+  --gradient-cta: linear-gradient(135deg, #1a2b4c 0%, #2a9d8f 100%);
+  --gradient-cyan: linear-gradient(90deg, #2a9d8f 0%, #48cae4 100%);
+  --gradient-gold: linear-gradient(135deg, #d4af37 0%, #f3e5ab 50%, #c5a065 100%);
+  --gradient-card-border: linear-gradient(90deg, #1a2b4c 0%, #2a9d8f 50%, #d4af37 100%);
+
+  /* RNF-08.5 Curvas y duraciones */
+  --ease-natural: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-page: 400ms;
+  --duration-slow: 600ms;
+}
+
+@theme inline {
+  /* Mapeo a utilidades Tailwind */
+  --color-navy-900: var(--navy-900);
+  --color-navy-800: var(--navy-800);
+  --color-teal-500: var(--teal-500);
+  --color-cyan-400: var(--cyan-400);
+  --color-gold-500: var(--gold-500);
+  --color-gold-300: var(--gold-300);
+  --color-gold-600: var(--gold-600);
+  --color-smoke: var(--smoke);
+  --color-white: var(--white);
+  --color-crimson: var(--crimson);
+  --color-coral: var(--coral);
+
+  /* Radios RNF-08.4 */
+  --radius-pill: 9999px;
+  --radius-card: 16px;
+  --radius-modal: 24px;
+
+  --font-sans: var(--font-geist-sans), Inter, Roboto, sans-serif;
+  --font-display: var(--font-geist-sans), Montserrat, Poppins, sans-serif;
+}
+
+body {
+  background: var(--smoke);
+  color: var(--navy-800);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Utilidades del sistema de diseño */
+.gradient-cta {
+  background: var(--gradient-cta);
+}
+.gradient-gold {
+  background: var(--gradient-gold);
+}
+.text-gradient-gold {
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.card-premium {
+  border-top: 4px solid var(--gold-500);
+}
+.anim-check-draw {
+  animation: checkDraw var(--duration-slow) var(--ease-bounce) forwards;
+}
+@keyframes checkDraw {
+  from {
+    stroke-dashoffset: 48;
+    opacity: 0;
+  }
+  to {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
