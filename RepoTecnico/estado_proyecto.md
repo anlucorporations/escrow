@@ -117,11 +117,17 @@ criterios Gherkin/EARS alineados), `arquitectura_tecnica.md` (secciones 1–10, 
   - [x] `SuscripcionEmpresa.sol`: staking bloqueado 30 días, plan 100 BRLT/mes configurable (D33), 10% al fondo (D7), cancelación con devolución (CU-24)
   - [x] Tests: 20 nuevos (52/52 totales verdes); cobertura líneas: BRLT 90%, Fondo 100%, Registry 94%, Suscripción 82%
   - [x] Despliegue anvil verificado: BRLT/Fondo/Registry/Suscripcion OK
-- [ ] (Fase 3) **Ciclo 4 — Indexador + PostgreSQL + PostGIS** (pendiente de confirmación)
+- [x] **Ciclo 4 — Indexador + PostgreSQL + PostGIS** ✅
+  - [x] `backend/db/schema.sql`: esquema PostgreSQL completo (14 tablas + PostGIS + enum canónico 9 estados + escalera D28 + cifrado PII D17 + idempotencia UNIQUE)
+  - [x] `backend/indexador.js`: listener Node.js propio (D25) — idempotencia (tx_hash/log_index/entidad), checkpoints por contrato, reconciliación, métricas de lag
+  - [x] `backend/indexador-cli.js`: barrido único / modo servicio --watch
+  - [x] Tests: 5/5 (node:test, pool en memoria): mapeo TruekeCreado→truekes, custodia→CUSTODIADO, idempotencia, barrerDesde+checkpoint, contrato desconocido
+  - [ ] Integración con `mcc-postgres` real (pendiente de entorno GCP — D25)
+- [ ] (Fase 3) **Ciclo 5 — Relayer EIP-712** (pendiente de confirmación)
 - [ ] (Fase 4) Pruebas E2E · (Fase 5) Manuales
 
 ## Próximos pasos
 
-1. Confirmar los **Ciclos 1-3** y avanzar al **Ciclo 4** (Indexador Node.js + PostgreSQL + PostGIS, D25).
-2. Ejecutar cada ciclo C4–C8 con unit + fuzz + invariantes + cobertura ≥80 % (D38) y preview en anvil/GCP.
+1. Confirmar los **Ciclos 1-4** y avanzar al **Ciclo 5** (Relayer EIP-712, D16/D29/D39).
+2. Ejecutar cada ciclo C5–C8 con unit + fuzz + invariantes + cobertura ≥80 % (D38) y preview en anvil/GCP.
 3. Los commits se crean localmente en `escrow-dsh-GCP`; el push a GitHub/GitLab se hace solo por orden del director (`/push`).
