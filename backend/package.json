@@ -1,10 +1,10 @@
 {
-  "name": "backend",
+  "name": "truekeate-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "TrueKeate backend: indexador + relayer EIP-712",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test test/indexador.test.js test/relayer.test.js"
   },
   "keywords": [],
   "author": "",

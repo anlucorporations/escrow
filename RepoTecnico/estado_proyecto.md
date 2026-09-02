@@ -123,11 +123,15 @@ criterios Gherkin/EARS alineados), `arquitectura_tecnica.md` (secciones 1–10, 
   - [x] `backend/indexador-cli.js`: barrido único / modo servicio --watch
   - [x] Tests: 5/5 (node:test, pool en memoria): mapeo TruekeCreado→truekes, custodia→CUSTODIADO, idempotencia, barrerDesde+checkpoint, contrato desconocido
   - [ ] Integración con `mcc-postgres` real (pendiente de entorno GCP — D25)
-- [ ] (Fase 3) **Ciclo 5 — Relayer EIP-712** (pendiente de confirmación)
+- [x] **Ciclo 5 — Relayer EIP-712** ✅
+  - [x] `backend/relayer.js`: relayer que envía meta-tx asumiendo el gas (RF-09.2) desde la cuenta 1 (RF-15.2); 4 protecciones D16 (nonce+chainId, allowlist de verificados con chequeo on-chain D28, límite diario 20/día D29, endpoint autenticado — rate-limit en C6); bloqueo 1h tras 3 fallos/10 min (D29); health-check SLA (D15)
+  - [x] Tests: 7/7 (node:test con provider mock): intent verificado, rechazo no-verificado, nonce repetido, chainId, límite diario, bloqueo por fallos, health
+  - [x] Integración E2E real en anvil: SmartAccount marcada VERIFICADO (D28) + meta-tx enviada por cuenta 1 con nonce incrementado ✅
+- [ ] (Fase 3) **Ciclo 6 — Backend API** (pendiente de confirmación)
 - [ ] (Fase 4) Pruebas E2E · (Fase 5) Manuales
 
 ## Próximos pasos
 
-1. Confirmar los **Ciclos 1-4** y avanzar al **Ciclo 5** (Relayer EIP-712, D16/D29/D39).
-2. Ejecutar cada ciclo C5–C8 con unit + fuzz + invariantes + cobertura ≥80 % (D38) y preview en anvil/GCP.
+1. Confirmar los **Ciclos 1-5** y avanzar al **Ciclo 6** (Backend API REST, Node.js).
+2. Ejecutar cada ciclo C6–C8 con unit + fuzz + invariantes + cobertura ≥80 % (D38) y preview en anvil/GCP.
 3. Los commits se crean localmente en `escrow-dsh-GCP`; el push a GitHub/GitLab se hace solo por orden del director (`/push`).

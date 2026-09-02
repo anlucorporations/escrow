@@ -1,4 +1,4 @@
-# TrueKeate — Backend (Ciclo 4, Fase 3)
+# TrueKeate — Backend (Ciclos 4-5, Fase 3)
 
 Backend off-chain del proyecto: base de datos PostgreSQL (lectura impulsada por eventos) e
 **indexador de eventos propio** (listener Node.js — D25).
@@ -58,9 +58,31 @@ node --test test/           # 5/5: mapeo TruekeCreado→truekes, custodia→CUST
 
 ## Roadmap
 
+## Relayer EIP-712 (`relayer.js` — Ciclo 5)
+
+Envía meta-transacciones de particulares asumiendo el gas (RF-09.2) desde la **cuenta 1** del
+anvil (RF-15.2). Protecciones (D16 + D29):
+
+1. **Nonce único EIP-712 + chainId** (anti-replay) — validado localmente y on-chain.
+2. **Allowlist**: solo Smart Accounts de particulares **VERIFICADOS** (chequeo on-chain del
+   estado D28).
+3. **Límite diario: 20 meta-tx por usuario/día** (D29).
+4. **Endpoints autenticados + rate-limiting** (aplica en la capa API — C6).
+5. **3 fallos en 10 min → bloqueo 1 h** del signer (D29).
+6. Health-check y alerta de saldo bajo (D15, SLA ≥99%).
+
+```js
+const relayer = new RelayerEIP712({ provider, wallet: walletCuenta1, smartAccountFactory, abiSmartAccount });
+const res = await relayer.procesarIntent({ signer, destino, valor, data, nonce, firma, chainId });
+```
+
+Integración E2E verificada en anvil: SmartAccount marcada VERIFICADO (D28) + meta-tx enviada por
+la cuenta 1 con nonce incrementado ✅ (`test/integracion-relayer.js`).
+
+## Roadmap
+
 | Ciclo | Contenido backend |
 |---|---|
-| C5 | Relayer EIP-712 (4 protecciones D16, límite 20/día D29, fallback D39) |
 | C6 | Backend API REST (auth, KYC, publicaciones, trueques, puntos de encuentro, etc.) |
 | C8 | Integración E2E + reconciliación fina por trueke |
 
