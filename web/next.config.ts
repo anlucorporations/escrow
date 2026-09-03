@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Build autónomo (standalone) para Cloud Run / contenedores — despliegue GCP
+  output: "standalone",
 };
 
 export default nextConfig;

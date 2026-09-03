@@ -1,6 +1,6 @@
 {
  "Escrow": {
-  "direccion": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+  "direccion": "0x8a93d247134d91e0de6f96547cb0204e5be8e5d8",
   "abi": [
    {
     "type": "constructor",
@@ -1372,7 +1372,7 @@
   ]
  },
  "SociosRegistry": {
-  "direccion": "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853",
+  "direccion": "0xb0f05d25e41fbc2b52013099ed9616f1206ae21b",
   "abi": [
    {
     "type": "constructor",
@@ -1996,7 +1996,7 @@
   ]
  },
  "BRLT": {
-  "direccion": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+  "direccion": "0x6f6f570f45833e249e27022648a26f4076f48f78",
   "abi": [
    {
     "type": "constructor",
@@ -2671,7 +2671,7 @@
   ]
  },
  "SuscripcionEmpresa": {
-  "direccion": "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6",
+  "direccion": "0x5feaebfb4439f3516c74939a9d04e95afe82c4ae",
   "abi": [
    {
     "type": "constructor",

@@ -4,8 +4,8 @@
 |---|---|
 | Proyecto | **TrueKeate** (DApp Web3 de trueques con escrow) |
 | Archivo | `RepoTecnico/estado_proyecto.md` |
-| Fase actual | **ENTREGADO** — 5 fases completadas + verificación de cuentas y scripts de operación |
-| Última actualización | Verificación cuentas (0=Owner, 1=Relayer) + scripts `reiniciar-plataforma.sh` y `bootstrap-owner.sh` (producción, bajo orden del director) |
+| Fase actual | **ENTREGADO + DESPLEGADO en GCP** (Cloud Run europe-west1 + Cloud SQL + anvil remoto MCC) |
+| Última actualización | Despliegue GCP completado: contratos en anvil remoto, API y Web en Cloud Run, Owner bootstrap en producción |
 
 ---
 
@@ -40,6 +40,27 @@
 - [x] **Auditoría de coherencia (6 lentes C1–C6)** — sincronía entre documentos verificada y
   correcciones aplicadas (cabeceras, CU-04/18/23/24/31, diccionario, estados del escrow,
   nomenclatura unificada, informes marcados históricos).
+
+## ✅ Despliegue en GCP (2026-09-03)
+
+| Componente | Recurso | URL / detalle |
+|---|---|---|
+| **Contratos** | Anvil remoto MCC (chain 31337, `mcc-foundry-anvil-slzlptbcla-ew`) | Escrow `0x8a93…e5d8` · Factory `0x4091…d849` · BRLT `0x6f6f…f78` · Fondo `0xca8c…8b9` · Registry `0xb0f0…e21b` · Suscripción `0x5fea…c4ae` · TKA/TKB/NFT (owner = cuenta 0) |
+| **API backend** | Cloud Run `truekeate-api` (europe-west1) | https://truekeate-api-593453426217.europe-west1.run.app (healthz 200; relayer = cuenta 1 `0x7099…79C8`; indexador activo sobre Cloud SQL) |
+| **Frontend web** | Cloud Run `truekeate-web` (europe-west1) | https://truekeate-web-593453426217.europe-west1.run.app (landing, /suite/dashboard, /help/manual → 200) |
+| **BD off-chain** | Cloud SQL `truekeate-db-dev` (PG15, southamerica-east1) | Esquema TrueKeate aplicado (14 tablas + extensiones) junto a tablas preexistentes del proyecto; secreto `DATABASE_URL` apunta vía socket `/cloudsql` |
+| **Secretos** | Secret Manager `truekeate-main` | `RPC_URL` (anvil remoto), `DATABASE_URL`, `RELAYER_PRIVATE_KEY` (**v3 = cuenta 1**, corregido), `KYC_SECRET` |
+| **Imágenes** | Artifact Registry `truekeate-repo` (southamerica-east1) | `backend:latest`/`backend:fix-indexador`, `web:latest` |
+
+**Bootstrap del Owner en GCP ejecutado** ✅: BD registra cuenta 0 como `CERTIFICADO/SOCIO/ORO` con SmartAccount `0xDb35…6AA`; `esSocio=true` on-chain (tx `0x7196…f2`).
+
+**Correcciones aplicadas durante el despliegue**:
+- ethers v6: `f.format('sighash')` devolvía el nombre del evento en vez del topic hash → `f.topicHash` en `backend/indexador.js:196` (bug latente no cubierto por tests con mock; verificado en vivo contra anvil remoto: barrido Escrow OK, 1 evento procesado).
+- Secreto `RELAYER_PRIVATE_KEY` apuntaba a la cuenta 0 → corregido a la **cuenta 1** (RF-15.2).
+- `backend/contratos.json` y `web/lib/contracts.ts` actualizados con las direcciones del despliegue remoto.
+- Dockerfiles creados (`backend/Dockerfile`, `web/Dockerfile` con Next standalone) + entrypoint `backend/api/index-gcp.js`.
+
+**Notas de operación**: el indexador corre dentro del servicio API (barrido periódico); con `min-instances=0` queda inactivo si no hay tráfico — para indexado continuo usar `--min-instances=1` o un job dedicado.
 
 ## ✅ Cierre de la Fase 4 — Pruebas
 

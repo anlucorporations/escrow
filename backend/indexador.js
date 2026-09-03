@@ -193,7 +193,7 @@ export class Indexador {
     const iface = new ethers.Interface(contrato.abi);
     const filtros = iface.fragments
       .filter((f) => f.type === 'event')
-      .map((f) => f.format('sighash'));
+      .map((f) => f.topicHash); // ethers v6: hash 0x…32 bytes (format('sighash') devolvía el nombre en v6)
     const direccion = contrato.direccion;
 
     for (const topic0 of filtros) {

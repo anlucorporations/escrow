@@ -17,16 +17,16 @@ export interface ContratoInfo {
   iface?: Interface;
 }
 
-/** Direcciones del despliegue de desarrollo (anvil, chain 31337). */
+/** Direcciones del despliegue en GCP (anvil remoto MCC, chain 31337 — deploy 2026-09-03). */
 export const DIRECCIONES: Record<string, string> = {
-  Escrow: process.env.NEXT_PUBLIC_ESCROW ?? "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+  Escrow: process.env.NEXT_PUBLIC_ESCROW ?? "0x8a93d247134d91e0de6f96547cb0204e5be8e5d8",
   SmartAccountFactory:
-    process.env.NEXT_PUBLIC_FACTORY ?? "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
-  BRLT: process.env.NEXT_PUBLIC_BRLT ?? "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+    process.env.NEXT_PUBLIC_FACTORY ?? "0x40918ba7f132e0acba2ce4de4c4baf9bd2d7d849",
+  BRLT: process.env.NEXT_PUBLIC_BRLT ?? "0x6f6f570f45833e249e27022648a26f4076f48f78",
   SociosRegistry:
-    process.env.NEXT_PUBLIC_REGISTRY ?? "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853",
+    process.env.NEXT_PUBLIC_REGISTRY ?? "0xb0f05d25e41fbc2b52013099ed9616f1206ae21b",
   SuscripcionEmpresa:
-    process.env.NEXT_PUBLIC_SUSCRIPCION ?? "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6",
+    process.env.NEXT_PUBLIC_SUSCRIPCION ?? "0x5feaebfb4439f3516c74939a9d04e95afe82c4ae",
 };
 
 /**
