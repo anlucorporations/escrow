@@ -2,25 +2,26 @@
 
 // =============================================================================
 // TrueKeate — Suite: Dashboard (RF-14.2)
-// Muestra el estado del usuario según la escalera D28 y los módulos a los que
-// tiene acceso según tipo/nivel (RF-14.3–14.8). Conecta la wallet (RF-16).
+// Muestra el estado del usuario según la escalera D28 (real, desde el backend)
+// y los módulos a los que tiene acceso según tipo/nivel (RF-14.3–14.8).
 // =============================================================================
+import Link from "next/link";
 import { useEthereum } from "@/lib/ethereum";
+import { useSesion } from "@/lib/sesion";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { StatusBadge } from "@/components/StatusBadge";
 
 type EstadoD28 = "INSCRITO" | "VERIFICADO" | "CERTIFICADO";
-
 const pasosD28: EstadoD28[] = ["INSCRITO", "VERIFICADO", "CERTIFICADO"];
 
 export default function Dashboard() {
   const { account, conectado, conectar, conectando } = useEthereum();
+  const { acceso } = useSesion();
 
-  // En una integración real el estado proviene del backend (/auth/session + /kyc/status).
-  // Aquí se simula para demostrar el render por estado de la escalera (D28).
-  const estado: EstadoD28 = "INSCRITO";
-
+  // Estado real de la escalera D28 (el guard ya garantiza que está inscrito).
+  const estado: EstadoD28 =
+    acceso.fase === "inscrito" ? (acceso.usuario.estado as EstadoD28) : "INSCRITO";
   const idx = pasosD28.indexOf(estado);
 
   return (
@@ -29,7 +30,9 @@ export default function Dashboard() {
         <div>
           <h1 className="font-display text-2xl font-bold text-navy-800">Mi Trueke Central</h1>
           <p className="text-sm text-navy-800/60">
-            {conectado && account ? `Wallet: ${account.slice(0, 6)}…${account.slice(-4)}` : "Wallet no conectada"}
+            {conectado && account
+              ? `Wallet: ${account.slice(0, 6)}…${account.slice(-4)}`
+              : "Wallet no conectada"}
           </p>
         </div>
         {!conectado && (
@@ -72,11 +75,15 @@ export default function Dashboard() {
 
       {/* Módulos por estado (RF-14.3–14.5) */}
       <div className="grid gap-4 sm:grid-cols-2">
-        <Card className="p-5">
-          <h3 className="font-semibold text-navy-800">Explorar ofertas</h3>
-          <p className="mt-1 text-sm text-navy-800/70">Catálogo de artículos AtoA disponibles para intercambio.</p>
-          <StatusBadge estado="Activo" tono="teal" />
-        </Card>
+        <Link href="/suite/mercado" className="block">
+          <Card className="h-full p-5">
+            <h3 className="font-semibold text-navy-800">Explorar ofertas</h3>
+            <p className="mt-1 text-sm text-navy-800/70">
+              Catálogo de artículos AtoA disponibles para intercambio.
+            </p>
+            <StatusBadge estado="Activo" tono="teal" />
+          </Card>
+        </Link>
         <Card className={`p-5 ${idx >= 1 ? "" : "opacity-50"}`}>
           <h3 className="font-semibold text-navy-800">Mis truekes</h3>
           <p className="mt-1 text-sm text-navy-800/70">

@@ -28,10 +28,12 @@ test.describe("Landing pública (RF-14.1)", () => {
     await expect(page.getByRole("heading", { name: "Reputación real" })).toBeVisible();
   });
 
-  test("el CTA navega a la suite", async ({ page }) => {
+  test("el CTA navega a la suite (sin wallet el guard pide conectar)", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("link", { name: "Entrar a la suite" }).click();
     await expect(page).toHaveURL(/\/suite\/dashboard/);
-    await expect(page.getByRole("heading", { name: "Mi Trueke Central" })).toBeVisible();
+    // Sin billetera conectada, el público no accede al contenido privado:
+    await expect(page.getByText("Conecta tu billetera para continuar")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Mi Trueke Central" })).toHaveCount(0);
   });
 });

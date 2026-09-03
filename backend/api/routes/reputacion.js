@@ -11,9 +11,9 @@ export function crearRouterReputacion({ almacen }) {
   const r = Router();
 
   // GET /reputacion/mi — puntaje, nivel, medalla y Oro histórico del usuario (CU-20)
-  r.get('/mi', requiereSesion(almacen), (req, res) => {
-    const u = almacen.getUsuario(req.wallet);
-    const truekes = almacen.listarTruekes().filter(
+  r.get('/mi', requiereSesion(almacen), async (req, res) => {
+    const u = await almacen.getUsuario(req.wallet);
+    const truekes = (await almacen.listarTruekes()).filter(
       (t) => (t.usuarioA === req.wallet || t.parteB === req.wallet)
     );
     const efectivos = truekes.filter((t) => t.estado === 'COMPLETADO').length;
@@ -30,7 +30,7 @@ export function crearRouterReputacion({ almacen }) {
     // volumen máximo del sistema (normalización D30)
     const volumenMaximo = Math.max(
       1,
-      ...almacen.listarTruekes().filter((t) => t.estado === 'COMPLETADO').map(() => 1)
+      ...(await almacen.listarTruekes()).filter((t) => t.estado === 'COMPLETADO').map(() => 1)
     );
 
     const puntaje = calcularPuntaje({

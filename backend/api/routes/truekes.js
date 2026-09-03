@@ -15,7 +15,7 @@ export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow
 
   // Helper: firma el intent y delega al relayer (particulares) o envía directo (empresas).
   async function _enviar(req, res, operacion, args, data) {
-    const u = almacen.getUsuario(req.wallet);
+    const u = await almacen.getUsuario(req.wallet);
     const esEmpresa = u.tipo === 'EMPRESA';
 
     if (esEmpresa && walletEmpresas) {
@@ -42,57 +42,57 @@ export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow
   // POST /truekes — crear trueque (requiere Verificado/Certificado; D14)
   r.post('/', requiereSesion(almacen), requiereEstado(almacen, 'VERIFICADO', 'CERTIFICADO'), async (req, res, next) => {
     try {
-      const u = almacen.getUsuario(req.wallet);
+      const u = await almacen.getUsuario(req.wallet);
       const { parteB, activoA, activoB, horaPautada } = req.body;
       if (!parteB || !activoA || !activoB) {
         return res.status(400).json({ error: 'datos_incompletos' });
       }
       // Verificado: máx. 3 trueques activos (RF-14.4)
-      const activos = almacen.listarTruekes().filter(
+      const activos = (await almacen.listarTruekes()).filter(
         (t) => (t.usuarioA === req.wallet || t.usuarioB === req.wallet) && ['CREADO', 'ACTIVO', 'CUSTODIADO', 'APERTURA'].includes(t.estado)
       ).length;
       if (u.estado === 'VERIFICADO' && activos >= 3) {
         return res.status(403).json({ error: 'max_3_activos', detalle: 'RF-14.4' });
       }
-      const id = almacen.crearTrueke({ usuarioA: req.wallet, parteB, activoA, activoB, horaPautada });
-      res.status(201).json({ trueke: almacen.getTrueke(id) });
+      const id = await almacen.crearTrueke({ usuarioA: req.wallet, parteB, activoA, activoB, horaPautada });
+      res.status(201).json({ trueke: await almacen.getTrueke(id) });
     } catch (e) { next(e); }
   });
 
   // GET /truekes/:id — detalle del trueque (CU-05.1: info de confianza)
-  r.get('/:id', (req, res) => {
-    const t = almacen.getTrueke(req.params.id);
+  r.get('/:id', async (req, res) => {
+    const t = await almacen.getTrueke(req.params.id);
     if (!t) return res.status(404).json({ error: 'trueke_inexistente' });
     res.json({ trueke: t });
   });
 
   // POST /truekes/:id/custodiar — custodiarA/B (CU-12)
-  r.post('/:id/custodiar', requiereSesion(almacen), (req, res, next) => {
+  r.post('/:id/custodiar', requiereSesion(almacen), async (req, res, next) => {
     try {
-      const t = almacen.getTrueke(req.params.id);
+      const t = await almacen.getTrueke(req.params.id);
       if (!t) return res.status(404).json({ error: 'trueke_inexistente' });
       const lado = req.body.lado; // 'A' o 'B'
       if (lado === 'A' && t.usuarioA !== req.wallet) return res.status(403).json({ error: 'no_autorizado' });
       if (lado === 'B' && t.parteB !== req.wallet) return res.status(403).json({ error: 'no_autorizado' });
-      almacen.actualizarTrueke(t.id, { estado: 'CUSTODIADO' });
-      res.json({ trueke: almacen.getTrueke(t.id) });
+      await almacen.actualizarTrueke(t.id, { estado: 'CUSTODIADO' });
+      res.json({ trueke: await almacen.getTrueke(t.id) });
     } catch (e) { next(e); }
   });
 
   // POST /truekes/:id/firma-recepcion — firmar recepción (CU-14)
-  r.post('/:id/firma-recepcion', requiereSesion(almacen), (req, res) => {
-    const t = almacen.getTrueke(req.params.id);
+  r.post('/:id/firma-recepcion', requiereSesion(almacen), async (req, res) => {
+    const t = await almacen.getTrueke(req.params.id);
     if (!t) return res.status(404).json({ error: 'trueke_inexistente' });
     const lado = req.body.lado;
     if (lado === 'A' && t.usuarioA !== req.wallet) return res.status(403).json({ error: 'no_autorizado' });
     if (lado === 'B' && t.parteB !== req.wallet) return res.status(403).json({ error: 'no_autorizado' });
-    almacen.actualizarTrueke(t.id, { [`firma${lado}`]: true });
-    res.json({ trueke: almacen.getTrueke(t.id) });
+    await almacen.actualizarTrueke(t.id, { [`firma${lado}`]: true });
+    res.json({ trueke: await almacen.getTrueke(t.id) });
   });
 
   // POST /truekes/:id/valoracion — marcar valoración (D36: marcador; detalle off-chain)
-  r.post('/:id/valoracion', requiereSesion(almacen), (req, res) => {
-    const t = almacen.getTrueke(req.params.id);
+  r.post('/:id/valoracion', requiereSesion(almacen), async (req, res) => {
+    const t = await almacen.getTrueke(req.params.id);
     if (!t) return res.status(404).json({ error: 'trueke_inexistente' });
     const { valorado, aceptacion, honestidad, seguridad, confiabilidad, compromiso } = req.body;
     const vals = [aceptacion, honestidad, seguridad, confiabilidad, compromiso];
@@ -100,8 +100,8 @@ export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow
       return res.status(400).json({ error: 'valoraciones_1_a_5', detalle: 'D18' });
     }
     // marcador on-chain (D36) + detalle en el espejo
-    almacen.actualizarTrueke(t.id, { valoracionDe: req.wallet, valorado, renglones: vals });
-    res.json({ ok: true, trueke: almacen.getTrueke(t.id) });
+    await almacen.actualizarTrueke(t.id, { valoracionDe: req.wallet, valorado, renglones: vals });
+    res.json({ ok: true, trueke: await almacen.getTrueke(t.id) });
   });
 
   return r;

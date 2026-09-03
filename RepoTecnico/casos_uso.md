@@ -51,32 +51,40 @@
   - El usuario no posee aún una Smart Account activa en la plataforma (salvo flujo A1).
 - **Flujo principal:**
   1. El usuario conecta su wallet (MetaMask) y el Sistema la detecta (RF-16.1).
-  2. El Sistema inscribe automáticamente la billetera como **Usuario Particular** (RF-01.4).
-  3. El usuario formaliza la inscripción aportando **correo, teléfono y dirección de inscripción** (RF-01.3); la dirección es la base de la geolocalización para puntos de encuentro (RF-08.4).
+  2. El Sistema verifica si la billetera ya está inscrita (`GET /auth/estado`); si NO lo está, la deja en **modo observación**: puede ver el catálogo, pero no operar (decisión del director: conectar NO inscribe — la inscripción es formal, RF-01.2b/01.3).
+  3. El usuario inicia el **proceso de inscripción** desde el menú de usuario (botón "Completar inscripción") y aporta **correo, teléfono y dirección de inscripción** (RF-01.3); la dirección es la base de la geolocalización para puntos de encuentro (RF-08.4).
   4. El Sistema solicita el **consentimiento explícito GDPR** para el tratamiento de datos, incluidos los biométricos (selfie + documento; RNF-01.7, D17); sin consentimiento no se continúa.
-  5. El Sistema despliega la **Smart Account ERC-4337** como wallet de identidad (RF-02.1, D22) mediante **meta-transacción EIP-712** vía relayer: el usuario firma el intent sin costo y el Relayer envía la transacción asumiendo el gas (RF-02.3, RF-09.1–09.2, R1).
-  6. El Sistema crea el registro `usuarios` con nivel **Iniciado** y medalla **Bronce** (RF-03.6/D19) y estado de verificación pendiente; los campos PII se almacenan **cifrados en reposo** (D17, RNF-01.4).
-  7. El Sistema confirma la inscripción y habilita el acceso restringido de Inscrito (ver ofertas; RF-14.3).
+  5. El Sistema registra al usuario como **Inscrito** (estado INSCRITO, escalera D28) en `usuarios` con nivel **Iniciado** y medalla **Bronce** (RF-03.6/D19); los campos PII se almacenan **cifrados en reposo** (D17, RNF-01.4).
+  6. (Posterior, vía KYC) el Sistema despliega la **Smart Account ERC-4337** como wallet de identidad (RF-02.1, D22) mediante **meta-transacción EIP-712** vía relayer: el usuario firma el intent sin costo y el Relayer envía la transacción asumiendo el gas (RF-02.3, RF-09.1–09.2, R1).
+  7. El Sistema confirma la inscripción y habilita el acceso de Inscrito: puede ver ofertas/catálogo (RF-14.3) y el resto de la suite según escalera D28.
 - **Flujos alternativos:**
-  - **A1 — Wallet ya registrada:** el Sistema detecta la Smart Account existente y ofrece inicio de sesión (auto-reconexión, RF-16.2); el flujo continúa en actualización de datos.
-  - **A2 — Consentimiento no otorgado:** no se crea la cuenta ni se despliega la Smart Account; se informa al usuario (RNF-01.7).
+  - **A1 — Wallet ya registrada:** el Sistema detecta la inscripción existente (`/auth/estado` → inscrito) y ofrece inicio de sesión (auto-reconexión, RF-16.2); el flujo continúa en actualización de datos.
+  - **A2 — Consentimiento no otorgado:** no se crea la cuenta ni se completa la inscripción; se informa al usuario (RNF-01.7).
   - **A3 — Falla de despliegue del Smart Account / error de red:** el Relayer reintenta desde su cola de reintentos con health-check (D15); si persiste, se notifica al soporte (Owner/moderador, RF-18.3).
-  - **A4 — Correo o teléfono inválidos o no confirmados:** la inscripción queda incompleta y el usuario conserva solo el estado de billetera conectada.
+  - **A4 — Correo o teléfono inválidos o no confirmados:** la inscripción queda incompleta y el usuario conserva solo el estado de billetera conectada (modo observación).
+  - **A5 — Público general sin billetera:** solo accede a la landing pública (RF-14.1); el resto de la plataforma exige billetera conectada (decisión del director).
 - **Criterios de aceptación:**
-  - **[Gherkin]** CA-01 · Inscripción automática de la billetera.
+  - **[Gherkin]** CA-01 · Acceso del público sin billetera.
     ```gherkin
-    Dado un usuario con una billetera MetaMask sin Smart Account en la plataforma
-    Cuando conecta su billetera
-    Entonces el sistema inscribe automáticamente la billetera como Usuario Particular
-    Y habilita el acceso restringido de Inscrito (ver ofertas y catálogo)
+    Dado un visitante sin billetera conectada
+    Cuando intenta acceder a la suite o a un área privada
+    Entonces el sistema le muestra la pantalla "Conecta tu billetera para continuar"
+    Y solo le permite navegar la landing pública (RF-14.1)
     ```
-  - **[Gherkin]** CA-02 · Formalización con datos, consentimiento y despliegue de la Smart Account.
+  - **[Gherkin]** CA-01b · Wallet conectada sin inscribir → solo catálogo.
     ```gherkin
-    Dado un usuario con la billetera inscrita automáticamente
+    Dado un usuario con una billetera MetaMask conectada pero SIN inscripción formal
+    Cuando intenta acceder a la suite
+    Entonces el sistema le permite SOLO ver el catálogo de trueques ofrecidos (RF-14.3)
+    Y le ofrece el botón "Completar inscripción" en el menú de usuario
+    Y le impide crear trueques, usar inventario, perfil u otras áreas privadas
+    ```
+  - **[Gherkin]** CA-02 · Inscripción formal con datos, consentimiento y acceso.
+    ```gherkin
+    Dado un usuario con la billetera conectada y no inscrita
     Cuando aporta correo, teléfono y dirección de inscripción y otorga el consentimiento GDPR explícito
-    Entonces el sistema despliega su Smart Account ERC-4337 como wallet de identidad mediante una meta-transacción EIP-712
-    Y el usuario no paga gas por ese despliegue (lo asume el relayer)
-    Y el sistema crea su registro con nivel Iniciado, medalla Bronce y estado de verificación pendiente
+    Entonces el sistema lo registra como Usuario Particular con estado INSCRITO (escalera D28)
+    Y habilita el acceso a la suite según el estado Inscrito (ver ofertas y catálogo; sin crear trueques)
     ```
   - **[EARS]** Si el usuario no otorga el consentimiento GDPR explícito (incluido el tratamiento biométrico de selfie y documento), entonces el sistema no creará la cuenta ni desplegará la Smart Account.
   - **[EARS]** El sistema deberá cifrar en reposo todos los campos PII (correo, teléfono, dirección) almacenados en PostgreSQL.

@@ -20,6 +20,9 @@ ENV NEXT_PUBLIC_ESCROW=0x8a93d247134d91e0de6f96547cb0204e5be8e5d8 \
     NEXT_PUBLIC_BRLT=0x6f6f570f45833e249e27022648a26f4076f48f78 \
     NEXT_PUBLIC_REGISTRY=0xb0f05d25e41fbc2b52013099ed9616f1206ae21b \
     NEXT_PUBLIC_SUSCRIPCION=0x5feaebfb4439f3516c74939a9d04e95afe82c4ae
+# URL del backend API (Cloud Run). Se puede sobrescribir en el build:
+ARG NEXT_PUBLIC_API_URL=https://truekeate-api-593453426217.europe-west1.run.app
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 RUN npm run build
 
 # --- runtime standalone ---

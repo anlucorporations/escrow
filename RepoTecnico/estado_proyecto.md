@@ -4,8 +4,8 @@
 |---|---|
 | Proyecto | **TrueKeate** (DApp Web3 de trueques con escrow) |
 | Archivo | `RepoTecnico/estado_proyecto.md` |
-| Fase actual | **ENTREGADO + DESPLEGADO en GCP** (Cloud Run europe-west1 + Cloud SQL + anvil remoto MCC) |
-| Última actualización | Despliegue GCP completado: contratos en anvil remoto, API y Web en Cloud Run, Owner bootstrap en producción |
+| Fase actual | **ENTREGADO + DESPLEGADO en GCP** + control de acceso por estados |
+| Última actualización | Control de acceso implementado y desplegado: suite exige wallet; no inscrito → solo catálogo; inscripción formal con botón en menú de usuario |
 
 ---
 
@@ -40,6 +40,34 @@
 - [x] **Auditoría de coherencia (6 lentes C1–C6)** — sincronía entre documentos verificada y
   correcciones aplicadas (cabeceras, CU-04/18/23/24/31, diccionario, estados del escrow,
   nomenclatura unificada, informes marcados históricos).
+
+## ✅ Control de acceso por estados (decisión del director, post-entrega)
+
+El director reportó 3 problemas al usar la plataforma y ordenó corregirlos:
+
+1. **Suite accesible sin billetera** → corregido: `/suite/**` exige wallet conectada (`SuiteGuard` en
+   `web/components/SuiteGuard.tsx`); el público general solo ve la landing. Sin wallet se muestra
+   "Conecta tu billetera para continuar".
+2. **Wallets conectadas sin inscribir accedían a todo** → corregido: una wallet conectada SIN
+   inscripción solo puede ver el **catálogo** (`/suite/mercado`, nuevo) y el resto de la suite le
+   pide inscripción.
+3. **Faltaba verificar la inscripción y ofrecerla** → corregido: la suite consulta el estado real
+   contra el backend (`GET /auth/estado?wallet=…`); si no está inscrita, el **menú de usuario**
+   (`TopBar`) muestra el botón **"Completar inscripción"** que abre `/suite/inscripcion`
+   (formulario formal: correo + teléfono + dirección + consentimiento GDPR → estado INSCRITO).
+
+Cambios de comportamiento (documentados en `requerimientos.md` RF-01.4 y `casos_uso.md` CU-01):
+- **Conectar la wallet ya NO inscribe automáticamente** (antes RF-01.4 autoinscripción); la
+  inscripción es **formal** (RF-01.2b/01.3, escalera D28).
+- El backend persiste usuarios/inscripción/catálogo en **PostgreSQL (Cloud SQL)** con el nuevo
+  almacén híbrido `backend/api/lib/almacen-pg.js` (misma interfaz; usado en `index-gcp.js` cuando
+  hay `DATABASE_URL`). Antes el almacén era solo en memoria.
+- CORS habilitado en la API (`web` → `api`, origen configurado por `CORS_ORIGEN`).
+
+Verificación en GCP (2026-09-03, en vivo): sin wallet → guard bloquea; wallet no inscrita → pide
+inscripción; catálogo visible; `register` persiste en Cloud SQL (estado INSCRITO) y `GET
+/auth/estado` lo confirma; el Owner (cuenta 0) figura CERTIFICADO/SOCIO. Tests: backend 28/28,
+E2E Playwright **20/20** (9 casos landing/suite × 2 proyectos + 2 de control de acceso nuevos).
 
 ## ✅ Despliegue en GCP (2026-09-03)
 

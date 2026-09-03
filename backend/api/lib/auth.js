@@ -21,21 +21,21 @@ export function nuevoToken() {
 
 /** Middleware: exige encabezado Authorization: Bearer <token> con sesión válida. */
 export function requiereSesion(almacen) {
-  return (req, res, next) => {
+  return async (req, res, next) => {
     const auth = req.headers.authorization || '';
     const token = auth.startsWith('Bearer ') ? auth.slice(7) : null;
-    const sesion = token ? almacen.getSesion(token) : null;
+    const sesion = token ? await almacen.getSesion(token) : null;
     if (!sesion) return res.status(401).json({ error: 'no_autorizado' });
     req.wallet = sesion.wallet;
-    req.usuario = almacen.getUsuario(sesion.wallet);
+    req.usuario = await almacen.getUsuario(sesion.wallet);
     next();
   };
 }
 
 /** Middleware: exige rol/tipo (PARTICULAR/EMPRESA/SOCIO) o estado de la escalera D28. */
 export function requiereEstado(almacen, ...estados) {
-  return (req, _res, next) => {
-    const u = almacen.getUsuario(req.wallet);
+  return async (req, _res, next) => {
+    const u = await almacen.getUsuario(req.wallet);
     if (!u) return next(Object.assign(new Error('usuario inexistente'), { status: 404 }));
     if (!estados.includes(u.estado)) {
       return next(Object.assign(new Error(`estado requerido: ${estados.join('/')}`), { status: 403, code: 'estado_requerido' }));

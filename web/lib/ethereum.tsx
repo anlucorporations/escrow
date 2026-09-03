@@ -119,7 +119,10 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
       provider,
       signer,
       conectando,
-      conectado: Boolean(account && signer),
+      // Control de acceso: "billetera conectada" = hay cuenta (la auto-reconexión
+      // RF-16.2 restaura la cuenta al refrescar). El signer solo se necesita
+      // para firmar transacciones on-chain.
+      conectado: Boolean(account),
       conectar,
       desconectar,
     }),

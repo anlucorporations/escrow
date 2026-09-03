@@ -32,6 +32,30 @@ export function crearApp(deps = {}) {
   const app = express();
   app.use(express.json({ limit: '1mb' }));
 
+  // CORS: la web (Cloud Run truekeate-web) llama a esta API desde otro origen.
+  // En producción se restringe al origen real; CORS_ORIGEN_EXTRA permite añadir
+  // dominios (p. ej. un dominio propio) separados por coma.
+  const origenesPermitidos = (process.env.CORS_ORIGEN || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  app.use((req, res, next) => {
+    const origen = req.headers.origin;
+    const permitido =
+      !origen ||
+      origenesPermitidos.length === 0 ||
+      origenesPermitidos.includes(origen);
+    if (origen && permitido) {
+      res.setHeader('Access-Control-Allow-Origin', origen);
+      res.setHeader('Vary', 'Origin');
+      res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+      res.setHeader('Access-Control-Max-Age', '86400');
+    }
+    if (req.method === 'OPTIONS') return res.sendStatus(204);
+    next();
+  });
+
   // rate-limiting global (D16/RF-09.6)
   app.use(
     rateLimit({

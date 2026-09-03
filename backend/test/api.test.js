@@ -1,9 +1,10 @@
 // =============================================================================
-// TrueKeate — Tests de la API REST (Ciclo 6)
+// TrueKeate — Tests de la API REST (Ciclo 6 + control de acceso)
 // Validan los flujos principales con el almacén en memoria:
-//   - auth: connect (inscripción automática RF-01.4) y register con consentimiento
+//   - auth: /auth/estado (guarda), connect (NO inscribe) y register (inscripción
+//     formal con GDPR → INSCRITO) — decisión del director
 //   - kyc: escalera D28 (códigos → VERIFICADO; documento+selfie + revisión → CERTIFICADO)
-//   - catalog: publicación AtoA con límite por nivel; encargo
+//   - catalog: GET público para observar; publicación AtoA con límite por nivel
 //   - truekes: creación (Verificado), custodiar, firma, valoración 1–5
 //   - admin: dashboard del Owner
 // =============================================================================
@@ -23,11 +24,24 @@ const walletA = ethers.Wallet.createRandom();
 const walletB = ethers.Wallet.createRandom();
 const walletOwner = ethers.Wallet.createRandom();
 
+const wA = walletA.address.toLowerCase();
+const wB = walletB.address.toLowerCase();
+const wOwner = walletOwner.address.toLowerCase();
+
 function sesionDe(wallet) {
   // token directo al almacén (flujo de sesión por firma se prueba aparte)
   const token = 'tok-' + wallet.address.slice(2, 10);
   almacen.guardarSesion(token, wallet.address.toLowerCase());
   return token;
+}
+
+/** Inscribe formalmente una wallet (register con GDPR) → estado INSCRITO. */
+async function inscribir(wallet, correo = 'u@x.com') {
+  const r = await request(app)
+    .post('/auth/register')
+    .send({ wallet: wallet.address.toLowerCase(), correo, telefono: '+580000', consentimientoGdpr: true });
+  assert.equal(r.status, 200, `register ${wallet.address}: ${JSON.stringify(r.body)}`);
+  return r.body.usuario;
 }
 
 before(async () => {
@@ -40,18 +54,30 @@ before(async () => {
 after(() => server.close());
 
 // ---------------------------------------------------------------------------
-test('POST /auth/connect inscribe la wallet (RF-01.4) y /auth/register con GDPR (D17)', async () => {
-  const w = walletA.address.toLowerCase();
-  const c = await request(app).post('/auth/connect').send({ wallet: w });
-  assert.equal(c.status, 200);
-  assert.equal(c.body.usuario.estado, 'INSCRITO', 'escalera D28 inicia INSCRITO');
+test('GET /auth/estado: wallet no inscrita → inscrito:false (guarda de acceso)', async () => {
+  const r = await request(app).get(`/auth/estado?wallet=${wA}`);
+  assert.equal(r.status, 200);
+  assert.equal(r.body.inscrito, false);
+});
 
-  const rr = await request(app).post('/auth/register').send({ wallet: w, correo: 'a@x.com', telefono: '+58', consentimientoGdpr: false });
+test('POST /auth/connect NO inscribe (inscripción formal) y /auth/register con GDPR inscribe', async () => {
+  const c = await request(app).post('/auth/connect').send({ wallet: wA });
+  assert.equal(c.status, 200);
+  assert.equal(c.body.inscrito, false, 'conectar no inscribe (decisión del director)');
+
+  // sin consentimiento GDPR se rechaza
+  const rr = await request(app).post('/auth/register').send({ wallet: wA, correo: 'a@x.com', telefono: '+58', consentimientoGdpr: false });
   assert.equal(rr.status, 400, 'sin consentimiento GDPR se rechaza');
 
-  const ok = await request(app).post('/auth/register').send({ wallet: w, correo: 'a@x.com', telefono: '+58', consentimientoGdpr: true });
+  // register formal → INSCRITO
+  const ok = await request(app).post('/auth/register').send({ wallet: wA, correo: 'a@x.com', telefono: '+58', consentimientoGdpr: true });
   assert.equal(ok.status, 200);
-  assert.equal(ok.body.usuario.consentimientoGdpr, true);
+  assert.equal(ok.body.usuario.estado, 'INSCRITO');
+
+  // ahora /auth/estado la reconoce
+  const e = await request(app).get(`/auth/estado?wallet=${wA}`);
+  assert.equal(e.body.inscrito, true);
+  assert.equal(e.body.usuario.estado, 'INSCRITO');
 });
 
 test('POST /auth/connect rechaza wallet malformada', async () => {
@@ -59,11 +85,16 @@ test('POST /auth/connect rechaza wallet malformada', async () => {
   assert.equal(r.status, 400);
 });
 
+test('GET /catalog es público (wallet sin inscribir observa ofertas)', async () => {
+  const r = await request(app).get('/catalog');
+  assert.equal(r.status, 200);
+  assert.ok(Array.isArray(r.body.articulos));
+});
+
 test('KYC: códigos → VERIFICADO; submit + revisión Owner → CERTIFICADO (D28/CU-02)', async () => {
-  const w = walletA.address.toLowerCase();
+  await inscribir(walletA);
   const token = sesionDe(walletA);
 
-  await request(app).post('/auth/connect').send({ wallet: w });
   await request(app).post('/kyc/init').set('Authorization', `Bearer ${token}`);
 
   const v = await request(app).post('/kyc/verify-codes').set('Authorization', `Bearer ${token}`).send({ codigoCorreo: '123456', codigoTelefono: '654321' });
@@ -75,33 +106,29 @@ test('KYC: códigos → VERIFICADO; submit + revisión Owner → CERTIFICADO (D2
   assert.equal(sub.body.kyc.estado, 'PENDIENTE', 'revisión humana del Owner (RF-18.4)');
 
   // el Owner revisa y aprueba → CERTIFICADO
-  const rev = await request(app).post('/kyc/review').set('Authorization', `Bearer ${token}`).send({ wallet: w, aprobar: true });
+  const rev = await request(app).post('/kyc/review').set('Authorization', `Bearer ${token}`).send({ wallet: wA, aprobar: true });
   assert.equal(rev.status, 200);
   assert.equal(rev.body.usuario.estado, 'CERTIFICADO');
 });
 
 test('catalog: solo Verificado/Certificado publica; límite por nivel (D14/RF-04.2)', async () => {
-  const w = walletA.address.toLowerCase();
+  // A quedó CERTIFICADO en el test anterior
   const token = sesionDe(walletA);
-  // A ya es CERTIFICADO por el test anterior
 
   for (let i = 0; i < 5; i++) {
     const r = await request(app).post('/catalog/articulos').set('Authorization', `Bearer ${token}`).send({ titulo: `Art ${i}`, rubro: 'electronica' });
-    assert.equal(r.status, 201);
+    assert.equal(r.status, 201, `art ${i}: ${JSON.stringify(r.body)}`);
   }
-  // 6º artículo: nivel CERTIFICADO con nivel INICIADO → límite 5 (RF-04.2)
+  // 6º artículo: nivel INICIADO → límite 5 (RF-04.2)
   const sexto = await request(app).post('/catalog/articulos').set('Authorization', `Bearer ${token}`).send({ titulo: 'Art 6', rubro: 'electronica' });
   assert.equal(sexto.status, 403);
   assert.match(sexto.body.error, /limite_articulos/);
 });
 
 test('truekes: Verificado crea (máx 3 activos RF-14.4) y valida valoración 1–5 (D18)', async () => {
-  const wA = walletA.address.toLowerCase();
-  const wB = walletB.address.toLowerCase();
+  await inscribir(walletB, 'b@x.com');
   const tokA = sesionDe(walletA);
   const tokB = sesionDe(walletB);
-  await request(app).post('/auth/connect').send({ wallet: wA });
-  await request(app).post('/auth/connect').send({ wallet: wB });
   // B → VERIFICADO
   await request(app).post('/kyc/init').set('Authorization', `Bearer ${tokB}`);
   await request(app).post('/kyc/verify-codes').set('Authorization', `Bearer ${tokB}`).send({ codigoCorreo: '1', codigoTelefono: '2' });
@@ -123,8 +150,7 @@ test('truekes: Verificado crea (máx 3 activos RF-14.4) y valida valoración 1�
 });
 
 test('admin: dashboard requiere rol Owner y expone KPIs', async () => {
-  const w = walletOwner.address.toLowerCase();
-  almacen.crearUsuario({ wallet: w, rol: 'OWNER' });
+  almacen.crearUsuario({ wallet: wOwner, rol: 'OWNER' });
   const token = sesionDe(walletOwner);
 
   const d = await request(app).get('/admin/db').set('Authorization', `Bearer ${token}`);

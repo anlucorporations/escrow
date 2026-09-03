@@ -15,8 +15,8 @@ export function crearRouterSubastas({ almacen }) {
   let proxId = 1;
 
   // POST /subastas — crear subasta (solo Empresa — RF-17.1)
-  r.post('/', requiereSesion(almacen), (req, res) => {
-    const u = almacen.getUsuario(req.wallet);
+  r.post('/', requiereSesion(almacen), async (req, res) => {
+    const u = await almacen.getUsuario(req.wallet);
     if (u.tipo !== 'EMPRESA') {
       return res.status(403).json({ error: 'solo_empresa', detalle: 'RF-17.1' });
     }
@@ -46,8 +46,8 @@ export function crearRouterSubastas({ almacen }) {
   });
 
   // POST /subastas/:id/pujas — pujar (solo Certificado — RF-17.2)
-  r.post('/:id/pujas', requiereSesion(almacen), (req, res) => {
-    const u = almacen.getUsuario(req.wallet);
+  r.post('/:id/pujas', requiereSesion(almacen), async (req, res) => {
+    const u = await almacen.getUsuario(req.wallet);
     if (u.estado !== 'CERTIFICADO') {
       return res.status(403).json({ error: 'solo_certificado', detalle: 'RF-17.2' });
     }

@@ -9,7 +9,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const items = [
-  { href: "/suite/dashboard", icono: "🏠", label: "Mercado" },
+  { href: "/suite/mercado", icono: "🛒", label: "Mercado" },
   { href: "/suite/inventario", icono: "💼", label: "Inventario" },
   { href: "/suite/intercambio", icono: "⇄", label: "Trueke", central: true },
   { href: "/suite/gobernanza", icono: "🏛️", label: "Socios" },

@@ -17,6 +17,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { crearAlmacen } from './lib/almacen.js';
+import { crearAlmacenPg } from './lib/almacen-pg.js';
 import { iniciarServidor } from './app.js';
 import { crearIndexador } from '../indexador.js';
 import { RelayerEIP712 } from '../relayer.js';
@@ -27,7 +28,28 @@ const CONTRATOS_FILE =
 
 async function main() {
   const contratos = JSON.parse(readFileSync(CONTRATOS_FILE, 'utf-8'));
-  const almacen = crearAlmacen();
+
+  // Almacén: con DATABASE_URL se persiste usuarios/inscripción/kyc/catálogo en
+  // PostgreSQL (Cloud SQL); sin BD se usa el almacén en memoria (tests/dev).
+  let pool = null;
+  let almacen;
+  if (process.env.DATABASE_URL) {
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      max: 10,
+      connectionTimeoutMillis: 20_000,
+    });
+    try {
+      almacen = await crearAlmacenPg(pool);
+      console.log('[index-gcp] Almacén con persistencia PostgreSQL (Cloud SQL).');
+    } catch (e) {
+      console.error('[index-gcp] No se pudo conectar a PostgreSQL, se usa memoria:', e.message);
+      almacen = crearAlmacen();
+    }
+  } else {
+    almacen = crearAlmacen();
+    console.warn('[index-gcp] DATABASE_URL ausente: almacén en memoria.');
+  }
   const deps = { almacen, contratos };
 
   // ---- Red on-chain (anvil/GCP) ---------------------------------------------
@@ -58,14 +80,9 @@ async function main() {
     console.warn('[index-gcp] Relayer NO configurado (falta RELAYER_PRIVATE_KEY o ABI SmartAccount).');
   }
 
-  // ---- Indexador de eventos (D25) → PostgreSQL ------------------------------
-  if (process.env.DATABASE_URL) {
+  // ---- Indexador de eventos (D25) → PostgreSQL (mismo pool) -----------------
+  if (pool) {
     try {
-      const pool = new Pool({
-        connectionString: process.env.DATABASE_URL,
-        max: 5,
-        connectionTimeoutMillis: 20_000,
-      });
       const idx = await crearIndexador(pool, contratos);
       deps.indexador = idx;
       const INTERVALO_MS = parseInt(process.env.INTERVALO_MS || '10000', 10);
