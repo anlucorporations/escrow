@@ -84,7 +84,10 @@ async function main() {
     // Resumen previo
     console.log('Resumen previo:');
     const prev = {};
-    for (const t of existentes) prev[t] = await contar(pool, t);
+    for (const t of existentes) {
+      prev[t] = await contar(pool, t);
+      console.log(`   ${t.padEnd(24)} ${String(prev[t]).padStart(6)} filas`);
+    }
 
     // TRUNCATE conjunto: corta dependencias con CASCADE y reinicia IDENTITY.
     const lista = existentes.map((t) => `"${t}"`).join(', ');

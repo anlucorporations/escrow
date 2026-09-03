@@ -196,6 +196,11 @@ criterios Gherkin/EARS alineados), `arquitectura_tecnica.md` (secciones 1–10, 
   - `backend/scripts/reiniciar-plataforma.sh` (+ `.mjs`): reset total de la BD off-chain (TRUNCATE CASCADE de las 14 tablas) **sin tocar anvil**; exige `--confirmar` + confirmación `BORRAR`; `--check` diagnóstico y `--respaldo` (pg_dump). Solo se ejecuta por orden del director.
   - `backend/scripts/bootstrap-owner.sh` (+ `.mjs`): registra al Owner (cuenta 0) en BD como CERTIFICADO + tipo/nivel SOCIO + GDPR, lo admite como Socio on-chain (`admitirSocioDirecto`) y opcionalmente despliega su SmartAccount (`--smart-account`).
   - Doc: `RepoTecnico/Manuales/04-Despliegue/02-reinicio-y-bootstrap.md` (enlazado desde el manual de despliegue).
+- [x] **Scripts VALIDADOS en entorno de pruebas real** ✅ (PostgreSQL 16 + PostGIS 3.4 locales en `/tmp/pgroot` + anvil 31337):
+  - `reiniciar-plataforma.mjs --check`: 14/14 tablas detectadas con conteos, sin borrar.
+  - `reiniciar-plataforma.sh --confirmar`: TRUNCATE CASCADE → 0 filas en las 14 tablas; secuencias reiniciadas (INSERT siguiente = id 1); esquema, extensiones postgis/pgcrypto y anvil intactos.
+  - `bootstrap-owner.mjs`: Owner (cuenta 0 `0xf39F…2266`) verificado como dueño on-chain del SociosRegistry; relayer verificado como cuenta 1 (`0x7099…79C8`); BD registra `CERTIFICADO + SOCIO/SOCIO/ORO + GDPR`; `admitirSocioDirecto` on-chain ejecutado (`esSocio=true`, totalSocios=1); con `--smart-account` desplegó la SmartAccount del Owner (`0x925A…f0B`) y la registró en BD.
+  - Flujo completo producción (sembrar datos → reiniciar → bootstrap) ejecutado con anvil vivo: OK.
 
 ## Próximos pasos
 
