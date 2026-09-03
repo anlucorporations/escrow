@@ -4,8 +4,8 @@
 |---|---|
 | Proyecto | **TrueKeate** (DApp Web3 de trueques con escrow) |
 | Archivo | `RepoTecnico/estado_proyecto.md` |
-| Fase actual | **5 — Manuales** (completada: técnicos + literales + 33 SVG + 16 PDF + Ayuda `/help/manual`) |
-| Última actualización | Fase 5 (@manuales) completada: 16 manuales técnicos, 16 literales, 33 diagramas SVG, 16 PDF y sección de Ayuda integrada |
+| Fase actual | **ENTREGADO** — 5 fases completadas (Concepto → Auditoría → Desarrollo → Pruebas → Manuales) |
+| Última actualización | **Entrega final confirmada por el director**: push `c8fc77e` (Fase 5) en los 3 repos — proyecto TrueKeate completo |
 
 ---
 
@@ -187,10 +187,10 @@ criterios Gherkin/EARS alineados), `arquitectura_tecnica.md` (secciones 1–10, 
 - [x] **Fase 4 — Pruebas completadas** ✅: Foundry 62/62 (unit/fuzz + invariantes), backend 26/26, E2E Playwright 18/18 (chromium + mobile-chrome); cobertura Forge ≥80 % (D38) verificada
 - [x] **Push e75e69a (Fase 4) en los 3 repos** ✅: rama `escrow-dsh-GCP` publicada en **GitHub**, **GitLab.com** y **gitlab.codecrypto.academy**
 - [x] **Fase 5 — Manuales completados (@manuales)** ✅: 16 manuales técnicos (`RepoTecnico/Manuales/`), 16 manuales de usuario (`docs/Manuales/`), 33 SVG (`docs/imagenes/`), 16 PDF (`docs/Manuales/pdf/`) y Ayuda integrada en `/help/manual` (web). E2E 18/18 y build OK tras integración.
-- [ ] (Fase 5) Confirmación final del director y push
+- [x] **Entrega final ✅** — Proyecto TrueKeate completado (Fases 1–5) y confirmado por el director; push de cierre `c8fc77e` en **GitHub**, **GitLab.com** y **gitlab.codecrypto.academy** (rama `escrow-dsh-GCP`).
 
 ## Próximos pasos
 
-1. **Fase 5 completada**: manuales técnicos + de usuario + gráficos + PDF + Ayuda en `/help/manual`.
-2. **Proyecto completo** (Fases 1–5). Pendiente: confirmación del director y push del commit de cierre a los 3 repos.
+1. **✅ Proyecto ENTREGADO** — Fases 1–5 completadas y publicadas en los 3 repos (rama `escrow-dsh-GCP`, `c8fc77e`).
+2. Mejoras futuras opcionales (fuera de alcance): APK nativa (D40), integración con `mcc-postgres` real en GCP (D25), auditoría externa de seguridad previa a producción (D24), integración del 1 % de trueques al FondoDeValor (D7, marcado "pendiente de confirmar" en manuales).
 3. Los commits se crean localmente en `escrow-dsh-GCP`; el push a GitHub/GitLab se hace solo por orden del director (`/push`).
