@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <rect width="800" height="54" fill="#1a2b4c"/>
+  <rect y="50" width="800" height="4" fill="#d4af37"/>
+  <text x="400" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">La piramide de pruebas de TrueKeate</text>
+
+  <!-- Side cards -->
+  <rect x="40" y="120" width="180" height="110" rx="14" fill="#48cae4"/>
+  <text x="130" y="150" text-anchor="middle" fill="#0a1128" font-size="12.5" font-weight="bold">Fuzzing</text>
+  <text x="130" y="172" text-anchor="middle" fill="#0a1128" font-size="10.5">256 combinaciones</text>
+  <text x="130" y="188" text-anchor="middle" fill="#0a1128" font-size="10.5">aleatorias por prueba</text>
+  <text x="130" y="206" text-anchor="middle" fill="#0a1128" font-size="10.5">busca fallos</text>
+
+  <rect x="580" y="120" width="180" height="110" rx="14" fill="#48cae4"/>
+  <text x="670" y="150" text-anchor="middle" fill="#0a1128" font-size="12.5" font-weight="bold">Invariantes</text>
+  <text x="670" y="172" text-anchor="middle" fill="#0a1128" font-size="10.5">64 rondas x 100</text>
+  <text x="670" y="188" text-anchor="middle" fill="#0a1128" font-size="10.5">movimientos aleatorios</text>
+  <text x="670" y="206" text-anchor="middle" fill="#0a1128" font-size="10.5">las reglas nunca se rompen</text>
+
+  <!-- Pyramid trapezoids -->
+  <!-- Base -->
+  <polygon points="170,450 630,450 560,360 240,360" fill="#0a1128"/>
+  <text x="400" y="402" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">Contratos (Forge)</text>
+  <text x="400" y="422" text-anchor="middle" fill="#f3e5ab" font-size="11">61 pruebas + invariantes</text>
+  <!-- Mid -->
+  <polygon points="240,360 560,360 500,260 300,260" fill="#2a9d8f"/>
+  <text x="400" y="306" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">Servidores (Node)</text>
+  <text x="400" y="324" text-anchor="middle" fill="#ffffff" font-size="11">26 pruebas: vigilante, mensajero, API</text>
+  <!-- Top -->
+  <polygon points="300,260 500,260 470,180 330,180" fill="#d4af37"/>
+  <text x="400" y="206" text-anchor="middle" fill="#0a1128" font-size="13" font-weight="bold">App (Playwright)</text>
+  <text x="400" y="224" text-anchor="middle" fill="#0a1128" font-size="10.5">18 ejecuciones en</text>
+  <text x="400" y="238" text-anchor="middle" fill="#0a1128" font-size="10.5">ordenador y movil</text>
+
+  <!-- Rule -->
+  <rect x="220" y="455" width="360" height="30" rx="15" fill="#e63946"/>
+  <text x="400" y="475" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="bold">Gate D38: cobertura minima del 80 % por ciclo</text>
+</svg>

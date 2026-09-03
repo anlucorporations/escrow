@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · Tu cuenta inteligente: identidad, verificación y recuperación</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">03 · Implementación</div>
+    <h1>Tu cuenta inteligente: identidad, verificación y recuperación</h1>
+    <div class="intro">Versión en lenguaje sencillo del manual técnico de los contratos de identidad (<strong>SmartAccount</strong> y <strong>SmartAccountFactory</strong>). Aquí contamos qué es tu "cuenta inteligente", cómo se verifica tu identidad y cómo recuperar tu cuenta si pierdes el acceso.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>03-Implementacion/02-contratos-identidad.md</b></span>
+      <span>Edición: <b>3 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/03-Implementacion/02-contratos-identidad</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Implementación · Implementacion — Tu cuenta inteligente: identidad, verificación y recuperación</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>Tu cuenta inteligente: qué es y para qué sirve</span></a><div class="subs"><a href="#sub1">2.1 La fábrica de cuentas</a></div></li><li><a href="#s3"><span class="tnum">3</span><span>Tu identidad guarda tres datos</span></a></li><li><a href="#s4"><span class="tnum">4</span><span>La escalera de verificación: INSCRITO → VERIFICADO → CERTIFICADO</span></a><div class="subs"><a href="#sub2">4.1 Comprobar la huella (prueba de inclusión)</a></div></li><li><a href="#s5"><span class="tnum">5</span><span>La firma digital: cómo demuestra que fuiste tú</span></a><div class="subs"><a href="#sub3">5.1 El número de un solo uso (nonce)</a><br><a href="#sub4">5.2 ¿Qué se necesita para que te firmen?</a></div></li><li><a href="#s6"><span class="tnum">6</span><span>Recuperar tu cuenta con 3 guardianes (paso a paso)</span></a><div class="subs"><a href="#sub5">6.1 Designar guardianes (una sola vez, para siempre)</a><br><a href="#sub6">6.2 Proponer la recuperación</a><br><a href="#sub7">6.3 La espera de 48 horas (para pensar y abortar)</a><br><a href="#sub8">6.4 Ejecutar la recuperación</a></div></li><li><a href="#s7"><span class="tnum">7</span><span>Qué falta confirmar (resumen)</span></a></li><li><a href="#s8"><span class="tnum">8</span><span>Glosario de este manual</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos</h2>
+<p>TrueKeate te da una <strong>cuenta inteligente</strong> (una identidad digital dentro de la blockchain) que hace tres cosas por ti:</p>
+<ol><li><strong>Te representa</strong>: guarda quién eres (tu estado de verificación).</li><li><strong>Firma por ti</strong>: ejecuta acciones solo con tu firma digital.</li><li><strong>Te protege</strong>: si pierdes tu clave, 3 guardianes pueden ayudarte a recuperarla.</li></ol>
+<p>Los 3 conceptos clave:</p>
+<ul><li><strong>Verificación</strong>: subes por una escalera de confianza: INSCRITO → VERIFICADO → CERTIFICADO. Cuanto más subes, más cosas puedes hacer.</li><li><strong>Firma digital</strong>: tu "firma manuscrita" electrónica que demuestra que fuiste tú quien pidió algo.</li><li><strong>Recuperación</strong>: si pierdes el acceso, necesitas que <strong>2 de tus 3 guardianes</strong> aprueben la recuperación, y esperar <strong>48 horas</strong>.</li></ul>
+<p>En 5 minutos entiendes la idea: tu cuenta es como un <strong>documento de identidad digital con cerradura propia</strong>, y tú llevas la llave.</p>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. Tu cuenta inteligente: qué es y para qué sirve</h2>
+<p>En las apps normales, tu cuenta vive en los servidores de la empresa. En TrueKeate, tu identidad vive en la blockchain como un <strong>contrato inteligente</strong> llamado <code>SmartAccount</code> (cuenta inteligente).</p>
+<p>Piénsalo como un <strong>casillero personal con tu nombre</strong>, que tiene dos ventajas grandes:</p>
+<ul><li><strong>Nadie puede falsificarla</strong>: cada acción necesita tu firma digital.</li><li><strong>Un ayudante puede pagar por ti</strong>: como tu cuenta solo actúa cuando firmas, un <strong>mensajero</strong> (relayer) puede enviar la transacción a la red y pagar el gas por ti. Así tú no pagas comisiones de red (gas) en tus trueques.</li></ul>
+<blockquote class="info"><span class="tag">Nota</span><p><strong>Gas</strong> es la "gasolina" que cuesta hacer una operación en la blockchain. Normalmente la pagas tú; en TrueKeate, para los particulares, la paga la plataforma por ti.</p></blockquote>
+<h3 class="sub" id="sub1">2.1 La fábrica de cuentas</h3>
+<p>Las cuentas no se crean solas: existe una <strong>fábrica</strong> (<code>SmartAccountFactory</code>) que las fabrica <strong>una por persona</strong>. Gracias a una técnica llamada CREATE2, la dirección de tu cuenta se puede <strong>calcular de antemano</strong>, sin tener que crearla antes. Esto permite que la plataforma te cree la cuenta sin que tú pagues nada.</p>
+<blockquote class="warn"><span class="tag">Aviso</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Detalle técnico: la fábrica no tiene administrador ni control de acceso: cualquiera puede pedir que se fabrique una cuenta (quien paga el gas). En el flujo real, el que paga es la plataforma.</p></blockquote>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. Tu identidad guarda tres datos</h2>
+<p>Tu cuenta inteligente guarda:</p>
+<ol><li><strong>Quién eres</strong> (<code>owner</code>): la dirección de tu billetera (por ejemplo, la de MetaMask). Es la única que puede firmar.</li><li><strong>Tu nivel de verificación</strong>: un estado de la escalera INSCRITO → VERIFICADO → CERTIFICADO.</li><li><strong>Una huella de tu verificación</strong> (<code>kycMerkleRoot</code>): una "marca" que demuestra que tu identidad fue comprobada <strong>sin revelar tus datos personales</strong>. Tu documento y tu selfie nunca se guardan en la blockchain: viven cifrados fuera de ella. En cadena solo queda la prueba.</li></ol>
+<p>Regla de privacidad: la blockchain certifica que "esta persona pasó la verificación", pero <strong>no muestra quién es realmente</strong> (nombre, DNI, foto...). Tus datos reales quedan en privado.</p>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. La escalera de verificación: INSCRITO → VERIFICADO → CERTIFICADO</h2>
+<p>Tu cuenta empieza como <strong>INSCRITO</strong> (recién registrado) y puede subir peldaños:</p>
+<div class="table-wrap"><table><thead><tr><th>Peldaño</th><th>Qué significa</th><th>Ejemplo cotidiano</th></tr></thead><tbody><tr><td><strong>INSCRITO</strong></td><td>Te registraste con tu billetera</td><td>"Entré a la feria, todavía no me conocen"</td></tr><tr><td><strong>VERIFICADO</strong></td><td>Confirmaste correo y teléfono (etapa 1)</td><td>"Dieron fe de que mi contacto funciona"</td></tr><tr><td><strong>CERTIFICADO</strong></td><td>Un humano revisó tu documento y selfie (etapa 2)</td><td>"El responsable de la feria vio mi DNI en persona"</td></tr></tbody></table></div>
+<p>Cómo se sube (en términos simples):</p>
+<ol><li>El sistema (backend) comprueba tus datos fuera de la cadena.</li><li>Te pide que firmes un mensaje: "subir mi estado a VERIFICADO".</li><li>Con tu firma, el sistema actualiza tu cuenta y guarda la nueva "huella".</li><li>La cuenta emite una notificación (evento) para que el resto del sistema se entere.</li></ol>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: el contrato acepta cualquier cambio de estado si está firmado por ti, incluso "bajar" de CERTIFICADO a INSCRITO o saltar directo a CERTIFICADO. La escalera en orden correcto la controla el <strong>backend</strong> (fuera del contrato). Cómo se garantiza esa secuencia en el backend está <strong>pendiente de confirmar</strong>.</p></blockquote>
+<h3 class="sub" id="sub2">4.1 Comprobar la huella (prueba de inclusión)</h3>
+<p>Cualquiera puede comprobar que tu huella pertenece al "árbol de verificados" on-chain usando la función <code>verificarInclusion</code>. Es como enseñar el sello de autenticidad de tu documento: se puede verificar <strong>sin abrir</strong> el documento.</p>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjgiIG1hcmtlckhlaWdodD0iOCIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5Fc2NhbGVyYSBkZSB2ZXJpZmljYWNpb24gKEQyOCk8L3RleHQ+CgogIDwhLS0gSHVlbGxhIC8gbWVya2xlIG5vdGUgLS0+CiAgPHJlY3QgeD0iNTAwIiB5PSI2NiIgd2lkdGg9IjI4NSIgaGVpZ2h0PSI2NCIgcng9IjEyIiBmaWxsPSIjMGExMTI4Ii8+CiAgPHRleHQgeD0iNjQyIiB5PSI4OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2YzZTVhYiIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiPkxhIGNhZGVuYSBzb2xvIHJlY2liZSB0dSBodWVsbGE8L3RleHQ+CiAgPHRleHQgeD0iNjQyIiB5PSIxMDYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTEiPihyYWl6IG1lcmtsZSkg4oCUIG51bmNhIGVsIGRvY3VtZW50bzwvdGV4dD4KICA8dGV4dCB4PSI2NDIiIHk9IjEyMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMSI+bmkgbGEgc2VsZmllPC90ZXh0PgoKICA8IS0tIFN0ZXBzIGFzY2VuZGluZyAtLT4KICA8cmVjdCB4PSI2MCIgeT0iMzYwIiB3aWR0aD0iMjEwIiBoZWlnaHQ9IjY2IiByeD0iMTQiIGZpbGw9IiM0OGNhZTQiLz4KICA8dGV4dCB4PSIxNjUiIHk9IjM4OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9ImJvbGQiPjEgwrcgSU5TQ1JJVE88L3RleHQ+CiAgPHRleHQgeD0iMTY1IiB5PSI0MDkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTEiPkJpbGxldGVyYSArIGluc2NyaXBjaW9uPC90ZXh0PgoKICA8cmVjdCB4PSIzMDAiIHk9IjI4MiIgd2lkdGg9IjIxMCIgaGVpZ2h0PSI2NiIgcng9IjE0IiBmaWxsPSIjMmE5ZDhmIi8+CiAgPHRleHQgeD0iNDA1IiB5PSIzMTEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTUiIGZvbnQtd2VpZ2h0PSJib2xkIj4yIMK3IFZFUklGSUNBRE88L3RleHQ+CiAgPHRleHQgeD0iNDA1IiB5PSIzMzEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTEiPkNvcnJlbyArIHRlbGVmb25vIGNvbmZpcm1hZG9zPC90ZXh0PgoKICA8cmVjdCB4PSI1NDAiIHk9IjIwNCIgd2lkdGg9IjIxMCIgaGVpZ2h0PSI2NiIgcng9IjE0IiBmaWxsPSIjZDRhZjM3Ii8+CiAgPHRleHQgeD0iNjQ1IiB5PSIyMzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTUiIGZvbnQtd2VpZ2h0PSJib2xkIj4zIMK3IENFUlRJRklDQURPPC90ZXh0PgogIDx0ZXh0IHg9IjY0NSIgeT0iMjUzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjExIj5LWUM6IGRvY3VtZW50byArIHNlbGZpZTwvdGV4dD4KCiAgPCEtLSBBcnJvdyBzdGVwMSAtPiBzdGVwMiAtLT4KICA8cGF0aCBkPSJNIDI3MiAzODUgQyAyODQgMzg1IDI4OCAzNTAgMjk2IDM1MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyKSIvPgogIDx0ZXh0IHg9IjI3MiIgeT0iMzQ0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwIj5zdWJlczwvdGV4dD4KCiAgPCEtLSBBcnJvdyBzdGVwMiAtPiBzdGVwMyAtLT4KICA8cGF0aCBkPSJNIDUxMiAzMDYgQyA1MjQgMzA2IDUyOCAyNzIgNTM2IDI3MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyKSIvPgogIDx0ZXh0IHg9IjUxMiIgeT0iMjY1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwIj5zdWJlczwvdGV4dD4KCiAgPCEtLSBBcnJvdyBzdGVwMyAtPiBtZXJrbGUgLS0+CiAgPHBhdGggZD0iTSA2NDUgMjAyIEwgNjQ1IDEzNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjUgNCIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+CiAgPHRleHQgeD0iNjU2IiB5PSIxNzAiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiPnNvbG8gaHVlbGxhPC90ZXh0PgoKICA8IS0tIENhcGFiaWxpdHkgY2FyZHMgLS0+CiAgPHJlY3QgeD0iNjAiIHk9IjQzOCIgd2lkdGg9IjIxMCIgaGVpZ2h0PSIzOCIgcng9IjEwIiBmaWxsPSIjZTJlOGYwIi8+CiAgPHRleHQgeD0iMTY1IiB5PSI0NjEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTEiPlNvbG8gdmVyIG9mZXJ0YXMgeSBjYXRhbG9nbzwvdGV4dD4KCiAgPHJlY3QgeD0iMzAwIiB5PSI0MzgiIHdpZHRoPSIyMTAiIGhlaWdodD0iMzgiIHJ4PSIxMCIgZmlsbD0iI2UyZThmMCIvPgogIDx0ZXh0IHg9IjQwNSIgeT0iNDU0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjExIj5DcmVhciB5IGNvbXBsZXRhciB0cnVlcXVlczwvdGV4dD4KICA8dGV4dCB4PSI0MDUiIHk9IjQ2OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMCI+TWF4aW1vIDMgYWN0aXZvcyBhIGxhIHZlejwvdGV4dD4KCiAgPHJlY3QgeD0iNTQwIiB5PSI0MzgiIHdpZHRoPSIyMTAiIGhlaWdodD0iMzgiIHJ4PSIxMCIgZmlsbD0iI2UyZThmMCIvPgogIDx0ZXh0IHg9IjY0NSIgeT0iNDU0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjExIj5Ub2RvIGxvIGFudGVyaW9yICsgc3ViYXN0YXM8L3RleHQ+CiAgPHRleHQgeD0iNjQ1IiB5PSI0NjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiPlJlcHV0YWNpb24geSBjb25maWFuemE8L3RleHQ+Cjwvc3ZnPgo=" alt="Escalera Verificacion"/><figcaption class="fig-caption">Figura · Escalera Verificacion</figcaption></figure>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. La firma digital: cómo demuestra que fuiste tú</h2>
+<p>Tu cuenta ejecuta acciones <strong>solo con tu firma</strong>. La firma se hace con tu billetera (MetaMask u otra) sobre un mensaje con formato estándar llamado <strong>EIP-712</strong>.</p>
+<p>Piénsalo como un <strong>cheque firmado</strong>:</p>
+<ol><li>La app te muestra: "Vas a ejecutar esta acción en tu cuenta".</li><li>Tu billetera te pide <strong>firmar</strong> (como estampar tu rúbrica).</li><li>La firma viaja a la plataforma (no necesitas pagar gas).</li><li>Un mensajero lleva tu firma a la blockchain.</li><li>Tu cuenta comprueba que la firma es tuya y ejecuta la acción.</li></ol>
+<h3 class="sub" id="sub3">5.1 El número de un solo uso (nonce)</h3>
+<p>Cada firma lleva un <strong>número de orden</strong> (nonce). Sirve para que una firma <strong>no se pueda usar dos veces</strong> (anti-replay):</p>
+<ul><li>Si alguien copiara tu firma, al intentar usarla otra vez el sistema diría: "este número ya se usó, firma inválida".</li><li>Es como numerar los cheques: el cheque número 5 no vale dos veces.</li></ul>
+<h3 class="sub" id="sub4">5.2 ¿Qué se necesita para que te firmen?</h3>
+<p>Tu cuenta verifica que la firma corresponde a tu <code>owner</code>. Si la firma no es tuya, la operación se rechaza con <strong>FirmaInvalida</strong>.</p>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: el contrato no exige por sí mismo un nivel mínimo de verificación para ejecutar acciones. La regla de "solo cuentas verificadas pueden operar" la aplica el mensajero (relayer) en el backend como protección anti-abuso. Esa política vive fuera del contrato.</p></blockquote>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5MYSBmaXJtYSBkaWdpdGFsOiBjb21vIGRlbXVlc3RyYSBxdWUgZnVpc3RlIHR1PC90ZXh0PgoKICA8IS0tIEFjdG9ycyAtLT4KICA8Zz4KICAgIDxyZWN0IHg9IjQwIiB5PSI4MCIgd2lkdGg9IjE2MCIgaGVpZ2h0PSI0OCIgcng9IjEyIiBmaWxsPSIjNDhjYWU0Ii8+CiAgICA8dGV4dCB4PSIxMjAiIHk9IjEwMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiPlR1IChiaWxsZXRlcmEpPC90ZXh0PgogICAgPHRleHQgeD0iMTIwIiB5PSIxMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iOS41Ij5NZXRhTWFzazwvdGV4dD4KICA8L2c+CiAgPGc+CiAgICA8cmVjdCB4PSIyNjAiIHk9IjgwIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjQ4IiByeD0iMTIiIGZpbGw9IiMyYTlkOGYiLz4KICAgIDx0ZXh0IHg9IjMzNSIgeT0iMTAyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iYm9sZCI+TGEgYXBwPC90ZXh0PgogICAgPHRleHQgeD0iMzM1IiB5PSIxMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iOS41Ij50ZSBtdWVzdHJhIGxhIGFjY2lvbjwvdGV4dD4KICA8L2c+CiAgPGc+CiAgICA8cmVjdCB4PSI0ODAiIHk9IjgwIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjQ4IiByeD0iMTIiIGZpbGw9IiMxYTJiNGMiLz4KICAgIDx0ZXh0IHg9IjU1NSIgeT0iMTAyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iYm9sZCI+TWVuc2FqZXJvPC90ZXh0PgogICAgPHRleHQgeD0iNTU1IiB5PSIxMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmM2U1YWIiIGZvbnQtc2l6ZT0iOSI+cGFnYSBlbCBnYXM8L3RleHQ+CiAgPC9nPgogIDxnPgogICAgPHJlY3QgeD0iNjgwIiB5PSI4MCIgd2lkdGg9IjkwIiBoZWlnaHQ9IjQ4IiByeD0iMTIiIGZpbGw9IiNlNjM5NDYiLz4KICAgIDx0ZXh0IHg9IjcyNSIgeT0iMTAyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+VHUgY3VlbnRhPC90ZXh0PgogICAgPHRleHQgeD0iNzI1IiB5PSIxMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iOS41Ij5pbnRlbGlnZW50ZTwvdGV4dD4KICA8L2c+CgogIDwhLS0gTGlmZWxpbmVzIC0tPgogIDxnIHN0cm9rZT0iIzk0YTNiOCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjYgNCI+CiAgICA8bGluZSB4MT0iMTIwIiB5MT0iMTI4IiB4Mj0iMTIwIiB5Mj0iNDIwIi8+CiAgICA8bGluZSB4MT0iMzM1IiB5MT0iMTI4IiB4Mj0iMzM1IiB5Mj0iNDIwIi8+CiAgICA8bGluZSB4MT0iNTU1IiB5MT0iMTI4IiB4Mj0iNTU1IiB5Mj0iNDIwIi8+CiAgICA8bGluZSB4MT0iNzI1IiB5MT0iMTI4IiB4Mj0iNzI1IiB5Mj0iNDIwIi8+CiAgPC9nPgoKICA8IS0tIFN0ZXBzIC0tPgogIDxsaW5lIHgxPSIxMjIiIHkxPSIxNTAiIHgyPSIzMzMiIHkyPSIxNTAiIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KICA8dGV4dCB4PSIyMjgiIHk9IjE0MyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMCI+IlF1aWVybyBjdXN0b2RpYXIgbWkgb2JqZXRvIjwvdGV4dD4KCiAgPGxpbmUgeDE9IjMzMyIgeTE9IjE4MiIgeDI9IjEyNCIgeTI9IjE4MiIgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyKSIvPgogIDx0ZXh0IHg9IjIyOCIgeT0iMTc1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwIj4iRmlybWEgZXN0ZSBtZW5zYWplIChFSVAtNzEyKSI8L3RleHQ+CgogIDxsaW5lIHgxPSIxMjIiIHkxPSIyMTQiIHgyPSIzMzMiIHkyPSIyMTQiIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSI2IDMiIG1hcmtlci1lbmQ9InVybCgjYXJyKSIvPgogIDx0ZXh0IHg9IjIyOCIgeT0iMjA3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwIj5GaXJtYXMgY29uIHR1IGNsYXZlIHByaXZhZGE8L3RleHQ+CgogIDxsaW5lIHgxPSIzMzUiIHkxPSIyNDgiIHgyPSI0NzgiIHkyPSIyNDgiIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KICA8dGV4dCB4PSI0MDYiIHk9IjI0MSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMCI+RW50cmVnYSBsYSBmaXJtYTwvdGV4dD4KCiAgPGxpbmUgeDE9IjU1NyIgeTE9IjI4MCIgeDI9IjcyMyIgeTI9IjI4MCIgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIuNSIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+CiAgPHRleHQgeD0iNjQwIiB5PSIyNzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiIGZvbnQtd2VpZ2h0PSJib2xkIj5FamVjdXRhIGVuIGxhIGNhZGVuYSAocGFnYSBlbCBnYXMpPC90ZXh0PgoKICA8IS0tIENoZWNrIGNhcmQgLS0+CiAgPHJlY3QgeD0iMzMwIiB5PSIzMDAiIHdpZHRoPSIzODAiIGhlaWdodD0iNTIiIHJ4PSIxMiIgZmlsbD0iI2YzZTVhYiIvPgogIDx0ZXh0IHg9IjUyMCIgeT0iMzIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+VHUgY3VlbnRhIGNvbXBydWViYTo8L3RleHQ+CiAgPHRleHQgeD0iNTIwIiB5PSIzMzgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAuNSI+ZmlybWEgdmFsaWRhIMK3IG51bWVybyBkZSB1biBzb2xvIHVzbyAobm9uY2UpPC90ZXh0PgogIDxsaW5lIHgxPSI3MjUiIHkxPSIzMDYiIHgyPSI3MjUiIHkyPSIzMTQiIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KCiAgPGxpbmUgeDE9IjcyMyIgeTE9IjM3MiIgeDI9IjEyNCIgeTI9IjM3MiIgc3Ryb2tlPSIjMmE5ZDhmIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWRhc2hhcnJheT0iNyA0IiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KICA8dGV4dCB4PSI0MjAiIHk9IjM2NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzJhOWQ4ZiIgZm9udC1zaXplPSIxMC41IiBmb250LXdlaWdodD0iYm9sZCI+SGVjaG8gT0s6IGFjY2lvbiBlamVjdXRhZGE8L3RleHQ+CgogIDwhLS0gTm9uY2Ugbm90ZSAtLT4KICA8cmVjdCB4PSIxNTAiIHk9IjQzMCIgd2lkdGg9IjUwMCIgaGVpZ2h0PSI1MiIgcng9IjEyIiBmaWxsPSIjMGExMTI4Ii8+CiAgPHRleHQgeD0iNDAwIiB5PSI0NTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmM2U1YWIiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSJib2xkIj5FbCBudW1lcm8gZGUgdW4gc29sbyB1c28gKG5vbmNlKSBldml0YSBlbCBhbnRpLXJlcGxheTo8L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSI0NjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAuNSI+dW5hIGZpcm1hIGNvcGlhZGEgbm8gdmFsZSBkb3MgdmVjZXMsIGNvbW8gdW4gY2hlcXVlIG51bWVyYWRvPC90ZXh0Pgo8L3N2Zz4K" alt="Firma Digital"/><figcaption class="fig-caption">Figura · Firma Digital</figcaption></figure>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. Recuperar tu cuenta con 3 guardianes (paso a paso)</h2>
+<p>Si pierdes tu clave o te roban el teléfono, no pierdes tu identidad: tus <strong>guardianes</strong> (personas de confianza) pueden ayudarte. Es la <strong>recuperación social</strong>: como pedir a 3 amigos que confirmen que tú eres tú.</p>
+<p>Reglas de oro:</p>
+<ul><li>La recuperación <strong>solo cambia quién es el dueño</strong> de la cuenta.</li><li>La recuperación <strong>nunca mueve objetos ni dinero</strong>: solo entrega la llave a la nueva persona.</li></ul>
+<h3 class="sub" id="sub5">6.1 Designar guardianes (una sola vez, para siempre)</h3>
+<ol><li>Siendo el dueño, eliges <strong>3 guardianes</strong> (amigos, familiares).</li><li>Deben ser personas distintas, y <strong>no puedes ser tu propio guardián</strong>.</li><li>Esta elección es <strong>definitiva</strong>: una vez fijados, no se pueden cambiar. Es una protección: un ladrón no podría cambiar a tus guardianes durante un ataque.</li></ol>
+<h3 class="sub" id="sub6">6.2 Proponer la recuperación</h3>
+<p>Cuando pierdes el acceso:</p>
+<ol><li>Un guardián (o tú mismo con uno de ellos) propone al nuevo dueño.</li><li>Cada guardián aprueba la propuesta. Se necesitan <strong>2 de 3</strong>.</li><li>Al alcanzar 2 aprobaciones, empieza una <strong>espera de 48 horas</strong>.</li></ol>
+<h3 class="sub" id="sub7">6.3 La espera de 48 horas (para pensar y abortar)</h3>
+<p>Las 48 horas son el <strong>tiempo de reacción</strong>:</p>
+<ul><li>Si tú (el dueño legítimo) recuperas tu clave durante la espera, puedes <strong>cancelar la recuperación</strong> y todo vuelve a la normalidad.</li><li>Solo puedes cancelar si la propuesta ya tiene las 2 aprobaciones.</li><li><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar (observación): mientras la propuesta no llegue a 2 guardianes, el dueño no puede cancelarla por esta vía.</li></ul>
+<h3 class="sub" id="sub8">6.4 Ejecutar la recuperación</h3>
+<p>Pasadas las 48 horas, <strong>cualquiera</strong> puede ejecutar el cambio (el sistema o un mensajero lo hace automáticamente):</p>
+<ol><li>El nuevo dueño queda registrado.</li><li>La cuenta emite la notificación "OwnerActualizado".</li><li>El resto del sistema (vigilantes, app) se entera y actualiza tus datos.</li></ol>
+<blockquote class="warn"><span class="tag">Aviso</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Observación técnica (para auditoría): el sistema de votos acumula las aprobaciones de los guardianes sin comprobar que todos aprueben <strong>al mismo nuevo dueño</strong>. Con 2 aprobaciones de guardianes distintos basta para arrancar la espera hacia el dueño del último que aprobó. Es un comportamiento verificable del código, señalado para revisión.</p></blockquote>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5SZWN1cGVyYXIgdHUgY3VlbnRhIGNvbiAzIGd1YXJkaWFuZXM8L3RleHQ+CgogIDwhLS0gUEVSIC0tPgogIDxyZWN0IHg9IjgwIiB5PSI4MCIgd2lkdGg9IjMwMCIgaGVpZ2h0PSI1NCIgcng9IjEzIiBmaWxsPSIjZjRhMjYxIi8+CiAgPHRleHQgeD0iMjMwIiB5PSIxMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPlBpZXJkZXMgZWwgYWNjZXNvIGEgdHUgY3VlbnRhPC90ZXh0PgoKICA8IS0tIFBST1AgLS0+CiAgPHJlY3QgeD0iODAiIHk9IjE2NSIgd2lkdGg9IjMwMCIgaGVpZ2h0PSI1NCIgcng9IjEzIiBmaWxsPSIjNDhjYWU0Ii8+CiAgPHRleHQgeD0iMjMwIiB5PSIxOTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSJib2xkIj5VbiBndWFyZGlhbiBwcm9wb25lPC90ZXh0PgogIDx0ZXh0IHg9IjIzMCIgeT0iMjA3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwLjUiPnVuIG51ZXZvIGR1ZW5vPC90ZXh0PgoKICA8IS0tIEFQMSAtLT4KICA8cmVjdCB4PSI4MCIgeT0iMjUwIiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjU0IiByeD0iMTMiIGZpbGw9IiMyYTlkOGYiLz4KICA8dGV4dCB4PSIyMzAiIHk9IjI3NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiPkd1YXJkacOhbiAxIGFwcnVlYmE8L3RleHQ+CiAgPHRleHQgeD0iMjMwIiB5PSIyOTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAuNSI+KHVuYSBhcHJvYmFjaW9uKTwvdGV4dD4KCiAgPCEtLSBBUDIgLS0+CiAgPHJlY3QgeD0iODAiIHk9IjMzNSIgd2lkdGg9IjMwMCIgaGVpZ2h0PSI1NCIgcng9IjEzIiBmaWxsPSIjMmE5ZDhmIi8+CiAgPHRleHQgeD0iMjMwIiB5PSIzNjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSJib2xkIj5HdWFyZGlhbiAyIGFwcnVlYmE8L3RleHQ+CiAgPHRleHQgeD0iMjMwIiB5PSIzNzciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAuNSI+dW1icmFsOiAyIGRlIDM8L3RleHQ+CgogIDwhLS0gVEwgLS0+CiAgPHJlY3QgeD0iODAiIHk9IjQyMCIgd2lkdGg9IjMwMCIgaGVpZ2h0PSI1NCIgcng9IjEzIiBmaWxsPSIjMWEyYjRjIi8+CiAgPHRleHQgeD0iMjMwIiB5PSI0NDUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmM2U1YWIiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSJib2xkIj5Fc3BlcmEgZGUgNDggaG9yYXM8L3RleHQ+CiAgPHRleHQgeD0iMjMwIiB5PSI0NjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAiPnRpZW1wbyBwYXJhIHBlbnNhciBvIGFib3J0YXI8L3RleHQ+CgogIDwhLS0gRGVjaXNpb24gLS0+CiAgPHJlY3QgeD0iNDcwIiB5PSIzMDAiIHdpZHRoPSIyNzAiIGhlaWdodD0iNzAiIHJ4PSIxMyIgZmlsbD0iI2YzZTVhYiIgc3Ryb2tlPSIjYzVhMDY1IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSI2MDUiIHk9IjMzMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiPkVsIGR1ZW5vIGxlZ2l0aW1vPC90ZXh0PgogIDx0ZXh0IHg9IjYwNSIgeT0iMzQ3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iYm9sZCI+cmVjdXBlcm8gc3UgY2xhdmU/PC90ZXh0PgoKICA8IS0tIE5PUiAtLT4KICA8cmVjdCB4PSI0NzAiIHk9IjEwMCIgd2lkdGg9IjI3MCIgaGVpZ2h0PSI3MCIgcng9IjEzIiBmaWxsPSIjZTJlOGYwIi8+CiAgPHRleHQgeD0iNjA1IiB5PSIxMzAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSJib2xkIj5TaTogY2FuY2VsYSBsYSByZWN1cGVyYWNpb248L3RleHQ+CiAgPHRleHQgeD0iNjA1IiB5PSIxNDgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAuNSI+dG9kbyBzaWd1ZSBpZ3VhbDwvdGV4dD4KICA8dGV4dCB4PSI2MDUiIHk9IjE2MyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMC41Ij5jdWVudGEgZGVsIGR1ZW5vIG9yaWdpbmFsPC90ZXh0PgoKICA8IS0tIEVKIC0tPgogIDxyZWN0IHg9IjQ3MCIgeT0iNDIwIiB3aWR0aD0iMjcwIiBoZWlnaHQ9IjU2IiByeD0iMTMiIGZpbGw9IiNkNGFmMzciLz4KICA8dGV4dCB4PSI2MDUiIHk9IjQ0NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiPk5vOiBzZSBlamVjdXRhPC90ZXh0PgogIDx0ZXh0IHg9IjYwNSIgeT0iNDYzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjExIj5udWV2byBkdWVubyBkZSBsYSBjdWVudGE8L3RleHQ+CgogIDwhLS0gQXJyb3dzIC0tPgogIDxnIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyLjUiIGZpbGw9Im5vbmUiIG1hcmtlci1lbmQ9InVybCgjYXJyKSI+CiAgICA8bGluZSB4MT0iMjMwIiB5MT0iMTM2IiB4Mj0iMjMwIiB5Mj0iMTYxIi8+CiAgICA8bGluZSB4MT0iMjMwIiB5MT0iMjIxIiB4Mj0iMjMwIiB5Mj0iMjQ2Ii8+CiAgICA8bGluZSB4MT0iMjMwIiB5MT0iMzA2IiB4Mj0iMjMwIiB5Mj0iMzMxIi8+CiAgICA8bGluZSB4MT0iMjMwIiB5MT0iMzkxIiB4Mj0iMjMwIiB5Mj0iNDE2Ii8+CiAgICA8IS0tIHRvIGRlY2lzaW9uIC0tPgogICAgPHBhdGggZD0iTSAzODIgNDQ3IEwgNDY2IDM3MCIvPgogICAgPCEtLSBzaSAtLT4KICAgIDxwYXRoIGQ9Ik0gNDcwIDMzNSBMIDQ0MCAzMzUgTCA0NDAgMTQwIEwgNDY2IDE0MCIvPgogICAgPCEtLSBubyAtLT4KICAgIDxwYXRoIGQ9Ik0gNjA1IDM3MiBMIDYwNSA0MTYiLz4KICA8L2c+CiAgPHRleHQgeD0iNDQwIiB5PSIyMDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMyYTlkOGYiIGZvbnQtc2l6ZT0iMTAiIGZvbnQtd2VpZ2h0PSJib2xkIiBwYWludC1vcmRlcj0ic3Ryb2tlIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMyI+c2k6IGNhbmNlbGE8L3RleHQ+CiAgPHRleHQgeD0iNjE2IiB5PSI0MDAiIGZpbGw9IiM4YTZkMWYiIGZvbnQtc2l6ZT0iMTAiIGZvbnQtd2VpZ2h0PSJib2xkIj5ubzwvdGV4dD4KICA8dGV4dCB4PSI0NTAiIHk9IjQxNSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSI5LjUiPmVzcGVyYSBjdW1wbGlkYTwvdGV4dD4KPC9zdmc+Cg==" alt="Recuperacion Cuenta"/><figcaption class="fig-caption">Figura · Recuperacion Cuenta</figcaption></figure>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. Qué falta confirmar (resumen)</h2>
+<ol><li>La elección de guardianes es de una sola vez y no permite cambios posteriores (decisión de diseño documentada en el código).</li><li>La secuencia de la escalera (INSCRITO → VERIFICADO → CERTIFICADO) no se impone dentro del contrato: depende del backend → <strong>pendiente de confirmar</strong> cómo se garantiza fuera de la cadena.</li><li>No hay límite on-chain de qué acciones permite cada estado de verificación (por ejemplo, "máximo 3 trueques activos"): la política se aplica en el backend → <strong>pendiente de confirmar</strong>.</li><li>La firma móvil de la app (deep-link a la billetera móvil) está comentada como delegación a la wallet en la PWA, sin código aún → <strong>pendiente de confirmar</strong>.</li><li>Las pruebas del contrato (14 casos en <code>SmartAccount.t.sol</code>) cubren fábrica, firma con nonce, escalera por huella y recuperación social.</li></ol>
+</section>
+<section class="seccion" id="s8"><h2 class="seccion">8. Glosario de este manual</h2>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Significado</th></tr></thead><tbody><tr><td><strong>Cuenta inteligente</strong></td><td>Tu identidad digital en la blockchain</td></tr><tr><td><strong>Owner</strong></td><td>El dueño de la cuenta (tu billetera)</td></tr><tr><td><strong>Fábrica de cuentas</strong></td><td>El contrato que crea cuentas, una por persona</td></tr><tr><td><strong>Firma digital</strong></td><td>Tu "rúbrica" electrónica que autoriza una acción</td></tr><tr><td><strong>EIP-712</strong></td><td>Formato estándar y legible para firmar mensajes</td></tr><tr><td><strong>Nonce</strong></td><td>Número de un solo uso que evita firmas repetidas</td></tr><tr><td><strong>Escalera de verificación</strong></td><td>INSCRITO → VERIFICADO → CERTIFICADO</td></tr><tr><td><strong>Huella (merkle root)</strong></td><td>Prueba de verificación sin revelar tus datos</td></tr><tr><td><strong>Guardianes</strong></td><td>Personas de confianza que ayudan a recuperar la cuenta</td></tr><tr><td><strong>Umbral</strong></td><td>Número mínimo de aprobaciones (2 de 3)</td></tr><tr><td><strong>Timelock</strong></td><td>Espera obligatoria (48 h en recuperación)</td></tr><tr><td><strong>Gas</strong></td><td>"Gasolina" que cuesta operar en la blockchain</td></tr></tbody></table></div>
+<p>¡Listo! Ya sabes cómo funciona tu identidad digital. El siguiente manual explica la moneda de la plataforma (BRLT), el Fondo de Valor y las suscripciones de empresas.</p>
+</section>
+</main>
+
+</body>
+</html>

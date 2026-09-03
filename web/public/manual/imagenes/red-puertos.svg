@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+    <marker id="arrBack" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <rect width="800" height="54" fill="#1a2b4c"/>
+  <rect y="50" width="800" height="4" fill="#d4af37"/>
+  <text x="400" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">Mapa de conexiones: local y nube (red y puertos)</text>
+
+  <!-- Local zone -->
+  <rect x="40" y="80" width="330" height="350" rx="16" fill="#e8f6fb" stroke="#1d7fa8" stroke-width="2"/>
+  <text x="205" y="103" text-anchor="middle" fill="#1d7fa8" font-size="13" font-weight="bold">Tu ordenador (local)</text>
+
+  <rect x="60" y="118" width="140" height="50" rx="10" fill="#48cae4"/>
+  <text x="130" y="138" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">App web</text>
+  <text x="130" y="155" text-anchor="middle" fill="#0a1128" font-size="10">puerto 3000</text>
+
+  <rect x="220" y="118" width="135" height="50" rx="10" fill="#48cae4"/>
+  <text x="287" y="141" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">MetaMask</text>
+  <text x="287" y="158" text-anchor="middle" fill="#0a1128" font-size="9.5">billetera</text>
+
+  <rect x="60" y="200" width="295" height="44" rx="10" fill="#48cae4"/>
+  <text x="207" y="217" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">API</text>
+  <text x="207" y="233" text-anchor="middle" fill="#0a1128" font-size="10">puerto 4000</text>
+
+  <rect x="60" y="268" width="295" height="44" rx="10" fill="#48cae4"/>
+  <text x="207" y="293" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">Vigilante (indexador)</text>
+
+  <rect x="60" y="336" width="295" height="64" rx="10" fill="#48cae4"/>
+  <text x="207" y="360" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">Blockchain anvil</text>
+  <text x="207" y="378" text-anchor="middle" fill="#0a1128" font-size="10">puerto 8545 · red 31337</text>
+  <text x="207" y="393" text-anchor="middle" fill="#0a1128" font-size="10">red de pruebas local</text>
+
+  <!-- Cloud zone -->
+  <rect x="430" y="80" width="330" height="350" rx="16" fill="#fdf6e3" stroke="#8a6d1f" stroke-width="2"/>
+  <text x="595" y="103" text-anchor="middle" fill="#8a6d1f" font-size="13" font-weight="bold">Nube de Google (GCP)</text>
+
+  <rect x="460" y="130" width="270" height="60" rx="10" fill="#d4af37"/>
+  <text x="595" y="156" text-anchor="middle" fill="#0a1128" font-size="12" font-weight="bold">PostgreSQL mcc-postgres</text>
+  <text x="595" y="176" text-anchor="middle" fill="#0a1128" font-size="10.5">puerto 443</text>
+
+  <rect x="460" y="240" width="270" height="60" rx="10" fill="#d4af37"/>
+  <text x="595" y="266" text-anchor="middle" fill="#0a1128" font-size="12" font-weight="bold">pgAdmin</text>
+  <text x="595" y="286" text-anchor="middle" fill="#0a1128" font-size="10.5">puerto 443</text>
+
+  <rect x="460" y="340" width="270" height="60" rx="10" fill="#d4af37"/>
+  <text x="595" y="366" text-anchor="middle" fill="#0a1128" font-size="12" font-weight="bold">Secret Manager</text>
+  <text x="595" y="386" text-anchor="middle" fill="#0a1128" font-size="10.5">claves secretas</text>
+
+  <!-- Arrows -->
+  <g stroke="#1a2b4c" stroke-width="2" fill="none" marker-end="url(#arr)">
+    <!-- App -> API -->
+    <line x1="130" y1="170" x2="130" y2="196"/>
+    <!-- App -> MetaMask -->
+    <line x1="202" y1="143" x2="216" y2="143"/>
+    <!-- API -> Secret Manager -->
+    <path d="M 357 222 L 380 222 L 380 370 L 456 370"/>
+    <!-- API -> blockchain (paga gas) -->
+    <path d="M 357 244 L 362 244 L 362 380 L 357 380"/>
+    <!-- Vigilante -> blockchain (lee eventos) -->
+    <line x1="230" y1="314" x2="230" y2="332"/>
+    <!-- Vigilante -> postgres (guarda copias) -->
+    <path d="M 357 290 L 420 290 L 420 160 L 456 160"/>
+  </g>
+  <!-- PG <-> pgAdmin -->
+  <line x1="595" y1="192" x2="595" y2="236" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="595" y1="236" x2="595" y2="194" stroke="#1a2b4c" stroke-width="2" marker-start="url(#arrBack)"/>
+
+  <!-- Labels -->
+  <text x="142" y="186" fill="#1a2b4c" font-size="9.5">peticiones</text>
+  <text x="370" y="410" fill="#1a2b4c" font-size="9.5">lee secretos</text>
+  <text x="368" y="320" fill="#1a2b4c" font-size="9">paga el gas</text>
+  <text x="240" y="326" fill="#1a2b4c" font-size="9">lee eventos</text>
+  <text x="362" y="150" fill="#1a2b4c" font-size="9">guarda copias</text>
+
+  <!-- Port table -->
+  <rect x="40" y="445" width="720" height="40" rx="10" fill="#1a2b4c"/>
+  <text x="400" y="461" text-anchor="middle" fill="#ffffff" font-size="11">Puertos: app web 3000 · API 4000 · anvil 8545 (red 31337) ·</text>
+  <text x="400" y="477" text-anchor="middle" fill="#ffffff" font-size="11">PostgreSQL y pgAdmin 443 (GCP) · MetaMask en el navegador</text>
+</svg>

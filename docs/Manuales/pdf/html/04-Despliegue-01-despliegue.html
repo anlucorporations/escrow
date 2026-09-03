@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · Dónde vive TrueKeate y cómo se actualiza</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">04 · Despliegue</div>
+    <h1>Dónde vive TrueKeate y cómo se actualiza</h1>
+    <div class="intro">Versión en lenguaje sencillo del manual técnico de despliegue. Aquí contamos en qué "casas" vive TrueKeate y cómo se levanta y actualiza.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>04-Despliegue/01-despliegue.md</b></span>
+      <span>Edición: <b>3 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/04-Despliegue/01-despliegue</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Despliegue · Despliegue — Dónde vive TrueKeate y cómo se actualiza</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>Las dos casas de TrueKeate</span></a><div class="subs"><a href="#sub1">2.1 Casa local: anvil (red 31337)</a><br><a href="#sub2">2.2 Casa en la nube: GCP (proyecto `truekeate-main`)</a></div></li><li><a href="#s3"><span class="tnum">3</span><span>Las llaves secretas: el Secret Manager</span></a></li><li><a href="#s4"><span class="tnum">4</span><span>Cómo se despliegan los contratos (paso a paso)</span></a><div class="subs"><a href="#sub3">4.1 Antes de empezar</a><br><a href="#sub4">4.2 El comando mágico</a><br><a href="#sub5">4.3 Qué crea el guion, en orden</a><br><a href="#sub6">4.4 Después del despliegue</a></div></li><li><a href="#s5"><span class="tnum">5</span><span>Cómo se encienden los servidores</span></a><div class="subs"><a href="#sub7">5.1 Preparar la base de datos (solo la primera vez)</a><br><a href="#sub8">5.2 El vigilante (indexador)</a><br><a href="#sub9">5.3 El camarero (API)</a><br><a href="#sub10">5.4 La app web</a></div></li><li><a href="#s6"><span class="tnum">6</span><span>El mapa de conexiones (red y puertos)</span></a></li><li><a href="#s7"><span class="tnum">7</span><span>Cómo saber que todo está sano: chequeos de salud</span></a></li><li><a href="#s8"><span class="tnum">8</span><span>Respaldo y recuperación</span></a></li><li><a href="#s9"><span class="tnum">9</span><span>Qué falta confirmar (resumen)</span></a></li><li><a href="#s10"><span class="tnum">10</span><span>Glosario de este manual</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos</h2>
+<p>TrueKeate corre en dos tipos de "casa":</p>
+<ol><li><strong>Tu ordenador (local)</strong>: una blockchain de pruebas llamada <strong>anvil</strong> que simula todo. Útil para probar.</li><li><strong>La nube de Google (GCP)</strong>: donde vive la versión compartida con los servicios de datos.</li></ol>
+<p>Para levantar TrueKeate en tu ordenador, el camino es:</p>
+<ol><li>Arranca la blockchain de pruebas: <code>anvil</code> (red 31337).</li><li>Despliega los contratos: un comando de Foundry los crea.</li><li>Prepara la base de datos: aplica el esquema (una sola vez).</li><li>Enciende los servidores: vigilante (indexador), camarero (API) y app web.</li><li>¡Listo! Abres http://localhost:3000 y TrueKeate funciona.</li></ol>
+<blockquote class="info"><span class="tag">Nota</span><p>El mensajero (relayer) no tiene botón propio: la API lo usa por dentro (ver manual 03-stack-backend).</p></blockquote>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. Las dos casas de TrueKeate</h2>
+<h3 class="sub" id="sub1">2.1 Casa local: anvil (red 31337)</h3>
+<p>anvil es un simulador de blockchain que corre en tu ordenador. Es rápido y gratis, perfecto para probar sin miedo a romper nada.</p>
+<p>Dos cuentas importantes en las pruebas:</p>
+<div class="table-wrap"><table><thead><tr><th>Cuenta</th><th>Quién es</th><th>Para qué sirve</th></tr></thead><tbody><tr><td>Cuenta 0</td><td>El Owner</td><td>Crea (despliega) los contratos</td></tr><tr><td>Cuenta 1</td><td>La plataforma</td><td>El relayer: paga el gas</td></tr></tbody></table></div>
+<h3 class="sub" id="sub2">2.2 Casa en la nube: GCP (proyecto <code>truekeate-main</code>)</h3>
+<p>En la nube, TrueKeate reutiliza servicios de Google:</p>
+<ul><li>Una blockchain anvil compartida (para pruebas en la nube).</li><li>PostgreSQL (base de datos) con pgAdmin (herramienta de administración).</li><li><strong>Secret Manager</strong>: la caja fuerte de Google donde se guardan las claves secretas (contraseñas de la base de datos, llaves privadas).</li></ul>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: los archivos de configuración del entorno siguen apuntando a un proyecto de Google llamado "MCC" (de otro proyecto). No se ha verificado un despliegue dedicado al proyecto TrueKeate (<code>truekeate-main</code>). Marcamos el estado real del entorno como <strong>pendiente de confirmar</strong>.</p></blockquote>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. Las llaves secretas: el Secret Manager</h2>
+<p>Los secretos son como las llaves de casa: nadie debe verlas.</p>
+<ul><li>TrueKeate guarda en el Secret Manager: la contraseña de la base de datos, la clave del administrador y la clave del relayer.</li><li>Un script (llamado <code>gcp-env.sh</code>) las lee <strong>sin imprimirlas nunca</strong> en pantalla ni guardarlas en archivos.</li><li>El Owner es el <strong>custodio</strong> de las llaves principales y debe <strong>rotarlas</strong> (cambiarlas) periódicamente.</li></ul>
+<p>Regla de seguridad:</p>
+<ol><li>Nunca escribas una clave secreta en un archivo del proyecto.</li><li>Nunca pegues una clave en un chat o en un correo.</li><li>Usa siempre el Secret Manager para leerlas.</li></ol>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. Cómo se despliegan los contratos (paso a paso)</h2>
+<h3 class="sub" id="sub3">4.1 Antes de empezar</h3>
+<p>Necesitas:</p>
+<ol><li>La blockchain de pruebas encendida (anvil) o un acceso remoto.</li><li>La clave privada del Owner (cuenta 0).</li><li>Las librerías de contratos descargadas.</li></ol>
+<h3 class="sub" id="sub4">4.2 El comando mágico</h3>
+<pre><code>forge script script/Deploy.s.sol --rpc-url http://localhost:8545 \
+  --private-key &lt;clave-del-owner&gt; --broadcast</code></pre>
+<p>Traducción: "taller de Foundry, ejecuta el guion de despliegue contra la red local, firmando con la clave del Owner, y publica el resultado".</p>
+<h3 class="sub" id="sub5">4.3 Qué crea el guion, en orden</h3>
+<ol><li>El <strong>Escrow</strong> (la caja fuerte).</li><li>La <strong>fábrica de cuentas</strong> (SmartAccountFactory).</li><li>Dos <strong>criptos de prueba</strong> (para simular trueques).</li><li>Un <strong>NFT de prueba</strong>.</li><li>La <strong>moneda BRLT</strong>, el <strong>Fondo de Valor</strong>, el <strong>padrón de Socios</strong> y las <strong>suscripciones de empresa</strong>.</li><li><strong>Conecta las piezas</strong> entre sí (por ejemplo: la moneda con el fondo).</li><li>Anota las direcciones de cada pieza (como si apuntara las direcciones de las nuevas tiendas en un mapa).</li></ol>
+<h3 class="sub" id="sub6">4.4 Después del despliegue</h3>
+<ol><li>Actualiza el <strong>mapa de contratos</strong> del backend (para que el vigilante sepa dónde escuchar).</li><li>Actualiza las <strong>direcciones</strong> en la app web si es necesario.</li></ol>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5EZXNwbGllZ3VlIGRlIGNvbnRyYXRvcyBwYXNvIGEgcGFzbzwvdGV4dD4KCiAgPCEtLSBNYWluIGNvbHVtbiBzdGVwcyAtLT4KICA8Zz4KICAgIDxyZWN0IHg9IjYwIiB5PSI4MCIgd2lkdGg9IjQ0MCIgaGVpZ2h0PSI1MiIgcng9IjEzIiBmaWxsPSIjZjRhMjYxIi8+CiAgICA8dGV4dCB4PSI4NCIgeT0iMTEyIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj4xLiBFbmNlbmRlciBhbnZpbDwvdGV4dD4KICAgIDx0ZXh0IHg9IjUyMCIgeT0iMTEyIiB0ZXh0LWFuY2hvcj0iZW5kIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwLjUiPmJsb2NrY2hhaW4gZGUgcHJ1ZWJhcywgcmVkIDMxMzM3PC90ZXh0PgogIDwvZz4KICA8bGluZSB4MT0iMjgwIiB5MT0iMTM0IiB4Mj0iMjgwIiB5Mj0iMTUwIiBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMi41IiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KICA8Zz4KICAgIDxyZWN0IHg9IjYwIiB5PSIxNTYiIHdpZHRoPSI0NDAiIGhlaWdodD0iNTIiIHJ4PSIxMyIgZmlsbD0iIzQ4Y2FlNCIvPgogICAgPHRleHQgeD0iODQiIHk9IjE4OCIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+Mi4gRWplY3V0YXIgZWwgZ3Vpb24gZGUgZGVzcGxpZWd1ZTwvdGV4dD4KICAgIDx0ZXh0IHg9IjUyMCIgeT0iMTg4IiB0ZXh0LWFuY2hvcj0iZW5kIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwLjUiPmZvcmdlIHNjcmlwdCBEZXBsb3kucy5zb2w8L3RleHQ+CiAgPC9nPgogIDxsaW5lIHgxPSIyODAiIHkxPSIyMTAiIHgyPSIyODAiIHkyPSIyMjYiIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyLjUiIG1hcmtlci1lbmQ9InVybCgjYXJyKSIvPgogIDxnPgogICAgPHJlY3QgeD0iNjAiIHk9IjIzMiIgd2lkdGg9IjQ0MCIgaGVpZ2h0PSI1OCIgcng9IjEzIiBmaWxsPSIjMmE5ZDhmIi8+CiAgICA8dGV4dCB4PSI4NCIgeT0iMjU2IiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj4zLiBTZSBjcmVhbiBsYXMgcGllemFzPC90ZXh0PgogICAgPHRleHQgeD0iODQiIHk9IjI3NiIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMC41Ij5Fc2Nyb3cgwrcgRmFjdG9yeSBkZSBjdWVudGFzIMK3IHRva2VucyBkZSBwcnVlYmEgwrcgQlJMVDwvdGV4dD4KICAgIDx0ZXh0IHg9Ijg0IiB5PSIyODgiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iOS41Ij5Gb25kbyBkZSBWYWxvciDCtyBQYWRyb24gZGUgU29jaW9zIMK3IFN1c2NyaXBjaW9uPC90ZXh0PgogIDwvZz4KICA8bGluZSB4MT0iMjgwIiB5MT0iMjkyIiB4Mj0iMjgwIiB5Mj0iMzA4IiBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMi41IiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KICA8Zz4KICAgIDxyZWN0IHg9IjYwIiB5PSIzMTQiIHdpZHRoPSI0NDAiIGhlaWdodD0iNTIiIHJ4PSIxMyIgZmlsbD0iIzJhOWQ4ZiIvPgogICAgPHRleHQgeD0iODQiIHk9IjM0MCIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+NC4gU2UgY29uZWN0YW4gbGFzIHBpZXphcyBlbnRyZSBzaTwvdGV4dD4KICAgIDx0ZXh0IHg9Ijg0IiB5PSIzNTciIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAuNSI+bW9uZWRhIGNvbiBmb25kbyDCtyBwYWRyb24gY29uIG1vbmVkYSDCtyBlc2Nyb3cgLi4uPC90ZXh0PgogIDwvZz4KICA8bGluZSB4MT0iMjgwIiB5MT0iMzY4IiB4Mj0iMjgwIiB5Mj0iMzg0IiBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMi41IiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KICA8Zz4KICAgIDxyZWN0IHg9IjYwIiB5PSIzOTAiIHdpZHRoPSI0NDAiIGhlaWdodD0iNTIiIHJ4PSIxMyIgZmlsbD0iI2Q0YWYzNyIvPgogICAgPHRleHQgeD0iODQiIHk9IjQxNiIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+NS4gU2UgYW5vdGFuIGxhcyBkaXJlY2Npb25lczwvdGV4dD4KICAgIDx0ZXh0IHg9Ijg0IiB5PSI0MzIiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAuNSI+YnJvYWRjYXN0LyDCtyBtYXBhIGRlIGNvbnRyYXRvczwvdGV4dD4KICA8L2c+CgogIDwhLS0gQnJhbmNoZXMgcmlnaHQgLS0+CiAgPGc+CiAgICA8cmVjdCB4PSI2MDAiIHk9IjE3MCIgd2lkdGg9IjE3MCIgaGVpZ2h0PSIxMDAiIHJ4PSIxMyIgZmlsbD0iI2UyZThmMCIvPgogICAgPHRleHQgeD0iNjg1IiB5PSIxOTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSJib2xkIj42LiBBY3R1YWxpemFyIGVsPC90ZXh0PgogICAgPHRleHQgeD0iNjg1IiB5PSIyMTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSJib2xkIj5tYXBhIGRlIGNvbnRyYXRvczwvdGV4dD4KICAgIDx0ZXh0IHg9IjY4NSIgeT0iMjM4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwLjUiPmRlbCBiYWNrZW5kPC90ZXh0PgogICAgPHRleHQgeD0iNjg1IiB5PSIyNTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiPnBhcmEgcXVlIGVsIHZpZ2lsYW50ZTwvdGV4dD4KICAgIDx0ZXh0IHg9IjY4NSIgeT0iMjY5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwIj5zZXBhIGRvbmRlIGVzY3VjaGFyPC90ZXh0PgogIDwvZz4KICA8Zz4KICAgIDxyZWN0IHg9IjYwMCIgeT0iMzMwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjkwIiByeD0iMTMiIGZpbGw9IiNlMmU4ZjAiLz4KICAgIDx0ZXh0IHg9IjY4NSIgeT0iMzU2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iYm9sZCI+Ny4gQWN0dWFsaXphcjwvdGV4dD4KICAgIDx0ZXh0IHg9IjY4NSIgeT0iMzc0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iYm9sZCI+ZGlyZWNjaW9uZXM8L3RleHQ+CiAgICA8dGV4dCB4PSI2ODUiIHk9IjM5NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMC41Ij5kZSBsYSBhcHAgd2ViPC90ZXh0PgogIDwvZz4KICA8ZyBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMi41IiBmaWxsPSJub25lIiBtYXJrZXItZW5kPSJ1cmwoI2FycikiPgogICAgPHBhdGggZD0iTSA1MDIgMzAwIEwgNTYwIDMwMCBMIDU2MCAyMjAgTCA1OTYgMjIwIi8+CiAgICA8cGF0aCBkPSJNIDUwMiA0MTYgTCA1NjAgNDE2IEwgNTYwIDM3NSBMIDU5NiAzNzUiLz4KICA8L2c+CgogIDwhLS0gTm90ZSAtLT4KICA8cmVjdCB4PSI2MCIgeT0iNDYwIiB3aWR0aD0iNzEwIiBoZWlnaHQ9IjI2IiByeD0iMTAiIGZpbGw9IiNmM2U1YWIiLz4KICA8dGV4dCB4PSI0MTUiIHk9IjQ3OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41IiBmb250LXdlaWdodD0iYm9sZCI+UGVuZGllbnRlIGRlIGNvbmZpcm1hcjogZWwgZ3Vpb24gYXVuIG5vIGNvbmVjdGEgZWwgRXNjcm93IGNvbiBlbCBQYWRyb24gZGUgU29jaW9zIChzZSBlc3BlcmEgZW4gdW4gZ3Vpb24gcG9zdGVyaW9yKTwvdGV4dD4KPC9zdmc+Cg==" alt="Despliegue Contratos"/><figcaption class="fig-caption">Figura · Despliegue Contratos</figcaption></figure>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: el guion conecta el Escrow con el padrón de Socios en el código del contrato, pero <strong>esa conexión no se ejecuta</strong> en el guion de despliegue actual. Esa vinculación queda <strong>pendiente de confirmar</strong> en un guion posterior.</p></blockquote>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. Cómo se encienden los servidores</h2>
+<h3 class="sub" id="sub7">5.1 Preparar la base de datos (solo la primera vez)</h3>
+<pre><code>psql "$DATABASE_URL" -f backend/db/schema.sql</code></pre>
+<p>Crea las tablas y tipos. Es seguro repetirlo: si algo ya existe, no lo duplica.</p>
+<h3 class="sub" id="sub8">5.2 El vigilante (indexador)</h3>
+<pre><code>node backend/indexador-cli.js          # una pasada rápida
+node backend/indexador-cli.js --watch  # modo vigilante: escucha siempre</code></pre>
+<p>El modo <code>--watch</code> revisa la blockchain cada 5 segundos (por defecto) y copia lo nuevo a la base de datos.</p>
+<h3 class="sub" id="sub9">5.3 El camarero (API)</h3>
+<pre><code>npm run api</code></pre>
+<p>Arranca la API en http://127.0.0.1:4000 (puerto configurable). Puedes comprobar que vive con un chequeo de salud: <code>GET /healthz</code>.</p>
+<h3 class="sub" id="sub10">5.4 La app web</h3>
+<pre><code>cd web
+npm run dev      # desarrollo: http://localhost:3000
+npm run build    # preparar la versión final
+npm start        # servir la versión final</code></pre>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. El mapa de conexiones (red y puertos)</h2>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICAgIDxtYXJrZXIgaWQ9ImFyckJhY2siIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iMSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5NYXBhIGRlIGNvbmV4aW9uZXM6IGxvY2FsIHkgbnViZSAocmVkIHkgcHVlcnRvcyk8L3RleHQ+CgogIDwhLS0gTG9jYWwgem9uZSAtLT4KICA8cmVjdCB4PSI0MCIgeT0iODAiIHdpZHRoPSIzMzAiIGhlaWdodD0iMzUwIiByeD0iMTYiIGZpbGw9IiNlOGY2ZmIiIHN0cm9rZT0iIzFkN2ZhOCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iMjA1IiB5PSIxMDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxZDdmYTgiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSJib2xkIj5UdSBvcmRlbmFkb3IgKGxvY2FsKTwvdGV4dD4KCiAgPHJlY3QgeD0iNjAiIHk9IjExOCIgd2lkdGg9IjE0MCIgaGVpZ2h0PSI1MCIgcng9IjEwIiBmaWxsPSIjNDhjYWU0Ii8+CiAgPHRleHQgeD0iMTMwIiB5PSIxMzgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTEuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkFwcCB3ZWI8L3RleHQ+CiAgPHRleHQgeD0iMTMwIiB5PSIxNTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPnB1ZXJ0byAzMDAwPC90ZXh0PgoKICA8cmVjdCB4PSIyMjAiIHk9IjExOCIgd2lkdGg9IjEzNSIgaGVpZ2h0PSI1MCIgcng9IjEwIiBmaWxsPSIjNDhjYWU0Ii8+CiAgPHRleHQgeD0iMjg3IiB5PSIxNDEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTEuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPk1ldGFNYXNrPC90ZXh0PgogIDx0ZXh0IHg9IjI4NyIgeT0iMTU4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjkuNSI+YmlsbGV0ZXJhPC90ZXh0PgoKICA8cmVjdCB4PSI2MCIgeT0iMjAwIiB3aWR0aD0iMjk1IiBoZWlnaHQ9IjQ0IiByeD0iMTAiIGZpbGw9IiM0OGNhZTQiLz4KICA8dGV4dCB4PSIyMDciIHk9IjIxNyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMS41IiBmb250LXdlaWdodD0iYm9sZCI+QVBJPC90ZXh0PgogIDx0ZXh0IHg9IjIwNyIgeT0iMjMzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwIj5wdWVydG8gNDAwMDwvdGV4dD4KCiAgPHJlY3QgeD0iNjAiIHk9IjI2OCIgd2lkdGg9IjI5NSIgaGVpZ2h0PSI0NCIgcng9IjEwIiBmaWxsPSIjNDhjYWU0Ii8+CiAgPHRleHQgeD0iMjA3IiB5PSIyOTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTEuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPlZpZ2lsYW50ZSAoaW5kZXhhZG9yKTwvdGV4dD4KCiAgPHJlY3QgeD0iNjAiIHk9IjMzNiIgd2lkdGg9IjI5NSIgaGVpZ2h0PSI2NCIgcng9IjEwIiBmaWxsPSIjNDhjYWU0Ii8+CiAgPHRleHQgeD0iMjA3IiB5PSIzNjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTEuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkJsb2NrY2hhaW4gYW52aWw8L3RleHQ+CiAgPHRleHQgeD0iMjA3IiB5PSIzNzgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPnB1ZXJ0byA4NTQ1IMK3IHJlZCAzMTMzNzwvdGV4dD4KICA8dGV4dCB4PSIyMDciIHk9IjM5MyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMCI+cmVkIGRlIHBydWViYXMgbG9jYWw8L3RleHQ+CgogIDwhLS0gQ2xvdWQgem9uZSAtLT4KICA8cmVjdCB4PSI0MzAiIHk9IjgwIiB3aWR0aD0iMzMwIiBoZWlnaHQ9IjM1MCIgcng9IjE2IiBmaWxsPSIjZmRmNmUzIiBzdHJva2U9IiM4YTZkMWYiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjU5NSIgeT0iMTAzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOGE2ZDFmIiBmb250LXNpemU9IjEzIiBmb250LXdlaWdodD0iYm9sZCI+TnViZSBkZSBHb29nbGUgKEdDUCk8L3RleHQ+CgogIDxyZWN0IHg9IjQ2MCIgeT0iMTMwIiB3aWR0aD0iMjcwIiBoZWlnaHQ9IjYwIiByeD0iMTAiIGZpbGw9IiNkNGFmMzciLz4KICA8dGV4dCB4PSI1OTUiIHk9IjE1NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiPlBvc3RncmVTUUwgbWNjLXBvc3RncmVzPC90ZXh0PgogIDx0ZXh0IHg9IjU5NSIgeT0iMTc2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwLjUiPnB1ZXJ0byA0NDM8L3RleHQ+CgogIDxyZWN0IHg9IjQ2MCIgeT0iMjQwIiB3aWR0aD0iMjcwIiBoZWlnaHQ9IjYwIiByeD0iMTAiIGZpbGw9IiNkNGFmMzciLz4KICA8dGV4dCB4PSI1OTUiIHk9IjI2NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiPnBnQWRtaW48L3RleHQ+CiAgPHRleHQgeD0iNTk1IiB5PSIyODYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAuNSI+cHVlcnRvIDQ0MzwvdGV4dD4KCiAgPHJlY3QgeD0iNDYwIiB5PSIzNDAiIHdpZHRoPSIyNzAiIGhlaWdodD0iNjAiIHJ4PSIxMCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjU5NSIgeT0iMzY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iYm9sZCI+U2VjcmV0IE1hbmFnZXI8L3RleHQ+CiAgPHRleHQgeD0iNTk1IiB5PSIzODYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAuNSI+Y2xhdmVzIHNlY3JldGFzPC90ZXh0PgoKICA8IS0tIEFycm93cyAtLT4KICA8ZyBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgbWFya2VyLWVuZD0idXJsKCNhcnIpIj4KICAgIDwhLS0gQXBwIC0+IEFQSSAtLT4KICAgIDxsaW5lIHgxPSIxMzAiIHkxPSIxNzAiIHgyPSIxMzAiIHkyPSIxOTYiLz4KICAgIDwhLS0gQXBwIC0+IE1ldGFNYXNrIC0tPgogICAgPGxpbmUgeDE9IjIwMiIgeTE9IjE0MyIgeDI9IjIxNiIgeTI9IjE0MyIvPgogICAgPCEtLSBBUEkgLT4gU2VjcmV0IE1hbmFnZXIgLS0+CiAgICA8cGF0aCBkPSJNIDM1NyAyMjIgTCAzODAgMjIyIEwgMzgwIDM3MCBMIDQ1NiAzNzAiLz4KICAgIDwhLS0gQVBJIC0+IGJsb2NrY2hhaW4gKHBhZ2EgZ2FzKSAtLT4KICAgIDxwYXRoIGQ9Ik0gMzU3IDI0NCBMIDM2MiAyNDQgTCAzNjIgMzgwIEwgMzU3IDM4MCIvPgogICAgPCEtLSBWaWdpbGFudGUgLT4gYmxvY2tjaGFpbiAobGVlIGV2ZW50b3MpIC0tPgogICAgPGxpbmUgeDE9IjIzMCIgeTE9IjMxNCIgeDI9IjIzMCIgeTI9IjMzMiIvPgogICAgPCEtLSBWaWdpbGFudGUgLT4gcG9zdGdyZXMgKGd1YXJkYSBjb3BpYXMpIC0tPgogICAgPHBhdGggZD0iTSAzNTcgMjkwIEwgNDIwIDI5MCBMIDQyMCAxNjAgTCA0NTYgMTYwIi8+CiAgPC9nPgogIDwhLS0gUEcgPC0+IHBnQWRtaW4gLS0+CiAgPGxpbmUgeDE9IjU5NSIgeTE9IjE5MiIgeDI9IjU5NSIgeTI9IjIzNiIgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyKSIvPgogIDxsaW5lIHgxPSI1OTUiIHkxPSIyMzYiIHgyPSI1OTUiIHkyPSIxOTQiIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItc3RhcnQ9InVybCgjYXJyQmFjaykiLz4KCiAgPCEtLSBMYWJlbHMgLS0+CiAgPHRleHQgeD0iMTQyIiB5PSIxODYiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iOS41Ij5wZXRpY2lvbmVzPC90ZXh0PgogIDx0ZXh0IHg9IjM3MCIgeT0iNDEwIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjkuNSI+bGVlIHNlY3JldG9zPC90ZXh0PgogIDx0ZXh0IHg9IjM2OCIgeT0iMzIwIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjkiPnBhZ2EgZWwgZ2FzPC90ZXh0PgogIDx0ZXh0IHg9IjI0MCIgeT0iMzI2IiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjkiPmxlZSBldmVudG9zPC90ZXh0PgogIDx0ZXh0IHg9IjM2MiIgeT0iMTUwIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjkiPmd1YXJkYSBjb3BpYXM8L3RleHQ+CgogIDwhLS0gUG9ydCB0YWJsZSAtLT4KICA8cmVjdCB4PSI0MCIgeT0iNDQ1IiB3aWR0aD0iNzIwIiBoZWlnaHQ9IjQwIiByeD0iMTAiIGZpbGw9IiMxYTJiNGMiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjQ2MSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMSI+UHVlcnRvczogYXBwIHdlYiAzMDAwIMK3IEFQSSA0MDAwIMK3IGFudmlsIDg1NDUgKHJlZCAzMTMzNykgwrc8L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSI0NzciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTEiPlBvc3RncmVTUUwgeSBwZ0FkbWluIDQ0MyAoR0NQKSDCtyBNZXRhTWFzayBlbiBlbCBuYXZlZ2Fkb3I8L3RleHQ+Cjwvc3ZnPgo=" alt="Red Puertos"/><figcaption class="fig-caption">Figura · Red Puertos</figcaption></figure>
+<div class="table-wrap"><table><thead><tr><th>Componente</th><th>Dónde está</th><th>Puerta (puerto)</th></tr></thead><tbody><tr><td>Blockchain de pruebas</td><td>local</td><td>8545 (red 31337)</td></tr><tr><td>API</td><td>local</td><td>4000</td></tr><tr><td>App web</td><td>local</td><td>3000</td></tr><tr><td>PostgreSQL</td><td>nube de Google</td><td>443</td></tr><tr><td>pgAdmin</td><td>nube de Google</td><td>443</td></tr></tbody></table></div>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. Cómo saber que todo está sano: chequeos de salud</h2>
+<p>Cada servidor tiene un termómetro:</p>
+<div class="table-wrap"><table><thead><tr><th>Servicio</th><th>Chequeo</th><th>Qué mira</th></tr></thead><tbody><tr><td>API</td><td><code>GET /healthz</code></td><td>Responde "ok, servicio: truekeate-api"</td></tr><tr><td>Vigilante</td><td>métricas de retraso</td><td>¿Cuántos eventos lleva de retraso?</td></tr><tr><td>Mensajero</td><td>chequeo de salud</td><td>¿Tiene saldo? ¿Está en la red correcta?</td></tr></tbody></table></div>
+<p>Si el mensajero tiene menos de <strong>0,5 ETH</strong> de saldo, avisa al Owner para que recargue (así no se quedan los trueques sin gas).</p>
+</section>
+<section class="seccion" id="s8"><h2 class="seccion">8. Respaldo y recuperación</h2>
+<p>El objetivo declarado:</p>
+<ul><li><strong>Copia de seguridad diaria</strong>: como mucho se pierden 24 h de datos.</li><li><strong>Recuperación en 48 h</strong>: si algo se rompe, se restaura en 2 días.</li><li><strong>Pruebas de restauración</strong>: cada 3 meses se ensaya recuperar todo.</li><li><strong>Reproceso del vigilante</strong>: si se pierde un evento, se vuelve a leer desde un punto anterior (ver manual 03-stack-backend).</li></ul>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: estos objetivos están escritos en el diseño, pero <strong>no se ha verificado</strong> la implementación operativa de las copias en el repositorio.</p></blockquote>
+</section>
+<section class="seccion" id="s9"><h2 class="seccion">9. Qué falta confirmar (resumen)</h2>
+<ol><li>El entorno en la nube dedicado a TrueKeate (<code>truekeate-main</code>): los archivos actuales apuntan al proyecto "MCC" → <strong>pendiente de confirmar</strong>.</li><li>No hay recetas de contenedores (Docker) ni tuberías automáticas (CI) en el repositorio → <strong>pendiente de confirmar</strong>.</li><li>La conexión Escrow ↔ Socios en el guion de despliegue → <strong>pendiente de confirmar</strong>.</li><li>El mensajero (relayer) como servicio independiente con 2 copias y cola de reintentos → <strong>pendiente de confirmar</strong>.</li><li>La red de producción definitiva no está decidida (hoy todo funciona sobre la red de pruebas 31337) → <strong>pendiente de confirmar</strong>.</li><li>Las copias de seguridad operativas y el plan B del mensajero → <strong>pendiente de confirmar</strong>.</li></ol>
+</section>
+<section class="seccion" id="s10"><h2 class="seccion">10. Glosario de este manual</h2>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Significado</th></tr></thead><tbody><tr><td><strong>Despliegue</strong></td><td>Poner el software a funcionar en un lugar</td></tr><tr><td><strong>Entorno</strong></td><td>Un lugar donde corre el software (local, nube...)</td></tr><tr><td><strong>RPC</strong></td><td>La puerta por la que se habla con la blockchain</td></tr><tr><td><strong>Broadcast</strong></td><td>Publicar la transacción en la red</td></tr><tr><td><strong>Secret Manager</strong></td><td>Caja fuerte de Google para claves secretas</td></tr><tr><td><strong>Health-check</strong></td><td>Chequeo de salud de un servicio</td></tr><tr><td><strong>Backup</strong></td><td>Copia de seguridad</td></tr><tr><td><strong>Puerto</strong></td><td>Número de puerta por el que entra el tráfico</td></tr></tbody></table></div>
+<p>¡Fin de los manuales de TrueKeate! Ya conoces la plataforma (01), su tecnología web3 (02), sus servidores (03), su app (04), sus piezas (dependencias) y sus casas (despliegue).</p>
+</section>
+</main>
+
+</body>
+</html>

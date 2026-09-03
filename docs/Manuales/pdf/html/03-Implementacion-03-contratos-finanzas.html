@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · Las finanzas de TrueKeate: BRLT, el Fondo de Valor y las empresas</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">03 · Implementación</div>
+    <h1>Las finanzas de TrueKeate: BRLT, el Fondo de Valor y las empresas</h1>
+    <div class="intro">Versión en lenguaje sencillo del manual técnico de los contratos de finanzas y gobernanza: el padrón de <strong>Socios</strong>, la moneda <strong>BRLT</strong>, el <strong>Fondo de Valor</strong> y las <strong>suscripciones de empresa</strong>. Aquí contamos, sin tecnicismos, cómo se mueve el dinero de la plataforma.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>03-Implementacion/03-contratos-finanzas.md</b></span>
+      <span>Edición: <b>3 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/03-Implementacion/03-contratos-finanzas</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Implementación · Implementacion — Las finanzas de TrueKeate: BRLT, el Fondo de Valor y las empresas</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>Las cuatro piezas y cómo se conectan</span></a></li><li><a href="#s3"><span class="tnum">3</span><span>El padrón de Socios: quién decide y cómo vota</span></a><div class="subs"><a href="#sub1">3.1 ¿Qué es un Socio?</a><br><a href="#sub2">3.2 Cómo se admite un Socio nuevo (por votación)</a><br><a href="#sub3">3.3 Propuestas económicas</a></div></li><li><a href="#s4"><span class="tnum">4</span><span>BRLT: la moneda de la plataforma (paso a paso)</span></a><div class="subs"><a href="#sub4">4.1 Características</a><br><a href="#sub5">4.2 Qué pasa cuando se emite moneda</a></div></li><li><a href="#s5"><span class="tnum">5</span><span>El Fondo de Valor: la hucha común</span></a></li><li><a href="#s6"><span class="tnum">6</span><span>Suscripción de empresas: pagar bloqueando (paso a paso)</span></a><div class="subs"><a href="#sub6">6.1 Suscribirse (el primer mes)</a><br><a href="#sub7">6.2 Cada mes (el ciclo de 30 días)</a><br><a href="#sub8">6.3 Cancelar la suscripción</a></div></li><li><a href="#s7"><span class="tnum">7</span><span>Orden de despliegue (cómo se monta todo)</span></a></li><li><a href="#s8"><span class="tnum">8</span><span>Qué falta confirmar (resumen)</span></a></li><li><a href="#s9"><span class="tnum">9</span><span>Glosario de este manual</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos</h2>
+<p>TrueKeate tiene su propia <strong>moneda digital</strong> y un <strong>fondo común</strong> para pagar los gastos de funcionamiento. Las piezas son cuatro:</p>
+<ol><li><strong>BRLT</strong>: la moneda de la plataforma (se llama "BorloTokens").</li><li><strong>Fondo de Valor</strong>: la "hucha" que paga los gastos de operación.</li><li><strong>Padrón de Socios</strong>: la lista de miembros de confianza que votan las decisiones económicas.</li><li><strong>Suscripción de empresa</strong>: cómo las empresas pagan por estar en la plataforma.</li></ol>
+<p>Las 3 ideas en 5 minutos:</p>
+<ul><li>La moneda <strong>no se puede imprimir sin control</strong>: hay un tope máximo de <strong>1.000.000 BRLT</strong>, y emitir más exige votación de los Socios.</li><li>Cada vez que se crea moneda o una empresa se suscribe, <strong>un porcentaje va a la hucha común</strong> (el Fondo de Valor).</li><li>Las empresas <strong>no pagan cada mes con transferencia</strong>: bloquean su pago por adelantado (staking) y el sistema cobra solo la parte del mes.</li></ul>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. Las cuatro piezas y cómo se conectan</h2>
+<div class="table-wrap"><table><thead><tr><th>Pieza</th><th>Qué es</th><th>Para qué sirve</th></tr></thead><tbody><tr><td><strong>BRLT</strong></td><td>La moneda de la plataforma</td><td>Pagar suscripciones, recibir reembolsos</td></tr><tr><td><strong>Fondo de Valor</strong></td><td>La hucha común</td><td>Pagar gastos: servidores, gas, red</td></tr><tr><td><strong>Padrón de Socios</strong></td><td>Lista + votaciones</td><td>Aprobar Socios nuevos y decisiones de dinero</td></tr><tr><td><strong>Suscripción de empresa</strong></td><td>Contrato de cobro por bloqueo</td><td>Empresas pagan su plan con BRLT bloqueados</td></tr></tbody></table></div>
+<p>Las piezas se <strong>conectan entre sí</strong> al desplegarse, como enchufar los aparatos de una casa:</p>
+<ul><li>La moneda se conecta con el padrón (¿quién puede mandar emitir?) y con el fondo (¿a dónde va el 5 %?).</li><li>El fondo se conecta con la moneda (para recibir y guardar).</li><li>El padrón se conecta con la moneda (para ejecutar votaciones).</li><li>Las suscripciones se conectan con la moneda y con el fondo.</li></ul>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p>Conexión pendiente: el <strong>Escrow</strong> (la caja fuerte de los trueques) también debería conectarse con el padrón de Socios para las disputas, pero esa conexión no se ejecuta en el guion de despliegue actual → <strong>pendiente de confirmar</strong> (ver manual 01).</p></blockquote>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5MYSBhcnF1aXRlY3R1cmEgZmluYW5jaWVyYTwvdGV4dD4KCiAgPCEtLSBQYWRyb24gLS0+CiAgPHJlY3QgeD0iNjAiIHk9Ijk1IiB3aWR0aD0iMjIwIiBoZWlnaHQ9IjEwNSIgcng9IjE0IiBmaWxsPSIjNDhjYWU0Ii8+CiAgPHRleHQgeD0iMTcwIiB5PSIxMzAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSJib2xkIj5QYWRyb24gZGUgU29jaW9zPC90ZXh0PgogIDx0ZXh0IHg9IjE3MCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwLjUiPnZvdGFuIGRlY2lzaW9uZXM8L3RleHQ+CiAgPHRleHQgeD0iMTcwIiB5PSIxNjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAuNSI+YWRtaXRlbiBTb2Npb3M8L3RleHQ+CiAgPHRleHQgeD0iMTcwIiB5PSIxODIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAuNSI+dm90YW4gcHJvcHVlc3RhcyBlY29ub21pY2FzPC90ZXh0PgoKICA8IS0tIEZvbmRvIC0tPgogIDxyZWN0IHg9IjUzMCIgeT0iOTAiIHdpZHRoPSIyMzAiIGhlaWdodD0iMTEwIiByeD0iMTQiIGZpbGw9IiNkNGFmMzciLz4KICA8dGV4dCB4PSI2NDUiIHk9IjEyNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMy41IiBmb250LXdlaWdodD0iYm9sZCI+Rm9uZG8gZGUgVmFsb3I8L3RleHQ+CiAgPHRleHQgeD0iNjQ1IiB5PSIxNDgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTEiPmxhIGh1Y2hhIGNvbXVuPC90ZXh0PgogIDx0ZXh0IHg9IjY0NSIgeT0iMTY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwLjUiPnBhZ2EgZ2FzdG9zIGRlIG9wZXJhY2lvbjwvdGV4dD4KICA8dGV4dCB4PSI2NDUiIHk9IjE4MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41Ij5yZXRpcm9zOiBzb2xvIGVsIE93bmVyPC90ZXh0PgoKICA8IS0tIEJSTFQgLS0+CiAgPHJlY3QgeD0iMzAwIiB5PSIyMzAiIHdpZHRoPSIyMDAiIGhlaWdodD0iMTAwIiByeD0iMTQiIGZpbGw9IiMyYTlkOGYiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjI2NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9ImJvbGQiPkJSTFQ8L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSIyODYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAuNSI+bW9uZWRhIEVSQy0yMCBkZSBsYTwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjMwMSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMC41Ij5wbGF0YWZvcm1hIMK3IHRvcGUgaW5pY2lhbDwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjMxNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMC41Ij4xLjAwMC4wMDAgQlJMVDwvdGV4dD4KCiAgPCEtLSBTdXNjcmlwY2lvbiAtLT4KICA8cmVjdCB4PSI1MzAiIHk9IjM2MCIgd2lkdGg9IjIzMCIgaGVpZ2h0PSI5MCIgcng9IjE0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHRleHQgeD0iNjQ1IiB5PSIzOTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPlN1c2NyaXBjaW9uIGRlIGVtcHJlc2E8L3RleHQ+CiAgPHRleHQgeD0iNjQ1IiB5PSI0MTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAuNSI+YmxvcXVlbyBkZSAzMCBkaWFzPC90ZXh0PgogIDx0ZXh0IHg9IjY0NSIgeT0iNDI2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZjNlNWFiIiBmb250LXNpemU9IjEwLjUiPnBsYW4gYmFzZTogMTAwIEJSTFQvbWVzPC90ZXh0PgoKICA8IS0tIFBhZHJvbiA8LT4gQlJMVCAtLT4KICA8bGluZSB4MT0iMjAwIiB5MT0iMjEzIiB4Mj0iMzQwIiB5Mj0iMjMxIiBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMi41IiBtYXJrZXItc3RhcnQ9InVybCgjYXJyKSIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+CiAgPHRleHQgeD0iMjY4IiB5PSIyMjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iOC41IiBmb250LXdlaWdodD0iYm9sZCIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjMiPmF1dG9yaWRhZCBkZSBlbWlzaW9uICsgcHJvcHVlc3RhczwvdGV4dD4KCiAgPCEtLSBCUkxUIC0+IEZvbmRvICg1JSkgLS0+CiAgPGxpbmUgeDE9IjUwMiIgeTE9IjI1OCIgeDI9IjU2MiIgeTI9IjIxNCIgc3Ryb2tlPSIjOGE2ZDFmIiBzdHJva2Utd2lkdGg9IjIuNSIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+CiAgPHRleHQgeD0iNTYwIiB5PSIyNDYiIGZpbGw9IiM4YTZkMWYiIGZvbnQtc2l6ZT0iMTAiIGZvbnQtd2VpZ2h0PSJib2xkIiBwYWludC1vcmRlcj0ic3Ryb2tlIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMyI+NSUgZGUgY2FkYSBlbWlzaW9uPC90ZXh0PgoKICA8IS0tIEZvbmRvIDwtPiBTdXNjcmlwY2lvbiAoMTAlKSAtLT4KICA8bGluZSB4MT0iNjAwIiB5MT0iMzU4IiB4Mj0iNjAwIiB5Mj0iMjE2IiBzdHJva2U9IiM4YTZkMWYiIHN0cm9rZS13aWR0aD0iMi41IiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KICA8dGV4dCB4PSI2MTIiIHk9IjMwMCIgZmlsbD0iIzhhNmQxZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9ImJvbGQiIHBhaW50LW9yZGVyPSJzdHJva2UiIHN0cm9rZT0iI2ZmZmZmZiIgc3Ryb2tlLXdpZHRoPSIzIj4xMCUgYWwgZm9uZG88L3RleHQ+CgogIDwhLS0gU3VzY3JpcGNpb24gLT4gQlJMVCAoY29icm8pIC0tPgogIDxsaW5lIHgxPSI1MjAiIHkxPSI0MjAiIHgyPSI0OTciIHkyPSIzMzQiIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyLjUiIG1hcmtlci1lbmQ9InVybCgjYXJyKSIvPgogIDx0ZXh0IHg9IjQ1MiIgeT0iMzk4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjkuNSIgZm9udC13ZWlnaHQ9ImJvbGQiIHBhaW50LW9yZGVyPSJzdHJva2UiIHN0cm9rZT0iI2ZmZmZmZiIgc3Ryb2tlLXdpZHRoPSIzIj5jb2JybyBlbiBCUkxUPC90ZXh0PgoKICA8IS0tIE5vdGUgLS0+CiAgPHJlY3QgeD0iNjAiIHk9IjQ2OCIgd2lkdGg9IjcwMCIgaGVpZ2h0PSIyNiIgcng9IjEwIiBmaWxsPSIjZjNlNWFiIi8+CiAgPHRleHQgeD0iNDEwIiB5PSI0ODYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iOS41IiBmb250LXdlaWdodD0iYm9sZCI+UGVuZGllbnRlOiBlbCBFc2Nyb3cgYXVuIG5vIHNlIGNvbmVjdGEgY29uIGVsIFBhZHJvbiDCtyBlbCAxJSBkZSBsb3MgdHJ1ZXF1ZXMgYWwgZm9uZG8gbm8gZXN0YSBpbXBsZW1lbnRhZG88L3RleHQ+Cjwvc3ZnPgo=" alt="Arquitectura Financiera"/><figcaption class="fig-caption">Figura · Arquitectura Financiera</figcaption></figure>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. El padrón de Socios: quién decide y cómo vota</h2>
+<h3 class="sub" id="sub1">3.1 ¿Qué es un Socio?</h3>
+<p>Un <strong>Socio</strong> es un miembro de la comunidad con buena reputación (puntaje alto) que puede:</p>
+<ul><li>Votar la <strong>admisión de Socios nuevos</strong>.</li><li>Votar <strong>propuestas económicas</strong> (emitir moneda, subir el tope).</li><li>Votar en las <strong>disputas de trueques</strong> (ver manual 01).</li></ul>
+<p>La lista de Socios la administra el Owner (el administrador de la plataforma):</p>
+<ul><li><strong>Alta directa</strong>: el Owner puede admitir a alguien como Socio (caso fundacional).</li><li><strong>Baja</strong>: el Owner puede quitar a un Socio.</li></ul>
+<h3 class="sub" id="sub2">3.2 Cómo se admite un Socio nuevo (por votación)</h3>
+<ol><li>El candidato se postula solo (debe tener puntaje ≥ 76, comprobado fuera de la cadena).</li><li>Los Socios votan a favor o en contra.</li><li>Regla: <strong>2 de cada 3 votos a favor</strong> (mayoría cualificada).</li><li>Si se alcanza, el candidato <strong>se admite automáticamente</strong>.</li></ol>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: el requisito del puntaje ≥ 76 se valida fuera de la blockchain; el mecanismo exacto que lo garantiza en el backend está <strong>pendiente de confirmar</strong>.</p></blockquote>
+<h3 class="sub" id="sub3">3.3 Propuestas económicas</h3>
+<p>Las decisiones de dinero se toman por votación:</p>
+<ol><li>El Owner crea la propuesta (por ejemplo: "emitir 50.000 BRLT para un programa").</li><li>Los Socios votan (cada uno, una sola vez por propuesta).</li><li>Al alcanzar <strong>2 de 3 votos a favor</strong>, la propuesta <strong>se ejecuta sola</strong>: el sistema manda la orden a la moneda (emitir) o sube el tope.</li></ol>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: una propuesta sin suficientes votos se queda abierta para siempre (no expira) y no existe "ejecutar después" si ya se aprobó: la ejecución ocurre en el momento en que el último voto alcanza el quórum. Además, solo el Owner puede crear propuestas.</p></blockquote>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. BRLT: la moneda de la plataforma (paso a paso)</h2>
+<h3 class="sub" id="sub4">4.1 Características</h3>
+<ul><li>Es una moneda digital estándar (ERC-20) llamada <strong>BorloTokens</strong>.</li><li>Tiene un <strong>tope de emisión inicial de 1.000.000 BRLT</strong>.</li><li>Para emitir más moneda hace falta una <strong>votación de los Socios</strong> (no puede decidirlo una sola persona).</li><li>Solo el <strong>padrón de Socios</strong> puede dar la orden de emitir (la moneda rechaza órdenes de cualquiera que no sea el padrón).</li></ul>
+<h3 class="sub" id="sub5">4.2 Qué pasa cuando se emite moneda</h3>
+<p>Cuando los Socios aprueban emitir, por ejemplo, 100.000 BRLT:</p>
+<ol><li>La moneda comprueba que la orden viene del padrón. <svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#1a2b4c"><path d="M2.5 8.6 6.4 12.4 13.5 4.2" stroke="#2a9d8f" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></svg></li><li>Comprueba el tope: ¿100.000 caben dentro del máximo? Si no, <strong>se rechaza</strong> con un aviso ("excede el tope").</li><li><strong>El 5 % va a la hucha común</strong> (Fondo de Valor): 5.000 BRLT.</li><li>El resto (95.000 BRLT) va al destinatario de la emisión.</li><li>La emisión queda <strong>registrada</strong> con su propósito y su fecha (transparencia total).</li></ol>
+<blockquote class="ejemplo"><span class="tag">Ejemplo</span><p>Ejemplo cotidiano: el ayuntamiento decide crear "vales" para un programa; automáticamente, el 5 % de los vales impresos se reserva para los gastos del propio programa.</p></blockquote>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5RdWUgcGFzYSBjdWFuZG8gc2UgZW1pdGUgQlJMVDwvdGV4dD4KCiAgPCEtLSBWOiBzb2Npb3MgYXBydWViYW4gLS0+CiAgPHJlY3QgeD0iMjAwIiB5PSI4MCIgd2lkdGg9IjQwMCIgaGVpZ2h0PSI1OCIgcng9IjEzIiBmaWxsPSIjNDhjYWU0Ii8+CiAgPHRleHQgeD0iNDAwIiB5PSIxMDYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkxvcyBTb2Npb3MgYXBydWViYW4gZW1pdGlyIDEwMC4wMDAgQlJMVDwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjEyNSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41Ij5xdW9ydW06IDIgZGUgMyB2b3RvcyBhIGZhdm9yPC90ZXh0PgoKICA8IS0tIE06IG1vbmVkYSAtLT4KICA8cmVjdCB4PSIyMDAiIHk9IjE4MCIgd2lkdGg9IjQwMCIgaGVpZ2h0PSI3MCIgcng9IjEzIiBmaWxsPSIjMmE5ZDhmIi8+CiAgPHRleHQgeD0iNDAwIiB5PSIyMDYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSJib2xkIj5MYSBtb25lZGEgQlJMVCBjb21wcnVlYmE8L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSIyMjUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTEiPjEuIExhIG9yZGVuIHZpZW5lIGRlbCBwYWRyb248L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSIyNDEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTEiPjIuIEVsIHRvcGU6IG5vIGV4Y2VkZSAxLjAwMC4wMDA8L3RleHQ+CgogIDwhLS0gQnJhbmNoIGJveGVzIC0tPgogIDxnPgogICAgPHJlY3QgeD0iNjAiIHk9IjMyMCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIxMDAiIHJ4PSIxMyIgZmlsbD0iI2Q0YWYzNyIvPgogICAgPHRleHQgeD0iMTYwIiB5PSIzNTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkZvbmRvIGRlIFZhbG9yPC90ZXh0PgogICAgPHRleHQgeD0iMTYwIiB5PSIzNzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTEuNSI+NSUgPSA1LjAwMCBCUkxUPC90ZXh0PgogICAgPHRleHQgeD0iMTYwIiB5PSIzOTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAuNSI+bGEgaHVjaGEgY29tdW48L3RleHQ+CiAgPC9nPgogIDxnPgogICAgPHJlY3QgeD0iMzAwIiB5PSIzMjAiIHdpZHRoPSIyMDAiIGhlaWdodD0iMTAwIiByeD0iMTMiIGZpbGw9IiMxYTJiNGMiLz4KICAgIDx0ZXh0IHg9IjQwMCIgeT0iMzUyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5EZXN0aW5hdGFyaW88L3RleHQ+CiAgICA8dGV4dCB4PSI0MDAiIHk9IjM3NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2YzZTVhYiIgZm9udC1zaXplPSIxMS41Ij45NSUgPSA5NS4wMDAgQlJMVDwvdGV4dD4KICAgIDx0ZXh0IHg9IjQwMCIgeT0iMzk0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwLjUiPnJlY2liZSBsYSBlbWlzaW9uPC90ZXh0PgogIDwvZz4KICA8Zz4KICAgIDxyZWN0IHg9IjU0MCIgeT0iMzIwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEwMCIgcng9IjEzIiBmaWxsPSIjZTllNWYwIiBzdHJva2U9IiM4ZDg2YTkiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgICA8dGV4dCB4PSI2NDAiIHk9IjM1MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+U2UgcmVnaXN0cmE8L3RleHQ+CiAgICA8dGV4dCB4PSI2NDAiIHk9IjM3NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMSI+bW9udG8sIHByb3Bvc2l0bzwvdGV4dD4KICAgIDx0ZXh0IHg9IjY0MCIgeT0iMzk0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjExIj55IGZlY2hhPC90ZXh0PgogIDwvZz4KCiAgPCEtLSBBcnJvd3MgLS0+CiAgPGxpbmUgeDE9IjQwMCIgeTE9IjE0MCIgeDI9IjQwMCIgeTI9IjE3NiIgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIuNSIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+CiAgPGcgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIuNSIgZmlsbD0ibm9uZSIgbWFya2VyLWVuZD0idXJsKCNhcnIpIj4KICAgIDxwYXRoIGQ9Ik0gMzAwIDI1MiBMIDE4MCAzMTYiLz4KICAgIDxsaW5lIHgxPSI0MDAiIHkxPSIyNTIiIHgyPSI0MDAiIHkyPSIzMTYiLz4KICAgIDxwYXRoIGQ9Ik0gNTAwIDI1MiBMIDYyMCAzMTYiLz4KICA8L2c+CiAgPHRleHQgeD0iMzMwIiB5PSIxNzYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiIGZvbnQtd2VpZ2h0PSJib2xkIj5vcmRlbiBmaXJtYWRhPC90ZXh0PgogIDx0ZXh0IHg9IjIxNSIgeT0iMjkwIiBmaWxsPSIjOGE2ZDFmIiBmb250LXNpemU9IjEwIiBmb250LXdlaWdodD0iYm9sZCIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjMiPjUlICg1LjAwMCk8L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSIyOTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiIGZvbnQtd2VpZ2h0PSJib2xkIiBwYWludC1vcmRlcj0ic3Ryb2tlIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMyI+OTUlICg5NS4wMDApPC90ZXh0PgogIDx0ZXh0IHg9IjU2NSIgeT0iMjkwIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwIiBmb250LXdlaWdodD0iYm9sZCIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjMiPnJlZ2lzdHJvPC90ZXh0PgoKICA8IS0tIElmIHJlamVjdGVkIC0tPgogIDxyZWN0IHg9IjIwMCIgeT0iNDQ4IiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjM2IiByeD0iMTAiIGZpbGw9IiNlNjM5NDYiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjQ3MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMSIgZm9udC13ZWlnaHQ9ImJvbGQiPlNpIDEwMC4wMDAgbm8gY2FiZW4gZW4gZWwgdG9wZSwgbGEgZW1pc2lvbiBzZSByZWNoYXphICgiZXhjZWRlIGVsIHRvcGUiKTwvdGV4dD4KPC9zdmc+Cg==" alt="Emision Brlt"/><figcaption class="fig-caption">Figura · Emision Brlt</figcaption></figure>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. El Fondo de Valor: la hucha común</h2>
+<p>El <strong>Fondo de Valor</strong> guarda BRLT para pagar los <strong>gastos de operación</strong>: servidores (hosting), gas de la red, etc. Se nutre de <strong>tres fuentes</strong>:</p>
+<div class="table-wrap"><table><thead><tr><th>Fuente</th><th>Porcentaje</th><th>¿De dónde sale?</th><th>¿Funciona hoy?</th></tr></thead><tbody><tr><td>1. Trueques completados</td><td><strong>1 %</strong></td><td>De cada trueque que termina bien</td><td><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar (sin implementar)</td></tr><tr><td>2. Suscripciones de empresa</td><td><strong>10 %</strong></td><td>De cada ciclo mensual de las empresas</td><td>Sí, funciona</td></tr><tr><td>3. Emisión de BRLT</td><td><strong>5 %</strong></td><td>De cada emisión aprobada</td><td>Sí, funciona</td></tr></tbody></table></div>
+<p>Cómo entran los fondos (fuentes 2 y 3):</p>
+<ul><li><strong>Por emisión</strong>: la moneda mintea el 5 % directamente al fondo y avisa.</li><li><strong>Por suscripción</strong>: la empresa bloquea BRLT; cada mes el sistema mueve el 10 % hacia el fondo (con tu aprobación previa automática).</li></ul>
+<p>Cómo salen los fondos:</p>
+<ul><li>Solo el <strong>Owner</strong> puede retirar BRLT del fondo, y solo <strong>para gastos de operación</strong> de la plataforma. Cada retiro queda registrado.</li></ul>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: la <strong>fuente 1 (el 1 % de los trueques)</strong> está declarada en el diseño, pero <strong>ningún contrato la ejecuta todavía</strong>: ni el Escrow ni el Fondo tienen la función que calcule y deposite ese 1 %. Se espera en ciclos posteriores. Además, el depósito voluntario siempre se registra como "suscripción" (fuente 2) aunque lo haga otra fuente autorizada.</p></blockquote>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. Suscripción de empresas: pagar bloqueando (paso a paso)</h2>
+<p>Las empresas <strong>no pagan cada mes con una transferencia nueva</strong>. En su lugar, bloquean su pago por adelantado. Se llama <strong>staking bloqueado</strong>: dejas el dinero "aparcado" y el sistema solo cobra lo que corresponde.</p>
+<h3 class="sub" id="sub6">6.1 Suscribirse (el primer mes)</h3>
+<ol><li>La empresa elige el plan (el plan base son <strong>100 BRLT al mes</strong>).</li><li>La empresa <strong>aprueba</strong> que el contrato mueva BRLT (autorización única).</li><li>El contrato <strong>transfiere los 100 BRLT</strong> del primer ciclo a su casillero y los <strong>retiene 30 días</strong>.</li><li>La empresa queda <strong>ACTIVA</strong>. Ya no tendrá que firmar cada mes.</li></ol>
+<blockquote class="ejemplo"><span class="tag">Ejemplo</span><p>Ejemplo cotidiano: pagas el gimnasio dejando el dinero en una taquilla; el gimnasio cobra de ahí cada mes sin que tengas que ir a pagar.</p></blockquote>
+<h3 class="sub" id="sub7">6.2 Cada mes (el ciclo de 30 días)</h3>
+<p>Cuando vencen los 30 días, un vigilante del sistema <strong>recolecta el ciclo</strong>:</p>
+<ol><li>Comprueba que han pasado los 30 días (si no, "ciclo no vencido").</li><li>Del mes (100 BRLT): <strong>10 % va al Fondo de Valor</strong> (10 BRLT).</li><li>El <strong>90 % restante se queda en el contrato</strong> como fondos de operación de la plataforma.</li><li>Se reinicia el contador del nuevo ciclo (otros 30 días).</li></ol>
+<p>Puntos importantes (comportamiento real del código):</p>
+<ul><li>La empresa <strong>no vuelve a aprobar</strong> por cada mes: la autorización inicial basta.</li><li>El bloqueo original <strong>no se gasta ni se repone</strong> por ciclo: el contrato solo mueve el 10 % mensual hacia el fondo.</li><li><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: el diseño dice que "si el saldo del contrato no cubre el próximo ciclo, la suscripción pasa a IRREGULAR", pero <strong>esa comprobación no está implementada</strong>: no hay transición automática a IRREGULAR. El único camino a IRREGULAR hoy es la llamada manual del Owner.</li></ul>
+<h3 class="sub" id="sub8">6.3 Cancelar la suscripción</h3>
+<p>La empresa puede cancelar en cualquier momento:</p>
+<ol><li>Solo si está ACTIVA.</li><li>El contrato <strong>devuelve los 100 BRLT bloqueados</strong> (el monto completo).</li><li>La empresa pasa a CANCELADA.</li></ol>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: la devolución entrega el monto completo <strong>sin descontar los días ya usados</strong> del ciclo (sin prorrateo). Además, si los ciclos previos ya vaciaron el casillero (10 % × varios meses hacia el fondo), la devolución podría fallar por falta de saldo. La política exacta de devolución está <strong>pendiente de confirmar</strong>.</p></blockquote>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5DaWNsbyBkZSBzdXNjcmlwY2lvbiBkZSBlbXByZXNhICgzMCBkaWFzKTwvdGV4dD4KCiAgPCEtLSBTVUIgLS0+CiAgPHJlY3QgeD0iMjQwIiB5PSI3OCIgd2lkdGg9IjMyMCIgaGVpZ2h0PSI2MCIgcng9IjEzIiBmaWxsPSIjNDhjYWU0Ii8+CiAgPHRleHQgeD0iNDAwIiB5PSIxMDIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPjEuIExhIGVtcHJlc2Egc2Ugc3VzY3JpYmU8L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSIxMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAuNSI+YmxvcXVlYSAxMDAgQlJMVCAoMzAgZGlhcykgwrcgQUNUSVZBPC90ZXh0PgoKICA8IS0tIENhbmNlbGFyIC0tPgogIDxyZWN0IHg9IjYyMCIgeT0iODAiIHdpZHRoPSIxNTAiIGhlaWdodD0iNTIiIHJ4PSIxMiIgZmlsbD0iI2U5ZTVmMCIgc3Ryb2tlPSIjOGQ4NmE5IiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDx0ZXh0IHg9IjY5NSIgeT0iMTAxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+Q2FuY2VsYXI8L3RleHQ+CiAgPHRleHQgeD0iNjk1IiB5PSIxMTciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iOS41Ij5zaWVtcHJlIHF1ZSBlc3RlIEFDVElWQTwvdGV4dD4KICA8cGF0aCBkPSJNIDU2MiAxMDYgTCA2MTYgMTA2IiBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+CiAgPHRleHQgeD0iNTkwIiB5PSI5OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSI5Ij5sYSBlbXByZXNhIGNhbmNlbGE8L3RleHQ+CiAgPHJlY3QgeD0iNjIwIiB5PSIxNTAiIHdpZHRoPSIxNTAiIGhlaWdodD0iNDQiIHJ4PSIxMiIgZmlsbD0iI2UyZThmMCIvPgogIDx0ZXh0IHg9IjY5NSIgeT0iMTY4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwIiBmb250LXdlaWdodD0iYm9sZCI+U2UgZGV2dWVsdmVuIGxvczwvdGV4dD4KICA8dGV4dCB4PSI2OTUiIHk9IjE4NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMCI+MTAwIEJSTFQgwrcgQ0FOQ0VMQURBPC90ZXh0PgogIDxsaW5lIHgxPSI2OTUiIHkxPSIxMzQiIHgyPSI2OTUiIHkyPSIxNDYiIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KCiAgPCEtLSBNRVMgLS0+CiAgPHJlY3QgeD0iMjQwIiB5PSIxNzUiIHdpZHRoPSIzMjAiIGhlaWdodD0iNTgiIHJ4PSIxMyIgZmlsbD0iIzJhOWQ4ZiIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj4yLiBWZW5jZSBlbCBtZXM8L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSIyMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAuNSI+ZWwgdmlnaWxhbnRlIHJlY29sZWN0YSBlbCBjaWNsbzwvdGV4dD4KCiAgPCEtLSBTcGxpdCAtLT4KICA8Zz4KICAgIDxyZWN0IHg9IjYwIiB5PSIyODAiIHdpZHRoPSIzMDAiIGhlaWdodD0iODYiIHJ4PSIxMyIgZmlsbD0iI2Q0YWYzNyIvPgogICAgPHRleHQgeD0iMjEwIiB5PSIzMDYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPjNhLiAxMCUgPSAxMCBCUkxUPC90ZXh0PgogICAgPHRleHQgeD0iMjEwIiB5PSIzMjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTEiPnZhbiBhbCBGb25kbyBkZSBWYWxvcjwvdGV4dD4KICAgIDx0ZXh0IHg9IjIxMCIgeT0iMzQ2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwLjUiPihodWNoYSBjb211bik8L3RleHQ+CiAgPC9nPgogIDxnPgogICAgPHJlY3QgeD0iNDQwIiB5PSIyODAiIHdpZHRoPSIzMDAiIGhlaWdodD0iODYiIHJ4PSIxMyIgZmlsbD0iIzFhMmI0YyIvPgogICAgPHRleHQgeD0iNTkwIiB5PSIzMDYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPjNiLiA5MCUgPSA5MCBCUkxUPC90ZXh0PgogICAgPHRleHQgeD0iNTkwIiB5PSIzMjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmM2U1YWIiIGZvbnQtc2l6ZT0iMTEiPnNlIHF1ZWRhbiBlbiBlbCBjb250cmF0bzwvdGV4dD4KICAgIDx0ZXh0IHg9IjU5MCIgeT0iMzQ2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwLjUiPmZvbmRvcyBkZSBvcGVyYWNpb248L3RleHQ+CiAgPC9nPgoKICA8IS0tIFJFIC0tPgogIDxyZWN0IHg9IjI0MCIgeT0iNDA1IiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjUwIiByeD0iMTMiIGZpbGw9IiMyYTlkOGYiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjQyNyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+NC4gU2UgcmVpbmljaWEgZWwgY2ljbG88L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSI0NDQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAuNSI+b3Ryb3MgMzAgZGlhcywgc2luIG51ZXZhIGZpcm1hPC90ZXh0PgoKICA8IS0tIEFycm93cyAtLT4KICA8bGluZSB4MT0iNDAwIiB5MT0iMTQwIiB4Mj0iNDAwIiB5Mj0iMTcxIiBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMi41IiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KICA8ZyBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMi41IiBmaWxsPSJub25lIiBtYXJrZXItZW5kPSJ1cmwoI2FycikiPgogICAgPHBhdGggZD0iTSAzMjAgMjM1IEwgMjM1IDI3NiIvPgogICAgPHBhdGggZD0iTSA0ODAgMjM1IEwgNTY1IDI3NiIvPgogICAgPHBhdGggZD0iTSAyMTAgMzY4IEwgMzMwIDQwMSIvPgogICAgPHBhdGggZD0iTSA1OTAgMzY4IEwgNDcwIDQwMSIvPgogICAgPCEtLSBsb29wIGJhY2sgUkUgLT4gTUVTIC0tPgogICAgPHBhdGggZD0iTSAyNDAgNDMwIEwgNDAgNDMwIEwgNDAgMjA0IEwgMjM2IDIwNCIvPgogIDwvZz4KICA8dGV4dCB4PSIyMTAiIHk9IjI2MiIgZmlsbD0iIzhhNmQxZiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9ImJvbGQiIHBhaW50LW9yZGVyPSJzdHJva2UiIHN0cm9rZT0iI2ZmZmZmZiIgc3Ryb2tlLXdpZHRoPSIzIj4xMCUgYWwgZm9uZG88L3RleHQ+CiAgPHRleHQgeD0iNTIwIiB5PSIyNjIiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiIGZvbnQtd2VpZ2h0PSJib2xkIiBwYWludC1vcmRlcj0ic3Ryb2tlIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMyI+OTAlIG9wZXJhY2lvbjwvdGV4dD4KICA8dGV4dCB4PSIzMDAiIHk9IjQ3MCIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSI5LjUiPm51ZXZvIGNpY2xvICh2dWVsdmUgYWwgcGFzbyAyKTwvdGV4dD4KCiAgPCEtLSBOb3RlIC0tPgogIDxyZWN0IHg9IjYwIiB5PSI0NzgiIHdpZHRoPSI2ODAiIGhlaWdodD0iMTgiIHJ4PSI4IiBmaWxsPSIjZjNlNWFiIi8+CiAgPHRleHQgeD0iNDAwIiB5PSI0OTEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iOC41IiBmb250LXdlaWdodD0iYm9sZCI+UGVuZGllbnRlOiBlbCBwYXNvIGEgSVJSRUdVTEFSIG5vIHNlIGRldGVjdGEgYXV0b21hdGljYW1lbnRlIMK3IGxhIGRldm9sdWNpb24gbm8gZGVzY3VlbnRhIGRpYXMgdXNhZG9zPC90ZXh0Pgo8L3N2Zz4K" alt="Ciclo Suscripcion"/><figcaption class="fig-caption">Figura · Ciclo Suscripcion</figcaption></figure>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. Orden de despliegue (cómo se monta todo)</h2>
+<p>Al desplegar el sistema, el guion crea las piezas en este orden:</p>
+<ol><li>La caja fuerte de trueques (Escrow).</li><li>La fábrica de cuentas.</li><li>Monedas y NFT de prueba.</li><li><strong>BRLT → Fondo de Valor → Padrón de Socios → Suscripción de empresa</strong>.</li><li>Conecta las piezas entre sí (las seis conexiones "enchufe").</li></ol>
+<blockquote class="info"><span class="tag">Nota</span><p>El Owner es la cuenta 0 del entorno de pruebas (la "cuenta principal").</p></blockquote>
+</section>
+<section class="seccion" id="s8"><h2 class="seccion">8. Qué falta confirmar (resumen)</h2>
+<ol><li>El <strong>1 %</strong> de los trueques completados hacia el fondo no tiene implementación en ningún contrato → <strong>pendiente de confirmar</strong>.</li><li>El depósito voluntario en el fondo se registra siempre como fuente 2 (suscripción), aunque venga de otra fuente → observación.</li><li>La recolección mensual no comprueba saldo ni detecta fallos repetidos; los contadores de fallos están declarados pero sin uso → <strong>pendiente de confirmar</strong>.</li><li>La cancelación de suscripción devuelve el monto íntegro sin prorrateo y puede fallar si el casillero quedó vacío → <strong>pendiente de confirmar</strong>.</li><li>Las propuestas económicas sin quórum no expiran y no hay ejecución diferida; solo el Owner crea propuestas → <strong>pendiente de confirmar</strong>.</li><li>El puntaje ≥ 76 para ser Socio se valida fuera de la cadena → <strong>pendiente de confirmar</strong>.</li><li>Los tests (319 líneas en <code>Ciclo3.t.sol</code>) cubren: admisión por quórum, emisión con tope y 5 % al fondo, suscripción con 10 % al fondo y porcentajes configurables.</li></ol>
+</section>
+<section class="seccion" id="s9"><h2 class="seccion">9. Glosario de este manual</h2>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Significado</th></tr></thead><tbody><tr><td><strong>BRLT</strong></td><td>La moneda digital de la plataforma (BorloTokens)</td></tr><tr><td><strong>Stablecoin</strong></td><td>Moneda digital pensada para valer siempre lo mismo</td></tr><tr><td><strong>Fondo de Valor</strong></td><td>La hucha común que paga los gastos de operación</td></tr><tr><td><strong>Padrón de Socios</strong></td><td>La lista oficial de Socios de la comunidad</td></tr><tr><td><strong>Quórum</strong></td><td>Votos mínimos para decidir (2 de 3)</td></tr><tr><td><strong>Tope de emisión</strong></td><td>Límite máximo de moneda que puede existir</td></tr><tr><td><strong>Emisión</strong></td><td>Crear moneda nueva</td></tr><tr><td><strong>Staking bloqueado</strong></td><td>Dejar dinero retenido por adelantado</td></tr><tr><td><strong>Ciclo</strong></td><td>Período de cobro (30 días)</td></tr><tr><td><strong>Prorrateo</strong></td><td>Descontar solo la parte usada del tiempo</td></tr><tr><td><strong>Socio</strong></td><td>Miembro de confianza con derecho a voto</td></tr><tr><td><strong>ERC-20</strong></td><td>Estándar común de las monedas digitales</td></tr></tbody></table></div>
+<p>¡Listo! Ya entiendes la economía de TrueKeate. El siguiente manual explica cómo el sistema anota cada movimiento que ocurre en la blockchain.</p>
+</section>
+</main>
+
+</body>
+</html>

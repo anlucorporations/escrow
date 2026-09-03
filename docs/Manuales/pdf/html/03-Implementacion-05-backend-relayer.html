@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · El mensajero (relayer): quién paga el gas y qué hacer si falla</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">03 · Implementación</div>
+    <h1>El mensajero (relayer): quién paga el gas y qué hacer si falla</h1>
+    <div class="intro">Versión en lenguaje sencillo del manual técnico del <strong>relayer EIP-712</strong> (el "mensajero" de TrueKeate). Aquí contamos quién paga la "gasolina" de tus operaciones, cómo se protege el sistema de abusos y qué pasa si el mensajero falla.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>03-Implementacion/05-backend-relayer.md</b></span>
+      <span>Edición: <b>3 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/03-Implementacion/05-backend-relayer</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Implementación · Implementacion — El mensajero (relayer): quién paga el gas y qué hacer si falla</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>Quién paga el gas (y quién no)</span></a></li><li><a href="#s3"><span class="tnum">3</span><span>Las 5 protecciones del mensajero (paso a paso)</span></a><div class="subs"><a href="#sub1">Protección 1: ¿Vienes de la red correcta?</a><br><a href="#sub2">Protección 2: ¿Es una firma nueva? (número de un solo uso)</a><br><a href="#sub3">Protección 3: ¿Estás en la lista de permitidos? (verificado)</a><br><a href="#sub4">Protección 4: Límite diario de 20 operaciones</a><br><a href="#sub5">Protección 5: Bloqueo tras fallos repetidos</a></div></li><li><a href="#s4"><span class="tnum">4</span><span>Qué pasa cuando el mensajero envía la operación</span></a><div class="subs"><a href="#sub6">4.1 Éxito</a><br><a href="#sub7">4.2 Fallo en la cadena</a></div></li><li><a href="#s5"><span class="tnum">5</span><span>El termómetro del mensajero (salud y métricas)</span></a></li><li><a href="#s6"><span class="tnum">6</span><span>Si el mensajero falla: el plan B (modo degradado)</span></a></li><li><a href="#s7"><span class="tnum">7</span><span>Los datos que recuerda el mensajero</span></a></li><li><a href="#s8"><span class="tnum">8</span><span>Qué falta confirmar (resumen)</span></a></li><li><a href="#s9"><span class="tnum">9</span><span>Glosario de este manual</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos</h2>
+<p>Hacer una operación en la blockchain cuesta <strong>gas</strong> (una pequeña comisión en cripto). En TrueKeate, si eres <strong>particular</strong>, <strong>no pagas ese gas</strong>: lo paga la plataforma por ti. El encargado es el <strong>mensajero</strong> (relayer).</p>
+<p>Cómo funciona en 5 minutos:</p>
+<ol><li>Tú quieres hacer algo: custodiar un objeto, firmar una recepción...</li><li>La app te pide <strong>firmar</strong> la petición (con MetaMask u otra billetera).</li><li>Tú firmas <strong>sin pagar nada</strong>.</li><li>El mensajero recoge tu firma, la lleva a la blockchain y <strong>paga el gas</strong>.</li><li>Tu cuenta inteligente comprueba tu firma y ejecuta la acción.</li></ol>
+<p>El mensajero cuida el dinero de la plataforma con <strong>5 protecciones</strong>:</p>
+<ol><li>Comprueba que la petición viene de la <strong>red correcta</strong>.</li><li>Comprueba que <strong>no sea una firma repetida</strong> (número de un solo uso).</li><li>Solo ayuda a usuarios <strong>verificados</strong> (lista de permitidos).</li><li>Límite de <strong>20 ayudas por persona y día</strong>.</li><li>Si alguien provoca <strong>3 fallos en 10 minutos</strong>, queda <strong>bloqueado 1 hora</strong>.</li></ol>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. Quién paga el gas (y quién no)</h2>
+<div class="table-wrap"><table><thead><tr><th>Tipo de usuario</th><th>¿Quién paga el gas?</th><th>Por qué</th></tr></thead><tbody><tr><td><strong>Particular</strong> (tú)</td><td>La plataforma (el mensajero)</td><td>Para que truequear sea gratis y fácil (sin gas)</td></tr><tr><td><strong>Empresa</strong></td><td>La propia empresa</td><td>Las empresas ya operan con sus propias cuentas</td></tr></tbody></table></div>
+<blockquote class="info"><span class="tag">Nota</span><p>Las empresas envían sus transacciones <strong>directamente</strong> a la blockchain, pagando su propio gas. El mensajero solo se ocupa de los particulares.</p></blockquote>
+<p>El mensajero paga desde una <strong>billetera propia</strong> (la "cuenta 1" del entorno de pruebas). Esa billetera necesita tener saldo: si baja de <strong>0,5 ETH</strong>, el sistema <strong>avisa al Owner</strong> para que la recargue y los trueques no se queden sin gasolina.</p>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5FbCByZWxheWVyOiBtZW5zYWplcm8gcXVlIHBhZ2EgZWwgZ2FzPC90ZXh0PgoKICA8IS0tIEFjdG9ycyAtLT4KICA8Zz4KICAgIDxyZWN0IHg9IjQwIiB5PSI4MCIgd2lkdGg9IjE1MCIgaGVpZ2h0PSI0NiIgcng9IjEyIiBmaWxsPSIjNDhjYWU0Ii8+CiAgICA8dGV4dCB4PSIxMTUiIHk9IjEwMSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+VHUgKHBhcnRpY3VsYXIpPC90ZXh0PgogICAgPHRleHQgeD0iMTE1IiB5PSIxMTciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iOS41Ij5zaW4gcGFnYXIgZ2FzPC90ZXh0PgogIDwvZz4KICA8Zz4KICAgIDxyZWN0IHg9IjI0MCIgeT0iODAiIHdpZHRoPSIxNTAiIGhlaWdodD0iNDYiIHJ4PSIxMiIgZmlsbD0iIzJhOWQ4ZiIvPgogICAgPHRleHQgeD0iMzE1IiB5PSIxMDEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkxhIGFwcDwvdGV4dD4KICAgIDx0ZXh0IHg9IjMxNSIgeT0iMTE3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjkuNSI+ZnJvbnRlbmQ8L3RleHQ+CiAgPC9nPgogIDxnPgogICAgPHJlY3QgeD0iNDUwIiB5PSI4MCIgd2lkdGg9IjE2MCIgaGVpZ2h0PSI0NiIgcng9IjEyIiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8dGV4dCB4PSI1MzAiIHk9IjEwMSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiPkVsIG1lbnNhamVybzwvdGV4dD4KICAgIDx0ZXh0IHg9IjUzMCIgeT0iMTE3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZjNlNWFiIiBmb250LXNpemU9IjkuNSI+cmVsYXllciDCtyBwYWdhIGVsIGdhczwvdGV4dD4KICA8L2c+CiAgPGc+CiAgICA8cmVjdCB4PSI2ODAiIHk9IjgwIiB3aWR0aD0iOTAiIGhlaWdodD0iNDYiIHJ4PSIxMiIgZmlsbD0iI2U2Mzk0NiIvPgogICAgPHRleHQgeD0iNzI1IiB5PSIxMDEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSJib2xkIj5CbG9ja2NoYWluPC90ZXh0PgogICAgPHRleHQgeD0iNzI1IiB5PSIxMTciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iOSI+U21hcnRBY2NvdW50PC90ZXh0PgogIDwvZz4KCiAgPCEtLSBMaWZlbGluZXMgLS0+CiAgPGxpbmUgeDE9IjExNSIgeTE9IjEyNiIgeDI9IjExNSIgeTI9IjQyMCIgc3Ryb2tlPSIjOTRhM2I4IiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iNiA0Ii8+CiAgPGxpbmUgeDE9IjMxNSIgeTE9IjEyNiIgeDI9IjMxNSIgeTI9IjQyMCIgc3Ryb2tlPSIjOTRhM2I4IiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iNiA0Ii8+CiAgPGxpbmUgeDE9IjUzMCIgeTE9IjEyNiIgeDI9IjUzMCIgeTI9IjQyMCIgc3Ryb2tlPSIjOTRhM2I4IiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iNiA0Ii8+CiAgPGxpbmUgeDE9IjcyNSIgeTE9IjEyNiIgeDI9IjcyNSIgeTI9IjQyMCIgc3Ryb2tlPSIjOTRhM2I4IiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWRhc2hhcnJheT0iNiA0Ii8+CgogIDwhLS0gU3RlcHMgLS0+CiAgPGxpbmUgeDE9IjExNyIgeTE9IjE1MCIgeDI9IjMxMyIgeTI9IjE1MCIgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyKSIvPgogIDx0ZXh0IHg9IjIxNSIgeT0iMTQzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwIj4xLiAiUXVpZXJvIGN1c3RvZGlhciBtaSBvYmpldG8iPC90ZXh0PgoKICA8bGluZSB4MT0iMzEzIiB5MT0iMTgwIiB4Mj0iMTE5IiB5Mj0iMTgwIiBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+CiAgPHRleHQgeD0iMjE2IiB5PSIxNzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiPjIuICJGaXJtYSBlc3RhIHBldGljaW9uIjwvdGV4dD4KCiAgPGxpbmUgeDE9IjExNyIgeTE9IjIxMCIgeDI9IjMxMyIgeTI9IjIxMCIgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjYgMyIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+CiAgPHRleHQgeD0iMjE1IiB5PSIyMDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiPjMuIEZpcm1hIGxpc3RhIChzaW4gcGFnYXIgbmFkYSk8L3RleHQ+CgogIDxsaW5lIHgxPSIzMTciIHkxPSIyNDAiIHgyPSI1MjgiIHkyPSIyNDAiIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KICA8dGV4dCB4PSI0MjIiIHk9IjIzMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMCI+NC4gIkxsZXZhIGVzdGEgcGV0aWNpb24sIHBvciBmYXZvciI8L3RleHQ+CgogIDwhLS0gUHJvdGVjY2lvbmVzIGNhcmQgLS0+CiAgPHJlY3QgeD0iMzMwIiB5PSIyNTYiIHdpZHRoPSI0MDAiIGhlaWdodD0iNzYiIHJ4PSIxMiIgZmlsbD0iI2YzZTVhYiIvPgogIDx0ZXh0IHg9IjUzMCIgeT0iMjc4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+NS4gUHJvdGVjY2lvbmVzIChhbnRlcyBkZSBmaXJtYXIpOjwvdGV4dD4KICA8dGV4dCB4PSI1MzAiIHk9IjI5NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41Ij5yZWQgY29ycmVjdGEgwrcgZmlybWEgbnVldmEgKG5vbmNlKSDCtyB1c3VhcmlvIHZlcmlmaWNhZG88L3RleHQ+CiAgPHRleHQgeD0iNTMwIiB5PSIzMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAuNSI+bGltaXRlIGRlIDIwIHBvciBkaWEgwrcgc2luIGJsb3F1ZW8gYWN0aXZvPC90ZXh0PgogIDx0ZXh0IHg9IjUzMCIgeT0iMzI4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwLjUiPjMgZmFsbG9zIGVuIDEwIG1pbiA9IGJsb3F1ZW8gZGUgMSBob3JhPC90ZXh0PgoKICA8bGluZSB4MT0iNTMyIiB5MT0iMjQwIiB4Mj0iNTMyIiB5Mj0iMjU0IiBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMS41Ii8+CgogIDxsaW5lIHgxPSI1MzIiIHkxPSIzMzQiIHgyPSI3MjMiIHkyPSIzMzQiIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyLjUiIG1hcmtlci1lbmQ9InVybCgjYXJyKSIvPgogIDx0ZXh0IHg9IjYyNyIgeT0iMzI3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj42LiBFbnZpYSB5IFBBR0EgZWwgZ2FzPC90ZXh0PgoKICA8bGluZSB4MT0iNzIzIiB5MT0iMzY0IiB4Mj0iNTM0IiB5Mj0iMzY0IiBzdHJva2U9IiMyYTlkOGYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNiAzIiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KICA8dGV4dCB4PSI2MjkiIHk9IjM1NyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzJhOWQ4ZiIgZm9udC1zaXplPSIxMC41IiBmb250LXdlaWdodD0iYm9sZCI+Ny4gSGVjaG8gT0sgKG8gZXJyb3IpPC90ZXh0PgoKICA8bGluZSB4MT0iNTMwIiB5MT0iMzk0IiB4Mj0iMzE3IiB5Mj0iMzk0IiBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+CiAgPHRleHQgeD0iNDI0IiB5PSIzODciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiPlJlc3VsdGFkbzwvdGV4dD4KCiAgPCEtLSBCb3R0b20gLS0+CiAgPHJlY3QgeD0iMTUwIiB5PSI0MzAiIHdpZHRoPSI1MDAiIGhlaWdodD0iNTIiIHJ4PSIxMiIgZmlsbD0iIzBhMTEyOCIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iNDUxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZjNlNWFiIiBmb250LXNpemU9IjExLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5FbCBtZW5zYWplcm8gcGFnYSBkZXNkZSBzdSBiaWxsZXRlcmEgKGN1ZW50YSAxKTwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjQ2OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMC41Ij5zaSBlbCBzYWxkbyBiYWphIGRlIDAsNSBFVEggYXZpc2EgYWwgT3duZXIgcGFyYSByZWNhcmdhcjwvdGV4dD4KPC9zdmc+Cg==" alt="Relayer Meta Tx"/><figcaption class="fig-caption">Figura · Relayer Meta Tx</figcaption></figure>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. Las 5 protecciones del mensajero (paso a paso)</h2>
+<h3 class="sub" id="sub1">Protección 1: ¿Vienes de la red correcta?</h3>
+<p>Cada petición firmada menciona <strong>a qué red</strong> pertenece (por ejemplo, la red de pruebas 31337). Si alguien intenta usar una firma de otra red, se rechaza: "cadena incorrecta".</p>
+<blockquote class="ejemplo"><span class="tag">Ejemplo</span><p>Ejemplo: un cheque emitido en un banco de otro país no se puede cobrar en este banco.</p></blockquote>
+<h3 class="sub" id="sub2">Protección 2: ¿Es una firma nueva? (número de un solo uso)</h3>
+<p>Cada petición lleva un <strong>número de orden</strong> (nonce). El mensajero recuerda los números ya usados:</p>
+<ul><li>Si llega una petición con un número <strong>antiguo o repetido</strong>, se rechaza (anti-replay): "esta firma ya se usó".</li><li>Así, una firma robada <strong>no sirve para repetir</strong> la operación.</li></ul>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: la comprobación del número se hace en un registro local del mensajero (en memoria). La validación estricta contra el número consumido en tu cuenta inteligente de la blockchain está prevista en el diseño pero <strong>no implementada</strong> → <strong>pendiente de confirmar</strong>.</p></blockquote>
+<h3 class="sub" id="sub3">Protección 3: ¿Estás en la lista de permitidos? (verificado)</h3>
+<p>El mensajero comprueba <strong>en la blockchain</strong> si tu cuenta está verificada:</p>
+<ol><li>Busca tu cuenta inteligente en la fábrica de cuentas.</li><li>Lee tu estado de verificación (INSCRITO, VERIFICADO o CERTIFICADO).</li><li>Si estás solo <strong>INSCRITO</strong> (recién registrado), te rechaza: "signer no verificado". Debes subir al menos a <strong>VERIFICADO</strong> para operar.</li></ol>
+<blockquote class="ejemplo"><span class="tag">Ejemplo</span><p>Ejemplo: el mensajero es como un repartidor que solo entrega paquetes a personas con identificación comprobada.</p></blockquote>
+<h3 class="sub" id="sub4">Protección 4: Límite diario de 20 operaciones</h3>
+<p>El mensajero cuenta cuántas veces ayuda a cada persona <strong>al día</strong>:</p>
+<ul><li>Máximo <strong>20 meta-operaciones por persona y día</strong>.</li><li>Al llegar a 20, te avisa: "límite diario superado, vuelve mañana".</li></ul>
+<p>Es una medida anti-abuso: evita que alguien use el mensajero (que paga el gas) para miles de operaciones sin coste.</p>
+<h3 class="sub" id="sub5">Protección 5: Bloqueo tras fallos repetidos</h3>
+<p>Si una operación <strong>falla en la blockchain</strong> (por ejemplo, tu firma no era válida), se anota el fallo:</p>
+<ul><li><strong>3 fallos en 10 minutos</strong> → el mensajero te <strong>bloquea 1 hora</strong>.</li><li>Pasada la hora, puedes volver a intentarlo.</li></ul>
+<blockquote class="info"><span class="tag">Nota</span><p>Los rechazos de las protecciones 1-4 (red, firma repetida, no verificado, límite) <strong>no cuentan</strong> como fallos de este mecanismo: solo cuentan los fallos reales en la cadena.</p></blockquote>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5MYXMgNSBwcm90ZWNjaW9uZXMgZGVsIG1lbnNhamVybzwvdGV4dD4KCiAgPCEtLSBTdGFydCAtLT4KICA8cmVjdCB4PSI4MCIgeT0iODAiIHdpZHRoPSIyODAiIGhlaWdodD0iNDgiIHJ4PSIxMiIgZmlsbD0iIzQ4Y2FlNCIvPgogIDx0ZXh0IHg9IjIyMCIgeT0iMTA5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5MbGVnYSB1bmEgcGV0aWNpb24gZmlybWFkYTwvdGV4dD4KCiAgPCEtLSBQMSAtLT4KICA8cmVjdCB4PSI4MCIgeT0iMTUwIiB3aWR0aD0iMjgwIiBoZWlnaHQ9IjQ2IiByeD0iMTIiIGZpbGw9IiNmM2U1YWIiIHN0cm9rZT0iI2M1YTA2NSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8dGV4dCB4PSIyMjAiIHk9IjE3OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMS41IiBmb250LXdlaWdodD0iYm9sZCI+MS4gUmVkIGNvcnJlY3RhPzwvdGV4dD4KICA8IS0tIFAyIC0tPgogIDxyZWN0IHg9IjgwIiB5PSIyMTAiIHdpZHRoPSIyODAiIGhlaWdodD0iNDYiIHJ4PSIxMiIgZmlsbD0iI2YzZTVhYiIgc3Ryb2tlPSIjYzVhMDY1IiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDx0ZXh0IHg9IjIyMCIgeT0iMjM4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjExLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj4yLiBGaXJtYSBudWV2YSAobm9uY2UpPzwvdGV4dD4KICA8IS0tIFAzIC0tPgogIDxyZWN0IHg9IjgwIiB5PSIyNzAiIHdpZHRoPSIyODAiIGhlaWdodD0iNDYiIHJ4PSIxMiIgZmlsbD0iI2YzZTVhYiIgc3Ryb2tlPSIjYzVhMDY1IiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDx0ZXh0IHg9IjIyMCIgeT0iMjk4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjExLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj4zLiBVc3VhcmlvIFZFUklGSUNBRE8/PC90ZXh0PgogIDwhLS0gUDQgLS0+CiAgPHJlY3QgeD0iODAiIHk9IjMzMCIgd2lkdGg9IjI4MCIgaGVpZ2h0PSI0NiIgcng9IjEyIiBmaWxsPSIjZjNlNWFiIiBzdHJva2U9IiNjNWEwNjUiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iMjIwIiB5PSIzNTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTEuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPjQuIE1lbm9zIGRlIDIwIGhveT88L3RleHQ+CiAgPCEtLSBQNSAtLT4KICA8cmVjdCB4PSI4MCIgeT0iMzkwIiB3aWR0aD0iMjgwIiBoZWlnaHQ9IjQ2IiByeD0iMTIiIGZpbGw9IiNmM2U1YWIiIHN0cm9rZT0iI2M1YTA2NSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8dGV4dCB4PSIyMjAiIHk9IjQxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMS41IiBmb250LXdlaWdodD0iYm9sZCI+NS4gU2luIGJsb3F1ZW8gYWN0aXZvPzwvdGV4dD4KCiAgPCEtLSBWZXJ0aWNhbCBwYXNzIGFycm93cyAtLT4KICA8ZyBzdHJva2U9IiMyYTlkOGYiIHN0cm9rZS13aWR0aD0iMyIgbWFya2VyLWVuZD0idXJsKCNhcnIpIj4KICAgIDxsaW5lIHgxPSIyMjAiIHkxPSIxMzAiIHgyPSIyMjAiIHkyPSIxNDYiLz4KICAgIDxsaW5lIHgxPSIyMjAiIHkxPSIxOTgiIHgyPSIyMjAiIHkyPSIyMDYiLz4KICAgIDxsaW5lIHgxPSIyMjAiIHkxPSIyNTgiIHgyPSIyMjAiIHkyPSIyNjYiLz4KICAgIDxsaW5lIHgxPSIyMjAiIHkxPSIzMTgiIHgyPSIyMjAiIHkyPSIzMjYiLz4KICAgIDxsaW5lIHgxPSIyMjAiIHkxPSIzNzgiIHgyPSIyMjAiIHkyPSIzODYiLz4KICA8L2c+CiAgPHRleHQgeD0iMjMwIiB5PSIxNDIiIGZpbGw9IiMyYTlkOGYiIGZvbnQtc2l6ZT0iMTAiIGZvbnQtd2VpZ2h0PSJib2xkIj5zaTwvdGV4dD4KCiAgPCEtLSBSZWplY3QgYm94ZXMgLS0+CiAgPGc+CiAgICA8cmVjdCB4PSI1MDAiIHk9IjE1MCIgd2lkdGg9IjI2MCIgaGVpZ2h0PSI0NiIgcng9IjEyIiBmaWxsPSIjZTYzOTQ2Ii8+CiAgICA8dGV4dCB4PSI2MzAiIHk9IjE2OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMSIgZm9udC13ZWlnaHQ9ImJvbGQiPlJlY2hhemFkYTogY2FkZW5hIGluY29ycmVjdGE8L3RleHQ+CiAgICA8dGV4dCB4PSI2MzAiIHk9IjE4NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSI5LjUiPmxhIGZpcm1hIGVzIGRlIG90cmEgcmVkPC90ZXh0PgogIDwvZz4KICA8Zz4KICAgIDxyZWN0IHg9IjUwMCIgeT0iMjEwIiB3aWR0aD0iMjYwIiBoZWlnaHQ9IjQ2IiByeD0iMTIiIGZpbGw9IiNlNjM5NDYiLz4KICAgIDx0ZXh0IHg9IjYzMCIgeT0iMjI5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+UmVjaGF6YWRhOiBmaXJtYSB5YSB1c2FkYTwvdGV4dD4KICAgIDx0ZXh0IHg9IjYzMCIgeT0iMjQ1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjkuNSI+YW50aS1yZXBldGljaW9uIChub25jZSB2aWVqbyk8L3RleHQ+CiAgPC9nPgogIDxnPgogICAgPHJlY3QgeD0iNTAwIiB5PSIyNzAiIHdpZHRoPSIyNjAiIGhlaWdodD0iNDYiIHJ4PSIxMiIgZmlsbD0iI2U2Mzk0NiIvPgogICAgPHRleHQgeD0iNjMwIiB5PSIyODkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSJib2xkIj5SZWNoYXphZGE6IG5vIHZlcmlmaWNhZG88L3RleHQ+CiAgICA8dGV4dCB4PSI2MzAiIHk9IjMwNSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSI5LjUiPklOU0NSSVRPIG5vIHB1ZWRlIG9wZXJhcjwvdGV4dD4KICA8L2c+CiAgPGc+CiAgICA8cmVjdCB4PSI1MDAiIHk9IjMzMCIgd2lkdGg9IjI2MCIgaGVpZ2h0PSI0NiIgcng9IjEyIiBmaWxsPSIjZTYzOTQ2Ii8+CiAgICA8dGV4dCB4PSI2MzAiIHk9IjM0OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMSIgZm9udC13ZWlnaHQ9ImJvbGQiPlJlY2hhemFkYTogbGltaXRlIGRpYXJpbzwvdGV4dD4KICAgIDx0ZXh0IHg9IjYzMCIgeT0iMzY1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjkuNSI+dnVlbHZlIG1hbmFuYTwvdGV4dD4KICA8L2c+CiAgPGc+CiAgICA8cmVjdCB4PSI1MDAiIHk9IjM5MCIgd2lkdGg9IjI2MCIgaGVpZ2h0PSI0NiIgcng9IjEyIiBmaWxsPSIjZTYzOTQ2Ii8+CiAgICA8dGV4dCB4PSI2MzAiIHk9IjQwOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMSIgZm9udC13ZWlnaHQ9ImJvbGQiPkJsb3F1ZWFkbyAxIGhvcmE8L3RleHQ+CiAgICA8dGV4dCB4PSI2MzAiIHk9IjQyNSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSI5LjUiPjMgZmFsbG9zIGVuIDEwIG1pbnV0b3M8L3RleHQ+CiAgPC9nPgoKICA8IS0tIE5vIGFycm93cyB0byByZWplY3RzIC0tPgogIDxnIHN0cm9rZT0iI2U2Mzk0NiIgc3Ryb2tlLXdpZHRoPSIyLjUiIGZpbGw9Im5vbmUiIG1hcmtlci1lbmQ9InVybCgjYXJyKSI+CiAgICA8bGluZSB4MT0iMzYyIiB5MT0iMTczIiB4Mj0iNDk2IiB5Mj0iMTczIi8+CiAgICA8bGluZSB4MT0iMzYyIiB5MT0iMjMzIiB4Mj0iNDk2IiB5Mj0iMjMzIi8+CiAgICA8bGluZSB4MT0iMzYyIiB5MT0iMjkzIiB4Mj0iNDk2IiB5Mj0iMjkzIi8+CiAgICA8bGluZSB4MT0iMzYyIiB5MT0iMzUzIiB4Mj0iNDk2IiB5Mj0iMzUzIi8+CiAgICA8bGluZSB4MT0iMzYyIiB5MT0iNDEzIiB4Mj0iNDk2IiB5Mj0iNDEzIi8+CiAgPC9nPgogIDx0ZXh0IHg9IjM3NSIgeT0iMTY2IiBmaWxsPSIjZTYzOTQ2IiBmb250LXNpemU9IjkuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPm5vPC90ZXh0PgoKICA8IS0tIE9LIC0tPgogIDxyZWN0IHg9IjMwMCIgeT0iNDUyIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjQwIiByeD0iMTIiIGZpbGw9IiMyYTlkOGYiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjQ3NyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiPk9LOiBlbnZpYSB5IHBhZ2EgZWwgZ2FzPC90ZXh0PgoKICA8bGluZSB4MT0iMjIwIiB5MT0iNDM4IiB4Mj0iMzAwIiB5Mj0iNDcyIiBzdHJva2U9IiMyYTlkOGYiIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+Cjwvc3ZnPgo=" alt="Protecciones Relayer"/><figcaption class="fig-caption">Figura · Protecciones Relayer</figcaption></figure>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. Qué pasa cuando el mensajero envía la operación</h2>
+<p>Dos resultados posibles:</p>
+<h3 class="sub" id="sub6">4.1 Éxito</h3>
+<ul><li>La transacción entra en la blockchain y se confirma.</li><li>El mensajero anota el número usado, suma uno a tu contador diario y guarda el coste del gas.</li><li>La app te muestra: "¡Hecho!" (por ejemplo, tu objeto quedó custodiado).</li></ul>
+<h3 class="sub" id="sub7">4.2 Fallo en la cadena</h3>
+<ul><li>La transacción se rechaza (por ejemplo, tu cuenta dijo "firma inválida").</li><li>El mensajero registra el fallo (al tercero en 10 minutos, bloqueo de 1 h).</li><li>La app te muestra un aviso claro: "meta-transacción rechazada".</li></ul>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: la app de trueques tiene preparado el cableado para usar al mensajero (una función llamada <code>_enviar</code>), pero en el ciclo actual <strong>ninguna ruta la invoca todavía</strong>: los trueques se guardan en un almacén de pruebas y no se envían aún a la blockchain. La conexión completa mensajero ↔ trueques está <strong>pendiente de confirmar</strong> en la integración final.</p></blockquote>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. El termómetro del mensajero (salud y métricas)</h2>
+<p>El mensajero se puede vigilar como a un coche con luces en el tablero:</p>
+<div class="table-wrap"><table><thead><tr><th>Chequeo</th><th>Qué mira</th><th>Alarma</th></tr></thead><tbody><tr><td><strong>Salud</strong></td><td>¿Tiene saldo su billetera? ¿Está en la red correcta?</td><td>Si tiene menos de 0,5 ETH: "saldo bajo"</td></tr><tr><td><strong>Métricas</strong></td><td>¿Cuántas operaciones envió? ¿Cuántas rechazó y por qué?</td><td>Panel del Owner</td></tr></tbody></table></div>
+<p>El panel del administrador muestra: operaciones enviadas, rechazadas (por firma repetida, no verificado, límite, bloqueo o fallo) y cuántas personas distintas usan el mensajero.</p>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: el diseño prevé <strong>mínimo 2 mensajeros</strong> con cola de reintentos y conmutación automática (SLA de disponibilidad ≥ 99 %). El código actual solo ofrece el chequeo de salud y las métricas: <strong>no hay cola de reintentos ni segunda copia</strong> en este archivo → <strong>pendiente de confirmar</strong> (depende de la orquestación del despliegue).</p></blockquote>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. Si el mensajero falla: el plan B (modo degradado)</h2>
+<p>¿Y si el mensajero se cae mucho rato? El diseño define un <strong>plan B</strong>:</p>
+<ol><li>Si el mensajero está caído <strong>más de 1 hora</strong>, se activa el <strong>modo degradado</strong>.</li><li>En modo degradado, <strong>tú pagas el gas directamente</strong> con tu billetera (como las empresas).</li><li>Si la caída fue <strong>culpa del operador</strong> de la plataforma, la plataforma te <strong>reembolsa en BRLT</strong> lo que pagaste.</li></ol>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: este plan B está <strong>documentado</strong> (en la cabecera del código y en el diseño), pero <strong>no está implementado</strong>: no existe el interruptor de "modo degradado" ni la lógica de reembolso en BRLT. Es una política operativa pendiente de activar.</p></blockquote>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. Los datos que recuerda el mensajero</h2>
+<p>El mensajero recuerda, por cada usuario:</p>
+<ul><li>El <strong>último número de firma</strong> usado.</li><li>El <strong>contador diario</strong> de operaciones.</li><li>Los <strong>fallos recientes</strong> (con hora).</li><li>El <strong>bloqueo</strong> activo (hasta cuándo).</li></ul>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: hoy esos datos viven <strong>en la memoria del programa</strong>: si el mensajero se reinicia, <strong>se pierden</strong>. El diseño prevé guardarlos en la base de datos (PostgreSQL), pero esa persistencia <strong>no está implementada</strong> → <strong>pendiente de confirmar</strong>.</p></blockquote>
+</section>
+<section class="seccion" id="s8"><h2 class="seccion">8. Qué falta confirmar (resumen)</h2>
+<ol><li>La validación estricta del número de firma contra tu cuenta en la blockchain no está implementada (se usa un registro local) → <strong>pendiente de confirmar</strong>.</li><li>El cableado real de la app de trueques con el mensajero no está activo (<code>_enviar</code> definido pero sin invocar) → <strong>pendiente de confirmar</strong>.</li><li>Sin cola de reintentos ni segunda copia del mensajero (SLA ≥ 99 % en diseño) → <strong>pendiente de confirmar</strong>.</li><li>El plan B (modo degradado + reembolso en BRLT) está documentado pero no implementado → <strong>pendiente de confirmar</strong>.</li><li>El estado del mensajero se pierde al reiniciar (persistencia en PostgreSQL pendiente) → <strong>pendiente de confirmar</strong>.</li><li>Los 7 tests del mensajero están verificados (7/7 verdes) con simulaciones (ver manual 08).</li></ol>
+</section>
+<section class="seccion" id="s9"><h2 class="seccion">9. Glosario de este manual</h2>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Significado</th></tr></thead><tbody><tr><td><strong>Relayer</strong></td><td>El mensajero que envía tus operaciones y paga el gas</td></tr><tr><td><strong>Meta-transacción</strong></td><td>Operación firmada por ti pero enviada por otro (el mensajero)</td></tr><tr><td><strong>Gas</strong></td><td>La "gasolina" que cuesta operar en la blockchain</td></tr><tr><td><strong>Firma EIP-712</strong></td><td>Tu rúbrica digital con formato estándar y legible</td></tr><tr><td><strong>Nonce</strong></td><td>Número de un solo uso que evita firmas repetidas</td></tr><tr><td><strong>Allowlist</strong></td><td>Lista de cuentas permitidas (usuarios verificados)</td></tr><tr><td><strong>Anti-replay</strong></td><td>Protección contra repetir una firma ya usada</td></tr><tr><td><strong>Límite diario</strong></td><td>Máximo de operaciones gratis por persona y día (20)</td></tr><tr><td><strong>Bloqueo temporal</strong></td><td>Castigo leve por fallos repetidos (1 hora)</td></tr><tr><td><strong>Health / salud</strong></td><td>Chequeo de que el mensajero está sano (saldo, red)</td></tr><tr><td><strong>Modo degradado</strong></td><td>Plan B cuando el mensajero no puede operar</td></tr><tr><td><strong>SLA</strong></td><td>Porcentaje de tiempo que un servicio debe estar disponible</td></tr></tbody></table></div>
+<p>¡Listo! Ya sabes quién paga el gas y qué pasa si el mensajero falla. El siguiente manual explica los servicios (la API) que la app usa por dentro.</p>
+</section>
+</main>
+
+</body>
+</html>

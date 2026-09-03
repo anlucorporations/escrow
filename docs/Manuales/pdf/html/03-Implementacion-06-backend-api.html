@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · Los servicios de TrueKeate (la API): qué puede hacer la plataforma</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">03 · Implementación</div>
+    <h1>Los servicios de TrueKeate (la API): qué puede hacer la plataforma</h1>
+    <div class="intro">Versión en lenguaje sencillo del manual técnico de la <strong>API REST</strong> (la "cocina" de TrueKeate). Aquí contamos los servicios que la plataforma ofrece por dentro: quién puede hacer qué, en qué orden y con qué reglas. Es el manual de referencia para entender las capacidades del sistema.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>03-Implementacion/06-backend-api.md</b></span>
+      <span>Edición: <b>3 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/03-Implementacion/06-backend-api</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Implementación · Implementacion — Los servicios de TrueKeate (la API): qué puede hacer la plataforma</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>La puerta de entrada (reglas generales)</span></a><div class="subs"><a href="#sub1">2.1 Límite de peticiones (rate limit)</a><br><a href="#sub2">2.2 Iniciar sesión con tu firma</a><br><a href="#sub3">2.3 El estado de verificación manda</a></div></li><li><a href="#s3"><span class="tnum">3</span><span>Acceso: registrarte e iniciar sesión (/auth)</span></a></li><li><a href="#s4"><span class="tnum">4</span><span>Verificación: subir la escalera (/kyc) — 2 etapas</span></a></li><li><a href="#s5"><span class="tnum">5</span><span>Catálogo: publicar y buscar (/catalog)</span></a><div class="subs"><a href="#sub4">5.1 El límite de artículos por nivel</a></div></li><li><a href="#s6"><span class="tnum">6</span><span>Trueques: crear y seguir (/truekes)</span></a><div class="subs"><a href="#sub5">6.1 La regla de los 3 trueques</a><br><a href="#sub6">6.2 La valoración en 5 dimensiones</a></div></li><li><a href="#s7"><span class="tnum">7</span><span>Panel del Owner: administración (/admin)</span></a></li><li><a href="#s8"><span class="tnum">8</span><span>Reputación: tu puntaje y tu nivel (/reputacion)</span></a></li><li><a href="#s9"><span class="tnum">9</span><span>Subastas de empresa (/subastas)</span></a><div class="subs"><a href="#sub7">9.1 El desempate (regla D27)</a></div></li><li><a href="#s10"><span class="tnum">10</span><span>Los códigos de error (cuando algo sale mal)</span></a></li><li><a href="#s11"><span class="tnum">11</span><span>Qué falta confirmar (resumen)</span></a></li><li><a href="#s12"><span class="tnum">12</span><span>Glosario de este manual</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos</h2>
+<p>La app que ves en el móvil no guarda los datos: los pide a un <strong>servicio central</strong> llamado API. La API es como la <strong>cocina de un restaurante</strong>: el camarero (la app) te toma el pedido, lo pasa a la cocina, y la cocina prepara el plato con sus reglas (no se sirve alcohol a menores, el chef revisa cada plato...).</p>
+<p>Los servicios se agrupan por <strong>familias</strong>:</p>
+<div class="table-wrap"><table><thead><tr><th>Familia</th><th>Prefijo</th><th>Qué hace</th></tr></thead><tbody><tr><td><strong>Acceso</strong></td><td><code>/auth</code></td><td>Registrarte, iniciar sesión</td></tr><tr><td><strong>Verificación</strong></td><td><code>/kyc</code></td><td>Subir tu escalera de confianza</td></tr><tr><td><strong>Catálogo</strong></td><td><code>/catalog</code></td><td>Publicar objetos y ver ofertas</td></tr><tr><td><strong>Trueques</strong></td><td><code>/truekes</code></td><td>Crear y seguir trueques</td></tr><tr><td><strong>Panel del Owner</strong></td><td><code>/admin</code></td><td>Ver usuarios, contratos y salud</td></tr><tr><td><strong>Reputación</strong></td><td><code>/reputacion</code></td><td>Calcular tu puntaje y nivel</td></tr><tr><td><strong>Subastas</strong></td><td><code>/subastas</code></td><td>Subastas de empresas</td></tr></tbody></table></div>
+<p>En 5 minutos: la API tiene <strong>3 puertas de entrada</strong> para proteger el servicio:</p>
+<ol><li><strong>Límite de peticiones</strong>: máximo 120 peticiones por minuto (anti-ataque).</li><li><strong>Sesión</strong>: para lo privado necesitas iniciar sesión con tu firma.</li><li><strong>Estado de verificación</strong>: algunas cosas exigen estar VERIFICADO o CERTIFICADO.</li></ol>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. La puerta de entrada (reglas generales)</h2>
+<h3 class="sub" id="sub1">2.1 Límite de peticiones (rate limit)</h3>
+<p>Cualquiera que pida demasiado rápido recibe un aviso: "demasiadas peticiones". Es la protección contra programas que intentan saturar el servicio: máximo <strong>120 peticiones por minuto</strong>.</p>
+<h3 class="sub" id="sub2">2.2 Iniciar sesión con tu firma</h3>
+<p>Para lo privado, la app pide que firmes el mensaje <strong>"TrueKeate: iniciar sesión"</strong> con tu billetera. La cocina:</p>
+<ol><li>Recupera quién firmó (con tu firma, calcula tu dirección).</li><li>Te crea un <strong>pase temporal</strong> (token) que no es tu clave: es solo un "ticket" de entrada válido mientras dure la sesión.</li><li>Cada petición privada debe mostrar su ticket en la cabecera.</li></ol>
+<blockquote class="info"><span class="tag">Nota</span><p>El ticket <strong>no es un JWT</strong> (aunque los comentarios del código lo llamen así): es un código opaco aleatorio. Detalle técnico documentado para no confundir.</p></blockquote>
+<h3 class="sub" id="sub3">2.3 El estado de verificación manda</h3>
+<p>Muchos servicios preguntan: "¿en qué peldaño de la escalera estás?" (INSCRITO, VERIFICADO o CERTIFICADO). Si el servicio exige VERIFICADO y tú estás INSCRITO, la respuesta es clara: "estado requerido".</p>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. Acceso: registrarte e iniciar sesión (/auth)</h2>
+<div class="table-wrap"><table><thead><tr><th>Acción</th><th>Qué hace</th><th>Reglas</th></tr></thead><tbody><tr><td><strong>Conectar billetera</strong></td><td>La app anuncia tu billetera y te <strong>inscribe automáticamente</strong></td><td>La dirección debe tener formato válido (0x...)</td></tr><tr><td><strong>Registrarte</strong></td><td>Formalizas tu inscripción con correo y teléfono</td><td><strong>Consentimiento GDPR obligatorio</strong> (protección de datos): sin consentimiento no hay registro</td></tr><tr><td><strong>Iniciar sesión</strong></td><td>Firmas el mensaje de sesión y recibes tu ticket</td><td>La firma debe ser tuya</td></tr></tbody></table></div>
+<blockquote class="info"><span class="tag">Nota</span><p>La <strong>GDPR</strong> es la ley europea de protección de datos personales. TrueKeate exige tu consentimiento expreso para tratar tus datos.</p></blockquote>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: el diseño lista verificaciones de correo y teléfono (<code>/auth/verify-email</code>, <code>/auth/verify-phone</code>) que <strong>no están implementadas</strong> en este ciclo.</p></blockquote>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. Verificación: subir la escalera (/kyc) — 2 etapas</h2>
+<p>La verificación ocurre en <strong>2 etapas</strong> (la escalera que ya conoces del manual 02):</p>
+<p><strong>Etapa 1: llegar a VERIFICADO</strong></p>
+<ol><li>Pides iniciar la verificación.</li><li>El sistema dice: "se enviaron códigos a tu correo y teléfono".</li><li>Escribes ambos códigos.</li><li>Subes a <strong>VERIFICADO</strong>.</li></ol>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: en el código actual, los códigos solo deben <strong>estar presentes</strong> (no se comprueban contra los reales enviados). El envío real por correo (email) y la validación con vencimiento están previstos pero <strong>no implementados</strong> → <strong>pendiente de confirmar</strong>.</p></blockquote>
+<p><strong>Etapa 2: llegar a CERTIFICADO</strong></p>
+<ol><li>Envías la <strong>referencia de tu documento</strong> y la de tu <strong>selfie</strong>.</li><li>Tu solicitud queda <strong>PENDIENTE</strong>: la revisa un <strong>humano</strong> (el Owner).</li><li>Si aprueba → subes a <strong>CERTIFICADO</strong>. Si rechaza → te avisa.</li></ol>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar (observación de seguridad): la ruta de revisión no comprueba que quien aprueba sea realmente el Owner: <strong>cualquier usuario con sesión</strong> podría aprobar o rechazar una verificación en el estado actual. Está señalado para corregir.</p></blockquote>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5Fc2NhbGVyYSBkZSBhY2Nlc29zOiBxdWUgcHVlZGVzIGhhY2VyIGVuIGNhZGEgbml2ZWw8L3RleHQ+CgogIDwhLS0gU3RlcCAxIC0tPgogIDxyZWN0IHg9IjQ1IiB5PSIzMzAiIHdpZHRoPSIyMTAiIGhlaWdodD0iNzAiIHJ4PSIxNCIgZmlsbD0iIzQ4Y2FlNCIvPgogIDx0ZXh0IHg9IjE1MCIgeT0iMzU5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjE0LjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5JTlNDUklUTzwvdGV4dD4KICA8dGV4dCB4PSIxNTAiIHk9IjM3OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41Ij52ZXMgZWwgY2F0YWxvZ28gcHVibGljbzwvdGV4dD4KICA8cmVjdCB4PSI0NSIgeT0iNDEyIiB3aWR0aD0iMjEwIiBoZWlnaHQ9IjU2IiByeD0iMTIiIGZpbGw9IiNlMmU4ZjAiLz4KICA8dGV4dCB4PSIxNTAiIHk9IjQzMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMC41Ij5ObyBjcmVhIHRydWVxdWVzIHRvZGF2aWE8L3RleHQ+CiAgPHRleHQgeD0iMTUwIiB5PSI0NDgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAuNSI+KG1vZHVsb3MgYXRlbnVhZG9zKTwvdGV4dD4KCiAgPCEtLSBTdGVwIDIgLS0+CiAgPHJlY3QgeD0iMjk1IiB5PSIyNDAiIHdpZHRoPSIyMTAiIGhlaWdodD0iNzAiIHJ4PSIxNCIgZmlsbD0iIzJhOWQ4ZiIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMjY5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjE0LjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5WRVJJRklDQURPPC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMjg5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwLjUiPmNvcnJlbyArIHRlbGVmb25vPC90ZXh0PgogIDxyZWN0IHg9IjI5NSIgeT0iMzIyIiB3aWR0aD0iMjEwIiBoZWlnaHQ9IjU2IiByeD0iMTIiIGZpbGw9IiNlMmU4ZjAiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjM0MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMC41Ij5wdWJsaWNhIG9iamV0b3MgeSB0cnVlcXVlYTwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjM1OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMC41Ij5tYXguIDMgdHJ1ZXF1ZXMgYWN0aXZvczwvdGV4dD4KCiAgPCEtLSBTdGVwIDMgLS0+CiAgPHJlY3QgeD0iNTQ1IiB5PSIxNTAiIHdpZHRoPSIyMTAiIGhlaWdodD0iNzAiIHJ4PSIxNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjY1MCIgeT0iMTc5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjE0LjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5DRVJUSUZJQ0FETzwvdGV4dD4KICA8dGV4dCB4PSI2NTAiIHk9IjE5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41Ij5LWUM6IGRvY3VtZW50byArIHNlbGZpZTwvdGV4dD4KICA8cmVjdCB4PSI1NDUiIHk9IjIzMiIgd2lkdGg9IjIxMCIgaGVpZ2h0PSI1NiIgcng9IjEyIiBmaWxsPSIjZTJlOGYwIi8+CiAgPHRleHQgeD0iNjUwIiB5PSIyNTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAuNSI+cmVwdXRhY2lvbiB5IHB1amFzPC90ZXh0PgogIDx0ZXh0IHg9IjY1MCIgeT0iMjY4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwLjUiPmVuIHN1YmFzdGFzPC90ZXh0PgoKICA8IS0tIEFycm93cyB1cCAtLT4KICA8cGF0aCBkPSJNIDI1NyAzNTUgTCAyOTMgMzAwIiBmaWxsPSJub25lIiBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMi41IiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KICA8cGF0aCBkPSJNIDUwNyAyNzAgTCA1NDMgMjE1IiBmaWxsPSJub25lIiBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMi41IiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KICA8dGV4dCB4PSIyNzAiIHk9IjMxMCIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSI5LjUiPnN1YmU8L3RleHQ+CiAgPHRleHQgeD0iNTIwIiB5PSIyMzAiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iOS41Ij5zdWJlPC90ZXh0PgoKICA8IS0tIExpbWl0cyB0YWJsZS1pc2ggYm90dG9tIC0tPgogIDxyZWN0IHg9IjYwIiB5PSI0NDUiIHdpZHRoPSI2ODAiIGhlaWdodD0iNDAiIHJ4PSIxMiIgZmlsbD0iIzFhMmI0YyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iNDYyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwLjUiPkxpbWl0ZXMgZGUgcHVibGljYWNpb24gcG9yIHJlcHV0YWNpb246IElOSUNJQURPIDUgwrcgQ09NVU4gNTAgwrcgRlJFQ1VFTlRFIDEwMCDCtyBTT0NJTyAxMDA8L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSI0NzgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmM2U1YWIiIGZvbnQtc2l6ZT0iMTAuNSI+U29sbyBWRVJJRklDQURPIG8gQ0VSVElGSUNBRE8gcHVlZGVuIG9wZXJhciAobG8gZXhpZ2UgZWwgcmVsYXllcik8L3RleHQ+Cjwvc3ZnPgo=" alt="Escalera Accesos"/><figcaption class="fig-caption">Figura · Escalera Accesos</figcaption></figure>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. Catálogo: publicar y buscar (/catalog)</h2>
+<p>El catálogo es el "escaparate" de la comunidad (AtoA = entre personas).</p>
+<div class="table-wrap"><table><thead><tr><th>Acción</th><th>Quién puede</th><th>Reglas</th></tr></thead><tbody><tr><td><strong>Publicar un objeto</strong></td><td>VERIFICADO o CERTIFICADO</td><td>No superar el <strong>límite de tu nivel</strong></td></tr><tr><td><strong>Ver el catálogo</strong></td><td>Todos (público)</td><td>Solo se ven objetos disponibles</td></tr><tr><td><strong>Pedir un encargo</strong></td><td>Cualquiera con sesión</td><td>Pides un objeto que no está en el mercado</td></tr><tr><td><strong>Ver encargos</strong></td><td>Todos</td><td>Lista de peticiones activas</td></tr></tbody></table></div>
+<h3 class="sub" id="sub4">5.1 El límite de artículos por nivel</h3>
+<p>No todos pueden publicar lo mismo. El límite depende de tu <strong>nivel</strong> (no de tu tipo de cuenta):</p>
+<div class="table-wrap"><table><thead><tr><th>Nivel</th><th>Máximo de objetos publicados</th></tr></thead><tbody><tr><td>INICIADO</td><td>5</td></tr><tr><td>COMÚN</td><td>50</td></tr><tr><td>FRECUENTE</td><td>100</td></tr><tr><td>SOCIO</td><td>100</td></tr></tbody></table></div>
+<blockquote class="ejemplo"><span class="tag">Ejemplo</span><p>Ejemplo: un INICIADO puede tener hasta 5 objetos a la vez en el escaparate. Si ya tiene 5, el sistema responde: "límite de artículos alcanzado".</p></blockquote>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. Trueques: crear y seguir (/truekes)</h2>
+<p>Esta familia coordina la caja fuerte (ver manual 01) con la app.</p>
+<div class="table-wrap"><table><thead><tr><th>Acción</th><th>Quién puede</th><th>Reglas</th></tr></thead><tbody><tr><td><strong>Crear trueque</strong></td><td>VERIFICADO o CERTIFICADO</td><td>Máximo <strong>3 trueques activos</strong> para VERIFICADO</td></tr><tr><td><strong>Ver detalle</strong></td><td>Cualquiera</td><td>Información de confianza del trueque</td></tr><tr><td><strong>Custodiar</strong></td><td>Solo la parte dueña del objeto</td><td>Cada lado custodia el suyo</td></tr><tr><td><strong>Firmar recepción</strong></td><td>Solo la parte correspondiente</td><td>Tu declaración de "recibí bien"</td></tr><tr><td><strong>Valorar</strong></td><td>Ambas partes</td><td>5 renglones con nota 1-5: aceptación, honestidad, seguridad, confiabilidad, compromiso</td></tr></tbody></table></div>
+<h3 class="sub" id="sub5">6.1 La regla de los 3 trueques</h3>
+<p>Un usuario <strong>VERIFICADO</strong> no puede tener más de <strong>3 trueques en marcha</strong> a la vez (estados CREADO, CUSTODIADO, APERTURA...). Es una regla anti-acaparación: limita el riesgo de comprometerse de más.</p>
+<h3 class="sub" id="sub6">6.2 La valoración en 5 dimensiones</h3>
+<p>Cuando valoras un trueque, puntúas <strong>5 cosas</strong> (de 1 a 5):</p>
+<ol><li><strong>Aceptación</strong>: ¿el otro cumplió lo pactado?</li><li><strong>Honestidad</strong>: ¿describió bien su objeto?</li><li><strong>Seguridad</strong>: ¿el intercambio fue seguro?</li><li><strong>Confiabilidad</strong>: ¿fue puntual y serio?</li><li><strong>Compromiso</strong>: ¿terminó lo que empezó?</li></ol>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: la app de trueques tiene preparado el envío a la blockchain (por mensajero para particulares, o directo para empresas), pero en el ciclo actual <strong>ninguna ruta lo ejecuta</strong>: los trueques se guardan en un almacén de pruebas y las acciones de custodiar/firmar no comprueban aún el estado real en la cadena. La integración completa está <strong>pendiente de confirmar</strong>. También faltan las rutas de apertura, anulación y disputa desde la app (en el diseño, no implementadas).</p></blockquote>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. Panel del Owner: administración (/admin)</h2>
+<p>El administrador (Owner) tiene su propio tablero:</p>
+<div class="table-wrap"><table><thead><tr><th>Servicio</th><th>Qué muestra</th></tr></thead><tbody><tr><td><strong>Usuarios</strong></td><td>Lista de inscritos (solo Owner o Socios)</td></tr><tr><td><strong>Contratos</strong></td><td>Direcciones de los contratos desplegados</td></tr><tr><td><strong>KPIs de disputas</strong></td><td>Total de trueques y disputas abiertas</td></tr><tr><td><strong>Base de datos</strong></td><td>Cuántos usuarios, objetos y trueques hay</td></tr><tr><td><strong>Salud de infraestructura</strong></td><td>Salud y métricas del mensajero y del vigilante</td></tr></tbody></table></div>
+<blockquote class="warn"><span class="tag">Aviso</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Observación: el servicio de contratos no exige rol de Owner (solo sesión), y el de salud responde vacío cuando no hay mensajero ni vigilante conectados (como ocurre en el modo de pruebas actual).</p></blockquote>
+</section>
+<section class="seccion" id="s8"><h2 class="seccion">8. Reputación: tu puntaje y tu nivel (/reputacion)</h2>
+<p>Cada trueque completado alimenta tu <strong>reputación</strong>. La fórmula (de diseño) mezcla tres ingredientes:</p>
+<pre><code>Puntaje = 50 % reputación + 30 % volumen efectivo + 20 % (1 − ratio de apelaciones)</code></pre>
+<p>Se normaliza a una nota de <strong>0 a 100</strong>, y de ahí salen tu nivel y tu medalla:</p>
+<div class="table-wrap"><table><thead><tr><th>Puntaje</th><th>Nivel</th><th>Medalla</th></tr></thead><tbody><tr><td>0 – 25</td><td>INICIADO</td><td>BRONCE</td></tr><tr><td>26 – 50</td><td>COMÚN</td><td>PLATA</td></tr><tr><td>51 – 75</td><td>FRECUENTE</td><td>ORO</td></tr><tr><td>76 – 100</td><td>SOCIO</td><td>ORO</td></tr></tbody></table></div>
+<p>Dos reglas especiales:</p>
+<ul><li><strong>Oro histórico</strong> (requisito de empresa): tener <strong>≥ 1.000 trueques efectivos</strong> y un <strong>ratio de éxito ≥ 90 %</strong>.</li><li><strong>Penalización por inactividad</strong>: 180 días sin actividad + dominar más del 5 % del mercado → tu puntaje baja (regla anti-monopolio).</li></ul>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: en el estado actual, el cálculo usa un "volumen máximo del sistema" fijo en 1 (la normalización real queda pendiente), el recálculo mensual automático solo responde un aviso (sin lote programado) y la penalización por inactividad está definida pero no se invoca en ninguna ruta.</p></blockquote>
+</section>
+<section class="seccion" id="s9"><h2 class="seccion">9. Subastas de empresa (/subastas)</h2>
+<p>Las empresas pueden subastar objetos (RF-17). Reglas claras:</p>
+<div class="table-wrap"><table><thead><tr><th>Acción</th><th>Quién puede</th><th>Reglas</th></tr></thead><tbody><tr><td><strong>Crear subasta</strong></td><td>Solo empresas</td><td>Puja inicial obligatoria; duración por defecto 24 h</td></tr><tr><td><strong>Ver subastas</strong></td><td>Todos (público)</td><td>Solo subastas abiertas</td></tr><tr><td><strong>Pujar</strong></td><td>Solo usuarios CERTIFICADOS</td><td>Puja mínima + incremento mínimo</td></tr><tr><td><strong>Cerrar</strong></td><td>Sistema/manual</td><td>Cuando vence el tiempo</td></tr></tbody></table></div>
+<h3 class="sub" id="sub7">9.1 El desempate (regla D27)</h3>
+<p>Al cerrar la subasta:</p>
+<ol><li>Gana la <strong>puja más alta</strong>.</li><li>Si hay <strong>empate</strong>, gana el de <strong>mayor nivel</strong> (SOCIO &gt; FRECUENTE &gt; COMÚN &gt; INICIADO).</li><li>Si no hubo pujas, la subasta se declara <strong>ANULADA</strong> (sin ganador).</li></ol>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: el estado de las subastas vive en la memoria del programa (se pierde al reiniciar), el cierre es manual (no hay reloj automático de vencimiento) y faltan servicios de detalle y de listado de pujas. Persistencia y automatización están <strong>pendientes de confirmar</strong>.</p></blockquote>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5MYSBBUEkgKGxhIGNvY2luYSkgeSBzdXMgc2VydmljaW9zPC90ZXh0PgoKICA8IS0tIEFQUCAtLT4KICA8cmVjdCB4PSIyNjAiIHk9IjgwIiB3aWR0aD0iMjgwIiBoZWlnaHQ9IjYyIiByeD0iMTQiIGZpbGw9IiM0OGNhZTQiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjEwOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9ImJvbGQiPkxhIGFwcCAobW92aWwgLyB3ZWIpPC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMTI4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwLjUiPnBldGljaW9uZXMgY29uIHRpY2tldCBkZSBzZXNpb248L3RleHQ+CgogIDwhLS0gQVBJIC0tPgogIDxyZWN0IHg9IjI2MCIgeT0iMTg1IiB3aWR0aD0iMjgwIiBoZWlnaHQ9IjcwIiByeD0iMTQiIGZpbGw9IiMxYTJiNGMiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjIxNSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkxBIEFQSSDCtyBsYSBjb2NpbmE8L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSIyMzYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmM2U1YWIiIGZvbnQtc2l6ZT0iMTEiPm1heC4gMTIwIHBldGljaW9uZXMgcG9yIG1pbnV0bzwvdGV4dD4KCiAgPCEtLSBBcnJvd3MgYXBwIC0+IGFwaSAtLT4KICA8bGluZSB4MT0iNDAwIiB5MT0iMTQ0IiB4Mj0iNDAwIiB5Mj0iMTgxIiBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMi41IiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KCiAgPCEtLSBTZXJ2aWNlIHJvdyAxIC0tPgogIDxnPgogICAgPHJlY3QgeD0iNjAiIHk9IjMwMCIgd2lkdGg9IjE1MCIgaGVpZ2h0PSI2MCIgcng9IjEyIiBmaWxsPSIjMmE5ZDhmIi8+CiAgICA8dGV4dCB4PSIxMzUiIHk9IjMyNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+L2F1dGg8L3RleHQ+CiAgICA8dGV4dCB4PSIxMzUiIHk9IjM0NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMCI+cmVnaXN0cm8geSBzZXNpb248L3RleHQ+CiAgPC9nPgogIDxnPgogICAgPHJlY3QgeD0iMjM1IiB5PSIzMDAiIHdpZHRoPSIxNTAiIGhlaWdodD0iNjAiIHJ4PSIxMiIgZmlsbD0iIzJhOWQ4ZiIvPgogICAgPHRleHQgeD0iMzEwIiB5PSIzMjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPi9reWM8L3RleHQ+CiAgICA8dGV4dCB4PSIzMTAiIHk9IjM0NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMCI+dmVyaWZpY2FjaW9uIDIgZXRhcGFzPC90ZXh0PgogIDwvZz4KICA8Zz4KICAgIDxyZWN0IHg9IjQxMCIgeT0iMzAwIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjYwIiByeD0iMTIiIGZpbGw9IiMyYTlkOGYiLz4KICAgIDx0ZXh0IHg9IjQ4NSIgeT0iMzI2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj4vY2F0YWxvZzwvdGV4dD4KICAgIDx0ZXh0IHg9IjQ4NSIgeT0iMzQ0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwIj5lc2NhcGFyYXRlIHkgZW5jYXJnb3M8L3RleHQ+CiAgPC9nPgogIDxnPgogICAgPHJlY3QgeD0iNTg1IiB5PSIzMDAiIHdpZHRoPSIxNTAiIGhlaWdodD0iNjAiIHJ4PSIxMiIgZmlsbD0iIzJhOWQ4ZiIvPgogICAgPHRleHQgeD0iNjYwIiB5PSIzMjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPi90cnVla2VzPC90ZXh0PgogICAgPHRleHQgeD0iNjYwIiB5PSIzNDQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAiPnRydWVxdWVzIHkgdmFsb3JhY2lvbmVzPC90ZXh0PgogIDwvZz4KCiAgPCEtLSBTZXJ2aWNlIHJvdyAyIC0tPgogIDxnPgogICAgPHJlY3QgeD0iMTIwIiB5PSIzOTAiIHdpZHRoPSIxNjAiIGhlaWdodD0iNjAiIHJ4PSIxMiIgZmlsbD0iI2Q0YWYzNyIvPgogICAgPHRleHQgeD0iMjAwIiB5PSI0MTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPi9yZXB1dGFjaW9uPC90ZXh0PgogICAgPHRleHQgeD0iMjAwIiB5PSI0MzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPnB1bnRhamUsIG5pdmVsLCBtZWRhbGxhPC90ZXh0PgogIDwvZz4KICA8Zz4KICAgIDxyZWN0IHg9IjMyMCIgeT0iMzkwIiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjYwIiByeD0iMTIiIGZpbGw9IiNkNGFmMzciLz4KICAgIDx0ZXh0IHg9IjQwMCIgeT0iNDE2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj4vc3ViYXN0YXM8L3RleHQ+CiAgICA8dGV4dCB4PSI0MDAiIHk9IjQzNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMCI+c3ViYXN0YXMgZGUgZW1wcmVzYTwvdGV4dD4KICA8L2c+CiAgPGc+CiAgICA8cmVjdCB4PSI1MjAiIHk9IjM5MCIgd2lkdGg9IjE2MCIgaGVpZ2h0PSI2MCIgcng9IjEyIiBmaWxsPSIjZDRhZjM3Ii8+CiAgICA8dGV4dCB4PSI2MDAiIHk9IjQxNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+L2FkbWluPC90ZXh0PgogICAgPHRleHQgeD0iNjAwIiB5PSI0MzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPnBhbmVsIGRlbCBPd25lcjwvdGV4dD4KICA8L2c+CgogIDwhLS0gRmFuIGFycm93cyAtLT4KICA8ZyBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgbWFya2VyLWVuZD0idXJsKCNhcnIpIj4KICAgIDxsaW5lIHgxPSIzMzAiIHkxPSIyNTciIHgyPSIxNTAiIHkyPSIyOTYiLz4KICAgIDxsaW5lIHgxPSIzNjAiIHkxPSIyNTciIHgyPSIyOTUiIHkyPSIyOTYiLz4KICAgIDxsaW5lIHgxPSI0MDAiIHkxPSIyNTciIHgyPSI0NDAiIHkyPSIyOTYiLz4KICAgIDxsaW5lIHgxPSI0NDAiIHkxPSIyNTciIHgyPSI2MDAiIHkyPSIyOTYiLz4KICAgIDxsaW5lIHgxPSIzNDUiIHkxPSIyNTciIHgyPSIyMDUiIHkyPSIzODYiLz4KICAgIDxsaW5lIHgxPSI0MTAiIHkxPSIyNTciIHgyPSI0MDUiIHkyPSIzODYiLz4KICAgIDxsaW5lIHgxPSI0NzUiIHkxPSIyNTciIHgyPSI1OTUiIHkyPSIzODYiLz4KICA8L2c+CgogIDwhLS0gT2JzZXJ2YXRpb24gLS0+CiAgPHJlY3QgeD0iNjAiIHk9IjQ2NiIgd2lkdGg9IjY4MCIgaGVpZ2h0PSIyNCIgcng9IjEwIiBmaWxsPSIjZmRmMWU3Ii8+CiAgPHRleHQgeD0iNDAwIiB5PSI0ODMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iOS41IiBmb250LXdlaWdodD0iYm9sZCI+T2JzZXJ2YWNpb246IGVsIHNlcnZpY2lvIC9hZG1pbiBubyBleGlnZSByb2wgZGUgT3duZXIgKHNvbG8gc2VzaW9uKSDigJQgcGVuZGllbnRlIGRlIGNvcnJlZ2lyPC90ZXh0Pgo8L3N2Zz4K" alt="Api Servicios"/><figcaption class="fig-caption">Figura · Api Servicios</figcaption></figure>
+</section>
+<section class="seccion" id="s10"><h2 class="seccion">10. Los códigos de error (cuando algo sale mal)</h2>
+<p>Cuando algo falla, la API responde con un <strong>código claro</strong>, no con un "error 500 misterioso". Ejemplos:</p>
+<div class="table-wrap"><table><thead><tr><th>Código</th><th>Qué significa</th></tr></thead><tbody><tr><td><code>wallet_invalida</code></td><td>La dirección de la billetera no tiene formato correcto</td></tr><tr><td><code>consentimiento_requerido</code></td><td>Falta el consentimiento GDPR</td></tr><tr><td><code>firma_invalida</code></td><td>La firma no corresponde a tu billetera</td></tr><tr><td><code>estado_requerido</code></td><td>Necesitas un estado de verificación mayor</td></tr><tr><td><code>limite_articulos</code></td><td>Ya publicaste el máximo de tu nivel</td></tr><tr><td><code>max_3_activos</code></td><td>Ya tienes 3 trueques en marcha</td></tr><tr><td><code>valoraciones_1_a_5</code></td><td>Las notas deben ser enteros de 1 a 5</td></tr><tr><td><code>solo_owner</code></td><td>Solo el Owner puede hacer esto</td></tr><tr><td><code>solo_empresa</code></td><td>Solo las empresas pueden hacer esto</td></tr><tr><td><code>solo_certificado</code></td><td>Solo CERTIFICADOS pueden hacer esto</td></tr><tr><td><code>rate_limit</code></td><td>Demasiadas peticiones por minuto</td></tr><tr><td><code>not_found</code></td><td>Lo que buscas no existe</td></tr></tbody></table></div>
+</section>
+<section class="seccion" id="s11"><h2 class="seccion">11. Qué falta confirmar (resumen)</h2>
+<ol><li>La API guarda todo en <strong>memoria</strong> (se pierde al reiniciar): el puente a la base de datos PostgreSQL real está declarado como trabajo de la integración final → <strong>pendiente de confirmar</strong>.</li><li>Verificación real de códigos de correo/teléfono y envío por email no implementados → <strong>pendiente de confirmar</strong>.</li><li>Sin control de rol Owner en la revisión de verificación (observación de seguridad).</li><li>Los trueques no se envían aún a la blockchain desde la app → <strong>pendiente de confirmar</strong>.</li><li>Reputación con volumen máximo fijo en 1 y recálculo mensual solo simulado → <strong>pendiente de confirmar</strong>.</li><li>Subastas en memoria, sin cierre automático ni persistencia → <strong>pendiente de confirmar</strong>.</li><li>Muchos servicios del diseño no existen aún: verificación por email/ teléfono, apelaciones, cola de revisión, rutas de disputas y votaciones, apertura/anulación de trueques, puntos de encuentro, campañas y finanzas → <strong>pendientes de confirmar</strong> (integración final o ciclos posteriores).</li><li>Los 14 tests de la API están verificados (14/14 verdes) con el almacén en memoria (ver manual 08).</li></ol>
+</section>
+<section class="seccion" id="s12"><h2 class="seccion">12. Glosario de este manual</h2>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Significado</th></tr></thead><tbody><tr><td><strong>API</strong></td><td>Servicio central que la app usa por dentro (la "cocina")</td></tr><tr><td><strong>Ruta / endpoint</strong></td><td>Una puerta concreta del servicio (<code>/truekes</code>, <code>/kyc</code>...)</td></tr><tr><td><strong>Sesión</strong></td><td>Tu estado de "logueado" con ticket temporal</td></tr><tr><td><strong>Token</strong></td><td>El ticket temporal de tu sesión</td></tr><tr><td><strong>Rate limit</strong></td><td>Límite de peticiones por minuto (120)</td></tr><tr><td><strong>GDPR</strong></td><td>Ley europea de protección de datos personales</td></tr><tr><td><strong>KYC</strong></td><td>Verificación de identidad ("conoce a tu cliente")</td></tr><tr><td><strong>Selfie</strong></td><td>Tu foto para verificar que eres tú</td></tr><tr><td><strong>AtoA</strong></td><td>Intercambio entre personas (a to a)</td></tr><tr><td><strong>Rubro</strong></td><td>Categoría del objeto (arte, tecnología...)</td></tr><tr><td><strong>Encargo</strong></td><td>Pedir un objeto que no está en el mercado</td></tr><tr><td><strong>Nivel / medalla</strong></td><td>Tu rango según el puntaje (INICIADO... SOCIO)</td></tr><tr><td><strong>Apelación</strong></td><td>Recurso contra una decisión (cuenta como disputa)</td></tr><tr><td><strong>JWT</strong></td><td>Formato de ticket firmado (no usado aquí: ticket opaco)</td></tr></tbody></table></div>
+<p>¡Listo! Ya conoces todos los servicios de la plataforma. El siguiente manual es la guía de la app: pantallas, conexión con MetaMask y navegación.</p>
+</section>
+</main>
+
+</body>
+</html>

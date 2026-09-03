@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · Las piezas que usa TrueKeate por dentro</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">02 · Dependencias</div>
+    <h1>Las piezas que usa TrueKeate por dentro</h1>
+    <div class="intro">Versión en lenguaje sencillo del manual técnico de dependencias. Aquí explicamos, sin tecnicismos, de qué piezas está hecha TrueKeate.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>02-Dependencias/01-dependencias.md</b></span>
+      <span>Edición: <b>3 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/02-Dependencias/01-dependencias</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Dependencias · Dependencias — Las piezas que usa TrueKeate por dentro</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>Cómo se leen las versiones</span></a></li><li><a href="#s3"><span class="tnum">3</span><span>Las piezas de los contratos (capa blockchain)</span></a><div class="subs"><a href="#sub1">Qué piezas de OpenZeppelin se usan</a></div></li><li><a href="#s4"><span class="tnum">4</span><span>Las piezas de los servidores (capa backend)</span></a></li><li><a href="#s5"><span class="tnum">5</span><span>Las piezas de la app web (capa frontend)</span></a><div class="subs"><a href="#sub2">5.1 Piezas de funcionamiento</a><br><a href="#sub3">5.2 Piezas de desarrollo (solo para quien construye)</a></div></li><li><a href="#s6"><span class="tnum">6</span><span>Las piezas externas (servicios que no son código)</span></a></li><li><a href="#s7"><span class="tnum">7</span><span>Licencias: ¿de quién es cada pieza?</span></a></li><li><a href="#s8"><span class="tnum">8</span><span>Mapa visual: las piezas por capa</span></a></li><li><a href="#s9"><span class="tnum">9</span><span>Qué falta confirmar</span></a></li><li><a href="#s10"><span class="tnum">10</span><span>Glosario de este manual</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos</h2>
+<p>Una app moderna no se construye desde cero: usa <strong>piezas ya hechas</strong> llamadas librerías o dependencias. Son como los ingredientes de una receta.</p>
+<p>TrueKeate se cocina con estos ingredientes principales:</p>
+<ol><li><strong>Solidity</strong> (idioma de los contratos) con el compilador fijado en la versión 0.8.24.</li><li><strong>OpenZeppelin</strong> (caja de piezas de seguridad probadas) versión 5.0.2.</li><li><strong>Node.js</strong> (motor de los servidores) con librerías como <strong>Express</strong> (servidor web) y <strong>ethers</strong> (puente con la blockchain).</li><li><strong>Next.js + React + Tailwind</strong> (la app web) y <strong>TypeScript</strong> (red de seguridad).</li><li><strong>PostgreSQL</strong> (base de datos) y servicios en la nube de Google (GCP).</li></ol>
+<blockquote class="info"><span class="tag">Nota</span><p>Para qué sirve saber esto: cuando TrueKeate se actualiza o algo falla, conocer las piezas ayuda a encontrar la causa. Y si usas la plataforma, te da confianza saber que se apoya en piezas muy usadas y conocidas.</p></blockquote>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. Cómo se leen las versiones</h2>
+<p>Las versiones se escriben con un formato llamado <strong>semver</strong>: <code>mayor.menor.parches</code>.</p>
+<ul><li>Ejemplo: <code>ethers ^6.17.0</code> significa "versión 6.17.0 o superior compatible".</li><li>El símbolo <code>^</code> permite actualizaciones menores automáticas.</li><li>Para saber la <strong>versión exacta</strong> instalada, se mira el "lockfile" (el recibo de la compra exacta de las piezas).</li></ul>
+<p>TrueKeate, además, fija algunas piezas <strong>por commit</strong> (una huella digital exacta del código). Así nadie cambia una pieza sin querer.</p>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. Las piezas de los contratos (capa blockchain)</h2>
+<div class="table-wrap"><table><thead><tr><th>Pieza</th><th>Versión exacta</th><th>Para qué sirve</th></tr></thead><tbody><tr><td>Solidity (idioma)</td><td>0.8.24</td><td>Escribir los contratos inteligentes</td></tr><tr><td>Foundry (taller)</td><td>sin fijar <svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg></td><td>Crear y probar contratos</td></tr><tr><td>forge-std (caja de pruebas)</td><td>v1.9.4</td><td>Utilidades de prueba</td></tr><tr><td>OpenZeppelin (piezas de seguridad)</td><td>v5.0.2</td><td>Candados y cerraduras estándar</td></tr></tbody></table></div>
+<h3 class="sub" id="sub1">Qué piezas de OpenZeppelin se usan</h3>
+<ul><li><strong>Ownable</strong>: "solo el dueño puede hacer esto" (el dueño es el Owner).</li><li><strong>ReentrancyGuard</strong>: evita que un contrato sea atacado con trucos de re-llamada.</li><li><strong>EIP712 y ECDSA</strong>: firma digital segura de mensajes.</li><li><strong>MerkleProof</strong>: demuestra que algo está en una lista sin mostrar la lista.</li><li><strong>ERC20 y ERC721</strong>: estándares de criptomonedas y NFTs.</li><li><strong>SafeERC20</strong>: transferencias de criptos sin sorpresas.</li></ul>
+<blockquote class="info"><span class="tag">Nota</span><p>Analogía: OpenZeppelin es como comprar cerraduras certificadas en lugar de inventar la tuya. Son piezas revisadas por mucha gente experta.</p></blockquote>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. Las piezas de los servidores (capa backend)</h2>
+<div class="table-wrap"><table><thead><tr><th>Pieza</th><th>Versión exacta</th><th>Para qué sirve</th></tr></thead><tbody><tr><td>Node.js (motor)</td><td>sin fijar <svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg></td><td>Ejecuta los servidores</td></tr><tr><td>ethers</td><td>6.17.0</td><td>Hablar con la blockchain</td></tr><tr><td>Express</td><td>5.2.1</td><td>Crear el servidor de la API</td></tr><tr><td>express-rate-limit</td><td>8.7.0</td><td>Freno de peticiones (anti-abuso)</td></tr><tr><td>pg</td><td>8.23.0</td><td>Conectar con PostgreSQL</td></tr><tr><td>supertest</td><td>7.2.2</td><td>Probar las puertas de la API</td></tr></tbody></table></div>
+<p>Ejemplo real de para qué sirve <strong>express-rate-limit</strong>: si alguien lanza miles de peticiones por minuto para saturar la app, este freno corta el abuso.</p>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. Las piezas de la app web (capa frontend)</h2>
+<h3 class="sub" id="sub2">5.1 Piezas de funcionamiento</h3>
+<div class="table-wrap"><table><thead><tr><th>Pieza</th><th>Versión exacta</th><th>Para qué sirve</th></tr></thead><tbody><tr><td>Next.js</td><td>16.3.4</td><td>El esqueleto de la web</td></tr><tr><td>React</td><td>19.2.8</td><td>Las pantallas</td></tr><tr><td>react-dom</td><td>19.2.8</td><td>Dibujar las pantallas</td></tr><tr><td>ethers</td><td>6.17.0</td><td>Conectar MetaMask y contratos</td></tr></tbody></table></div>
+<h3 class="sub" id="sub3">5.2 Piezas de desarrollo (solo para quien construye)</h3>
+<div class="table-wrap"><table><thead><tr><th>Pieza</th><th>Versión exacta</th><th>Para qué sirve</th></tr></thead><tbody><tr><td>TypeScript</td><td>5.9.3</td><td>Red de seguridad contra errores</td></tr><tr><td>Tailwind CSS</td><td>4.3.3</td><td>Los estilos visuales</td></tr><tr><td>Playwright</td><td>1.62.1</td><td>Pruebas automáticas como usuario real</td></tr><tr><td>ESLint</td><td>9.39.5</td><td>Revisa calidad del código</td></tr></tbody></table></div>
+<blockquote class="info"><span class="tag">Nota</span><p>Las piezas de desarrollo no llegan a los usuarios: solo ayudan a quien construye a trabajar mejor.</p></blockquote>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. Las piezas externas (servicios que no son código)</h2>
+<p>TrueKeate también depende de servicios:</p>
+<div class="table-wrap"><table><thead><tr><th>Servicio</th><th>Para qué sirve</th><th>Estado</th></tr></thead><tbody><tr><td><strong>PostgreSQL + PostGIS</strong></td><td>Base de datos + mapas</td><td>Reutiliza un servicio en Google Cloud (GCP)</td></tr><tr><td><strong>IPFS</strong></td><td>Guardar imágenes y archivos de forma descentralizada</td><td>Decidido, sin desplegar <svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg></td></tr><tr><td><strong>OpenStreetMap (OSM)</strong></td><td>Mapas y rutas para el punto de encuentro</td><td>Decidido, sin integrar <svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg></td></tr><tr><td><strong>Nodemailer + SMTP</strong></td><td>Enviar correos y códigos de verificación</td><td>Decidido, sin integrar <svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg></td></tr><tr><td><strong>MetaMask</strong></td><td>La billetera del usuario</td><td>Verificado en la app</td></tr><tr><td><strong>GCP Secret Manager</strong></td><td>Guardar claves secretas</td><td>Verificado en los scripts</td></tr></tbody></table></div>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Varios servicios están <strong>decididos en el diseño</strong> (elegidos) pero aún no integrados en el código. Los marcamos como <strong>pendiente de confirmar</strong>.</p></blockquote>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. Licencias: ¿de quién es cada pieza?</h2>
+<div class="table-wrap"><table><thead><tr><th>Pieza</th><th>Licencia</th><th>Qué significa en simple</th></tr></thead><tbody><tr><td>Contratos de TrueKeate</td><td>MIT</td><td>Código abierto y libre</td></tr><tr><td>Backend de TrueKeate</td><td>ISC</td><td>Permisiva, similar a MIT</td></tr><tr><td>App web</td><td>privada</td><td>Sin licencia pública declarada</td></tr><tr><td>OpenZeppelin</td><td>MIT</td><td>Libre (autor upstream)</td></tr><tr><td>forge-std</td><td>MIT/Apache-2.0</td><td>Libre (autor upstream)</td></tr></tbody></table></div>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p>No se ha hecho una revisión completa legal de las licencias de todas las piezas secundarias (las que traen otras piezas) → <strong>pendiente de confirmar</strong> si el proyecto necesita esa revisión.</p></blockquote>
+</section>
+<section class="seccion" id="s8"><h2 class="seccion">8. Mapa visual: las piezas por capa</h2>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5MYXMgcGllemFzIHBvciBjYXBhPC90ZXh0PgoKICA8IS0tIENhcGEgMSAtLT4KICA8cmVjdCB4PSI0MCIgeT0iODAiIHdpZHRoPSI3MjAiIGhlaWdodD0iODYiIHJ4PSIxNiIgZmlsbD0iI2ZkZjFlNyIgc3Ryb2tlPSIjYjA2YTJhIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSI2MCIgeT0iMTAyIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iYm9sZCI+Q2FwYSAxIMK3IENvbnRyYXRvcyAoYmxvY2tjaGFpbik8L3RleHQ+CiAgPGc+CiAgICA8cmVjdCB4PSI2MCIgeT0iMTE0IiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjM4IiByeD0iOSIgZmlsbD0iI2Y0YTI2MSIvPgogICAgPHRleHQgeD0iMTQwIiB5PSIxMzgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSJib2xkIj5Tb2xpZGl0eSAwLjguMjQ8L3RleHQ+CiAgPC9nPgogIDxnPgogICAgPHJlY3QgeD0iMjQwIiB5PSIxMTQiIHdpZHRoPSIxNjAiIGhlaWdodD0iMzgiIHJ4PSI5IiBmaWxsPSIjZjRhMjYxIi8+CiAgICA8dGV4dCB4PSIzMjAiIHk9IjEzOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMSIgZm9udC13ZWlnaHQ9ImJvbGQiPkZvdW5kcnk8L3RleHQ+CiAgPC9nPgogIDxnPgogICAgPHJlY3QgeD0iNDIwIiB5PSIxMTQiIHdpZHRoPSIxNjAiIGhlaWdodD0iMzgiIHJ4PSI5IiBmaWxsPSIjZjRhMjYxIi8+CiAgICA8dGV4dCB4PSI1MDAiIHk9IjEzMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9ImJvbGQiPk9wZW5aZXBwZWxpbjwvdGV4dD4KICAgIDx0ZXh0IHg9IjUwMCIgeT0iMTQ0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjguNSI+djUuMC4yIChPd25hYmxlLCBFUkMyMC4uLik8L3RleHQ+CiAgPC9nPgogIDxnPgogICAgPHJlY3QgeD0iNjAwIiB5PSIxMTQiIHdpZHRoPSIxNDAiIGhlaWdodD0iMzgiIHJ4PSI5IiBmaWxsPSIjZjRhMjYxIi8+CiAgICA8dGV4dCB4PSI2NzAiIHk9IjEzOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMSIgZm9udC13ZWlnaHQ9ImJvbGQiPmZvcmdlLXN0ZDwvdGV4dD4KICA8L2c+CgogIDwhLS0gQ2FwYSAyIC0tPgogIDxyZWN0IHg9IjQwIiB5PSIxOTAiIHdpZHRoPSI3MjAiIGhlaWdodD0iODYiIHJ4PSIxNiIgZmlsbD0iI2U4ZjZmYiIgc3Ryb2tlPSIjMWQ3ZmE4IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSI2MCIgeT0iMjEyIiBmaWxsPSIjMWQ3ZmE4IiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iYm9sZCI+Q2FwYSAyIMK3IFNlcnZpZG9yZXMgKE5vZGUuanMpPC90ZXh0PgogIDxnPgogICAgPHJlY3QgeD0iNjAiIHk9IjIyNCIgd2lkdGg9IjE2MCIgaGVpZ2h0PSIzOCIgcng9IjkiIGZpbGw9IiM0OGNhZTQiLz4KICAgIDx0ZXh0IHg9IjE0MCIgeT0iMjQ4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+ZXRoZXJzIDYuMTcuMDwvdGV4dD4KICA8L2c+CiAgPGc+CiAgICA8cmVjdCB4PSIyNDAiIHk9IjIyNCIgd2lkdGg9IjE2MCIgaGVpZ2h0PSIzOCIgcng9IjkiIGZpbGw9IiM0OGNhZTQiLz4KICAgIDx0ZXh0IHg9IjMyMCIgeT0iMjQ4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+RXhwcmVzcyA1LjIuMTwvdGV4dD4KICA8L2c+CiAgPGc+CiAgICA8cmVjdCB4PSI0MjAiIHk9IjIyNCIgd2lkdGg9IjE2MCIgaGVpZ2h0PSIzOCIgcng9IjkiIGZpbGw9IiM0OGNhZTQiLz4KICAgIDx0ZXh0IHg9IjUwMCIgeT0iMjQ4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5leHByZXNzLXJhdGUtbGltaXQ8L3RleHQ+CiAgPC9nPgogIDxnPgogICAgPHJlY3QgeD0iNjAwIiB5PSIyMjQiIHdpZHRoPSIxNDAiIGhlaWdodD0iMzgiIHJ4PSI5IiBmaWxsPSIjNDhjYWU0Ii8+CiAgICA8dGV4dCB4PSI2NzAiIHk9IjI0OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMSIgZm9udC13ZWlnaHQ9ImJvbGQiPnBnIDguMjMuMDwvdGV4dD4KICA8L2c+CgogIDwhLS0gQ2FwYSAzIC0tPgogIDxyZWN0IHg9IjQwIiB5PSIzMDAiIHdpZHRoPSI3MjAiIGhlaWdodD0iODYiIHJ4PSIxNiIgZmlsbD0iI2U2ZjRmMiIgc3Ryb2tlPSIjMWY2ZjY0IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSI2MCIgeT0iMzIyIiBmaWxsPSIjMWY2ZjY0IiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iYm9sZCI+Q2FwYSAzIMK3IEFwcCB3ZWI8L3RleHQ+CiAgPGc+CiAgICA8cmVjdCB4PSI2MCIgeT0iMzM0IiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjM4IiByeD0iOSIgZmlsbD0iIzJhOWQ4ZiIvPgogICAgPHRleHQgeD0iMTQwIiB5PSIzNTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSJib2xkIj5OZXh0LmpzIDE2LjMuNDwvdGV4dD4KICA8L2c+CiAgPGc+CiAgICA8cmVjdCB4PSIyNDAiIHk9IjMzNCIgd2lkdGg9IjE2MCIgaGVpZ2h0PSIzOCIgcng9IjkiIGZpbGw9IiMyYTlkOGYiLz4KICAgIDx0ZXh0IHg9IjMyMCIgeT0iMzU4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+UmVhY3QgMTkuMi44PC90ZXh0PgogIDwvZz4KICA8Zz4KICAgIDxyZWN0IHg9IjQyMCIgeT0iMzM0IiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjM4IiByeD0iOSIgZmlsbD0iIzJhOWQ4ZiIvPgogICAgPHRleHQgeD0iNTAwIiB5PSIzNTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSJib2xkIj5UYWlsd2luZCA0LjMuMzwvdGV4dD4KICA8L2c+CiAgPGc+CiAgICA8cmVjdCB4PSI2MDAiIHk9IjMzNCIgd2lkdGg9IjE0MCIgaGVpZ2h0PSIzOCIgcng9IjkiIGZpbGw9IiMyYTlkOGYiLz4KICAgIDx0ZXh0IHg9IjY3MCIgeT0iMzU4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+ZXRoZXJzIDYuMTcuMDwvdGV4dD4KICA8L2c+CgogIDwhLS0gQ2FwYSBzZXJ2aWNpb3MgZXh0ZXJub3MgLS0+CiAgPHJlY3QgeD0iNDAiIHk9IjQxMCIgd2lkdGg9IjcyMCIgaGVpZ2h0PSI3NCIgcng9IjE2IiBmaWxsPSIjZmRmNmUzIiBzdHJva2U9IiM4YTZkMWYiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjYwIiB5PSI0MzIiIGZpbGw9IiM4YTZkMWYiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSJib2xkIj5TZXJ2aWNpb3MgZXh0ZXJub3M8L3RleHQ+CiAgPGc+CiAgICA8cmVjdCB4PSI2MCIgeT0iNDQyIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjMyIiByeD0iOSIgZmlsbD0iI2Q0YWYzNyIvPgogICAgPHRleHQgeD0iMTM1IiB5PSI0NjMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPlBvc3RncmVTUUwgKyBQb3N0R0lTPC90ZXh0PgogIDwvZz4KICA8Zz4KICAgIDxyZWN0IHg9IjIyNSIgeT0iNDQyIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjMyIiByeD0iOSIgZmlsbD0iI2Q0YWYzNyIvPgogICAgPHRleHQgeD0iMzAwIiB5PSI0NjMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkdDUCBTZWNyZXQgTWFuYWdlcjwvdGV4dD4KICA8L2c+CiAgPGc+CiAgICA8cmVjdCB4PSIzOTAiIHk9IjQ0MiIgd2lkdGg9IjEzMCIgaGVpZ2h0PSIzMiIgcng9IjkiIGZpbGw9IiNkNGFmMzciLz4KICAgIDx0ZXh0IHg9IjQ1NSIgeT0iNDYzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5NZXRhTWFzazwvdGV4dD4KICA8L2c+CiAgPGc+CiAgICA8cmVjdCB4PSI1MzUiIHk9IjQ0MiIgd2lkdGg9IjE1MCIgaGVpZ2h0PSIzMiIgcng9IjkiIGZpbGw9IiNlOWU1ZjAiIHN0cm9rZT0iIzhkODZhOSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICAgIDx0ZXh0IHg9IjYxMCIgeT0iNDYzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5JUEZTIChwZW5kaWVudGUpPC90ZXh0PgogIDwvZz4KCiAgPCEtLSBSZWxhdGlvbnMgYXJyb3dzIGJldHdlZW4gY2FwcyAtLT4KICA8ZyBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgbWFya2VyLWVuZD0idXJsKCNhcnIpIj4KICAgIDxsaW5lIHgxPSI0MDAiIHkxPSIxNjgiIHgyPSI0MDAiIHkyPSIxODYiLz4KICAgIDxsaW5lIHgxPSI0MDAiIHkxPSIyNzgiIHgyPSI0MDAiIHkyPSIyOTYiLz4KICA8L2c+CiAgPHRleHQgeD0iNDEyIiB5PSIxODAiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iOS41Ij5zZSBhcG95YSBlbjwvdGV4dD4KICA8dGV4dCB4PSI0MTIiIHk9IjI5MCIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSI5LjUiPmhhYmxhIGNvbjwvdGV4dD4KPC9zdmc+Cg==" alt="Mapa Piezas"/><figcaption class="fig-caption">Figura · Mapa Piezas</figcaption></figure>
+</section>
+<section class="seccion" id="s9"><h2 class="seccion">9. Qué falta confirmar</h2>
+<ol><li>La versión de Node.js no está fijada en el proyecto → <strong>pendiente de confirmar</strong>.</li><li>La versión de Foundry no está fijada → <strong>pendiente de confirmar</strong>.</li><li>La versión del servicio PostgreSQL en la nube → <strong>pendiente de confirmar</strong>.</li><li>IPFS, mapas (OSM) y correos (SMTP) están elegidos en el diseño pero no integrados → <strong>pendiente de confirmar</strong>.</li><li>No existe política escrita de actualización de piezas (ni robot automático de actualizaciones) → <strong>pendiente de confirmar</strong>.</li><li>Revisión legal completa de licencias → <strong>pendiente de confirmar</strong>.</li></ol>
+</section>
+<section class="seccion" id="s10"><h2 class="seccion">10. Glosario de este manual</h2>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Significado</th></tr></thead><tbody><tr><td><strong>Dependencia</strong></td><td>Pieza de software que otro software usa</td></tr><tr><td><strong>Librería</strong></td><td>Conjunto de piezas listas para usar</td></tr><tr><td><strong>Versión</strong></td><td>Número que identifica una edición del código</td></tr><tr><td><strong>Lockfile</strong></td><td>Recibo con las versiones exactas instaladas</td></tr><tr><td><strong>Submódulo</strong></td><td>Pieza guardada en otro repositorio, fijada por huella digital</td></tr><tr><td><strong>Semver</strong></td><td>Formato de versiones: mayor.menor.parche</td></tr><tr><td><strong>Licencia</strong></td><td>Permiso legal de uso del código</td></tr><tr><td><strong>Runtime</strong></td><td>El motor que ejecuta el programa (p. ej. Node.js)</td></tr></tbody></table></div>
+<p>Continúa con el manual <strong>04-Despliegue</strong>: dónde vive TrueKeate y cómo se actualiza.</p>
+</section>
+</main>
+
+</body>
+</html>

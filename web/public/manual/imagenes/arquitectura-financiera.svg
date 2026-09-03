@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <rect width="800" height="54" fill="#1a2b4c"/>
+  <rect y="50" width="800" height="4" fill="#d4af37"/>
+  <text x="400" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">La arquitectura financiera</text>
+
+  <!-- Padron -->
+  <rect x="60" y="95" width="220" height="105" rx="14" fill="#48cae4"/>
+  <text x="170" y="130" text-anchor="middle" fill="#0a1128" font-size="13" font-weight="bold">Padron de Socios</text>
+  <text x="170" y="150" text-anchor="middle" fill="#0a1128" font-size="10.5">votan decisiones</text>
+  <text x="170" y="166" text-anchor="middle" fill="#0a1128" font-size="10.5">admiten Socios</text>
+  <text x="170" y="182" text-anchor="middle" fill="#0a1128" font-size="10.5">votan propuestas economicas</text>
+
+  <!-- Fondo -->
+  <rect x="530" y="90" width="230" height="110" rx="14" fill="#d4af37"/>
+  <text x="645" y="126" text-anchor="middle" fill="#0a1128" font-size="13.5" font-weight="bold">Fondo de Valor</text>
+  <text x="645" y="148" text-anchor="middle" fill="#0a1128" font-size="11">la hucha comun</text>
+  <text x="645" y="166" text-anchor="middle" fill="#0a1128" font-size="10.5">paga gastos de operacion</text>
+  <text x="645" y="182" text-anchor="middle" fill="#0a1128" font-size="10.5">retiros: solo el Owner</text>
+
+  <!-- BRLT -->
+  <rect x="300" y="230" width="200" height="100" rx="14" fill="#2a9d8f"/>
+  <text x="400" y="266" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="bold">BRLT</text>
+  <text x="400" y="286" text-anchor="middle" fill="#ffffff" font-size="10.5">moneda ERC-20 de la</text>
+  <text x="400" y="301" text-anchor="middle" fill="#ffffff" font-size="10.5">plataforma · tope inicial</text>
+  <text x="400" y="316" text-anchor="middle" fill="#ffffff" font-size="10.5">1.000.000 BRLT</text>
+
+  <!-- Suscripcion -->
+  <rect x="530" y="360" width="230" height="90" rx="14" fill="#1a2b4c"/>
+  <text x="645" y="392" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">Suscripcion de empresa</text>
+  <text x="645" y="410" text-anchor="middle" fill="#ffffff" font-size="10.5">bloqueo de 30 dias</text>
+  <text x="645" y="426" text-anchor="middle" fill="#f3e5ab" font-size="10.5">plan base: 100 BRLT/mes</text>
+
+  <!-- Padron <-> BRLT -->
+  <line x1="200" y1="213" x2="340" y2="231" stroke="#1a2b4c" stroke-width="2.5" marker-start="url(#arr)" marker-end="url(#arr)"/>
+  <text x="268" y="222" text-anchor="middle" fill="#1a2b4c" font-size="8.5" font-weight="bold" paint-order="stroke" stroke="#ffffff" stroke-width="3">autoridad de emision + propuestas</text>
+
+  <!-- BRLT -> Fondo (5%) -->
+  <line x1="502" y1="258" x2="562" y2="214" stroke="#8a6d1f" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="560" y="246" fill="#8a6d1f" font-size="10" font-weight="bold" paint-order="stroke" stroke="#ffffff" stroke-width="3">5% de cada emision</text>
+
+  <!-- Fondo <-> Suscripcion (10%) -->
+  <line x1="600" y1="358" x2="600" y2="216" stroke="#8a6d1f" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="612" y="300" fill="#8a6d1f" font-size="10" font-weight="bold" paint-order="stroke" stroke="#ffffff" stroke-width="3">10% al fondo</text>
+
+  <!-- Suscripcion -> BRLT (cobro) -->
+  <line x1="520" y1="420" x2="497" y2="334" stroke="#1a2b4c" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="452" y="398" text-anchor="middle" fill="#1a2b4c" font-size="9.5" font-weight="bold" paint-order="stroke" stroke="#ffffff" stroke-width="3">cobro en BRLT</text>
+
+  <!-- Note -->
+  <rect x="60" y="468" width="700" height="26" rx="10" fill="#f3e5ab"/>
+  <text x="410" y="486" text-anchor="middle" fill="#0a1128" font-size="9.5" font-weight="bold">Pendiente: el Escrow aun no se conecta con el Padron · el 1% de los trueques al fondo no esta implementado</text>
+</svg>

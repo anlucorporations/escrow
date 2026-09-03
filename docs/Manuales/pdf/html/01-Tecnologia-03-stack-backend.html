@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · Los servidores que vigilan los trueques</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">01 · Tecnología</div>
+    <h1>Los servidores que vigilan los trueques</h1>
+    <div class="intro">Versión en lenguaje sencillo del manual técnico del backend (Node.js). Aquí contamos qué hacen los "trabajadores invisibles" de TrueKeate.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>01-Tecnologia/03-stack-backend.md</b></span>
+      <span>Edición: <b>3 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/01-Tecnologia/03-stack-backend</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Tecnología · Tecnologia — Los servidores que vigilan los trueques</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>El camarero: la API (REST)</span></a><div class="subs"><a href="#sub1">2.1 ¿Qué es una API?</a><br><a href="#sub2">2.2 Qué puertas existen</a><br><a href="#sub3">2.3 Reglas de negocio que la API hace cumplir</a><br><a href="#sub4">2.4 ¿Cómo sabe la API quién eres?</a></div></li><li><a href="#s3"><span class="tnum">3</span><span>La base de datos: PostgreSQL (el almacén)</span></a><div class="subs"><a href="#sub5">3.1 ¿Para qué sirve si ya está la blockchain?</a><br><a href="#sub6">3.2 Regla de oro</a><br><a href="#sub7">3.3 Datos personales protegidos</a><br><a href="#sub8">3.4 ¿Dónde está la base de datos?</a></div></li><li><a href="#s4"><span class="tnum">4</span><span>El vigilante: el indexador</span></a><div class="subs"><a href="#sub9">4.1 Su trabajo</a><br><a href="#sub10">4.2 ¿Y si se pierde algo?</a><br><a href="#sub11">4.3 El vigilante también informa</a></div></li><li><a href="#s5"><span class="tnum">5</span><span>El mensajero: el relayer</span></a><div class="subs"><a href="#sub12">5.1 Su trabajo en simple</a><br><a href="#sub13">5.2 Su salud: ¿está todo bien?</a><br><a href="#sub14">5.3 ¿Y si el mensajero se cae?</a></div></li><li><a href="#s6"><span class="tnum">6</span><span>Seguridad: límites y frenos</span></a></li><li><a href="#s7"><span class="tnum">7</span><span>Cómo se sabe que todo funciona: pruebas</span></a></li><li><a href="#s8"><span class="tnum">8</span><span>Qué falta confirmar</span></a></li><li><a href="#s9"><span class="tnum">9</span><span>Glosario de este manual</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos</h2>
+<p>TrueKeate no es solo blockchain: detrás hay <strong>servidores</strong> (ordenadores siempre encendidos) que hacen tres trabajos:</p>
+<ol><li><strong>El vigilante de eventos (indexador)</strong>: mira la blockchain y copia lo que pasa a la base de datos, para que la app sea rápida.</li><li><strong>El mensajero que paga (relayer)</strong>: envía las operaciones de los usuarios particulares a la blockchain y paga el gas por ellos.</li><li><strong>El camarero de peticiones (API)</strong>: atiende a la app web/móvil: "dame el catálogo", "crea un trueque", "inicia sesión".</li></ol>
+<p>Es como un restaurante:</p>
+<ul><li>La <strong>API</strong> es el camarero que toma los pedidos de los clientes.</li><li>El <strong>indexador</strong> es el que anota en el libro de contabilidad lo que ocurre en la cocina.</li><li>El <strong>relayer</strong> es el repartidor que lleva los pedidos a la blockchain pagando el envío.</li></ul>
+<p>Los tres hablan el mismo idioma que la blockchain (una librería llamada <strong>ethers</strong>) y guardan datos en una base de datos llamada <strong>PostgreSQL</strong>.</p>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. El camarero: la API (REST)</h2>
+<h3 class="sub" id="sub1">2.1 ¿Qué es una API?</h3>
+<p>Una API es la "boca" de los servidores: un conjunto de puertas (direcciones) por las que la app pide cosas.</p>
+<p>Ejemplo real: cuando Ana abre el catálogo, su app le pide a la API: "dame los artículos disponibles". La API responde con la lista.</p>
+<h3 class="sub" id="sub2">2.2 Qué puertas existen</h3>
+<div class="table-wrap"><table><thead><tr><th>Área</th><th>Para qué sirve</th><th>Ejemplo de petición</th></tr></thead><tbody><tr><td><code>/auth</code></td><td>Entrar y registrarse</td><td>"iniciar sesión con mi firma"</td></tr><tr><td><code>/kyc</code></td><td>Subir en la escalera de verificación</td><td>"envié mi documento y selfie"</td></tr><tr><td><code>/catalog</code></td><td>Publicar y ver artículos</td><td>"publicar mi bici", "ver encargos"</td></tr><tr><td><code>/truekes</code></td><td>Gestionar trueques</td><td>"crear trueque", "firmar recepción"</td></tr><tr><td><code>/admin</code></td><td>Panel del Owner</td><td>"ver usuarios", "estado de los servidores"</td></tr><tr><td><code>/reputacion</code></td><td>Ver la reputación</td><td>"¿qué puntuación tengo?"</td></tr><tr><td><code>/subastas</code></td><td>Subastas de empresas</td><td>"hacer una puja"</td></tr></tbody></table></div>
+<h3 class="sub" id="sub3">2.3 Reglas de negocio que la API hace cumplir</h3>
+<ol><li>Para crear un trueque necesitas sesión iniciada y estar <strong>VERIFICADO</strong> o <strong>CERTIFICADO</strong>.</li><li>Si estás VERIFICADO, máximo <strong>3 trueques activos</strong> a la vez.</li><li>Las valoraciones son de 1 a 5 en cinco aspectos.</li></ol>
+<h3 class="sub" id="sub4">2.4 ¿Cómo sabe la API quién eres?</h3>
+<p>Cuando Ana inicia sesión:</p>
+<ol><li>La app le pide firmar un mensaje con MetaMask: <em>"TrueKeate: iniciar sesión"</em>.</li><li>Con esa firma, la API sabe que Ana es Ana (la matemática lo demuestra).</li><li>La API le entrega un <strong>pase de sesión</strong> (un código secreto temporal).</li><li>Con ese pase, Ana puede pedir cosas durante un tiempo sin volver a firmar.</li></ol>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p>Nota de verificación: hoy los datos de la API viven en la <strong>memoria</strong> del servidor (como un bloc rápido) imitando las tablas de la base de datos. La conexión definitiva con PostgreSQL está prevista en una fase de integración posterior → <strong>pendiente de confirmar</strong>.</p></blockquote>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. La base de datos: PostgreSQL (el almacén)</h2>
+<h3 class="sub" id="sub5">3.1 ¿Para qué sirve si ya está la blockchain?</h3>
+<p>La blockchain es segura pero <strong>lenta para buscar</strong>. Imagina buscar una aguja en un pajar cada vez que quieres ver el catálogo.</p>
+<p>PostgreSQL es el almacén veloz: guarda <strong>copias</strong> de lo que pasa en la blockchain + todos los datos de uso (artículos, chats, valoraciones, ubicaciones, estadísticas).</p>
+<h3 class="sub" id="sub6">3.2 Regla de oro</h3>
+<p><strong>Solo el vigilante (indexador) escribe las copias del estado de los trueques.</strong> Nadie más puede tocar esas copias desde la base de datos. Si alguien modificara la base de datos a mano, no cambiaría nada en la blockchain: la cadena manda.</p>
+<h3 class="sub" id="sub7">3.3 Datos personales protegidos</h3>
+<p>Los datos sensibles (correo, teléfono, dirección, documento de identidad, selfie) están marcados para guardarse <strong>cifrados</strong> (encriptados). Eso significa que aunque alguien robara la base de datos, no podría leerlos.</p>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: el cifrado está marcado en el diseño del esquema, pero <strong>no se ha verificado</strong> el mecanismo concreto que lo implementa.</p></blockquote>
+<h3 class="sub" id="sub8">3.4 ¿Dónde está la base de datos?</h3>
+<p>TrueKeate reutiliza un servicio de base de datos en la nube de Google (GCP) llamado internamente <code>mcc-postgres</code>, con una herramienta de administración llamada pgAdmin. Ver manual 04-Despliegue.</p>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. El vigilante: el indexador</h2>
+<h3 class="sub" id="sub9">4.1 Su trabajo</h3>
+<p>La blockchain emite <strong>eventos</strong> cuando algo pasa (un "grito" público): "¡El trueque 42 pasó a CUSTODIADO!", "¡Ana fue admitida como SOCIO!".</p>
+<p>El indexador está <strong>siempre escuchando</strong>. Cuando oye un evento:</p>
+<ol><li>Anota en su libro (auditoría) que ya lo vio, para no repetirlo.</li><li>Copia el cambio a la base de datos (tablas espejo).</li><li>Guarda la marca de hasta dónde ha leído (checkpoint).</li></ol>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjgiIG1hcmtlckhlaWdodD0iOCIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5FbCB2aWdpbGFudGUgY29waWEgbG9zIGV2ZW50b3MgYSBsYSBiYXNlIGRlIGRhdG9zPC90ZXh0PgoKICA8IS0tIEJsb2NrY2hhaW4gZ3JvdXAgLS0+CiAgPHJlY3QgeD0iNDAiIHk9IjkwIiB3aWR0aD0iMjIwIiBoZWlnaHQ9IjMwMCIgcng9IjE2IiBmaWxsPSIjZmZmMWYwIiBzdHJva2U9IiNlNjM5NDYiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjE1MCIgeT0iMTE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjYTgyMzJkIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCI+QmxvY2tjaGFpbjwvdGV4dD4KICA8dGV4dCB4PSIxNTAiIHk9IjEzNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2E4MjMyZCIgZm9udC1zaXplPSIxMCI+ZnVlbnRlIGRlIHZlcmRhZDwvdGV4dD4KICA8Zz4KICAgIDxyZWN0IHg9IjYwIiB5PSIxNjAiIHdpZHRoPSIxODAiIGhlaWdodD0iNTYiIHJ4PSIxMCIgZmlsbD0iI2U2Mzk0NiIvPgogICAgPHRleHQgeD0iMTUwIiB5PSIxODQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSJib2xkIj5FdmVudG88L3RleHQ+CiAgICA8dGV4dCB4PSIxNTAiIHk9IjIwMSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMCI+VHJ1ZWtlIDQyIC0mZ3Q7IENVU1RPRElBRE88L3RleHQ+CiAgPC9nPgogIDxnPgogICAgPHJlY3QgeD0iNjAiIHk9IjIzNSIgd2lkdGg9IjE4MCIgaGVpZ2h0PSI1NiIgcng9IjEwIiBmaWxsPSIjZTYzOTQ2Ii8+CiAgICA8dGV4dCB4PSIxNTAiIHk9IjI1OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMSIgZm9udC13ZWlnaHQ9ImJvbGQiPkV2ZW50bzwvdGV4dD4KICAgIDx0ZXh0IHg9IjE1MCIgeT0iMjc2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwIj5BbmEgYWRtaXRpZGEgY29tbyBTT0NJTzwvdGV4dD4KICA8L2c+CiAgPGc+CiAgICA8cmVjdCB4PSI2MCIgeT0iMzEwIiB3aWR0aD0iMTgwIiBoZWlnaHQ9IjU2IiByeD0iMTAiIGZpbGw9IiNlNjM5NDYiLz4KICAgIDx0ZXh0IHg9IjE1MCIgeT0iMzM0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+RXZlbnRvPC90ZXh0PgogICAgPHRleHQgeD0iMTUwIiB5PSIzNTEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAiPlRydWVrZUNvbXBsZXRhZG88L3RleHQ+CiAgPC9nPgoKICA8IS0tIEFycm93cyBmcm9tIGV2ZW50cyB0byBpbmRleGVyIC0tPgogIDxnIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyLjUiIG1hcmtlci1lbmQ9InVybCgjYXJyKSI+CiAgICA8bGluZSB4MT0iMjQyIiB5MT0iMTg4IiB4Mj0iMjg4IiB5Mj0iMTg4Ii8+CiAgICA8bGluZSB4MT0iMjQyIiB5MT0iMjYzIiB4Mj0iMjg4IiB5Mj0iMjYzIi8+CiAgICA8bGluZSB4MT0iMjQyIiB5MT0iMzM4IiB4Mj0iMjg4IiB5Mj0iMzM4Ii8+CiAgPC9nPgogIDx0ZXh0IHg9IjI2NSIgeT0iMzAwIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwIiB0cmFuc2Zvcm09InJvdGF0ZSgtOTAgMjY1IDMwMCkiIHRleHQtYW5jaG9yPSJtaWRkbGUiPmxlZSBldmVudG9zPC90ZXh0PgoKICA8IS0tIEluZGV4YWRvciBncm91cCAtLT4KICA8cmVjdCB4PSIzMDAiIHk9IjkwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjMwMCIgcng9IjE2IiBmaWxsPSIjZThmNmZiIiBzdHJva2U9IiMxZDdmYTgiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMTE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWQ3ZmE4IiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCI+VmlnaWxhbnRlPC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMTM2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWQ3ZmE4IiBmb250LXNpemU9IjEwIj5pbmRleGFkb3I8L3RleHQ+CiAgPHJlY3QgeD0iMzE4IiB5PSIxNjAiIHdpZHRoPSIxNjQiIGhlaWdodD0iMjEwIiByeD0iMTIiIGZpbGw9IiM0OGNhZTQiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjE5MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiPkVzY3VjaGEgZXZlbnRvczwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjIzMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMSI+MS4gQW5vdGEgcXVlPC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMjQ4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjExIj55YSBsbyB2aW88L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSIyOTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTEiPjIuIENvcGlhIGVsIGNhbWJpbzwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjMzMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMSI+My4gR3VhcmRhPC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQ2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjExIj5jaGVja3BvaW50PC90ZXh0PgoKICA8IS0tIEFycm93cyBpbmRleGFkb3IgLT4gQkQgLS0+CiAgPGcgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIuNSIgbWFya2VyLWVuZD0idXJsKCNhcnIpIj4KICAgIDxsaW5lIHgxPSI1MDIiIHkxPSIyMTAiIHgyPSI1NDgiIHkyPSIyMTAiLz4KICAgIDxsaW5lIHgxPSI1MDIiIHkxPSIyOTAiIHgyPSI1NDgiIHkyPSIyOTAiLz4KICA8L2c+CiAgPHRleHQgeD0iNTI1IiB5PSIxOTAiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPmVzY3JpYmU8L3RleHQ+CiAgPHRleHQgeD0iNTI1IiB5PSIyNTIiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPmNvcGlhczwvdGV4dD4KCiAgPCEtLSBCRCBncm91cCAtLT4KICA8cmVjdCB4PSI1NjAiIHk9IjkwIiB3aWR0aD0iMjEwIiBoZWlnaHQ9IjMwMCIgcng9IjE2IiBmaWxsPSIjZTZmNGYyIiBzdHJva2U9IiMxZjZmNjQiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjY2NSIgeT0iMTE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWY2ZjY0IiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCI+QmFzZSBkZSBkYXRvczwvdGV4dD4KICA8dGV4dCB4PSI2NjUiIHk9IjEzNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFmNmY2NCIgZm9udC1zaXplPSIxMCI+Y29waWFzIHJhcGlkYXM8L3RleHQ+CiAgPGc+CiAgICA8cmVjdCB4PSI1NzgiIHk9IjE2MCIgd2lkdGg9IjE3NCIgaGVpZ2h0PSI3MiIgcng9IjEwIiBmaWxsPSIjMmE5ZDhmIi8+CiAgICA8dGV4dCB4PSI2NjUiIHk9IjE4NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMSIgZm9udC13ZWlnaHQ9ImJvbGQiPlRhYmxhIHRydWVrZXM8L3RleHQ+CiAgICA8dGV4dCB4PSI2NjUiIHk9IjIwMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMCI+ZXN0YWRvIGFjdHVhbGl6YWRvPC90ZXh0PgogICAgPHRleHQgeD0iNjY1IiB5PSIyMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAiPmVzcGVqbyBkZWwgZXNjcm93PC90ZXh0PgogIDwvZz4KICA8Zz4KICAgIDxyZWN0IHg9IjU3OCIgeT0iMjUwIiB3aWR0aD0iMTc0IiBoZWlnaHQ9IjcyIiByeD0iMTAiIGZpbGw9IiMyYTlkOGYiLz4KICAgIDx0ZXh0IHg9IjY2NSIgeT0iMjc1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+VGFibGEgdXN1YXJpb3M8L3RleHQ+CiAgICA8dGV4dCB4PSI2NjUiIHk9IjI5MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMCI+dGlwbyA9IFNPQ0lPPC90ZXh0PgogICAgPHRleHQgeD0iNjY1IiB5PSIzMDkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAiPmh1ZWxsYSB2ZXJpZmljYWRhPC90ZXh0PgogIDwvZz4KICA8Zz4KICAgIDxyZWN0IHg9IjU3OCIgeT0iMzQwIiB3aWR0aD0iMTc0IiBoZWlnaHQ9IjM2IiByeD0iMTAiIGZpbGw9IiMxYTJiNGMiLz4KICAgIDx0ZXh0IHg9IjY2NSIgeT0iMzYzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZjNlNWFiIiBmb250LXNpemU9IjEwLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5hdWRpdG9yaWE6IGJpdGFjb3JhPC90ZXh0PgogIDwvZz4KCiAgPCEtLSBCb3R0b20gbm90ZSAtLT4KICA8cmVjdCB4PSI2MCIgeT0iNDIwIiB3aWR0aD0iNjgwIiBoZWlnaHQ9IjQ0IiByeD0iMTIiIGZpbGw9IiNmM2U1YWIiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjQzOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMS41IiBmb250LXdlaWdodD0iYm9sZCI+U2kgZWwgdmlnaWxhbnRlIHNlIGNhZSBvIHNlIHBpZXJkZSB1biBldmVudG8sIHNlIHJlcHJvY2VzYTwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjQ1NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMSI+cmVsZXllbmRvIGxhIGJsb2NrY2hhaW4gZGVzZGUgdW4gYmxvcXVlIGFudGVyaW9yOiBsb3MgZXZlbnRvcyB0aWVuZW4gbnVtZXJvIGRlIHNlcmllIHVuaWNvIHkgbnVuY2Egc2UgZHVwbGljYW48L3RleHQ+Cjwvc3ZnPgo=" alt="Indexador Copia"/><figcaption class="fig-caption">Figura · Indexador Copia</figcaption></figure>
+<h3 class="sub" id="sub10">4.2 ¿Y si se pierde algo?</h3>
+<p>Si el vigilante se cae o se pierde un evento, se puede <strong>reprocesar</strong>: volver a leer la blockchain desde un bloque anterior y rehacer las copias. Como cada evento tiene un número de serie único, no se duplican (el sistema omite lo que ya está anotado).</p>
+<h3 class="sub" id="sub11">4.3 El vigilante también informa</h3>
+<p>El indexador calcula el <strong>retraso</strong> (lag): cuántos eventos hay entre lo último que leyó y lo último que pasó en la blockchain. Si el retraso crece, algo va mal y el Owner lo ve en su panel.</p>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. El mensajero: el relayer</h2>
+<h3 class="sub" id="sub12">5.1 Su trabajo en simple</h3>
+<p>Cuando Ana quiere hacer una operación sin pagar gas:</p>
+<ol><li>Ana firma con su billetera (ver manual 02-stack-web3).</li><li>La API recibe la firma y llama al relayer.</li><li>El relayer <strong>revisa todo</strong> (red, bloqueos, límite diario, número de serie, estado de verificación).</li><li>Si todo está bien, envía la operación a la blockchain pagando el gas.</li></ol>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5Mb3Mgc2Vydmlkb3JlcyB2aWdpbGFudGVzIGRlIFRydWVLZWF0ZTwvdGV4dD4KCiAgPHRleHQgeD0iNDAiIHk9IjgwIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+VVNVQVJJT1M8L3RleHQ+CiAgPHRleHQgeD0iMzAwIiB5PSI4MCIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMSIgZm9udC13ZWlnaHQ9ImJvbGQiPlVTVUFSSU9TPC90ZXh0PgogIDx0ZXh0IHg9IjQwIiB5PSIyMjIiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSJib2xkIj5TRVJWSURPUkVTIERFIFRSVUVLRUFURTwvdGV4dD4KICA8dGV4dCB4PSIzMDAiIHk9IjM4MiIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMSIgZm9udC13ZWlnaHQ9ImJvbGQiPkdVQVJEQURPPC90ZXh0PgoKICA8IS0tIFVzZXJzIC0tPgogIDxyZWN0IHg9IjQwIiB5PSI5MCIgd2lkdGg9IjE4MCIgaGVpZ2h0PSI3MCIgcng9IjE0IiBmaWxsPSIjNDhjYWU0Ii8+CiAgPHRleHQgeD0iMTMwIiB5PSIxMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSJib2xkIj5BbmEgwrcgcGFydGljdWxhcjwvdGV4dD4KICA8dGV4dCB4PSIxMzAiIHk9IjEzNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41Ij5maXJtYSwgbm8gcGFnYSBnYXM8L3RleHQ+CgogIDxyZWN0IHg9IjU4MCIgeT0iOTAiIHdpZHRoPSIxODAiIGhlaWdodD0iNzAiIHJ4PSIxNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjY3MCIgeT0iMTE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEzIiBmb250LXdlaWdodD0iYm9sZCI+RW1wcmVzYTwvdGV4dD4KICA8dGV4dCB4PSI2NzAiIHk9IjEzNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41Ij5lbnZpYSBkaXJlY3RvLCBwYWdhIHN1IGdhczwvdGV4dD4KCiAgPCEtLSBTZXJ2ZXJzIC0tPgogIDxyZWN0IHg9IjQwIiB5PSIyNDAiIHdpZHRoPSIxODAiIGhlaWdodD0iODYiIHJ4PSIxNCIgZmlsbD0iIzJhOWQ4ZiIvPgogIDx0ZXh0IHg9IjEzMCIgeT0iMjcwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEzIiBmb250LXdlaWdodD0iYm9sZCI+Q2FtYXJlcm8gwrcgQVBJPC90ZXh0PgogIDx0ZXh0IHg9IjEzMCIgeT0iMjg4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwIj5yZWNpYmUgcGV0aWNpb25lczwvdGV4dD4KICA8dGV4dCB4PSIxMzAiIHk9IjMwNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMCI+ZGUgbGEgYXBwPC90ZXh0PgoKICA8cmVjdCB4PSIzMDAiIHk9IjI0MCIgd2lkdGg9IjE4MCIgaGVpZ2h0PSI4NiIgcng9IjE0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHRleHQgeD0iMzkwIiB5PSIyNzAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSJib2xkIj5NZW5zYWplcm8gwrcgcmVsYXllcjwvdGV4dD4KICA8dGV4dCB4PSIzOTAiIHk9IjI4OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2YzZTVhYiIgZm9udC1zaXplPSIxMCI+cmV2aXNhIGZpcm1hczwvdGV4dD4KICA8dGV4dCB4PSIzOTAiIHk9IjMwNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2YzZTVhYiIgZm9udC1zaXplPSIxMCI+ZW52aWEgeSBwYWdhIGVsIGdhczwvdGV4dD4KCiAgPHJlY3QgeD0iNTgwIiB5PSIyNDAiIHdpZHRoPSIxODAiIGhlaWdodD0iODYiIHJ4PSIxNCIgZmlsbD0iIzQ4Y2FlNCIvPgogIDx0ZXh0IHg9IjY3MCIgeT0iMjcwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEzIiBmb250LXdlaWdodD0iYm9sZCI+VmlnaWxhbnRlIMK3IGluZGV4YWRvcjwvdGV4dD4KICA8dGV4dCB4PSI2NzAiIHk9IjI4OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMCI+ZXNjdWNoYSBsb3MgZXZlbnRvczwvdGV4dD4KICA8dGV4dCB4PSI2NzAiIHk9IjMwNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMCI+Y29waWEgYSBsYSBiYXNlPC90ZXh0PgoKICA8IS0tIFN0b3JhZ2UgLS0+CiAgPHJlY3QgeD0iMzAwIiB5PSI0MDAiIHdpZHRoPSIxODAiIGhlaWdodD0iNzAiIHJ4PSIxNCIgZmlsbD0iI2U2Mzk0NiIvPgogIDx0ZXh0IHg9IjM5MCIgeT0iNDI4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEzIiBmb250LXdlaWdodD0iYm9sZCI+QmxvY2tjaGFpbjwvdGV4dD4KICA8dGV4dCB4PSIzOTAiIHk9IjQ0NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMCI+ZXN0YWRvcyBkZWwgZXNjcm93PC90ZXh0PgoKICA8cmVjdCB4PSI1ODAiIHk9IjQwMCIgd2lkdGg9IjE4MCIgaGVpZ2h0PSI3MCIgcng9IjE0IiBmaWxsPSIjMmE5ZDhmIi8+CiAgPHRleHQgeD0iNjcwIiB5PSI0MjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSJib2xkIj5Qb3N0Z3JlU1FMPC90ZXh0PgogIDx0ZXh0IHg9IjY3MCIgeT0iNDQ2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwIj5jb3BpYXMgcmFwaWRhczwvdGV4dD4KCiAgPCEtLSBBcnJvd3MgLS0+CiAgPGcgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIG1hcmtlci1lbmQ9InVybCgjYXJyKSI+CiAgICA8IS0tIEFuYSAtPiBBUEkgLS0+CiAgICA8bGluZSB4MT0iMTMwIiB5MT0iMTYyIiB4Mj0iMTMwIiB5Mj0iMjM2Ii8+CiAgICA8IS0tIEVtcHJlc2EgLT4gQkMgKGVsYm93IHBvciBsYSBpenF1aWVyZGEpIC0tPgogICAgPHBhdGggZD0iTSA1ODAgMTIwIEwgMjkwIDEyMCBMIDI5MCA0MzUgTCAyOTggNDM1Ii8+CiAgICA8IS0tIEFQSSAtPiByZWxheWVyIC0tPgogICAgPGxpbmUgeDE9IjIyMiIgeTE9IjI4MyIgeDI9IjI5NiIgeTI9IjI4MyIvPgogICAgPCEtLSByZWxheWVyIC0+IGJsb2NrY2hhaW4gLS0+CiAgICA8bGluZSB4MT0iMzkwIiB5MT0iMzI4IiB4Mj0iMzkwIiB5Mj0iMzk2Ii8+CiAgICA8IS0tIGJsb2NrY2hhaW4gLT4gaW5kZXhhZG9yIChldmVudG9zKSAtLT4KICAgIDxwYXRoIGQ9Ik0gNDgyIDQ0MCBMIDU2MCAzMjAiLz4KICAgIDwhLS0gaW5kZXhhZG9yIC0+IHBvc3RncmVzIC0tPgogICAgPGxpbmUgeDE9IjY3MCIgeTE9IjMyOCIgeDI9IjY3MCIgeTI9IjM5NiIvPgogIDwvZz4KCiAgPCEtLSBMYWJlbHMgLS0+CiAgPHRleHQgeD0iMTQyIiB5PSIyMTAiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiPnBldGljaW9uZXM8L3RleHQ+CiAgPHRleHQgeD0iNDE1IiB5PSIxMTIiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iOS41IiBmb250LXdlaWdodD0iYm9sZCI+ZGlyZWN0bzwvdGV4dD4KICA8dGV4dCB4PSI0MTUiIHk9IjEyNSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSI5LjUiPnBhZ2Egc3UgZ2FzPC90ZXh0PgogIDx0ZXh0IHg9IjI1NSIgeT0iMjc0IiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjkuNSI+bGxhbWE8L3RleHQ+CiAgPHRleHQgeD0iMzk4IiB5PSIzNzAiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiPnBhZ2EgZWwgZ2FzPC90ZXh0PgogIDx0ZXh0IHg9IjUwMCIgeT0iNDAwIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwIj5ldmVudG9zPC90ZXh0PgogIDx0ZXh0IHg9IjY4MCIgeT0iMzcwIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwIj5jb3BpYXM8L3RleHQ+Cjwvc3ZnPgo=" alt="Servidores Vigilantes"/><figcaption class="fig-caption">Figura · Servidores Vigilantes</figcaption></figure>
+<h3 class="sub" id="sub13">5.2 Su salud: ¿está todo bien?</h3>
+<p>El relayer se hace un chequeo médico periódico:</p>
+<ul><li>¿Tiene saldo la cuenta que paga el gas? Si baja de <strong>0,5 ETH</strong>, avisa al Owner.</li><li>¿Está conectado a la red correcta?</li></ul>
+<h3 class="sub" id="sub14">5.3 ¿Y si el mensajero se cae?</h3>
+<p>Está previsto un plan B (<strong>D39</strong>): si el relayer falla más de una hora, el usuario puede pagar el gas directamente y la plataforma le reembolsa en BRLT (la moneda propia) si la caída fue culpa del operador.</p>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: ese plan B está documentado como requisito, pero <strong>no se ha verificado</strong> su implantación operativa. También <strong>pendiente de confirmar</strong>: que el relayer corra como servicio independiente con 2 copias y cola de reintentos (así lo pide el diseño D15).</p></blockquote>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. Seguridad: límites y frenos</h2>
+<p>La API y el relayer tienen frenos para evitar abusos:</p>
+<div class="table-wrap"><table><thead><tr><th>Freno</th><th>Qué hace</th></tr></thead><tbody><tr><td><strong>Límite de peticiones</strong></td><td>Máximo 120 peticiones por minuto a la API</td></tr><tr><td><strong>Límite diario</strong></td><td>Máximo 20 operaciones gratis por usuario y día</td></tr><tr><td><strong>Bloqueo temporal</strong></td><td>3 fallos en 10 minutos → pausa de 1 hora</td></tr><tr><td><strong>Pase de sesión</strong></td><td>Las zonas privadas exigen tu pase válido</td></tr></tbody></table></div>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. Cómo se sabe que todo funciona: pruebas</h2>
+<p>El backend se prueba con pruebas automáticas:</p>
+<ul><li><strong>Pruebas del vigilante</strong>: ¿copia bien los eventos? ¿no duplica?</li><li><strong>Pruebas del mensajero</strong>: ¿rechaza firmas repetidas? ¿aplica los frenos?</li><li><strong>Pruebas del camarero</strong>: ¿responden bien todas las puertas de la API?</li></ul>
+<p>Documentado: <strong>19 de 19 pruebas pasan</strong> en el momento de escribir el manual técnico.</p>
+</section>
+<section class="seccion" id="s8"><h2 class="seccion">8. Qué falta confirmar</h2>
+<ol><li>El diseño pedía escribir el backend en TypeScript, pero el código real está en JavaScript → desviación del diseño, <strong>pendiente de confirmar</strong> si es intencional.</li><li>El cifrado real de datos personales en la base de datos → <strong>pendiente de confirmar</strong>.</li><li>La API guarda datos en memoria; la conexión definitiva con PostgreSQL está en fase de integración → <strong>pendiente de confirmar</strong>.</li><li>El relayer como servicio independiente con 2 instancias → <strong>pendiente de confirmar</strong>.</li><li>En el mapa de contratos del indexador, la dirección de las SmartAccounts de cada usuario figura como "pendiente" (las cuentas se crean una a una) → <strong>pendiente de confirmar</strong> cómo se resolverá en producción.</li></ol>
+</section>
+<section class="seccion" id="s9"><h2 class="seccion">9. Glosario de este manual</h2>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Significado</th></tr></thead><tbody><tr><td><strong>API</strong></td><td>Puertas de los servidores por las que la app pide cosas</td></tr><tr><td><strong>Endpoint</strong></td><td>Una puerta concreta de la API (una dirección + una acción)</td></tr><tr><td><strong>Evento</strong></td><td>Aviso público que emite la blockchain cuando algo pasa</td></tr><tr><td><strong>Checkpoint</strong></td><td>Marca de hasta dónde ha leído el vigilante</td></tr><tr><td><strong>Lag / retraso</strong></td><td>Distancia entre lo último leído y lo último ocurrido</td></tr><tr><td><strong>Pool</strong></td><td>Conjunto de conexiones preparadas a la base de datos</td></tr><tr><td><strong>Rate limiting</strong></td><td>Freno que limita peticiones por minuto</td></tr><tr><td><strong>Health-check</strong></td><td>Chequeo de salud de un servidor</td></tr></tbody></table></div>
+<p>Continúa con el manual <strong>04-stack-frontend</strong>: la app que ven las personas.</p>
+</section>
+</main>
+
+</body>
+</html>

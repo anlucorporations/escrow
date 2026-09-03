@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <rect width="800" height="54" fill="#1a2b4c"/>
+  <rect y="50" width="800" height="4" fill="#d4af37"/>
+  <text x="400" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">La API (la cocina) y sus servicios</text>
+
+  <!-- APP -->
+  <rect x="260" y="80" width="280" height="62" rx="14" fill="#48cae4"/>
+  <text x="400" y="108" text-anchor="middle" fill="#0a1128" font-size="14" font-weight="bold">La app (movil / web)</text>
+  <text x="400" y="128" text-anchor="middle" fill="#0a1128" font-size="10.5">peticiones con ticket de sesion</text>
+
+  <!-- API -->
+  <rect x="260" y="185" width="280" height="70" rx="14" fill="#1a2b4c"/>
+  <text x="400" y="215" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="bold">LA API · la cocina</text>
+  <text x="400" y="236" text-anchor="middle" fill="#f3e5ab" font-size="11">max. 120 peticiones por minuto</text>
+
+  <!-- Arrows app -> api -->
+  <line x1="400" y1="144" x2="400" y2="181" stroke="#1a2b4c" stroke-width="2.5" marker-end="url(#arr)"/>
+
+  <!-- Service row 1 -->
+  <g>
+    <rect x="60" y="300" width="150" height="60" rx="12" fill="#2a9d8f"/>
+    <text x="135" y="326" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">/auth</text>
+    <text x="135" y="344" text-anchor="middle" fill="#ffffff" font-size="10">registro y sesion</text>
+  </g>
+  <g>
+    <rect x="235" y="300" width="150" height="60" rx="12" fill="#2a9d8f"/>
+    <text x="310" y="326" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">/kyc</text>
+    <text x="310" y="344" text-anchor="middle" fill="#ffffff" font-size="10">verificacion 2 etapas</text>
+  </g>
+  <g>
+    <rect x="410" y="300" width="150" height="60" rx="12" fill="#2a9d8f"/>
+    <text x="485" y="326" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">/catalog</text>
+    <text x="485" y="344" text-anchor="middle" fill="#ffffff" font-size="10">escaparate y encargos</text>
+  </g>
+  <g>
+    <rect x="585" y="300" width="150" height="60" rx="12" fill="#2a9d8f"/>
+    <text x="660" y="326" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">/truekes</text>
+    <text x="660" y="344" text-anchor="middle" fill="#ffffff" font-size="10">trueques y valoraciones</text>
+  </g>
+
+  <!-- Service row 2 -->
+  <g>
+    <rect x="120" y="390" width="160" height="60" rx="12" fill="#d4af37"/>
+    <text x="200" y="416" text-anchor="middle" fill="#0a1128" font-size="12.5" font-weight="bold">/reputacion</text>
+    <text x="200" y="434" text-anchor="middle" fill="#0a1128" font-size="10">puntaje, nivel, medalla</text>
+  </g>
+  <g>
+    <rect x="320" y="390" width="160" height="60" rx="12" fill="#d4af37"/>
+    <text x="400" y="416" text-anchor="middle" fill="#0a1128" font-size="12.5" font-weight="bold">/subastas</text>
+    <text x="400" y="434" text-anchor="middle" fill="#0a1128" font-size="10">subastas de empresa</text>
+  </g>
+  <g>
+    <rect x="520" y="390" width="160" height="60" rx="12" fill="#d4af37"/>
+    <text x="600" y="416" text-anchor="middle" fill="#0a1128" font-size="12.5" font-weight="bold">/admin</text>
+    <text x="600" y="434" text-anchor="middle" fill="#0a1128" font-size="10">panel del Owner</text>
+  </g>
+
+  <!-- Fan arrows -->
+  <g stroke="#1a2b4c" stroke-width="2" fill="none" marker-end="url(#arr)">
+    <line x1="330" y1="257" x2="150" y2="296"/>
+    <line x1="360" y1="257" x2="295" y2="296"/>
+    <line x1="400" y1="257" x2="440" y2="296"/>
+    <line x1="440" y1="257" x2="600" y2="296"/>
+    <line x1="345" y1="257" x2="205" y2="386"/>
+    <line x1="410" y1="257" x2="405" y2="386"/>
+    <line x1="475" y1="257" x2="595" y2="386"/>
+  </g>
+
+  <!-- Observation -->
+  <rect x="60" y="466" width="680" height="24" rx="10" fill="#fdf1e7"/>
+  <text x="400" y="483" text-anchor="middle" fill="#0a1128" font-size="9.5" font-weight="bold">Observacion: el servicio /admin no exige rol de Owner (solo sesion) — pendiente de corregir</text>
+</svg>

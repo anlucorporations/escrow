@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <rect width="800" height="54" fill="#1a2b4c"/>
+  <rect y="50" width="800" height="4" fill="#d4af37"/>
+  <text x="400" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">Ejemplo de principio a fin: Ana y Bruno</text>
+
+  <!-- Stage labels -->
+  <text x="60" y="80" fill="#1a2b4c" font-size="11" font-weight="bold">1 · Identidad</text>
+  <text x="60" y="175" fill="#1a2b4c" font-size="11" font-weight="bold">2 · Catalogo</text>
+  <text x="60" y="275" fill="#1a2b4c" font-size="11" font-weight="bold">3 · El trueque (espejo del Escrow)</text>
+  <text x="60" y="420" fill="#1a2b4c" font-size="11" font-weight="bold">4 · Cierre y confianza</text>
+
+  <!-- Row1 personas -->
+  <g>
+    <rect x="60" y="90" width="320" height="62" rx="13" fill="#f4a261"/>
+    <text x="220" y="114" text-anchor="middle" fill="#0a1128" font-size="12.5" font-weight="bold">usuarios: Ana</text>
+    <text x="220" y="133" text-anchor="middle" fill="#0a1128" font-size="10.5">id 1 · wallet 0x...A</text>
+  </g>
+  <g>
+    <rect x="420" y="90" width="320" height="62" rx="13" fill="#f4a261"/>
+    <text x="580" y="114" text-anchor="middle" fill="#0a1128" font-size="12.5" font-weight="bold">usuarios: Bruno</text>
+    <text x="580" y="133" text-anchor="middle" fill="#0a1128" font-size="10.5">id 2 · wallet 0x...B</text>
+  </g>
+
+  <!-- Row2 articulos -->
+  <g>
+    <rect x="60" y="185" width="320" height="62" rx="13" fill="#e2e8f0"/>
+    <text x="220" y="209" text-anchor="middle" fill="#1a2b4c" font-size="12.5" font-weight="bold">articulos: bicicleta</text>
+    <text x="220" y="228" text-anchor="middle" fill="#1a2b4c" font-size="10.5">usuario_id -&gt; Ana (id 1)</text>
+  </g>
+  <g>
+    <rect x="420" y="185" width="320" height="62" rx="13" fill="#e2e8f0"/>
+    <text x="580" y="209" text-anchor="middle" fill="#1a2b4c" font-size="12" font-weight="bold">articulos: curso de fotografia</text>
+    <text x="580" y="228" text-anchor="middle" fill="#1a2b4c" font-size="10.5">usuario_id -&gt; Bruno (id 2)</text>
+  </g>
+
+  <!-- Row3 trueque -->
+  <rect x="60" y="285" width="680" height="100" rx="14" fill="#48cae4"/>
+  <text x="400" y="312" text-anchor="middle" fill="#0a1128" font-size="13.5" font-weight="bold">truekes: escrow 42</text>
+  <text x="400" y="334" text-anchor="middle" fill="#0a1128" font-size="11">articulo A -&gt; bicicleta de Ana · articulo B -&gt; curso de Bruno</text>
+  <rect x="240" y="346" width="320" height="28" rx="9" fill="#1a2b4c"/>
+  <text x="400" y="365" text-anchor="middle" fill="#ffffff" font-size="10.5" font-weight="bold">CREADO -&gt; CUSTODIADO -&gt; APERTURA -&gt; COMPLETADO</text>
+
+  <!-- Row4 valoraciones -->
+  <g>
+    <rect x="60" y="430" width="320" height="56" rx="13" fill="#d4af37"/>
+    <text x="220" y="453" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">valoraciones: Ana valora a Bruno</text>
+    <text x="220" y="471" text-anchor="middle" fill="#0a1128" font-size="10">5 notas del 1 al 5</text>
+  </g>
+  <g>
+    <rect x="420" y="430" width="320" height="56" rx="13" fill="#d4af37"/>
+    <text x="580" y="453" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">valoraciones: Bruno valora a Ana</text>
+    <text x="580" y="471" text-anchor="middle" fill="#0a1128" font-size="10">5 notas del 1 al 5</text>
+  </g>
+
+  <!-- Arrows -->
+  <g stroke="#1a2b4c" stroke-width="2.5" fill="none" marker-end="url(#arr)">
+    <line x1="220" y1="154" x2="220" y2="181"/>
+    <line x1="580" y1="154" x2="580" y2="181"/>
+    <line x1="220" y1="249" x2="320" y2="281"/>
+    <line x1="580" y1="249" x2="480" y2="281"/>
+    <path d="M 220 387 L 220 426"/>
+    <path d="M 580 387 L 580 426"/>
+  </g>
+</svg>

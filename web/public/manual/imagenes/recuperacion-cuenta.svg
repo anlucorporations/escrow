@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <rect width="800" height="54" fill="#1a2b4c"/>
+  <rect y="50" width="800" height="4" fill="#d4af37"/>
+  <text x="400" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">Recuperar tu cuenta con 3 guardianes</text>
+
+  <!-- PER -->
+  <rect x="80" y="80" width="300" height="54" rx="13" fill="#f4a261"/>
+  <text x="230" y="113" text-anchor="middle" fill="#0a1128" font-size="12.5" font-weight="bold">Pierdes el acceso a tu cuenta</text>
+
+  <!-- PROP -->
+  <rect x="80" y="165" width="300" height="54" rx="13" fill="#48cae4"/>
+  <text x="230" y="190" text-anchor="middle" fill="#0a1128" font-size="12" font-weight="bold">Un guardian propone</text>
+  <text x="230" y="207" text-anchor="middle" fill="#0a1128" font-size="10.5">un nuevo dueno</text>
+
+  <!-- AP1 -->
+  <rect x="80" y="250" width="300" height="54" rx="13" fill="#2a9d8f"/>
+  <text x="230" y="275" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="bold">Guardián 1 aprueba</text>
+  <text x="230" y="292" text-anchor="middle" fill="#ffffff" font-size="10.5">(una aprobacion)</text>
+
+  <!-- AP2 -->
+  <rect x="80" y="335" width="300" height="54" rx="13" fill="#2a9d8f"/>
+  <text x="230" y="360" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="bold">Guardian 2 aprueba</text>
+  <text x="230" y="377" text-anchor="middle" fill="#ffffff" font-size="10.5">umbral: 2 de 3</text>
+
+  <!-- TL -->
+  <rect x="80" y="420" width="300" height="54" rx="13" fill="#1a2b4c"/>
+  <text x="230" y="445" text-anchor="middle" fill="#f3e5ab" font-size="12" font-weight="bold">Espera de 48 horas</text>
+  <text x="230" y="462" text-anchor="middle" fill="#ffffff" font-size="10">tiempo para pensar o abortar</text>
+
+  <!-- Decision -->
+  <rect x="470" y="300" width="270" height="70" rx="13" fill="#f3e5ab" stroke="#c5a065" stroke-width="2"/>
+  <text x="605" y="330" text-anchor="middle" fill="#0a1128" font-size="12" font-weight="bold">El dueno legitimo</text>
+  <text x="605" y="347" text-anchor="middle" fill="#0a1128" font-size="12" font-weight="bold">recupero su clave?</text>
+
+  <!-- NOR -->
+  <rect x="470" y="100" width="270" height="70" rx="13" fill="#e2e8f0"/>
+  <text x="605" y="130" text-anchor="middle" fill="#1a2b4c" font-size="12" font-weight="bold">Si: cancela la recuperacion</text>
+  <text x="605" y="148" text-anchor="middle" fill="#1a2b4c" font-size="10.5">todo sigue igual</text>
+  <text x="605" y="163" text-anchor="middle" fill="#1a2b4c" font-size="10.5">cuenta del dueno original</text>
+
+  <!-- EJ -->
+  <rect x="470" y="420" width="270" height="56" rx="13" fill="#d4af37"/>
+  <text x="605" y="446" text-anchor="middle" fill="#0a1128" font-size="12" font-weight="bold">No: se ejecuta</text>
+  <text x="605" y="463" text-anchor="middle" fill="#0a1128" font-size="11">nuevo dueno de la cuenta</text>
+
+  <!-- Arrows -->
+  <g stroke="#1a2b4c" stroke-width="2.5" fill="none" marker-end="url(#arr)">
+    <line x1="230" y1="136" x2="230" y2="161"/>
+    <line x1="230" y1="221" x2="230" y2="246"/>
+    <line x1="230" y1="306" x2="230" y2="331"/>
+    <line x1="230" y1="391" x2="230" y2="416"/>
+    <!-- to decision -->
+    <path d="M 382 447 L 466 370"/>
+    <!-- si -->
+    <path d="M 470 335 L 440 335 L 440 140 L 466 140"/>
+    <!-- no -->
+    <path d="M 605 372 L 605 416"/>
+  </g>
+  <text x="440" y="200" text-anchor="middle" fill="#2a9d8f" font-size="10" font-weight="bold" paint-order="stroke" stroke="#ffffff" stroke-width="3">si: cancela</text>
+  <text x="616" y="400" fill="#8a6d1f" font-size="10" font-weight="bold">no</text>
+  <text x="450" y="415" fill="#1a2b4c" font-size="9.5">espera cumplida</text>
+</svg>

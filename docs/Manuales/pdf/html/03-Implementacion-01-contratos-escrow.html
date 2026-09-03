@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · El Escrow: la caja fuerte de tu trueque</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">03 · Implementación</div>
+    <h1>El Escrow: la caja fuerte de tu trueque</h1>
+    <div class="intro">Versión en lenguaje sencillo del manual técnico del contrato <strong>Escrow</strong>. Aquí contamos, con ejemplos de la vida diaria, qué pasa cuando creas, custodias y completas un trueque en TrueKeate.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>03-Implementacion/01-contratos-escrow.md</b></span>
+      <span>Edición: <b>3 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/03-Implementacion/01-contratos-escrow</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Implementación · Implementacion — El Escrow: la caja fuerte de tu trueque</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>Qué es el escrow y por qué existe</span></a></li><li><a href="#s3"><span class="tnum">3</span><span>Los 9 estados del trueque (con ejemplos cotidianos)</span></a></li><li><a href="#s4"><span class="tnum">4</span><span>Crear un trueque (paso a paso)</span></a></li><li><a href="#s5"><span class="tnum">5</span><span>Custodiar: depositar los objetos (paso a paso)</span></a></li><li><a href="#s6"><span class="tnum">6</span><span>El encuentro: apertura y la ventana de 10 minutos</span></a></li><li><a href="#s7"><span class="tnum">7</span><span>Completar: firmas dobles + valoración (paso a paso)</span></a></li><li><a href="#s8"><span class="tnum">8</span><span>Cancelar antes de custodiar</span></a></li><li><a href="#s9"><span class="tnum">9</span><span>Disputas: anulación con votos de Socios (paso a paso)</span></a></li><li><a href="#s10"><span class="tnum">10</span><span>Bloqueo y sanción (cuando alguien rompe las normas)</span></a><div class="subs"><a href="#sub1">10.1 Bloqueo por el Owner (moderación)</a><br><a href="#sub2">10.2 Sanción con espera de 6 horas</a></div></li><li><a href="#s11"><span class="tnum">11</span><span>Qué falta confirmar (resumen)</span></a></li><li><a href="#s12"><span class="tnum">12</span><span>Glosario de este manual</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos</h2>
+<p>Un trueque en TrueKeate funciona como un trueque de verdad, pero con una <strong>caja fuerte digital</strong> por medio. Nadie puede quedarse con lo suyo sin cumplir su parte.</p>
+<p>Las 4 ideas básicas:</p>
+<ol><li><strong>Acuerdas</strong>: tú y otra persona se ponen de acuerdo en qué intercambian.</li><li><strong>Depositan</strong>: cada uno entrega su objeto a la caja fuerte (el escrow).</li><li><strong>Se encuentran</strong>: confirman que están listos para el intercambio.</li><li><strong>Reciben</strong>: cuando ambos dicen "lo recibí bien", la caja fuerte entrega a cada uno lo del otro. Nadie se queda sin su parte.</li></ol>
+<p>Ejemplo rápido de 5 minutos:</p>
+<ul><li>Ana ofrece su <strong>bicicleta</strong> a cambio del <strong>curso de fotografía</strong> de Bruno.</li><li>Ana crea el trueque. La caja fuerte queda marcada como <strong>CREADO</strong>.</li><li>Ana deposita la bici y Bruno deposita el curso.</li><li>Ambos confirman la entrega. La caja fuerte manda la bici a Bruno y el curso a Ana. Trueque terminado: <strong>COMPLETADO</strong>.</li></ul>
+<p>Si algo sale mal, la caja fuerte no suelta nada hasta que se resuelva (disputa, anulación o bloqueo). Eso es lo que hace segura a la plataforma.</p>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. Qué es el escrow y por qué existe</h2>
+<p><strong>Escrow</strong> es la palabra inglesa para "depósito en manos de un tercero de confianza". En TrueKeate, ese tercero es un <strong>contrato inteligente</strong>: un programa que vive dentro de la blockchain y que <strong>no puede ser engañado ni cambiado a mitad de camino</strong>.</p>
+<p>Imagina una caja fuerte con dos cerraduras:</p>
+<ul><li>La caja solo se abre con <strong>dos llaves a la vez</strong>: la tuya y la de la otra persona.</li><li>Mientras las dos no giren, el contenido está congelado.</li></ul>
+<p>Por eso funciona el intercambio <strong>entre dos personas (AtoA = "a to a")</strong>: ni tú puedes quedarte con el objeto de Bruno sin entregar el tuyo, ni Bruno con el tuyo sin entregar el suyo.</p>
+<blockquote class="info"><span class="tag">Nota</span><p>La blockchain es la <strong>única fuente de verdad</strong>: el estado del trueque (creado, completado, anulado...) vive en la cadena, no en los servidores de la plataforma. Si la plataforma se apagara, la caja fuerte seguiría guardando todo.</p></blockquote>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. Los 9 estados del trueque (con ejemplos cotidianos)</h2>
+<p>Cada trueque tiene un <strong>estado</strong>, como una etiqueta que dice en qué momento está. Son 9:</p>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>Estado</th><th>Qué significa</th><th>Ejemplo cotidiano</th></tr></thead><tbody><tr><td>0</td><td><strong>CREADO</strong></td><td>Se registró el acuerdo, todavía nadie depositó</td><td>"Quedamos en intercambiar, pero aún no llevamos nada"</td></tr><tr><td>1</td><td><strong>ACTIVO</strong></td><td>Lo mismo que CREADO (nombre antiguo para leer)</td><td>—</td></tr><tr><td>2</td><td><strong>CUSTODIADO</strong></td><td>Al menos uno (o ambos) ya depositó su objeto</td><td>"Ana ya dejó la bici en la caja fuerte"</td></tr><tr><td>3</td><td><strong>APERTURA</strong></td><td>Ambos confirmaron que están listos en la ventana de tiempo</td><td>"Los dos llegan a la cita a la hora acordada"</td></tr><tr><td>4</td><td><strong>EN_DISPUTA</strong></td><td>Alguien pidió anular el trueque</td><td>"Bruno dice que el curso no era lo que ofrecía"</td></tr><tr><td>5</td><td><strong>RESOLUCION_SOCIOS</strong></td><td>Los Socios están votando qué hacer</td><td>"Un jurado de vecinos está deliberando"</td></tr><tr><td>6</td><td><strong>COMPLETADO</strong></td><td>Ambos firmaron y valoraron: se entregó todo en cruz</td><td>"¡Trueque hecho! Cada uno tiene lo suyo"</td></tr><tr><td>7</td><td><strong>ANULADO</strong></td><td>Se canceló (antes de custodiar, o por votación)</td><td>"No se hizo, y cada uno recuperó lo suyo"</td></tr><tr><td>8</td><td><strong>BLOQUEADO</strong></td><td>Alguien violó una norma: los objetos quedan congelados</td><td>"La caja fuerte se sella a la espera de sanción"</td></tr></tbody></table></div>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Detalle técnico (pendiente de confirmar su utilidad): el estado <strong>ACTIVO</strong> existe en la lista, pero el programa nunca lo usa al crear un trueque (crea en CREADO). Solo lo acepta como estado de entrada en algunas funciones. En la práctica no lo verás en pantalla.</p></blockquote>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjgiIG1hcmtlckhlaWdodD0iOCIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICAgIDxtYXJrZXIgaWQ9ImFyckdvbGQiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjgiIG1hcmtlckhlaWdodD0iOCIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjOGE2ZDFmIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5Mb3MgOSBlc3RhZG9zIGRlbCBlc2Nyb3cgeSBzdXMgdHJhbnNpY2lvbmVzPC90ZXh0PgoKICA8IS0tIEFDVElWTyBhbGlhcyBwaWxsIC0tPgogIDxyZWN0IHg9IjI1IiB5PSI2MiIgd2lkdGg9IjE0NyIgaGVpZ2h0PSIyNCIgcng9IjEyIiBmaWxsPSJub25lIiBzdHJva2U9IiNjNWEwNjUiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtZGFzaGFycmF5PSI1IDMiLz4KICA8dGV4dCB4PSI5OCIgeT0iNzgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM4YTZkMWYiIGZvbnQtc2l6ZT0iOS41IiBmb250LXdlaWdodD0iYm9sZCI+QUNUSVZPID0gYWxpYXMgZGUgQ1JFQURPPC90ZXh0PgoKICA8IS0tIFJvdyAxOiBoYXBweSBwYXRoIC0tPgogIDxyZWN0IHg9IjEyIiB5PSI5NSIgd2lkdGg9IjE2MCIgaGVpZ2h0PSI2MiIgcng9IjE0IiBmaWxsPSIjNDhjYWU0Ii8+CiAgPHRleHQgeD0iOTIiIHk9IjEyMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9ImJvbGQiPkNSRUFETzwvdGV4dD4KICA8dGV4dCB4PSI5MiIgeT0iMTQwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjkuNSI+YWN1ZXJkbyByZWdpc3RyYWRvPC90ZXh0PgoKICA8cmVjdCB4PSIyMTciIHk9Ijk1IiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjYyIiByeD0iMTQiIGZpbGw9IiMyYTlkOGYiLz4KICA8dGV4dCB4PSIyOTciIHk9IjEyMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9ImJvbGQiPkNVU1RPRElBRE88L3RleHQ+CiAgPHRleHQgeD0iMjk3IiB5PSIxNDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iOS41Ij5vYmpldG9zIGVuIGxhIGNhamEgZnVlcnRlPC90ZXh0PgoKICA8cmVjdCB4PSI0MjIiIHk9Ijk1IiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjYyIiByeD0iMTQiIGZpbGw9IiM0OGNhZTQiLz4KICA8dGV4dCB4PSI1MDIiIHk9IjEyMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9ImJvbGQiPkFQRVJUVVJBPC90ZXh0PgogIDx0ZXh0IHg9IjUwMiIgeT0iMTQwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjkuNSI+YW1ib3MgY29uZmlybWFuIGxpc3RvczwvdGV4dD4KCiAgPHJlY3QgeD0iNjI3IiB5PSI5NSIgd2lkdGg9IjE2MCIgaGVpZ2h0PSI2MiIgcng9IjE0IiBmaWxsPSIjZDRhZjM3Ii8+CiAgPHRleHQgeD0iNzA3IiB5PSIxMjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSJib2xkIj5DT01QTEVUQURPPC90ZXh0PgogIDx0ZXh0IHg9IjcwNyIgeT0iMTQwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjkuNSI+ZW50cmVnYXMgY3J1emFkYXM8L3RleHQ+CgogIDwhLS0gUm93IDI6IGV4Y2VwdGlvbiBzdGF0ZXMgLS0+CiAgPHJlY3QgeD0iMTIiIHk9IjI2MCIgd2lkdGg9IjE2MCIgaGVpZ2h0PSI2MiIgcng9IjE0IiBmaWxsPSIjZTJlOGYwIi8+CiAgPHRleHQgeD0iOTIiIHk9IjI4NyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9ImJvbGQiPkFOVUxBRE88L3RleHQ+CiAgPHRleHQgeD0iOTIiIHk9IjMwNSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSI5LjUiPmNhZGEgdW5vIHJlY3VwZXJhIGxvIHN1eW88L3RleHQ+CgogIDxyZWN0IHg9IjIxNyIgeT0iMjYwIiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjYyIiByeD0iMTQiIGZpbGw9IiNmNGEyNjEiLz4KICA8dGV4dCB4PSIyOTciIHk9IjI4NyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9ImJvbGQiPkVOX0RJU1BVVEE8L3RleHQ+CiAgPHRleHQgeD0iMjk3IiB5PSIzMDUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iOS41Ij5hbGd1aWVuIHBpZGlvIGFudWxhcjwvdGV4dD4KCiAgPHJlY3QgeD0iNDIyIiB5PSIyNjAiIHdpZHRoPSIxNjAiIGhlaWdodD0iNjIiIHJ4PSIxNCIgZmlsbD0iIzFhMmI0YyIvPgogIDx0ZXh0IHg9IjUwMiIgeT0iMjg3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5SRVNPTFVDSU9OX1NPQ0lPUzwvdGV4dD4KICA8dGV4dCB4PSI1MDIiIHk9IjMwNSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSI5LjUiPnZvdGFuIGxvcyBTb2Npb3MgKDIgZGUgMyk8L3RleHQ+CgogIDwhLS0gUm93IDM6IGJsb3F1ZWFkbyAtLT4KICA8cmVjdCB4PSI0MjIiIHk9IjQyNCIgd2lkdGg9IjE2MCIgaGVpZ2h0PSI0NiIgcng9IjE0IiBmaWxsPSIjZTYzOTQ2Ii8+CiAgPHRleHQgeD0iNTAyIiB5PSI0NDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSJib2xkIj5CTE9RVUVBRE88L3RleHQ+CiAgPHRleHQgeD0iNTAyIiB5PSI0NTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iOSI+Y29uZ2VsYWRvIMK3IHNhbmNpb24gNiBoPC90ZXh0PgoKICA8IS0tIFJvdzEgaGFwcHkgYXJyb3dzIC0tPgogIDxsaW5lIHgxPSIxNzYiIHkxPSIxMzYiIHgyPSIyMTMiIHkyPSIxMzYiIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyLjUiIG1hcmtlci1lbmQ9InVybCgjYXJyKSIvPgogIDx0ZXh0IHg9IjE5NSIgeT0iMTI5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjgiIHBhaW50LW9yZGVyPSJzdHJva2UiIHN0cm9rZT0iI2ZmZmZmZiIgc3Ryb2tlLXdpZHRoPSIyLjUiPkEgeSBCIGRlcG9zaXRhbjwvdGV4dD4KCiAgPGxpbmUgeDE9IjM4MSIgeTE9IjEzNiIgeDI9IjQxOCIgeTI9IjEzNiIgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIuNSIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+CiAgPHRleHQgeD0iNDAwIiB5PSIxMjkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iOCIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjIuNSI+Y29uZmlybWFuIGFwZXJ0dXJhPC90ZXh0PgoKICA8bGluZSB4MT0iNTg2IiB5MT0iMTM2IiB4Mj0iNjIzIiB5Mj0iMTM2IiBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMi41IiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KICA8dGV4dCB4PSI2MDUiIHk9IjEyOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSI4IiBwYWludC1vcmRlcj0ic3Ryb2tlIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMi41Ij4yIGZpcm1hcyArIHZhbG9yYWNpb25lczwvdGV4dD4KCiAgPCEtLSBDUkVBRE8gLT4gQU5VTEFETyAtLT4KICA8bGluZSB4MT0iMTYwIiB5MT0iMTU5IiB4Mj0iMTYwIiB5Mj0iMjU2IiBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMi41IiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KICA8dGV4dCB4PSIxNzAiIHk9IjIwNSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSI5IiBmb250LXdlaWdodD0iYm9sZCI+Y2FuY2VsYXIgYW50ZXM8L3RleHQ+CiAgPHRleHQgeD0iMTcwIiB5PSIyMTciIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iOSIgZm9udC13ZWlnaHQ9ImJvbGQiPmRlIGRlcG9zaXRhcjwvdGV4dD4KCiAgPCEtLSBDVVNUT0RJQURPIC0+IEVOX0RJU1BVVEEgLS0+CiAgPGxpbmUgeDE9IjMwMCIgeTE9IjE1OSIgeDI9IjMwMCIgeTI9IjI1NiIgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIuNSIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+CiAgPHRleHQgeD0iMzEwIiB5PSIyMDUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iOSIgZm9udC13ZWlnaHQ9ImJvbGQiPmFsZ3VpZW4gcGlkZTwvdGV4dD4KICA8dGV4dCB4PSIzMTAiIHk9IjIxNyIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSI5IiBmb250LXdlaWdodD0iYm9sZCI+bGEgYW51bGFjaW9uPC90ZXh0PgoKICA8IS0tIEVOX0RJU1BVVEEgLT4gQU5VTEFETyAocGxhem8pIC0tPgogIDxsaW5lIHgxPSIyMTUiIHkxPSIyOTYiIHgyPSIxNzYiIHkyPSIyOTYiIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyLjUiIG1hcmtlci1lbmQ9InVybCgjYXJyKSIvPgogIDx0ZXh0IHg9IjE5NSIgeT0iMjg4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjcuNSIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjIuNSI+cGxhem8gNSBkaWFzPC90ZXh0PgoKICA8IS0tIEVOX0RJU1BVVEEgLT4gUkVTT0xVQ0lPTl9TT0NJT1MgLS0+CiAgPGxpbmUgeDE9IjM4MSIgeTE9IjI5NiIgeDI9IjQxOCIgeTI9IjI5NiIgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIuNSIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+CiAgPHRleHQgeD0iNDAwIiB5PSIyODgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iOCIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjIuNSI+dm90YW4gU29jaW9zPC90ZXh0PgoKICA8IS0tIFJFU09MVUNJT04gLT4gQU5VTEFETyAodm90YW4gYW51bGFyKSAtLT4KICA8cGF0aCBkPSJNIDQ3MCAzMjIgTCA0NzAgMzYwIEwgOTIgMzYwIEwgOTIgMzIzIiBmaWxsPSJub25lIiBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMi41IiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KICA8dGV4dCB4PSIzMDAiIHk9IjM1MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSI5IiBmb250LXdlaWdodD0iYm9sZCIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjIuNSI+dm90YW4gYW51bGFyPC90ZXh0PgoKICA8IS0tIFJFU09MVUNJT04gLT4gQ09NUExFVEFETyAodm90YW4gY29tcGxldGFyKSAtLT4KICA8bGluZSB4MT0iNTc1IiB5MT0iMjY1IiB4Mj0iNjIzIiB5Mj0iMTM1IiBzdHJva2U9IiM4YTZkMWYiIHN0cm9rZS13aWR0aD0iMi41IiBtYXJrZXItZW5kPSJ1cmwoI2FyckdvbGQpIi8+CiAgPHRleHQgeD0iNTU2IiB5PSIyMzIiIGZpbGw9IiM4YTZkMWYiIGZvbnQtc2l6ZT0iOSIgZm9udC13ZWlnaHQ9ImJvbGQiIHBhaW50LW9yZGVyPSJzdHJva2UiIHN0cm9rZT0iI2ZmZmZmZiIgc3Ryb2tlLXdpZHRoPSIzIj52b3RhbiBjb21wbGV0YXI8L3RleHQ+CgogIDwhLS0gUkVTT0xVQ0lPTiAtPiBCTE9RVUVBRE8gKHNhbmNpb24gdGltZWxvY2spIC0tPgogIDxsaW5lIHgxPSI1MDIiIHkxPSIzMjQiIHgyPSI1MDIiIHkyPSI0MjAiIHN0cm9rZT0iI2U2Mzk0NiIgc3Ryb2tlLXdpZHRoPSIyLjUiIG1hcmtlci1lbmQ9InVybCgjYXJyKSIvPgogIDx0ZXh0IHg9IjUxNCIgeT0iMzcyIiBmaWxsPSIjZTYzOTQ2IiBmb250LXNpemU9IjkiIGZvbnQtd2VpZ2h0PSJib2xkIj5zYW5jaW9uIHRyYXM8L3RleHQ+CiAgPHRleHQgeD0iNTE0IiB5PSIzODQiIGZpbGw9IiNlNjM5NDYiIGZvbnQtc2l6ZT0iOSIgZm9udC13ZWlnaHQ9ImJvbGQiPmVzcGVyYSBkZSA2IGg8L3RleHQ+CgogIDwhLS0gVGVybWluYWwgZG90cyAtLT4KICA8ZyBmaWxsPSIjMWEyYjRjIj4KICAgIDxjaXJjbGUgY3g9IjkyIiBjeT0iMzIyIiByPSI0Ii8+CiAgICA8Y2lyY2xlIGN4PSI3MDciIGN5PSIxNTciIHI9IjQiLz4KICA8L2c+CiAgPGNpcmNsZSBjeD0iNTAyIiBjeT0iNDcwIiByPSI0IiBmaWxsPSIjZTYzOTQ2Ii8+CgogIDwhLS0gTGVnZW5kIC0tPgogIDx0ZXh0IHg9IjQwMCIgeT0iNDk0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjguNSI+CiAgICBUZXJtaW5hbGVzOiBDT01QTEVUQURPIMK3IEFOVUxBRE8gwrcgQkxPUVVFQURPICAgfCAgIEFDVElWTyBlcyBzaW5vbmltbyBsZWdhZG8gZGUgQ1JFQURPIChzb2xvIGxlY3R1cmEsIG51bmNhIHNlIGFzaWduYSkKICA8L3RleHQ+Cjwvc3ZnPgo=" alt="Estados Escrow"/><figcaption class="fig-caption">Figura · Estados Escrow</figcaption></figure>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. Crear un trueque (paso a paso)</h2>
+<p><strong>Quién puede crearlo</strong>: cualquier persona registrada (parte A). La parte A crea el acuerdo ofreciendo su objeto y pidiendo el de la parte B.</p>
+<p>Pasos:</p>
+<ol><li>La parte A indica quién es la parte B.</li><li>Describe su objeto (lo que ofrece) y el objeto que quiere de B.</li><li>Propone una <strong>hora pautada</strong>: cuándo se hará el encuentro.</li><li>El sistema registra el acuerdo y lo marca como <strong>CREADO</strong>.</li><li>Se emite una "notificación en cadena" (un evento llamado <code>TruekeCreado</code>) que sirve para que los vigilantes del sistema lo anoten.</li></ol>
+<p>Reglas básicas:</p>
+<ul><li>No puedes hacerte un trueque a ti mismo.</li><li>Cada objeto debe ser válido: una cripto (token) o un NFT con su número de identificación.</li><li>No existe un botón "aceptar oferta": la parte B participa directamente depositando su objeto (paso siguiente).</li></ul>
+<blockquote class="info"><span class="tag">Nota</span><p>Un <strong>NFT</strong> es un "certificado digital único" (como una obra de arte firmada). Una <strong>cripto</strong> es dinero digital divisible (como monedas fraccionables).</p></blockquote>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. Custodiar: depositar los objetos (paso a paso)</h2>
+<p><strong>Custodiar</strong> = entregar tu objeto a la caja fuerte. Puede hacerse en cualquier orden: primero uno, luego el otro.</p>
+<ol><li>La parte A deposita su objeto (la bici) con un clic.</li><li>El sistema pide <strong>permiso previo</strong> (aprobación) para mover tu objeto. Es como firmar una autorización: "puedes mover mi bici a la caja fuerte".</li><li>El objeto sale de tu billetera y entra al escrow. El estado pasa a <strong>CUSTODIADO</strong>.</li><li>La parte B hace lo mismo con el suyo (el curso).</li></ol>
+<p>Reglas importantes:</p>
+<ul><li>Solo el dueño del objeto puede custodiarlo.</li><li>No puedes depositar dos veces el mismo objeto.</li><li>Cuando los dos objetos están dentro, el trueque está "cargado" y listo para el encuentro.</li></ul>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. El encuentro: apertura y la ventana de 10 minutos</h2>
+<p>Antes de que la caja fuerte entregue nada, <strong>ambas partes confirman que están listas</strong>. Esto se llama <strong>apertura</strong>.</p>
+<p>Las reglas de tiempo son como las de una cita presencial:</p>
+<ul><li>Solo puedes confirmar si <strong>los dos objetos ya están custodiados</strong>. No se abre la puerta con la caja medio vacía.</li><li>Debes hacerlo cerca de la <strong>hora pautada</strong>: como máximo 10 minutos antes o después. Si llegas tarde, el sistema te avisa: "fuera de la ventana de apertura".</li><li>Si el otro ya abrió, tú debes abrir <strong>a lo sumo 10 minutos después</strong>. Es como decir: "los dos llegamos a la cita con poca diferencia".</li></ul>
+<blockquote class="warn"><span class="tag">Aviso</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Detalle técnico (observación): el programa permite, en rigor, firmar la recepción sin pasar por la apertura si ambos ya depositaron. En la práctica documentada y probada, el paso de apertura existe siempre. La secuencia completa no se impone por fuerza en el contrato → queda como observación, no como fallo.</p></blockquote>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. Completar: firmas dobles + valoración (paso a paso)</h2>
+<p>Aquí ocurre la magia. Para que la caja fuerte se abra hacen falta <strong>cuatro gestos</strong>:</p>
+<ol><li>La parte A marca que <strong>valoró</strong> el trueque (estrella 1-5, opcional en pantalla pero necesaria para cerrar).</li><li>La parte B marca que <strong>valoró</strong> el trueque.</li><li>La parte A <strong>firma la recepción</strong>: "recibí el curso de Bruno y está bien".</li><li>La parte B <strong>firma la recepción</strong>: "recibí la bici de Ana y está bien".</li></ol>
+<p>Cuando las dos valoraciones y las dos firmas están, el sistema <strong>libera en cruz</strong>:</p>
+<ul><li>El curso va de la caja fuerte a la billetera de Ana.</li><li>La bici va de la caja fuerte a la billetera de Bruno.</li></ul>
+<p>El trueque queda <strong>COMPLETADO</strong> y nadie puede deshacerlo.</p>
+<blockquote class="info"><span class="tag">Nota</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#d4af37"><path d="M8 1.5c-2.6 0-4.4 1.7-4.4 4 0 1.6 1 2.7 1.6 3.5.5.7.8 1.3.8 2h4c0-.7.3-1.3.8-2 .6-.8 1.6-1.9 1.6-3.5 0-2.3-1.8-4-4.4-4zM6.3 12.6h3.4v1.4H6.3z"/></g></svg> Por qué es seguro: la entrega ocurre <strong>después</strong> de que ambos firmaron y valoraron, y las dos entregas ocurren en el mismo movimiento. No existe "primero tú y luego yo".</p></blockquote>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjgiIG1hcmtlckhlaWdodD0iOCIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5GbHVqbyBmZWxpeiBkZSB1biB0cnVlcXVlIGNvbiBlc2Nyb3c8L3RleHQ+CgogIDwhLS0gU3RlcCBjaXJjbGVzIC0tPgogIDxnIGZpbGw9IiNkNGFmMzciPgogICAgPGNpcmNsZSBjeD0iMTIwIiBjeT0iMTAwIiByPSIxNiIvPgogICAgPGNpcmNsZSBjeD0iMTIwIiBjeT0iMTc0IiByPSIxNiIvPgogICAgPGNpcmNsZSBjeD0iMTIwIiBjeT0iMjQ4IiByPSIxNiIvPgogICAgPGNpcmNsZSBjeD0iMTIwIiBjeT0iMzIyIiByPSIxNiIvPgogICAgPGNpcmNsZSBjeD0iMTIwIiBjeT0iMzk2IiByPSIxNiIvPgogIDwvZz4KICA8ZyBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+CiAgICA8dGV4dCB4PSIxMjAiIHk9IjEwNSI+MTwvdGV4dD4KICAgIDx0ZXh0IHg9IjEyMCIgeT0iMTc5Ij4yPC90ZXh0PgogICAgPHRleHQgeD0iMTIwIiB5PSIyNTMiPjM8L3RleHQ+CiAgICA8dGV4dCB4PSIxMjAiIHk9IjMyNyI+NDwvdGV4dD4KICAgIDx0ZXh0IHg9IjEyMCIgeT0iNDAxIj41PC90ZXh0PgogIDwvZz4KCiAgPCEtLSBTdGVwIGJhcnMgLS0+CiAgPHJlY3QgeD0iMTcwIiB5PSI3MiIgd2lkdGg9IjU2MCIgaGVpZ2h0PSI1NiIgcng9IjE0IiBmaWxsPSIjNDhjYWU0Ii8+CiAgPHRleHQgeD0iMTk1IiB5PSI5MyIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9ImJvbGQiPjEgwrcgQW5hIGNyZWEgZWwgdHJ1ZXF1ZTogc3UgYmljaSBwb3IgbGEgZ3VpdGFycmEgZGUgQnJ1bm88L3RleHQ+CiAgPHRleHQgeD0iMTk1IiB5PSIxMTMiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTEiPlNlIHJlZ2lzdHJhIGVsIGFjdWVyZG8gwrcgZXN0YWRvOiBDUkVBRE88L3RleHQ+CgogIDxyZWN0IHg9IjE3MCIgeT0iMTQ2IiB3aWR0aD0iNTYwIiBoZWlnaHQ9IjU2IiByeD0iMTQiIGZpbGw9IiMyYTlkOGYiLz4KICA8dGV4dCB4PSIxOTUiIHk9IjE2NyIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9ImJvbGQiPjIgwrcgQ3VzdG9kaWE6IEFuYSBkZXBvc2l0YSBsYSBiaWNpIHkgQnJ1bm8gbGEgZ3VpdGFycmE8L3RleHQ+CiAgPHRleHQgeD0iMTk1IiB5PSIxODciIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTEiPkNhZGEgb2JqZXRvIGVudHJhIGVuIGxhIGNhamEgZnVlcnRlIMK3IGVzdGFkbzogQ1VTVE9ESUFETzwvdGV4dD4KCiAgPHJlY3QgeD0iMTcwIiB5PSIyMjAiIHdpZHRoPSI1NjAiIGhlaWdodD0iNTYiIHJ4PSIxNCIgZmlsbD0iIzQ4Y2FlNCIvPgogIDx0ZXh0IHg9IjE5NSIgeT0iMjQxIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEzIiBmb250LXdlaWdodD0iYm9sZCI+MyDCtyBBcGVydHVyYTogYW1ib3MgY29uZmlybWFuIHF1ZSBlc3RhbiBsaXN0b3M8L3RleHQ+CiAgPHRleHQgeD0iMTk1IiB5PSIyNjEiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTEiPlZlbnRhbmEgZGUgKy8tIDEwIG1pbnV0b3MgYWxyZWRlZG9yIGRlIGxhIGhvcmEgcGF1dGFkYTwvdGV4dD4KCiAgPHJlY3QgeD0iMTcwIiB5PSIyOTQiIHdpZHRoPSI1NjAiIGhlaWdodD0iNTYiIHJ4PSIxNCIgZmlsbD0iIzFhMmI0YyIvPgogIDx0ZXh0IHg9IjE5NSIgeT0iMzE1IiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEzIiBmb250LXdlaWdodD0iYm9sZCI+NCDCtyBSZWNpYmlyIHkgZmlybWFyOiBjYWRhIHVubyBmaXJtYSBsYSByZWNlcGNpb248L3RleHQ+CiAgPHRleHQgeD0iMTk1IiB5PSIzMzUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTEiPkFkZW1hcyBjYWRhIHVubyB2YWxvcmEgbGEgZXhwZXJpZW5jaWEgZGVsIDEgYWwgNTwvdGV4dD4KCiAgPHJlY3QgeD0iMTcwIiB5PSIzNjgiIHdpZHRoPSI1NjAiIGhlaWdodD0iNTYiIHJ4PSIxNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjE5NSIgeT0iMzg5IiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEzIiBmb250LXdlaWdodD0iYm9sZCI+NSDCtyBDaWVycmU6IGxhIGNhamEgZnVlcnRlIGVudHJlZ2EgZW4gY3J1ejwvdGV4dD4KICA8dGV4dCB4PSIxOTUiIHk9IjQwOSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMSI+QmljaSBhIEJydW5vLCBndWl0YXJyYSBhIEFuYSDCtyBlc3RhZG8gZmluYWw6IENPTVBMRVRBRE88L3RleHQ+CgogIDwhLS0gQXJyb3dzIGJldHdlZW4gc3RlcHMgLS0+CiAgPGcgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIuNSI+CiAgICA8bGluZSB4MT0iNDUwIiB5MT0iMTMwIiB4Mj0iNDUwIiB5Mj0iMTQ0IiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KICAgIDxsaW5lIHgxPSI0NTAiIHkxPSIyMDQiIHgyPSI0NTAiIHkyPSIyMTgiIG1hcmtlci1lbmQ9InVybCgjYXJyKSIvPgogICAgPGxpbmUgeDE9IjQ1MCIgeTE9IjI3OCIgeDI9IjQ1MCIgeTI9IjI5MiIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+CiAgICA8bGluZSB4MT0iNDUwIiB5MT0iMzUyIiB4Mj0iNDUwIiB5Mj0iMzY2IiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KICA8L2c+CgogIDwhLS0gUnVsZSBvZiBnb2xkIC0tPgogIDxyZWN0IHg9IjE3MCIgeT0iNDQwIiB3aWR0aD0iNTYwIiBoZWlnaHQ9IjQ0IiByeD0iMTIiIGZpbGw9IiMwYTExMjgiLz4KICA8dGV4dCB4PSI0NTAiIHk9IjQ1OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2YzZTVhYiIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiPlJlZ2xhIGRlIG9ybzogbmFkaWUgcHVlZGUgbGliZXJhciB1biBhY3Rpdm8gc29sbzwvdGV4dD4KICA8dGV4dCB4PSI0NTAiIHk9IjQ3NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMC41Ij5IYWNlbiBmYWx0YSBsYXMgMiBmaXJtYXMgeSAyIHZhbG9yYWNpb25lcyAobyBsYSB2b3RhY2lvbiBkZSBsb3MgU29jaW9zKTwvdGV4dD4KPC9zdmc+Cg==" alt="Flujo Truque"/><figcaption class="fig-caption">Figura · Flujo Truque</figcaption></figure>
+</section>
+<section class="seccion" id="s8"><h2 class="seccion">8. Cancelar antes de custodiar</h2>
+<p>Si <strong>nadie ha depositado todavía</strong>, cualquiera de las dos partes puede cancelar sin problemas:</p>
+<ol><li>Pulsas "cancelar".</li><li>El trueque pasa a <strong>ANULADO</strong>. Sin castigos, sin comisiones.</li></ol>
+<p>Pero si <strong>algo ya está custodiado</strong>, <strong>no se puede cancelar por las buenas</strong>: alguien podría depositar y luego irse. En ese caso, para salir se usa el camino de la disputa (sección siguiente) o se completa el trueque.</p>
+<blockquote class="ejemplo"><span class="tag">Ejemplo</span><p>Ejemplo: Ana y Bruno quedaron, pero Bruno se arrepintió antes de depositar nada → cancelación limpia. Si Bruno ya depositó el curso y luego desaparece → no hay botón de "me arrepiento": entra la disputa.</p></blockquote>
+</section>
+<section class="seccion" id="s9"><h2 class="seccion">9. Disputas: anulación con votos de Socios (paso a paso)</h2>
+<p>Si algo se rompe con los objetos ya depositados, cualquiera de las dos partes puede <strong>solicitar la anulación</strong> y contar su motivo.</p>
+<ol><li>La parte afectada solicita la anulación (solo una vez por trueque).</li><li>El trueque pasa a <strong>EN_DISPUTA</strong>. Se abre un plazo de <strong>5 días</strong>.</li><li>Los <strong>Socios</strong> (miembros con buena reputación de la comunidad) votan a favor o en contra de anular.</li><li>Regla de votación: se necesitan <strong>2 de cada 3 votos a favor</strong> (mayoría cualificada de dos tercios).</li><li>Si se alcanza el quórum a favor → los objetos vuelven a sus dueños (<strong>ANULADO</strong>).</li><li>Si en 5 días no se alcanza → el sistema <strong>resuelve por defecto</strong> y anula igualmente. Nadie queda esperando para siempre.</li></ol>
+<p>Puntos importantes:</p>
+<ul><li>Solo se puede pedir anulación si hay objetos custodiados (si no, se cancela directo, ver sección 8).</li><li>Cada Socio vota <strong>una sola vez</strong> por trueque.</li><li><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: en el código actual, una vez pedida la anulación, el trueque <strong>siempre termina en ANULADO</strong> (por votos o por plazo). No existe todavía un camino que diga "no se anula y el trueque continúa". Si el diseño prevé esa salida, no está implementada.</li></ul>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5EaXNwdXRhIHkgYW51bGFjaW9uIGNvbiB2b3RvcyBkZSBTb2Npb3M8L3RleHQ+CgogIDwhLS0gRCAtLT4KICA8cmVjdCB4PSIyNDAiIHk9IjgwIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjU2IiByeD0iMTMiIGZpbGw9IiNmNGEyNjEiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjEwNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+T2JqZXRvcyBjdXN0b2RpYWRvcyB5IHN1cmdlIHVuIHByb2JsZW1hPC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMTIzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwIj5hbGd1aWVuIG5vIGN1bXBsZSBvIHF1aWVyZSBzYWxpcnNlPC90ZXh0PgoKICA8IS0tIFM6IHNvbGljaXRhciBhbnVsYWNpb24gLS0+CiAgPHJlY3QgeD0iMjQwIiB5PSIxNzUiIHdpZHRoPSIzMjAiIGhlaWdodD0iNjIiIHJ4PSIxMyIgZmlsbD0iI2Y0YTI2MSIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj4xLiBBbGd1aWVuIHNvbGljaXRhIGxhIGFudWxhY2lvbjwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjIxNyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41Ij51bmEgc29sYSB2ZXogcG9yIHRydWVxdWUgwrcgRU5fRElTUFVUQTwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjIzMSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMCI+cGxhem86IDUgZGlhczwvdGV4dD4KCiAgPCEtLSBWOiB2b3RhY2lvbiAtLT4KICA8cmVjdCB4PSIyNDAiIHk9IjI3NiIgd2lkdGg9IjMyMCIgaGVpZ2h0PSI2MiIgcng9IjEzIiBmaWxsPSIjMWEyYjRjIi8+CiAgPHRleHQgeD0iNDAwIiB5PSIzMDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPjIuIExvcyBTb2Npb3Mgdm90YW48L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSIzMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmM2U1YWIiIGZvbnQtc2l6ZT0iMTEiPmNhZGEgU29jaW8gdm90YSB1bmEgdmV6PC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzMzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZjNlNWFiIiBmb250LXNpemU9IjEwLjUiPnF1b3J1bTogMiBkZSAzIGEgZmF2b3I8L3RleHQ+CgogIDwhLS0gT3V0Y29tZXMgLS0+CiAgPGc+CiAgICA8cmVjdCB4PSI2MCIgeT0iNDAwIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjcwIiByeD0iMTMiIGZpbGw9IiNlMmU4ZjAiLz4KICAgIDx0ZXh0IHg9IjIyMCIgeT0iNDI0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjExLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj4zYS4gU2kgaGF5IDIgZGUgMzogc2UgYW51bGE8L3RleHQ+CiAgICA8dGV4dCB4PSIyMjAiIHk9IjQ0MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMC41Ij5jYWRhIHVubyByZWN1cGVyYSBzdSBvYmpldG88L3RleHQ+CiAgICA8dGV4dCB4PSIyMjAiIHk9IjQ1OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2U2Mzk0NiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9ImJvbGQiPkFOVUxBRE88L3RleHQ+CiAgPC9nPgogIDxnPgogICAgPHJlY3QgeD0iNDIwIiB5PSI0MDAiIHdpZHRoPSIzMjAiIGhlaWdodD0iNzAiIHJ4PSIxMyIgZmlsbD0iI2UyZThmMCIvPgogICAgPHRleHQgeD0iNTgwIiB5PSI0MjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTEuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPjNiLiBTaSBlbiA1IGRpYXMgbm8gaGF5IHF1b3J1bTwvdGV4dD4KICAgIDx0ZXh0IHg9IjU4MCIgeT0iNDQyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwLjUiPnJlc29sdWNpb24gcG9yIGRlZmVjdG86PC90ZXh0PgogICAgPHRleHQgeD0iNTgwIiB5PSI0NTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNlNjM5NDYiIGZvbnQtc2l6ZT0iMTAiIGZvbnQtd2VpZ2h0PSJib2xkIj5zZSBhbnVsYSBpZ3VhbG1lbnRlPC90ZXh0PgogIDwvZz4KCiAgPCEtLSBBcnJvd3MgLS0+CiAgPGxpbmUgeDE9IjQwMCIgeTE9IjEzOCIgeDI9IjQwMCIgeTI9IjE3MSIgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIuNSIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+CiAgPGxpbmUgeDE9IjQwMCIgeTE9IjIzOSIgeDI9IjQwMCIgeTI9IjI3MiIgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIuNSIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+CiAgPGcgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIuNSIgZmlsbD0ibm9uZSIgbWFya2VyLWVuZD0idXJsKCNhcnIpIj4KICAgIDxwYXRoIGQ9Ik0gMzQwIDM0MCBMIDIyMCAzOTYiLz4KICAgIDxwYXRoIGQ9Ik0gNDYwIDM0MCBMIDU4MCAzOTYiLz4KICA8L2c+CiAgPHRleHQgeD0iMzYwIiB5PSIzNTIiIGZpbGw9IiMyYTlkOGYiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSJib2xkIiBwYWludC1vcmRlcj0ic3Ryb2tlIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMyI+c2k8L3RleHQ+CiAgPHRleHQgeD0iNDQwIiB5PSIzNTIiIGZpbGw9IiNlNjM5NDYiIGZvbnQtc2l6ZT0iOS41IiBmb250LXdlaWdodD0iYm9sZCIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjMiPm5vIGVuIDUgZGlhczwvdGV4dD4KCiAgPCEtLSBOb3RlIC0tPgogIDxyZWN0IHg9IjYwIiB5PSI0NzAiIHdpZHRoPSI2ODAiIGhlaWdodD0iMjIiIHJ4PSI4IiBmaWxsPSIjZjNlNWFiIi8+CiAgPHRleHQgeD0iNDAwIiB5PSI0ODUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iOSIgZm9udC13ZWlnaHQ9ImJvbGQiPk9ic2VydmFjaW9uOiBob3kgdG9kYSBkaXNwdXRhIHRlcm1pbmEgZW4gQU5VTEFETyAobm8gZXhpc3RlICJubyBzZSBhbnVsYSB5IHNpZ3VlIGVsIHRydWVxdWUiKTwvdGV4dD4KPC9zdmc+Cg==" alt="Disputa Anulacion"/><figcaption class="fig-caption">Figura · Disputa Anulacion</figcaption></figure>
+</section>
+<section class="seccion" id="s10"><h2 class="seccion">10. Bloqueo y sanción (cuando alguien rompe las normas)</h2>
+<h3 class="sub" id="sub1">10.1 Bloqueo por el Owner (moderación)</h3>
+<p>El <strong>Owner</strong> (el administrador de la plataforma) puede <strong>bloquear</strong> un trueque si se viola una norma:</p>
+<ul><li>Los objetos quedan <strong>congelados</strong> dentro de la caja fuerte.</li><li>No se puede bloquear un trueque ya COMPLETADO o ANULADO.</li></ul>
+<h3 class="sub" id="sub2">10.2 Sanción con espera de 6 horas</h3>
+<p>Los Socios pueden además <strong>programar una sanción</strong>:</p>
+<ol><li>Un Socio programa la sanción (solo en estados BLOQUEADO o en votación).</li><li>Empieza una <strong>espera de 6 horas</strong> (el "timelock"): tiempo para pensar o rectificar.</li><li>Pasadas las 6 horas, cualquiera puede ejecutarla.</li><li>El resultado: el trueque queda <strong>BLOQUEADO de forma definitiva</strong>.</li></ol>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: la sanción ejecutada por el contrato es el bloqueo definitivo <strong>sin liberación</strong> de los objetos. No se ha visto en el código un mecanismo que, tras la sanción, devuelva o redistribuya los objetos congelados. La interpretación económica exacta queda por confirmar.</p></blockquote>
+</section>
+<section class="seccion" id="s11"><h2 class="seccion">11. Qué falta confirmar (resumen)</h2>
+<ol><li>El estado ACTIVO nunca se asigna en el código actual (solo se acepta de entrada) → <strong>pendiente de confirmar</strong>.</li><li>La apertura dual no es un requisito mecánico para completar → observación.</li><li>No existe ruta de "rechazo de anulación": toda disputa termina en ANULADO → <strong>pendiente de confirmar</strong>.</li><li>BLOQUEADO no tiene salida que libere los objetos; la sanción vuelve a BLOQUEADO → <strong>pendiente de confirmar</strong>.</li><li>La comisión del <strong>1 %</strong> de los trueques completados hacia el Fondo de Valor está en el diseño pero <strong>no aparece en este contrato</strong> → <strong>pendiente de confirmar</strong> (se integra en ciclos posteriores).</li><li>La conexión del Escrow con el padrón de Socios no se ejecuta en el guion de despliegue actual → <strong>pendiente de confirmar</strong>.</li></ol>
+</section>
+<section class="seccion" id="s12"><h2 class="seccion">12. Glosario de este manual</h2>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Significado</th></tr></thead><tbody><tr><td><strong>Escrow</strong></td><td>La caja fuerte digital que guarda los objetos durante el trueque</td></tr><tr><td><strong>Contrato inteligente</strong></td><td>Programa que vive en la blockchain y se ejecuta solo</td></tr><tr><td><strong>Trueque AtoA</strong></td><td>Intercambio directo entre dos personas</td></tr><tr><td><strong>Custodiar</strong></td><td>Depositar tu objeto en la caja fuerte</td></tr><tr><td><strong>Apertura</strong></td><td>Confirmación de ambos de que están listos para el intercambio</td></tr><tr><td><strong>Hora pautada</strong></td><td>La hora acordada para el encuentro</td></tr><tr><td><strong>Firma de recepción</strong></td><td>Tu declaración: "recibí mi parte y está bien"</td></tr><tr><td><strong>Valoración</strong></td><td>Tu puntuación 1-5 del trueque</td></tr><tr><td><strong>Socios</strong></td><td>Miembros de confianza de la comunidad que votan en disputas</td></tr><tr><td><strong>Quórum</strong></td><td>Número mínimo de votos necesarios para decidir (2 de 3)</td></tr><tr><td><strong>Timelock</strong></td><td>Espera obligatoria antes de ejecutar algo (6 h en sanciones)</td></tr><tr><td><strong>NFT</strong></td><td>Certificado digital único (obra, coleccionable...)</td></tr><tr><td><strong>Token / cripto</strong></td><td>Dinero digital (divisible)</td></tr></tbody></table></div>
+<p>¡Listo! Ya entiendes la caja fuerte de TrueKeate. El siguiente manual explica tu cuenta inteligente: tu identidad digital en la plataforma.</p>
+</section>
+</main>
+
+</body>
+</html>

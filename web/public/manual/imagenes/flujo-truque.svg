@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <rect width="800" height="54" fill="#1a2b4c"/>
+  <rect y="50" width="800" height="4" fill="#d4af37"/>
+  <text x="400" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">Flujo feliz de un trueque con escrow</text>
+
+  <!-- Step circles -->
+  <g fill="#d4af37">
+    <circle cx="120" cy="100" r="16"/>
+    <circle cx="120" cy="174" r="16"/>
+    <circle cx="120" cy="248" r="16"/>
+    <circle cx="120" cy="322" r="16"/>
+    <circle cx="120" cy="396" r="16"/>
+  </g>
+  <g fill="#0a1128" font-size="14" font-weight="bold" text-anchor="middle">
+    <text x="120" y="105">1</text>
+    <text x="120" y="179">2</text>
+    <text x="120" y="253">3</text>
+    <text x="120" y="327">4</text>
+    <text x="120" y="401">5</text>
+  </g>
+
+  <!-- Step bars -->
+  <rect x="170" y="72" width="560" height="56" rx="14" fill="#48cae4"/>
+  <text x="195" y="93" fill="#0a1128" font-size="13" font-weight="bold">1 · Ana crea el trueque: su bici por la guitarra de Bruno</text>
+  <text x="195" y="113" fill="#0a1128" font-size="11">Se registra el acuerdo · estado: CREADO</text>
+
+  <rect x="170" y="146" width="560" height="56" rx="14" fill="#2a9d8f"/>
+  <text x="195" y="167" fill="#ffffff" font-size="13" font-weight="bold">2 · Custodia: Ana deposita la bici y Bruno la guitarra</text>
+  <text x="195" y="187" fill="#ffffff" font-size="11">Cada objeto entra en la caja fuerte · estado: CUSTODIADO</text>
+
+  <rect x="170" y="220" width="560" height="56" rx="14" fill="#48cae4"/>
+  <text x="195" y="241" fill="#0a1128" font-size="13" font-weight="bold">3 · Apertura: ambos confirman que estan listos</text>
+  <text x="195" y="261" fill="#0a1128" font-size="11">Ventana de +/- 10 minutos alrededor de la hora pautada</text>
+
+  <rect x="170" y="294" width="560" height="56" rx="14" fill="#1a2b4c"/>
+  <text x="195" y="315" fill="#ffffff" font-size="13" font-weight="bold">4 · Recibir y firmar: cada uno firma la recepcion</text>
+  <text x="195" y="335" fill="#ffffff" font-size="11">Ademas cada uno valora la experiencia del 1 al 5</text>
+
+  <rect x="170" y="368" width="560" height="56" rx="14" fill="#d4af37"/>
+  <text x="195" y="389" fill="#0a1128" font-size="13" font-weight="bold">5 · Cierre: la caja fuerte entrega en cruz</text>
+  <text x="195" y="409" fill="#0a1128" font-size="11">Bici a Bruno, guitarra a Ana · estado final: COMPLETADO</text>
+
+  <!-- Arrows between steps -->
+  <g stroke="#1a2b4c" stroke-width="2.5">
+    <line x1="450" y1="130" x2="450" y2="144" marker-end="url(#arr)"/>
+    <line x1="450" y1="204" x2="450" y2="218" marker-end="url(#arr)"/>
+    <line x1="450" y1="278" x2="450" y2="292" marker-end="url(#arr)"/>
+    <line x1="450" y1="352" x2="450" y2="366" marker-end="url(#arr)"/>
+  </g>
+
+  <!-- Rule of gold -->
+  <rect x="170" y="440" width="560" height="44" rx="12" fill="#0a1128"/>
+  <text x="450" y="459" text-anchor="middle" fill="#f3e5ab" font-size="12" font-weight="bold">Regla de oro: nadie puede liberar un activo solo</text>
+  <text x="450" y="475" text-anchor="middle" fill="#ffffff" font-size="10.5">Hacen falta las 2 firmas y 2 valoraciones (o la votacion de los Socios)</text>
+</svg>

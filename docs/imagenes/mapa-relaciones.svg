@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <rect width="800" height="54" fill="#1a2b4c"/>
+  <rect y="50" width="800" height="4" fill="#d4af37"/>
+  <text x="400" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">Mapa general de las carpetas de datos</text>
+
+  <!-- USUARIOS -->
+  <rect x="300" y="95" width="200" height="110" rx="14" fill="#48cae4"/>
+  <text x="400" y="126" text-anchor="middle" fill="#0a1128" font-size="13.5" font-weight="bold">USUARIOS</text>
+  <text x="400" y="146" text-anchor="middle" fill="#0a1128" font-size="10">id (PK) · wallet unica</text>
+  <text x="400" y="163" text-anchor="middle" fill="#0a1128" font-size="10">estado: escalera D28</text>
+  <text x="400" y="180" text-anchor="middle" fill="#0a1128" font-size="10">tipo / nivel / medalla</text>
+
+  <!-- KYC -->
+  <rect x="40" y="95" width="190" height="86" rx="14" fill="#e2e8f0"/>
+  <text x="135" y="122" text-anchor="middle" fill="#1a2b4c" font-size="12.5" font-weight="bold">KYC</text>
+  <text x="135" y="142" text-anchor="middle" fill="#1a2b4c" font-size="10">usuario_id -&gt; usuarios</text>
+  <text x="135" y="160" text-anchor="middle" fill="#1a2b4c" font-size="10">merkle_root (huella)</text>
+
+  <!-- ARTICULOS -->
+  <rect x="40" y="220" width="190" height="86" rx="14" fill="#e2e8f0"/>
+  <text x="135" y="247" text-anchor="middle" fill="#1a2b4c" font-size="12.5" font-weight="bold">ARTICULOS</text>
+  <text x="135" y="267" text-anchor="middle" fill="#1a2b4c" font-size="10">usuario_id -&gt; usuarios</text>
+  <text x="135" y="285" text-anchor="middle" fill="#1a2b4c" font-size="10">rubro · disponible</text>
+
+  <!-- PUNTOS ENCUENTRO -->
+  <rect x="40" y="345" width="190" height="86" rx="14" fill="#e2e8f0"/>
+  <text x="135" y="365" text-anchor="middle" fill="#1a2b4c" font-size="10.5" font-weight="bold">PUNTOS_ENCUENTRO</text>
+  <text x="135" y="386" text-anchor="middle" fill="#1a2b4c" font-size="10">usuario_id -&gt; usuarios</text>
+  <text x="135" y="403" text-anchor="middle" fill="#1a2b4c" font-size="10">geog (PostGIS)</text>
+  <text x="135" y="420" text-anchor="middle" fill="#1a2b4c" font-size="10">radio 10 km</text>
+
+  <!-- FINANZAS -->
+  <rect x="560" y="95" width="200" height="86" rx="14" fill="#d4af37"/>
+  <text x="660" y="122" text-anchor="middle" fill="#0a1128" font-size="12.5" font-weight="bold">FINANZAS</text>
+  <text x="660" y="142" text-anchor="middle" fill="#0a1128" font-size="10">usuario_id (1 a 1)</text>
+  <text x="660" y="160" text-anchor="middle" fill="#0a1128" font-size="10">saldo BRLT</text>
+
+  <!-- SUSCRIPCIONES -->
+  <rect x="560" y="220" width="200" height="86" rx="14" fill="#d4af37"/>
+  <text x="660" y="247" text-anchor="middle" fill="#0a1128" font-size="12.5" font-weight="bold">SUSCRIPCIONES</text>
+  <text x="660" y="267" text-anchor="middle" fill="#0a1128" font-size="10">empresa_id -&gt; usuarios</text>
+  <text x="660" y="285" text-anchor="middle" fill="#0a1128" font-size="10">ciclos de 30 dias</text>
+
+  <!-- CAMPANAS / SUBASTAS -->
+  <rect x="560" y="345" width="200" height="86" rx="14" fill="#d4af37"/>
+  <text x="660" y="366" text-anchor="middle" fill="#0a1128" font-size="11" font-weight="bold">CAMPANAS · SUBASTAS</text>
+  <text x="660" y="386" text-anchor="middle" fill="#0a1128" font-size="10">empresa_id -&gt; usuarios</text>
+  <text x="660" y="403" text-anchor="middle" fill="#0a1128" font-size="10">articulo_id -&gt; articulos</text>
+
+  <!-- TRUEKES central bottom -->
+  <rect x="300" y="350" width="200" height="110" rx="14" fill="#2a9d8f"/>
+  <text x="400" y="378" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">TRUEKES</text>
+  <text x="400" y="396" text-anchor="middle" fill="#ffffff" font-size="10">escrow_id (espejo)</text>
+  <text x="400" y="412" text-anchor="middle" fill="#ffffff" font-size="10">articulo_a_id + articulo_b_id</text>
+  <text x="400" y="428" text-anchor="middle" fill="#ffffff" font-size="10">usuario_a + usuario_b</text>
+  <text x="400" y="444" text-anchor="middle" fill="#ffffff" font-size="10">etiqueta: 9 estados</text>
+
+  <!-- VALORACIONES & DISPUTAS bottom -->
+  <rect x="40" y="470" width="190" height="0" fill="none"/>
+
+  <!-- Connections -->
+  <g stroke="#1a2b4c" stroke-width="2" fill="none" marker-end="url(#arr)">
+    <!-- usuarios -> kyc -->
+    <line x1="296" y1="130" x2="234" y2="138"/>
+    <!-- usuarios -> articulos -->
+    <line x1="296" y1="170" x2="234" y2="240"/>
+    <!-- usuarios -> puntos -->
+    <path d="M 296 180 C 200 200 200 320 190 345"/>
+    <!-- usuarios -> finanzas (1-1) -->
+    <line x1="502" y1="130" x2="556" y2="138"/>
+    <!-- usuarios -> suscripciones -->
+    <line x1="502" y1="170" x2="556" y2="240"/>
+    <!-- usuarios -> campanas -->
+    <path d="M 502 190 C 600 220 620 300 640 343"/>
+    <!-- articulos -> truekes -->
+    <path d="M 230 300 C 260 330 300 360 330 380"/>
+    <!-- truekes -> valoraciones/disputas note -->
+  </g>
+
+  <!-- VALORACIONES / DISPUTAS chips under truekes -->
+  <rect x="40" y="440" width="190" height="46" rx="12" fill="#f4a261"/>
+  <text x="135" y="460" text-anchor="middle" fill="#0a1128" font-size="11" font-weight="bold">VALORACIONES</text>
+  <text x="135" y="476" text-anchor="middle" fill="#0a1128" font-size="9.5">trueke_id -&gt; truekes</text>
+  <rect x="560" y="440" width="200" height="46" rx="12" fill="#f4a261"/>
+  <text x="660" y="460" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">DISPUTAS</text>
+  <text x="660" y="476" text-anchor="middle" fill="#0a1128" font-size="9.5">trueke_id -&gt; truekes</text>
+  <g stroke="#1a2b4c" stroke-width="2" fill="none" marker-end="url(#arr)">
+    <path d="M 300 430 C 220 440 200 445 190 442"/>
+    <path d="M 502 430 C 560 440 580 445 600 442"/>
+  </g>
+
+  <!-- Key -->
+  <rect x="640" y="452" width="0" height="0" fill="none"/>
+</svg>

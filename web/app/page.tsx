@@ -149,6 +149,19 @@ export default function Landing() {
           </Link>
         </div>
       </section>
+
+      {/* Pie discreto con acceso a la ayuda (agente INTEGRADOR) */}
+      <footer className="border-t border-white/10 bg-navy-900 py-5 text-white/60">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-6 text-xs sm:flex-row">
+          <span>© {new Date().getFullYear()} TrueKeate · Trueque descentralizado con escrow on-chain</span>
+          <Link
+            href="/help/manual"
+            className="font-medium text-gold-300 underline-offset-2 transition-colors hover:text-gold-500 hover:underline"
+          >
+            📖 Ayuda · Manuales TrueKeate
+          </Link>
+        </div>
+      </footer>
     </main>
   );
 }

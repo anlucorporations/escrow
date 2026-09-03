@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <rect width="800" height="54" fill="#1a2b4c"/>
+  <rect y="50" width="800" height="4" fill="#d4af37"/>
+  <text x="400" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">Escalera de accesos: que puedes hacer en cada nivel</text>
+
+  <!-- Step 1 -->
+  <rect x="45" y="330" width="210" height="70" rx="14" fill="#48cae4"/>
+  <text x="150" y="359" text-anchor="middle" fill="#0a1128" font-size="14.5" font-weight="bold">INSCRITO</text>
+  <text x="150" y="379" text-anchor="middle" fill="#0a1128" font-size="10.5">ves el catalogo publico</text>
+  <rect x="45" y="412" width="210" height="56" rx="12" fill="#e2e8f0"/>
+  <text x="150" y="432" text-anchor="middle" fill="#1a2b4c" font-size="10.5">No crea trueques todavia</text>
+  <text x="150" y="448" text-anchor="middle" fill="#1a2b4c" font-size="10.5">(modulos atenuados)</text>
+
+  <!-- Step 2 -->
+  <rect x="295" y="240" width="210" height="70" rx="14" fill="#2a9d8f"/>
+  <text x="400" y="269" text-anchor="middle" fill="#ffffff" font-size="14.5" font-weight="bold">VERIFICADO</text>
+  <text x="400" y="289" text-anchor="middle" fill="#ffffff" font-size="10.5">correo + telefono</text>
+  <rect x="295" y="322" width="210" height="56" rx="12" fill="#e2e8f0"/>
+  <text x="400" y="342" text-anchor="middle" fill="#1a2b4c" font-size="10.5">publica objetos y truequea</text>
+  <text x="400" y="358" text-anchor="middle" fill="#1a2b4c" font-size="10.5">max. 3 trueques activos</text>
+
+  <!-- Step 3 -->
+  <rect x="545" y="150" width="210" height="70" rx="14" fill="#d4af37"/>
+  <text x="650" y="179" text-anchor="middle" fill="#0a1128" font-size="14.5" font-weight="bold">CERTIFICADO</text>
+  <text x="650" y="199" text-anchor="middle" fill="#0a1128" font-size="10.5">KYC: documento + selfie</text>
+  <rect x="545" y="232" width="210" height="56" rx="12" fill="#e2e8f0"/>
+  <text x="650" y="252" text-anchor="middle" fill="#1a2b4c" font-size="10.5">reputacion y pujas</text>
+  <text x="650" y="268" text-anchor="middle" fill="#1a2b4c" font-size="10.5">en subastas</text>
+
+  <!-- Arrows up -->
+  <path d="M 257 355 L 293 300" fill="none" stroke="#1a2b4c" stroke-width="2.5" marker-end="url(#arr)"/>
+  <path d="M 507 270 L 543 215" fill="none" stroke="#1a2b4c" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="270" y="310" fill="#1a2b4c" font-size="9.5">sube</text>
+  <text x="520" y="230" fill="#1a2b4c" font-size="9.5">sube</text>
+
+  <!-- Limits table-ish bottom -->
+  <rect x="60" y="445" width="680" height="40" rx="12" fill="#1a2b4c"/>
+  <text x="400" y="462" text-anchor="middle" fill="#ffffff" font-size="10.5">Limites de publicacion por reputacion: INICIADO 5 · COMUN 50 · FRECUENTE 100 · SOCIO 100</text>
+  <text x="400" y="478" text-anchor="middle" fill="#f3e5ab" font-size="10.5">Solo VERIFICADO o CERTIFICADO pueden operar (lo exige el relayer)</text>
+</svg>

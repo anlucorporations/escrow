@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <rect width="800" height="54" fill="#1a2b4c"/>
+  <rect y="50" width="800" height="4" fill="#d4af37"/>
+  <text x="400" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">Recorrido por la app: de la portada a tu nivel</text>
+
+  <!-- L -->
+  <rect x="30" y="180" width="150" height="90" rx="14" fill="#1a2b4c"/>
+  <text x="105" y="222" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">Pagina principal</text>
+  <text x="105" y="241" text-anchor="middle" fill="#ffffff" font-size="10.5">landing publica</text>
+  <!-- D -->
+  <rect x="260" y="180" width="160" height="90" rx="14" fill="#2a9d8f"/>
+  <text x="340" y="218" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">Panel personal</text>
+  <text x="340" y="236" text-anchor="middle" fill="#ffffff" font-size="10.5">dashboard</text>
+  <text x="340" y="252" text-anchor="middle" fill="#ffffff" font-size="10.5">zona privada</text>
+  <!-- W -->
+  <rect x="500" y="180" width="150" height="90" rx="14" fill="#48cae4"/>
+  <text x="575" y="218" text-anchor="middle" fill="#0a1128" font-size="12.5" font-weight="bold">Billetera</text>
+  <text x="575" y="236" text-anchor="middle" fill="#0a1128" font-size="10.5">MetaMask conectada</text>
+  <text x="575" y="252" text-anchor="middle" fill="#0a1128" font-size="10.5">0x1234...abcd</text>
+  <!-- N -->
+  <rect x="330" y="330" width="160" height="80" rx="14" fill="#d4af37"/>
+  <text x="410" y="362" text-anchor="middle" fill="#0a1128" font-size="13" font-weight="bold">Nivel de la</text>
+  <text x="410" y="380" text-anchor="middle" fill="#0a1128" font-size="13" font-weight="bold">escalera</text>
+
+  <!-- Arrows main -->
+  <g stroke="#1a2b4c" stroke-width="2.5" marker-end="url(#arr)">
+    <line x1="182" y1="225" x2="256" y2="225"/>
+    <line x1="422" y1="225" x2="496" y2="225"/>
+    <path d="M 575 272 L 575 300 L 420 300 L 420 326"/>
+  </g>
+  <text x="219" y="214" text-anchor="middle" fill="#1a2b4c" font-size="9.5">Comenzar</text>
+  <text x="219" y="226" text-anchor="middle" fill="#1a2b4c" font-size="9.5">a truequear</text>
+  <text x="459" y="218" text-anchor="middle" fill="#1a2b4c" font-size="9.5">Conectar</text>
+  <text x="459" y="230" text-anchor="middle" fill="#1a2b4c" font-size="9.5">MetaMask</text>
+  <text x="575" y="292" text-anchor="middle" fill="#1a2b4c" font-size="9.5">muestra tu nivel</text>
+
+  <!-- Outcomes -->
+  <g>
+    <rect x="60" y="420" width="200" height="58" rx="12" fill="#e2e8f0"/>
+    <text x="160" y="443" text-anchor="middle" fill="#1a2b4c" font-size="12" font-weight="bold">INSCRITO</text>
+    <text x="160" y="460" text-anchor="middle" fill="#1a2b4c" font-size="10">solo ver catalogo</text>
+    <text x="160" y="473" text-anchor="middle" fill="#1a2b4c" font-size="10">(modulos atenuados)</text>
+  </g>
+  <g>
+    <rect x="300" y="420" width="200" height="58" rx="12" fill="#2a9d8f"/>
+    <text x="400" y="443" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="bold">VERIFICADO</text>
+    <text x="400" y="460" text-anchor="middle" fill="#ffffff" font-size="10">crear trueques</text>
+    <text x="400" y="473" text-anchor="middle" fill="#ffffff" font-size="10">(max. 3 activos)</text>
+  </g>
+  <g>
+    <rect x="540" y="420" width="200" height="58" rx="12" fill="#d4af37"/>
+    <text x="640" y="443" text-anchor="middle" fill="#0a1128" font-size="12" font-weight="bold">CERTIFICADO</text>
+    <text x="640" y="460" text-anchor="middle" fill="#0a1128" font-size="10">todo + subastas</text>
+    <text x="640" y="473" text-anchor="middle" fill="#0a1128" font-size="10">reputacion plena</text>
+  </g>
+
+  <!-- Branches from N -->
+  <g stroke="#1a2b4c" stroke-width="2" fill="none" marker-end="url(#arr)">
+    <line x1="372" y1="412" x2="168" y2="417"/>
+    <line x1="410" y1="412" x2="410" y2="417"/>
+    <line x1="448" y1="412" x2="632" y2="417"/>
+  </g>
+</svg>

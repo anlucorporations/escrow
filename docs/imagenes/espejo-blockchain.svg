@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <rect width="800" height="54" fill="#1a2b4c"/>
+  <rect y="50" width="800" height="4" fill="#d4af37"/>
+  <text x="400" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">El espejo de la blockchain: que copia cada carpeta</text>
+
+  <!-- Contracts group -->
+  <rect x="40" y="90" width="220" height="340" rx="16" fill="#fff1f0" stroke="#e63946" stroke-width="2"/>
+  <text x="150" y="118" text-anchor="middle" fill="#a8232d" font-size="13.5" font-weight="bold">Contratos en la cadena</text>
+  <g fill="#e63946">
+    <rect x="60" y="140" width="180" height="40" rx="9"/>
+    <rect x="60" y="196" width="180" height="40" rx="9"/>
+    <rect x="60" y="252" width="180" height="40" rx="9"/>
+    <rect x="60" y="308" width="180" height="40" rx="9"/>
+    <rect x="60" y="364" width="180" height="40" rx="9"/>
+  </g>
+  <g fill="#ffffff" font-size="11" text-anchor="middle">
+    <text x="150" y="165">Escrow</text>
+    <text x="150" y="221">Smart Account</text>
+    <text x="150" y="277">Padron de Socios</text>
+    <text x="150" y="333">BRLT (moneda)</text>
+    <text x="150" y="389">Suscripcion de empresa</text>
+  </g>
+
+  <!-- Vigilante -->
+  <rect x="330" y="180" width="140" height="130" rx="14" fill="#48cae4"/>
+  <text x="400" y="235" text-anchor="middle" fill="#0a1128" font-size="13" font-weight="bold">Vigilante</text>
+  <text x="400" y="255" text-anchor="middle" fill="#0a1128" font-size="10.5">indexador</text>
+  <text x="400" y="275" text-anchor="middle" fill="#0a1128" font-size="10.5">escucha</text>
+  <text x="400" y="291" text-anchor="middle" fill="#0a1128" font-size="10.5">los eventos</text>
+
+  <!-- Mirror group -->
+  <rect x="560" y="90" width="200" height="240" rx="16" fill="#e6f4f2" stroke="#1f6f64" stroke-width="2"/>
+  <rect x="560" y="90" width="200" height="34" rx="16" fill="#2a9d8f"/>
+  <rect x="560" y="108" width="200" height="16" fill="#2a9d8f"/>
+  <text x="660" y="114" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="bold">Carpetas espejo</text>
+  <g fill="#2a9d8f">
+    <rect x="575" y="136" width="170" height="42" rx="9"/>
+    <rect x="575" y="192" width="170" height="42" rx="9"/>
+    <rect x="575" y="248" width="170" height="42" rx="9"/>
+  </g>
+  <g fill="#ffffff" font-size="10" text-anchor="middle">
+    <text x="660" y="157">truekes</text>
+    <text x="660" y="170">estado del trueque</text>
+    <text x="660" y="213">kyc + usuarios</text>
+    <text x="660" y="226">huella y direccion</text>
+    <text x="660" y="269">finanzas + suscripciones</text>
+    <text x="660" y="282">saldo y ciclos</text>
+  </g>
+
+  <!-- Auditoria -->
+  <rect x="560" y="360" width="200" height="70" rx="14" fill="#e9e5f0" stroke="#8d86a9" stroke-width="1.5"/>
+  <text x="660" y="386" text-anchor="middle" fill="#1a2b4c" font-size="11.5" font-weight="bold">auditoria</text>
+  <text x="660" y="404" text-anchor="middle" fill="#1a2b4c" font-size="9.5">cada evento procesado</text>
+  <text x="660" y="418" text-anchor="middle" fill="#1a2b4c" font-size="9.5">sin duplicar (triple llave)</text>
+
+  <!-- Arrows -->
+  <g stroke="#1a2b4c" stroke-width="2" fill="none" marker-end="url(#arr)">
+    <line x1="242" y1="160" x2="326" y2="200"/>
+    <line x1="242" y1="216" x2="326" y2="225"/>
+    <line x1="242" y1="272" x2="326" y2="250"/>
+    <line x1="242" y1="328" x2="326" y2="275"/>
+    <line x1="242" y1="384" x2="326" y2="295"/>
+    <path d="M 472 245 L 556 245"/>
+    <path d="M 400 312 L 400 395 L 556 395"/>
+  </g>
+  <text x="290" y="250" fill="#1a2b4c" font-size="9">eventos</text>
+  <text x="510" y="236" fill="#1a2b4c" font-size="9.5">espejo</text>
+  <text x="420" y="372" fill="#1a2b4c" font-size="9.5">bitacora</text>
+
+  <!-- Note -->
+  <rect x="40" y="460" width="720" height="26" rx="10" fill="#f3e5ab"/>
+  <text x="400" y="478" text-anchor="middle" fill="#0a1128" font-size="9.5" font-weight="bold">Pendiente C8: el Fondo de Valor y los eventos de disputa/resolucion aun no se copian</text>
+</svg>

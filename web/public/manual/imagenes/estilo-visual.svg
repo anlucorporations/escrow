@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <rect width="800" height="54" fill="#1a2b4c"/>
+  <rect y="50" width="800" height="4" fill="#d4af37"/>
+  <text x="400" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">Identidad visual: paleta Boveda Digital Moderna</text>
+
+  <!-- Swatches row 1 -->
+  <g>
+    <rect x="50" y="90" width="160" height="120" rx="14" fill="#0a1128"/>
+    <text x="130" y="140" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">Navy</text>
+    <text x="130" y="160" text-anchor="middle" fill="#f3e5ab" font-size="12">#0a1128</text>
+    <text x="130" y="184" text-anchor="middle" fill="#ffffff" font-size="10">fondo oscuro</text>
+    <text x="130" y="198" text-anchor="middle" fill="#ffffff" font-size="10">principal</text>
+  </g>
+  <g>
+    <rect x="230" y="90" width="160" height="120" rx="14" fill="#1a2b4c"/>
+    <text x="310" y="140" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">Navy 800</text>
+    <text x="310" y="160" text-anchor="middle" fill="#f3e5ab" font-size="12">#1a2b4c</text>
+    <text x="310" y="184" text-anchor="middle" fill="#ffffff" font-size="10">fondos y barras</text>
+    <text x="310" y="198" text-anchor="middle" fill="#ffffff" font-size="10">de la app</text>
+  </g>
+  <g>
+    <rect x="410" y="90" width="160" height="120" rx="14" fill="#2a9d8f"/>
+    <text x="490" y="140" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">Teal</text>
+    <text x="490" y="160" text-anchor="middle" fill="#f3e5ab" font-size="12">#2a9d8f</text>
+    <text x="490" y="184" text-anchor="middle" fill="#ffffff" font-size="10">acciones</text>
+    <text x="490" y="198" text-anchor="middle" fill="#ffffff" font-size="10">y exito</text>
+  </g>
+  <g>
+    <rect x="590" y="90" width="160" height="120" rx="14" fill="#48cae4"/>
+    <text x="670" y="140" text-anchor="middle" fill="#0a1128" font-size="14" font-weight="bold">Cian</text>
+    <text x="670" y="160" text-anchor="middle" fill="#0a1128" font-size="12">#48cae4</text>
+    <text x="670" y="184" text-anchor="middle" fill="#0a1128" font-size="10">detalles y</text>
+    <text x="670" y="198" text-anchor="middle" fill="#0a1128" font-size="10">estados activos</text>
+  </g>
+
+  <!-- Swatches row 2 -->
+  <g>
+    <rect x="50" y="240" width="160" height="120" rx="14" fill="#d4af37"/>
+    <text x="130" y="290" text-anchor="middle" fill="#0a1128" font-size="14" font-weight="bold">Dorado</text>
+    <text x="130" y="310" text-anchor="middle" fill="#0a1128" font-size="12">#d4af37</text>
+    <text x="130" y="334" text-anchor="middle" fill="#0a1128" font-size="10">premium y boton</text>
+    <text x="130" y="348" text-anchor="middle" fill="#0a1128" font-size="10">central Trueke</text>
+  </g>
+  <g>
+    <rect x="230" y="240" width="160" height="120" rx="14" fill="#e63946"/>
+    <text x="310" y="290" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">Carmesi</text>
+    <text x="310" y="310" text-anchor="middle" fill="#f3e5ab" font-size="12">#e63946</text>
+    <text x="310" y="334" text-anchor="middle" fill="#ffffff" font-size="10">alertas</text>
+    <text x="310" y="348" text-anchor="middle" fill="#ffffff" font-size="10">y peligro</text>
+  </g>
+  <g>
+    <rect x="410" y="240" width="160" height="120" rx="14" fill="#f4a261"/>
+    <text x="490" y="290" text-anchor="middle" fill="#0a1128" font-size="14" font-weight="bold">Coral</text>
+    <text x="490" y="310" text-anchor="middle" fill="#0a1128" font-size="12">#f4a261</text>
+    <text x="490" y="334" text-anchor="middle" fill="#0a1128" font-size="10">avisos suaves</text>
+    <text x="490" y="348" text-anchor="middle" fill="#0a1128" font-size="10">y espera</text>
+  </g>
+  <g>
+    <rect x="590" y="240" width="160" height="120" rx="14" fill="#f8f9fa" stroke="#cbd5e1" stroke-width="2"/>
+    <text x="670" y="290" text-anchor="middle" fill="#1a2b4c" font-size="14" font-weight="bold">Lienzo</text>
+    <text x="670" y="310" text-anchor="middle" fill="#1a2b4c" font-size="12">#f8f9fa</text>
+    <text x="670" y="334" text-anchor="middle" fill="#1a2b4c" font-size="10">fondos de</text>
+    <text x="670" y="348" text-anchor="middle" fill="#1a2b4c" font-size="10">las pantallas</text>
+  </g>
+
+  <!-- Gradient bar -->
+  <rect x="50" y="400" width="700" height="26" rx="13" fill="url(#grad)"/>
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1a2b4c"/>
+      <stop offset="0.5" stop-color="#2a9d8f"/>
+      <stop offset="1" stop-color="#d4af37"/>
+    </linearGradient>
+  </defs>
+  <text x="400" y="416" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="bold">Gradiente de marca: navy a teal a dorado</text>
+
+  <rect x="50" y="440" width="700" height="40" rx="12" fill="#1a2b4c"/>
+  <text x="400" y="465" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="bold">Tipografia: Montserrat / Poppins (titulos) · Inter / Roboto (cuerpo)</text>
+</svg>

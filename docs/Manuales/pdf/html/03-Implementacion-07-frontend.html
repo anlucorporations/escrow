@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · La app de TrueKeate: pantallas, MetaMask y navegación</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">03 · Implementación</div>
+    <h1>La app de TrueKeate: pantallas, MetaMask y navegación</h1>
+    <div class="intro">Versión en lenguaje sencillo del manual técnico del <strong>frontend</strong> de TrueKeate (la app web hecha con Next.js). Aquí contamos las pantallas que existen hoy, cómo conectar tu billetera (MetaMask) y cómo moverte por la app.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>03-Implementacion/07-frontend.md</b></span>
+      <span>Edición: <b>3 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/03-Implementacion/07-frontend</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Implementación · Implementacion — La app de TrueKeate: pantallas, MetaMask y navegación</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>Las pantallas que existen hoy (mapa de la app)</span></a></li><li><a href="#s3"><span class="tnum">3</span><span>La portada (la carta de presentación)</span></a></li><li><a href="#s4"><span class="tnum">4</span><span>Conectar tu billetera con MetaMask (paso a paso)</span></a><div class="subs"><a href="#sub1">4.1 Primera vez (conectar)</a><br><a href="#sub2">4.2 Al refrescar la página (volver a entrar)</a><br><a href="#sub3">4.3 Cambiar de cuenta o desconectar</a></div></li><li><a href="#s5"><span class="tnum">5</span><span>Mi Trueke Central (el panel personal)</span></a></li><li><a href="#s6"><span class="tnum">6</span><span>La barra superior y la barra inferior</span></a><div class="subs"><a href="#sub4">6.1 Barra superior (marco de la suite)</a><br><a href="#sub5">6.2 Barra inferior (navegación)</a></div></li><li><a href="#s7"><span class="tnum">7</span><span>El estilo de la app (la "Bóveda Digital Moderna")</span></a></li><li><a href="#s8"><span class="tnum">8</span><span>Qué falta confirmar (resumen)</span></a></li><li><a href="#s9"><span class="tnum">9</span><span>Glosario de este manual</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos</h2>
+<p>La app de TrueKeate es una <strong>página web</strong> (también instalable en el móvil como una app, gracias a la tecnología PWA). Sus pantallas principales:</p>
+<ol><li><strong>Portada</strong> (<code>/</code>): la página de bienvenida pública.</li><li><strong>Mi Trueke Central</strong> (<code>/suite/dashboard</code>): tu panel personal tras entrar.</li><li><strong>Inventario, Intercambio, Socios y Perfil</strong>: accesos desde la barra de abajo (algunos en construcción).</li></ol>
+<p>Para empezar en 5 minutos:</p>
+<ol><li>Abre la portada y pulsa <strong>"Comenzar a truequear"</strong>.</li><li>Se abre tu panel personal (Mi Trueke Central).</li><li>Pulsa <strong>"Conectar MetaMask"</strong> para conectar tu billetera.</li><li>Verás tu dirección resumida (por ejemplo <code>0x1234…abcd</code>).</li><li>Ya estás dentro de la suite: la escalera de verificación te muestra en qué peldaño estás (INSCRITO por ahora).</li></ol>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: hoy el panel muestra tu estado <strong>simulado</strong> (siempre INSCRITO). En la integración final, ese estado vendrá del backend (tu sesión y tu verificación real). Mientras tanto, la app es una demostración visual del diseño.</p></blockquote>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. Las pantallas que existen hoy (mapa de la app)</h2>
+<div class="table-wrap"><table><thead><tr><th>Pantalla</th><th>Ruta</th><th>Qué encuentras</th><th>Estado</th></tr></thead><tbody><tr><td><strong>Portada</strong></td><td><code>/</code></td><td>Hero, ventajas del trueque, filosofía y botón de inicio</td><td>Funcional</td></tr><tr><td><strong>Suite (marco)</strong></td><td><code>/suite</code></td><td>Barra superior + navegación inferior</td><td>Funcional</td></tr><tr><td><strong>Mi Trueke Central</strong></td><td><code>/suite/dashboard</code></td><td>Tu estado, módulos por verificación, conectar MetaMask</td><td>Funcional (estado simulado)</td></tr><tr><td><strong>Inventario</strong></td><td><code>/suite/inventario</code></td><td>Tus objetos</td><td>En construcción (placeholder)</td></tr><tr><td><strong>Trueke Central</strong></td><td><code>/suite/intercambio</code></td><td>Crear y ver trueques</td><td>En construcción (placeholder)</td></tr><tr><td><strong>Socios</strong></td><td><code>/suite/gobernanza</code></td><td>Gobernanza y votaciones</td><td>En construcción (placeholder)</td></tr><tr><td><strong>Perfil</strong></td><td><code>/suite/perfil</code></td><td>Tus datos</td><td>En construcción (placeholder)</td></tr></tbody></table></div>
+<p>Los módulos "en construcción" muestran el aviso: <em>"Este módulo se completa en la integración final. Acceso según rol y estado"</em>.</p>
+<blockquote class="info"><span class="tag">Nota</span><p>Rutas del diseño que <strong>todavía no existen</strong>: historial, zona de empresa, zona de socio, panel de administración, subastas, campañas y la sala de intercambio. No están prometidas como funcionales.</p></blockquote>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5NYXBhIGRlIHBhbnRhbGxhcyBkZSBsYSBhcHA8L3RleHQ+CgogIDwhLS0gUG9ydGFkYSAtLT4KICA8cmVjdCB4PSI0MCIgeT0iMjEwIiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjkwIiByeD0iMTQiIGZpbGw9IiNkNGFmMzciLz4KICA8dGV4dCB4PSIxMjAiIHk9IjI0NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9ImJvbGQiPlBvcnRhZGE8L3RleHQ+CiAgPHRleHQgeD0iMTIwIiB5PSIyNjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAuNSI+cGFnaW5hIHB1YmxpY2E8L3RleHQ+CiAgPHRleHQgeD0iMTIwIiB5PSIyODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAuNSI+cnV0YTogLzwvdGV4dD4KCiAgPCEtLSBEYXNoYm9hcmQgLS0+CiAgPHJlY3QgeD0iMjgwIiB5PSIyMTAiIHdpZHRoPSIxODAiIGhlaWdodD0iOTAiIHJ4PSIxNCIgZmlsbD0iIzJhOWQ4ZiIvPgogIDx0ZXh0IHg9IjM3MCIgeT0iMjQ2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5NaSBUcnVla2UgQ2VudHJhbDwvdGV4dD4KICA8dGV4dCB4PSIzNzAiIHk9IjI2NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMC41Ij4vc3VpdGUvZGFzaGJvYXJkPC90ZXh0PgogIDx0ZXh0IHg9IjM3MCIgeT0iMjgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwLjUiPm5pdmVsICsgY29uZWN0YXIgd2FsbGV0PC90ZXh0PgoKICA8IS0tIEJvdHRvbU5hdiBsYWJlbCAtLT4KICA8cmVjdCB4PSIyNTAiIHk9IjMyMCIgd2lkdGg9IjI2MCIgaGVpZ2h0PSIzNCIgcng9IjEwIiBmaWxsPSIjMWEyYjRjIi8+CiAgPHRleHQgeD0iMzgwIiB5PSIzNDIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmM2U1YWIiIGZvbnQtc2l6ZT0iMTEuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPmJhcnJhIGluZmVyaW9yIGRlIDUgYm90b25lczwvdGV4dD4KCiAgPCEtLSBNb2R1bGUgYm94ZXMgLS0+CiAgPGc+CiAgICA8cmVjdCB4PSI2MDAiIHk9IjgwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjcyIiByeD0iMTIiIGZpbGw9IiM0OGNhZTQiLz4KICAgIDx0ZXh0IHg9IjY4NSIgeT0iMTA4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5JbnZlbnRhcmlvPC90ZXh0PgogICAgPHRleHQgeD0iNjg1IiB5PSIxMjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPnR1cyBvYmpldG9zPC90ZXh0PgogICAgPHRleHQgeD0iNjg1IiB5PSIxNDIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNlNjM5NDYiIGZvbnQtc2l6ZT0iOS41IiBmb250LXdlaWdodD0iYm9sZCI+ZW4gY29uc3RydWNjaW9uPC90ZXh0PgogIDwvZz4KICA8Zz4KICAgIDxyZWN0IHg9IjYwMCIgeT0iMTcwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjcyIiByeD0iMTIiIGZpbGw9IiM0OGNhZTQiLz4KICAgIDx0ZXh0IHg9IjY4NSIgeT0iMTk4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5UcnVla2UgQ2VudHJhbDwvdGV4dD4KICAgIDx0ZXh0IHg9IjY4NSIgeT0iMjE2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwIj5jcmVhciB5IHZlciB0cnVlcXVlczwvdGV4dD4KICAgIDx0ZXh0IHg9IjY4NSIgeT0iMjMyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZTYzOTQ2IiBmb250LXNpemU9IjkuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPmVuIGNvbnN0cnVjY2lvbjwvdGV4dD4KICA8L2c+CiAgPGc+CiAgICA8cmVjdCB4PSI2MDAiIHk9IjI2MCIgd2lkdGg9IjE3MCIgaGVpZ2h0PSI3MiIgcng9IjEyIiBmaWxsPSIjNDhjYWU0Ii8+CiAgICA8dGV4dCB4PSI2ODUiIHk9IjI4OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+U29jaW9zPC90ZXh0PgogICAgPHRleHQgeD0iNjg1IiB5PSIzMDYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPmdvYmVybmFuemEgeSB2b3RvczwvdGV4dD4KICAgIDx0ZXh0IHg9IjY4NSIgeT0iMzIyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZTYzOTQ2IiBmb250LXNpemU9IjkuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPmVuIGNvbnN0cnVjY2lvbjwvdGV4dD4KICA8L2c+CiAgPGc+CiAgICA8cmVjdCB4PSI2MDAiIHk9IjM1MCIgd2lkdGg9IjE3MCIgaGVpZ2h0PSI3MiIgcng9IjEyIiBmaWxsPSIjNDhjYWU0Ii8+CiAgICA8dGV4dCB4PSI2ODUiIHk9IjM3OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+UGVyZmlsPC90ZXh0PgogICAgPHRleHQgeD0iNjg1IiB5PSIzOTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPnR1cyBkYXRvczwvdGV4dD4KICAgIDx0ZXh0IHg9IjY4NSIgeT0iNDEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZTYzOTQ2IiBmb250LXNpemU9IjkuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPmVuIGNvbnN0cnVjY2lvbjwvdGV4dD4KICA8L2c+CgogIDwhLS0gQXJyb3dzIC0tPgogIDxnIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyLjUiIGZpbGw9Im5vbmUiIG1hcmtlci1lbmQ9InVybCgjYXJyKSI+CiAgICA8bGluZSB4MT0iMjAyIiB5MT0iMjU1IiB4Mj0iMjc2IiB5Mj0iMjU1Ii8+CiAgICA8cGF0aCBkPSJNIDQ2MCAyNTUgTCA1OTYgMTE2Ii8+CiAgICA8cGF0aCBkPSJNIDQ2MCAyNTUgTCA1OTYgMjA2Ii8+CiAgICA8cGF0aCBkPSJNIDQ2MCAyNTUgTCA1OTYgMjk2Ii8+CiAgICA8cGF0aCBkPSJNIDQ2MCAyNTUgTCA1OTYgMzg2Ii8+CiAgPC9nPgogIDx0ZXh0IHg9IjIzOSIgeT0iMjQ2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjkuNSI+Q29tZW56YXI8L3RleHQ+CiAgPHRleHQgeD0iMjM5IiB5PSIyNTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iOS41Ij5hIHRydWVxdWVhcjwvdGV4dD4KCiAgPCEtLSBQbGFjZWhvbGRlciBub3RlIC0tPgogIDxyZWN0IHg9IjYwIiB5PSI0NDAiIHdpZHRoPSI1NDAiIGhlaWdodD0iNDIiIHJ4PSIxMiIgZmlsbD0iI2YzZTVhYiIvPgogIDx0ZXh0IHg9IjMzMCIgeT0iNDU3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+TG9zIG1vZHVsb3MgZW4gY29uc3RydWNjaW9uIG11ZXN0cmFuOiAiRXN0ZSBtb2R1bG8gc2UgY29tcGxldGEgZW4gbGE8L3RleHQ+CiAgPHRleHQgeD0iMzMwIiB5PSI0NzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTEiPmludGVncmFjaW9uIGZpbmFsLiBBY2Nlc28gc2VndW4gcm9sIHkgZXN0YWRvIi4gTm8gc2UgcHJvbWV0ZW4gZnVuY2lvbmFsZXMuPC90ZXh0Pgo8L3N2Zz4K" alt="Pantallas App"/><figcaption class="fig-caption">Figura · Pantallas App</figcaption></figure>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. La portada (la carta de presentación)</h2>
+<p>La portada pública cuenta qué es TrueKeate:</p>
+<ul><li><strong>Hero</strong> con el logo, el titular y las cifras de la plataforma (usuarios, trueques, volumen...).</li><li><strong>"¿Qué es un Trueke Digital?"</strong> con las 4 ventajas:</li></ul>
+
+<ul><li><strong>Filosofía</strong>: confianza recompensada, seguridad por diseño, sin barreras.</li><li><strong>Botón final</strong> "Comenzar a truequear" → te lleva a tu panel.</li></ul>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: las cifras de la portada (usuarios, trueques, volumen) son <strong>contenido de maqueta</strong> (estático), no datos reales del backend.</p></blockquote>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. Conectar tu billetera con MetaMask (paso a paso)</h2>
+<p><strong>MetaMask</strong> es una "billetera" (wallet) de cripto: una extensión del navegador (o app móvil) que guarda tus llaves y firma por ti. TrueKeate la usa para saber quién eres.</p>
+<h3 class="sub" id="sub1">4.1 Primera vez (conectar)</h3>
+<ol><li>Instala MetaMask en tu navegador (o usa una wallet compatible).</li><li>Abre <strong>Mi Trueke Central</strong>.</li><li>Pulsa el botón <strong>"Conectar MetaMask"</strong>.</li><li>MetaMask te pregunta: <em>"¿Permites que este sitio vea tus cuentas?"</em> → Acepta.</li><li>Tu dirección aparece en la pantalla (resumida: <code>0x1234…abcd</code>).</li></ol>
+<p>Si MetaMask <strong>no está instalado</strong>, la app te avisa claramente: "MetaMask no está instalado. Instálalo o usa una wallet compatible".</p>
+<h3 class="sub" id="sub2">4.2 Al refrescar la página (volver a entrar)</h3>
+<p>La app recuerda tu cuenta (en el almacén local del navegador):</p>
+<ol><li>Al abrir la página, intenta <strong>reconectarse sola</strong>.</li><li>Si tu billetera está <strong>bloqueada</strong> (con contraseña), conserva tu dirección pero sin firma disponible hasta que la desbloquees.</li></ol>
+<h3 class="sub" id="sub3">4.3 Cambiar de cuenta o desconectar</h3>
+<ul><li>Si cambias de cuenta <strong>dentro de MetaMask</strong>, la app se entera al momento y actualiza la pantalla (escucha el aviso <code>accountsChanged</code>).</li><li>Si cierras sesión, la app borra el recuerdo y vuelve al estado inicial.</li></ul>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: la <strong>firma desde el móvil</strong> (firmar con la app móvil de MetaMask, "deep-link") está comentada como delegación a la wallet móvil, pero <strong>sin código todavía</strong>. La instalabilidad completa de la PWA (funcionar sin conexión) también queda <strong>pendiente de confirmar</strong>: existe el archivo de manifiesto pero no se observó el "service worker".</p></blockquote>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5Db25lY3RhciB0dSBiaWxsZXRlcmEgY29uIE1ldGFNYXNrPC90ZXh0PgoKICA8IS0tIEEgLS0+CiAgPHJlY3QgeD0iMzAwIiB5PSI4MCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSI1MiIgcng9IjEzIiBmaWxsPSIjNDhjYWU0Ii8+CiAgPHRleHQgeD0iNDAwIiB5PSIxMTEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkFicmVzIE1pIFRydWVrZSBDZW50cmFsPC90ZXh0PgoKICA8IS0tIEIgZGVjaXNpb24gLS0+CiAgPHJlY3QgeD0iMzAwIiB5PSIxNjUiIHdpZHRoPSIyMDAiIGhlaWdodD0iNTgiIHJ4PSIxMyIgZmlsbD0iI2YzZTVhYiIgc3Ryb2tlPSIjYzVhMDY1IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjE5MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+TWV0YU1hc2s8L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSIyMDgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTEuNSI+aW5zdGFsYWRvPzwvdGV4dD4KCiAgPCEtLSBDIC0tPgogIDxyZWN0IHg9IjMwMCIgeT0iMjU4IiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjUyIiByeD0iMTMiIGZpbGw9IiMxYTJiNGMiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjI4OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+UHVsc2FzICJDb25lY3RhciBNZXRhTWFzayI8L3RleHQ+CgogIDwhLS0gRCAtLT4KICA8cmVjdCB4PSIzMDAiIHk9IjM0NSIgd2lkdGg9IjIwMCIgaGVpZ2h0PSI1MiIgcng9IjEzIiBmaWxsPSIjMmE5ZDhmIi8+CiAgPHRleHQgeD0iNDAwIiB5PSIzNjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSJib2xkIj5NZXRhTWFzayBwaWRlIHBlcm1pc288L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSIzODMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAiPnBhcmEgdmVyIHR1cyBjdWVudGFzPC90ZXh0PgoKICA8IS0tIE4gYXZpc28gLS0+CiAgPHJlY3QgeD0iNTYwIiB5PSIxNjUiIHdpZHRoPSIyMTAiIGhlaWdodD0iNTgiIHJ4PSIxMyIgZmlsbD0iI2U2Mzk0NiIvPgogIDx0ZXh0IHg9IjY2NSIgeT0iMTkwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iYm9sZCI+QXZpc288L3RleHQ+CiAgPHRleHQgeD0iNjY1IiB5PSIyMDgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAiPmluc3RhbGEgTWV0YU1hc2sgbzwvdGV4dD4KICA8dGV4dCB4PSI2NjUiIHk9IjIyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMCI+dXNhIG90cmEgd2FsbGV0PC90ZXh0PgoKICA8IS0tIEUgY29uZWN0YWRvIC0tPgogIDxyZWN0IHg9IjU2MCIgeT0iMzAwIiB3aWR0aD0iMjEwIiBoZWlnaHQ9IjgwIiByeD0iMTMiIGZpbGw9IiNkNGFmMzciLz4KICA8dGV4dCB4PSI2NjUiIHk9IjMyNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+Q29uZWN0YWRvPC90ZXh0PgogIDx0ZXh0IHg9IjY2NSIgeT0iMzQ2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwLjUiPnR1IGRpcmVjY2lvbiBhcGFyZWNlPC90ZXh0PgogIDx0ZXh0IHg9IjY2NSIgeT0iMzYyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwLjUiPjB4MTIzNC4uLmFiY2Q8L3RleHQ+CgogIDwhLS0gRiByZWNoYXphcyAtLT4KICA8cmVjdCB4PSIzMCIgeT0iMzMwIiB3aWR0aD0iMTkwIiBoZWlnaHQ9IjcwIiByeD0iMTMiIGZpbGw9IiNlMmU4ZjAiLz4KICA8dGV4dCB4PSIxMjUiIHk9IjM1NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiPlNpZ3VlcyBzaW4gY29uZWN0YXI8L3RleHQ+CiAgPHRleHQgeD0iMTI1IiB5PSIzNzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiPnB1ZWRlcyByZWludGVudGFyPC90ZXh0PgoKICA8IS0tIEcgcmVjb25lY3RhciAtLT4KICA8cmVjdCB4PSI1NjAiIHk9IjQxMCIgd2lkdGg9IjIxMCIgaGVpZ2h0PSI2MCIgcng9IjEzIiBmaWxsPSIjMmE5ZDhmIi8+CiAgPHRleHQgeD0iNjY1IiB5PSI0MzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTEuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkFsIHJlZnJlc2NhciBsYSBwYWdpbmE8L3RleHQ+CiAgPHRleHQgeD0iNjY1IiB5PSI0NTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAuNSI+bGEgYXBwIHNlIHJlY29uZWN0YSBzb2xhPC90ZXh0PgoKICA8IS0tIEFycm93cyAtLT4KICA8ZyBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMi41IiBmaWxsPSJub25lIiBtYXJrZXItZW5kPSJ1cmwoI2FycikiPgogICAgPGxpbmUgeDE9IjQwMCIgeTE9IjEzNCIgeDI9IjQwMCIgeTI9IjE2MSIvPgogICAgPCEtLSBzaSAtLT4KICAgIDxsaW5lIHgxPSI0MDAiIHkxPSIyMjUiIHgyPSI0MDAiIHkyPSIyNTQiLz4KICAgIDxsaW5lIHgxPSI0MDAiIHkxPSIzMTIiIHgyPSI0MDAiIHkyPSIzNDEiLz4KICAgIDwhLS0gbm8gaW5zdGFsYWRvIC0tPgogICAgPHBhdGggZD0iTSA1MDIgMTk0IEwgNTU2IDE5NCIvPgogICAgPCEtLSBhY2VwdGFzIC0tPgogICAgPHBhdGggZD0iTSA1MDIgMzcxIEwgNTU2IDM1MCIvPgogICAgPCEtLSByZWNoYXphcyAtLT4KICAgIDxwYXRoIGQ9Ik0gMjk4IDM2NSBMIDIyNCAzNjgiLz4KICAgIDwhLS0gcmVjb25leGlvbiAtLT4KICAgIDxwYXRoIGQ9Ik0gNjY1IDM4MiBMIDY2NSA0MDYiLz4KICA8L2c+CiAgPHRleHQgeD0iNDUyIiB5PSIyNDAiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSJib2xkIj5zaTwvdGV4dD4KICA8dGV4dCB4PSI1MjkiIHk9IjE4NSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSI5LjUiPm5vPC90ZXh0PgogIDx0ZXh0IHg9IjUyOSIgeT0iMzY2IiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwIiBmb250LXdlaWdodD0iYm9sZCI+YWNlcHRhczwvdGV4dD4KICA8dGV4dCB4PSIyNTUiIHk9IjM1OSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9ImJvbGQiPnJlY2hhemFzPC90ZXh0PgoKICA8IS0tIE5vdGUgLS0+CiAgPHJlY3QgeD0iNDAiIHk9IjQzMCIgd2lkdGg9IjQ0MCIgaGVpZ2h0PSI1MCIgcng9IjEyIiBmaWxsPSIjMGExMTI4Ii8+CiAgPHRleHQgeD0iMjYwIiB5PSI0NDkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmM2U1YWIiIGZvbnQtc2l6ZT0iMTAuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPlNpIGNhbWJpYXMgZGUgY3VlbnRhIGRlbnRybyBkZSBNZXRhTWFzaywgbGEgYXBwPC90ZXh0PgogIDx0ZXh0IHg9IjI2MCIgeT0iNDY1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwLjUiPnNlIGVudGVyYSBhbCBtb21lbnRvIChhdmlzbyBhY2NvdW50c0NoYW5nZWQpPC90ZXh0Pgo8L3N2Zz4K" alt="Conexion Metamask"/><figcaption class="fig-caption">Figura · Conexion Metamask</figcaption></figure>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. Mi Trueke Central (el panel personal)</h2>
+<p>Esta es tu pantalla principal dentro de la suite. Muestra:</p>
+<ol><li><strong>Tu billetera</strong> conectada (o el botón para conectar).</li><li><strong>Tu escalera de verificación</strong>: INSCRITO → VERIFICADO → CERTIFICADO, dibujada como pasos. Los alcanzados se ven en color (azul marino → verde azulado).</li><li><strong>Tus módulos disponibles según tu estado</strong>:</li></ol>
+<div class="table-wrap"><table><thead><tr><th>Módulo</th><th>Qué necesitas</th><th>Qué pasa si no lo tienes</th></tr></thead><tbody><tr><td><strong>Explorar ofertas</strong></td><td>Cualquiera (hasta INSCRITO)</td><td>Siempre activo: puedes ver el mercado</td></tr><tr><td><strong>Mis truekes</strong></td><td>VERIFICADO</td><td>Se ve atenuado con el aviso "Requiere estado Verificado"</td></tr><tr><td><strong>Reputación</strong></td><td>CERTIFICADO</td><td>Se ve atenuado hasta que subas de estado</td></tr></tbody></table></div>
+<ol><li><strong>La barra de abajo</strong> (navegación inferior) con 5 accesos.</li></ol>
+<blockquote class="info"><span class="tag">Nota</span><p>La lógica de "qué puedes hacer según tu estado" es <strong>visual</strong> (los botones se atenúan), no hay todavía bloqueo real de rutas por rol.</p></blockquote>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. La barra superior y la barra inferior</h2>
+<h3 class="sub" id="sub4">6.1 Barra superior (marco de la suite)</h3>
+<ul><li>Logo textual <strong>⇄ TrueKeat☑</strong> (el "☑" es el check on-chain, la marca de confianza).</li><li>Tu nombre de usuario con check: <strong>@usuario <svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#1a2b4c"><path d="M2.5 8.6 6.4 12.4 13.5 4.2" stroke="#2a9d8f" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></svg></strong>.</li><li>Un icono de <strong>notificaciones</strong> con un contador.</li></ul>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: el nombre de usuario y el contador de notificaciones son <strong>estáticos</strong> (dibujados), no vienen de datos reales del backend.</p></blockquote>
+<h3 class="sub" id="sub5">6.2 Barra inferior (navegación)</h3>
+<p>La barra de abajo es fija y flotante (siempre a la vista). Tiene 5 botones:</p>
+<ol><li><strong>Mercado</strong> → Mi Trueke Central.</li><li><strong>Inventario</strong> → tus objetos.</li><li><strong>Trueke Central</strong> (el botón del centro, destacado en dorado y elevado): el corazón de la app, para crear trueques.</li><li><strong>Socios</strong> → gobernanza.</li><li><strong>Perfil</strong> → tus datos.</li></ol>
+<p>El botón de la pantalla donde estás se ilumina en color verde azulado.</p>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. El estilo de la app (la "Bóveda Digital Moderna")</h2>
+<p>TrueKeate tiene su propia identidad visual:</p>
+<ul><li><strong>Colores</strong>: azul marino profundo (confianza), verde azulado (teal) y dorado (prestigio). Rojo y coral solo para alertas y estados de error.</li><li><strong>Formas</strong>: botones en cápsula (pill), tarjetas con esquinas redondeadas y la tarjeta "premium" con borde dorado para activos certificados.</li><li><strong>Fuentes</strong>: tipografías limpias y modernas (Geist y sus variantes).</li><li><strong>Detalle de marca</strong>: el check <strong>☑</strong> que se dibuja con una animación al completar una verificación (el "TrueKeat☑").</li><li><strong>Estados con colores</strong> (badges):</li></ul>
+<div class="table-wrap"><table><thead><tr><th>Estado</th><th>Color de la etiqueta</th></tr></thead><tbody><tr><td>INSCRITO, CREADO, CUSTODIADO</td><td>Azul marino</td></tr><tr><td>VERIFICADO</td><td>Verde azulado</td></tr><tr><td>CERTIFICADO, COMPLETADO</td><td>Dorado</td></tr><tr><td>EN_DISPUTA, RESOLUCION_SOCIOS, APERTURA</td><td>Coral</td></tr><tr><td>RECHAZADO, ANULADO, BLOQUEADO</td><td>Rojo</td></tr><tr><td>Otros</td><td>Gris</td></tr></tbody></table></div>
+</section>
+<section class="seccion" id="s8"><h2 class="seccion">8. Qué falta confirmar (resumen)</h2>
+<ol><li>El panel muestra un estado de verificación <strong>simulado</strong> (INSCRITO): no consume aún los servicios del backend (sesión, estado de verificación) → <strong>pendiente de confirmar</strong>.</li><li>Ninguna pantalla hace llamadas reales al backend (catálogo, reputación, trueques) → <strong>pendiente de confirmar</strong>.</li><li>La capa de contratos (ABIs) está lista pero <strong>no se activa en ninguna pantalla</strong>: no hay todavía lectura on-chain funcional → <strong>pendiente de confirmar</strong>.</li><li>Cuatro módulos de la suite son <strong>placeholders</strong> (inventario, intercambio, gobernanza, perfil).</li><li>Datos estáticos: nombre de usuario, notificaciones y cifras de la portada son maqueta.</li><li>La PWA tiene su archivo de instalación (manifest) pero <strong>sin service worker</strong> observado (offline incompleto) → <strong>pendiente de confirmar</strong>.</li><li>Firma móvil (RF-16.3) y los roles de Empresa/Socio/Owner no están implementados en la app → <strong>pendiente de confirmar</strong>.</li><li>Las pruebas de la app (Playwright, 18 ejecuciones) cubren portada y panel con estado estático; no ejercitan una billetera real (ver manual 08).</li></ol>
+</section>
+<section class="seccion" id="s9"><h2 class="seccion">9. Glosario de este manual</h2>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Significado</th></tr></thead><tbody><tr><td><strong>Frontend</strong></td><td>La parte visible de la app (lo que ves)</td></tr><tr><td><strong>PWA</strong></td><td>App web que se puede instalar como una app del móvil</td></tr><tr><td><strong>Wallet / billetera</strong></td><td>Programa que guarda tus llaves y firma (MetaMask)</td></tr><tr><td><strong>MetaMask</strong></td><td>La billetera más conocida (extensión o app móvil)</td></tr><tr><td><strong>Conectar</strong></td><td>Vincular tu billetera a la app</td></tr><tr><td><strong>Suite</strong></td><td>La zona privada de la app tras entrar</td></tr><tr><td><strong>Dashboard</strong></td><td>Panel resumen (Mi Trueke Central)</td></tr><tr><td><strong>Escalera D28</strong></td><td>INSCRITO → VERIFICADO → CERTIFICADO</td></tr><tr><td><strong>Placeholder</strong></td><td>Pantalla provisional "en construcción"</td></tr><tr><td><strong>Landing</strong></td><td>Página de bienvenida pública (portada)</td></tr><tr><td><strong>Hero</strong></td><td>La primera imagen grande de la portada</td></tr><tr><td><strong>Manifest</strong></td><td>Archivo que permite instalar la PWA</td></tr><tr><td><strong>Service worker</strong></td><td>Programa que permite la app sin conexión (pendiente)</td></tr></tbody></table></div>
+<p>¡Listo! Ya sabes moverte por la app y conectar tu billetera. El último manual de esta sección explica cómo sabemos que todo esto funciona: las pruebas.</p>
+</section>
+</main>
+
+</body>
+</html>

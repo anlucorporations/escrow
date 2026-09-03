@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · La app web y móvil de TrueKeate</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">01 · Tecnología</div>
+    <h1>La app web y móvil de TrueKeate</h1>
+    <div class="intro">Versión en lenguaje sencillo del manual técnico del frontend (Next.js). Aquí contamos qué ves y qué tocas cuando usas TrueKeate.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>01-Tecnologia/04-stack-frontend.md</b></span>
+      <span>Edición: <b>3 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/01-Tecnologia/04-stack-frontend</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Tecnología · Tecnologia — La app web y móvil de TrueKeate</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>Con qué está construida la app</span></a></li><li><a href="#s3"><span class="tnum">3</span><span>La página principal (landing)</span></a></li><li><a href="#s4"><span class="tnum">4</span><span>El panel personal (dashboard)</span></a><div class="subs"><a href="#sub1">4.1 Qué hace</a><br><a href="#sub2">4.2 La barra superior</a><br><a href="#sub3">4.3 El menú inferior (BottomNav)</a></div></li><li><a href="#s5"><span class="tnum">5</span><span>Identidad visual: el estilo "Bóveda Digital Moderna"</span></a></li><li><a href="#s6"><span class="tnum">6</span><span>Conectar la billetera: cómo funciona</span></a></li><li><a href="#s7"><span class="tnum">7</span><span>La app como "aplicación instalable" (PWA)</span></a></li><li><a href="#s8"><span class="tnum">8</span><span>¿Cómo sabemos que la app funciona? Pruebas automáticas</span></a></li><li><a href="#s9"><span class="tnum">9</span><span>Qué falta confirmar</span></a></li><li><a href="#s10"><span class="tnum">10</span><span>Glosario de este manual</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos</h2>
+<p>TrueKeate tiene una <strong>página web</strong> (la app) hecha con tecnologías modernas. Esto es lo que encontrarás:</p>
+<ol><li><strong>Página principal</strong> (landing): explica qué es TrueKeate y tiene un botón "Comenzar a truequear".</li><li><strong>Panel personal</strong> (dashboard): tu espacio dentro de la app. Aquí conectas tu billetera y ves tu nivel (INSCRITO, VERIFICADO o CERTIFICADO).</li><li><strong>Menú inferior</strong> con 5 botones: Mercado, Inventario, Trueke, Socios y Perfil.</li></ol>
+<p>Para empezar a usar la app en 5 minutos:</p>
+<ol><li>Abre la página principal.</li><li>Pulsa "Comenzar a truequear".</li><li>Conecta tu billetera MetaMask (un clic para aceptar).</li><li>Mira tu panel: verás tu nivel de la escalera y qué módulos puedes usar.</li><li>Si estás solo INSCRITO, verás el catálogo pero no podrás crear trueques todavía: verifica tu correo y teléfono para subir de nivel.</li></ol>
+<blockquote class="ejemplo"><span class="tag">Ejemplo</span><p>Ejemplo real: Ana abre la app, conecta MetaMask y aparece como "INSCRITO". Los módulos de crear trueques están atenuados (grises). Después de confirmar su correo y teléfono, pasa a "VERIFICADO" y ya puede empezar a truequear.</p></blockquote>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5SZWNvcnJpZG8gcG9yIGxhIGFwcDogZGUgbGEgcG9ydGFkYSBhIHR1IG5pdmVsPC90ZXh0PgoKICA8IS0tIEwgLS0+CiAgPHJlY3QgeD0iMzAiIHk9IjE4MCIgd2lkdGg9IjE1MCIgaGVpZ2h0PSI5MCIgcng9IjE0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHRleHQgeD0iMTA1IiB5PSIyMjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPlBhZ2luYSBwcmluY2lwYWw8L3RleHQ+CiAgPHRleHQgeD0iMTA1IiB5PSIyNDEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAuNSI+bGFuZGluZyBwdWJsaWNhPC90ZXh0PgogIDwhLS0gRCAtLT4KICA8cmVjdCB4PSIyNjAiIHk9IjE4MCIgd2lkdGg9IjE2MCIgaGVpZ2h0PSI5MCIgcng9IjE0IiBmaWxsPSIjMmE5ZDhmIi8+CiAgPHRleHQgeD0iMzQwIiB5PSIyMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPlBhbmVsIHBlcnNvbmFsPC90ZXh0PgogIDx0ZXh0IHg9IjM0MCIgeT0iMjM2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwLjUiPmRhc2hib2FyZDwvdGV4dD4KICA8dGV4dCB4PSIzNDAiIHk9IjI1MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMC41Ij56b25hIHByaXZhZGE8L3RleHQ+CiAgPCEtLSBXIC0tPgogIDxyZWN0IHg9IjUwMCIgeT0iMTgwIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjkwIiByeD0iMTQiIGZpbGw9IiM0OGNhZTQiLz4KICA8dGV4dCB4PSI1NzUiIHk9IjIxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+QmlsbGV0ZXJhPC90ZXh0PgogIDx0ZXh0IHg9IjU3NSIgeT0iMjM2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwLjUiPk1ldGFNYXNrIGNvbmVjdGFkYTwvdGV4dD4KICA8dGV4dCB4PSI1NzUiIHk9IjI1MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41Ij4weDEyMzQuLi5hYmNkPC90ZXh0PgogIDwhLS0gTiAtLT4KICA8cmVjdCB4PSIzMzAiIHk9IjMzMCIgd2lkdGg9IjE2MCIgaGVpZ2h0PSI4MCIgcng9IjE0IiBmaWxsPSIjZDRhZjM3Ii8+CiAgPHRleHQgeD0iNDEwIiB5PSIzNjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSJib2xkIj5OaXZlbCBkZSBsYTwvdGV4dD4KICA8dGV4dCB4PSI0MTAiIHk9IjM4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9ImJvbGQiPmVzY2FsZXJhPC90ZXh0PgoKICA8IS0tIEFycm93cyBtYWluIC0tPgogIDxnIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyLjUiIG1hcmtlci1lbmQ9InVybCgjYXJyKSI+CiAgICA8bGluZSB4MT0iMTgyIiB5MT0iMjI1IiB4Mj0iMjU2IiB5Mj0iMjI1Ii8+CiAgICA8bGluZSB4MT0iNDIyIiB5MT0iMjI1IiB4Mj0iNDk2IiB5Mj0iMjI1Ii8+CiAgICA8cGF0aCBkPSJNIDU3NSAyNzIgTCA1NzUgMzAwIEwgNDIwIDMwMCBMIDQyMCAzMjYiLz4KICA8L2c+CiAgPHRleHQgeD0iMjE5IiB5PSIyMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iOS41Ij5Db21lbnphcjwvdGV4dD4KICA8dGV4dCB4PSIyMTkiIHk9IjIyNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSI5LjUiPmEgdHJ1ZXF1ZWFyPC90ZXh0PgogIDx0ZXh0IHg9IjQ1OSIgeT0iMjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjkuNSI+Q29uZWN0YXI8L3RleHQ+CiAgPHRleHQgeD0iNDU5IiB5PSIyMzAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iOS41Ij5NZXRhTWFzazwvdGV4dD4KICA8dGV4dCB4PSI1NzUiIHk9IjI5MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSI5LjUiPm11ZXN0cmEgdHUgbml2ZWw8L3RleHQ+CgogIDwhLS0gT3V0Y29tZXMgLS0+CiAgPGc+CiAgICA8cmVjdCB4PSI2MCIgeT0iNDIwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjU4IiByeD0iMTIiIGZpbGw9IiNlMmU4ZjAiLz4KICAgIDx0ZXh0IHg9IjE2MCIgeT0iNDQzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iYm9sZCI+SU5TQ1JJVE88L3RleHQ+CiAgICA8dGV4dCB4PSIxNjAiIHk9IjQ2MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMCI+c29sbyB2ZXIgY2F0YWxvZ288L3RleHQ+CiAgICA8dGV4dCB4PSIxNjAiIHk9IjQ3MyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMCI+KG1vZHVsb3MgYXRlbnVhZG9zKTwvdGV4dD4KICA8L2c+CiAgPGc+CiAgICA8cmVjdCB4PSIzMDAiIHk9IjQyMCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSI1OCIgcng9IjEyIiBmaWxsPSIjMmE5ZDhmIi8+CiAgICA8dGV4dCB4PSI0MDAiIHk9IjQ0MyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiPlZFUklGSUNBRE88L3RleHQ+CiAgICA8dGV4dCB4PSI0MDAiIHk9IjQ2MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMCI+Y3JlYXIgdHJ1ZXF1ZXM8L3RleHQ+CiAgICA8dGV4dCB4PSI0MDAiIHk9IjQ3MyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMCI+KG1heC4gMyBhY3Rpdm9zKTwvdGV4dD4KICA8L2c+CiAgPGc+CiAgICA8cmVjdCB4PSI1NDAiIHk9IjQyMCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSI1OCIgcng9IjEyIiBmaWxsPSIjZDRhZjM3Ii8+CiAgICA8dGV4dCB4PSI2NDAiIHk9IjQ0MyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiPkNFUlRJRklDQURPPC90ZXh0PgogICAgPHRleHQgeD0iNjQwIiB5PSI0NjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPnRvZG8gKyBzdWJhc3RhczwvdGV4dD4KICAgIDx0ZXh0IHg9IjY0MCIgeT0iNDczIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwIj5yZXB1dGFjaW9uIHBsZW5hPC90ZXh0PgogIDwvZz4KCiAgPCEtLSBCcmFuY2hlcyBmcm9tIE4gLS0+CiAgPGcgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIG1hcmtlci1lbmQ9InVybCgjYXJyKSI+CiAgICA8bGluZSB4MT0iMzcyIiB5MT0iNDEyIiB4Mj0iMTY4IiB5Mj0iNDE3Ii8+CiAgICA8bGluZSB4MT0iNDEwIiB5MT0iNDEyIiB4Mj0iNDEwIiB5Mj0iNDE3Ii8+CiAgICA8bGluZSB4MT0iNDQ4IiB5MT0iNDEyIiB4Mj0iNjMyIiB5Mj0iNDE3Ii8+CiAgPC9nPgo8L3N2Zz4K" alt="Recorrido App"/><figcaption class="fig-caption">Figura · Recorrido App</figcaption></figure>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. Con qué está construida la app</h2>
+<div class="table-wrap"><table><thead><tr><th>Pieza</th><th>Qué es</th><th>En simple</th></tr></thead><tbody><tr><td><strong>Next.js</strong></td><td>El marco principal de la web</td><td>El "esqueleto" de la app</td></tr><tr><td><strong>React</strong></td><td>Librería de pantallas</td><td>Piezas de interfaz reutilizables</td></tr><tr><td><strong>TypeScript</strong></td><td>JavaScript con red de seguridad</td><td>Evita errores de tipos antes de publicar</td></tr><tr><td><strong>Tailwind CSS</strong></td><td>Sistema de estilos</td><td>Define colores y formas de forma ordenada</td></tr><tr><td><strong>ethers</strong></td><td>Puente con la blockchain</td><td>Conecta con MetaMask y los contratos</td></tr></tbody></table></div>
+<blockquote class="info"><span class="tag">Nota</span><p>Verificación: versión exacta de Next.js 16.3.4, React 19.2.8, Tailwind v4 y ethers 6.17.0 (leídos de los archivos de bloqueo de versiones).</p></blockquote>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. La página principal (landing)</h2>
+<p>Es la puerta de entrada, abierta a todo el mundo (no hace falta iniciar sesión).</p>
+<p>Muestra:</p>
+<ul><li>El nombre y logo de TrueKeate.</li><li>Las <strong>4 ventajas</strong> del trueque digital:<ul><li><strong>Custodia atómica</strong>: nadie se queda sin su parte.</li><li><strong>Trueke sin gas</strong>: los particulares no pagan comisiones de red.</li><li><strong>Reputación real</strong>: las valoraciones construyen confianza.</li><li><strong>Economía circular</strong>: las cosas se reutilizan entre personas.</li></ul></li><li>Un botón grande: <strong>"Comenzar a truequear"</strong>, que lleva al panel personal.</li></ul>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. El panel personal (dashboard)</h2>
+<p>Es la única pantalla de la zona privada que ya está <strong>totalmente funcional</strong>.</p>
+<h3 class="sub" id="sub1">4.1 Qué hace</h3>
+<ol><li>Muestra un botón <strong>"Conectar MetaMask"</strong> si no tienes la billetera conectada.</li><li>Al conectar, muestra tu <strong>nivel de la escalera</strong> (INSCRITO → VERIFICADO → CERTIFICADO).</li><li>Activa o atenúa los módulos según tu nivel:<ul><li>Explorar ofertas</li><li>Mis truekes (máximo 3 activos si eres VERIFICADO)</li><li>Reputación</li><li>Punto de encuentro</li></ul></li></ol>
+<h3 class="sub" id="sub2">4.2 La barra superior</h3>
+<p>Dentro de la app, arriba aparece la marca <code>TrueKeat☑</code> y tu nombre de usuario con una palomita (<svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#1a2b4c"><path d="M2.5 8.6 6.4 12.4 13.5 4.2" stroke="#2a9d8f" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></svg>) si estás verificado.</p>
+<h3 class="sub" id="sub3">4.3 El menú inferior (BottomNav)</h3>
+<p>Una barra flotante abajo con 5 botones:</p>
+<div class="table-wrap"><table><thead><tr><th>Botón</th><th>Ícono</th><th>Qué es</th></tr></thead><tbody><tr><td>Mercado</td><td><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#1a2b4c"><path d="M8 1.5 1 7.2h2V14h4v-4h2v4h4V7.2h2z"/></g></svg></td><td>El panel principal</td></tr><tr><td>Inventario</td><td><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#2a9d8f"><rect x="1.5" y="5.5" width="13" height="8.5" rx="1"/><path d="M5.5 5.5V3.8c0-.8.7-1.3 2.5-1.3s2.5.5 2.5 1.3v1.7"/><path d="M1.5 9h13" stroke="#fff" stroke-width="1.6" fill="none"/></g></svg></td><td>Tus artículos (en construcción)</td></tr><tr><td><strong>Trueke</strong></td><td>⇄</td><td>El trueque (botón central dorado, hexagonal)</td></tr><tr><td>Socios</td><td><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#d4af37"><path d="M2 6 8 2l6 4z"/><path d="M3 6v5h2V6M7 6v5h2V6M11 6v5h2V6"/><rect x="2" y="11.5" width="12" height="2"/></g></svg></td><td>Gobernanza y votaciones (en construcción)</td></tr><tr><td>Perfil</td><td><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#48cae4"><circle cx="8" cy="5.4" r="2.9"/><path d="M2.2 14.4c.6-3 3.2-4.6 5.8-4.6s5.2 1.6 5.8 4.6z"/></g></svg></td><td>Tu perfil (en construcción)</td></tr></tbody></table></div>
+<blockquote class="importante"><span class="tag">Importante</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Importante (verificado): los módulos <strong>Inventario, Trueke, Socios y Perfil son lugares reservados (placeholders)</strong>. Dentro de cada uno pone: "módulo en construcción — se completa en el Ciclo 8". No afirmamos que funcionen todavía.</p></blockquote>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. Identidad visual: el estilo "Bóveda Digital Moderna"</h2>
+<p>TrueKeate tiene un sistema de diseño propio con esta paleta:</p>
+<div class="table-wrap"><table><thead><tr><th>Color</th><th>Uso</th><th>Código</th></tr></thead><tbody><tr><td>Azul marino oscuro</td><td>Fondos principales</td><td><code>#0a1128</code> / <code>#1a2b4c</code></td></tr><tr><td>Verde azulado (teal)</td><td>Acciones y éxito</td><td><code>#2a9d8f</code></td></tr><tr><td>Cian</td><td>Detalles y estados activos</td><td><code>#48cae4</code></td></tr><tr><td>Dorado</td><td>Lo premium y el botón central</td><td><code>#d4af37</code></td></tr><tr><td>Rojo carmesí</td><td>Alertas y peligro</td><td><code>#e63946</code></td></tr><tr><td>Coral</td><td>Avisos suaves</td><td><code>#f4a261</code></td></tr></tbody></table></div>
+<p>Las piezas visuales (botones, tarjetas, insignias) ya existen como componentes reutilizables. Los activos de marca (logos) están en la carpeta pública de la web.</p>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5JZGVudGlkYWQgdmlzdWFsOiBwYWxldGEgQm92ZWRhIERpZ2l0YWwgTW9kZXJuYTwvdGV4dD4KCiAgPCEtLSBTd2F0Y2hlcyByb3cgMSAtLT4KICA8Zz4KICAgIDxyZWN0IHg9IjUwIiB5PSI5MCIgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxMjAiIHJ4PSIxNCIgZmlsbD0iIzBhMTEyOCIvPgogICAgPHRleHQgeD0iMTMwIiB5PSIxNDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIj5OYXZ5PC90ZXh0PgogICAgPHRleHQgeD0iMTMwIiB5PSIxNjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmM2U1YWIiIGZvbnQtc2l6ZT0iMTIiPiMwYTExMjg8L3RleHQ+CiAgICA8dGV4dCB4PSIxMzAiIHk9IjE4NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMCI+Zm9uZG8gb3NjdXJvPC90ZXh0PgogICAgPHRleHQgeD0iMTMwIiB5PSIxOTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAiPnByaW5jaXBhbDwvdGV4dD4KICA8L2c+CiAgPGc+CiAgICA8cmVjdCB4PSIyMzAiIHk9IjkwIiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjEyMCIgcng9IjE0IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8dGV4dCB4PSIzMTAiIHk9IjE0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9ImJvbGQiPk5hdnkgODAwPC90ZXh0PgogICAgPHRleHQgeD0iMzEwIiB5PSIxNjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmM2U1YWIiIGZvbnQtc2l6ZT0iMTIiPiMxYTJiNGM8L3RleHQ+CiAgICA8dGV4dCB4PSIzMTAiIHk9IjE4NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMCI+Zm9uZG9zIHkgYmFycmFzPC90ZXh0PgogICAgPHRleHQgeD0iMzEwIiB5PSIxOTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAiPmRlIGxhIGFwcDwvdGV4dD4KICA8L2c+CiAgPGc+CiAgICA8cmVjdCB4PSI0MTAiIHk9IjkwIiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjEyMCIgcng9IjE0IiBmaWxsPSIjMmE5ZDhmIi8+CiAgICA8dGV4dCB4PSI0OTAiIHk9IjE0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9ImJvbGQiPlRlYWw8L3RleHQ+CiAgICA8dGV4dCB4PSI0OTAiIHk9IjE2MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2YzZTVhYiIgZm9udC1zaXplPSIxMiI+IzJhOWQ4ZjwvdGV4dD4KICAgIDx0ZXh0IHg9IjQ5MCIgeT0iMTg0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwIj5hY2Npb25lczwvdGV4dD4KICAgIDx0ZXh0IHg9IjQ5MCIgeT0iMTk4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwIj55IGV4aXRvPC90ZXh0PgogIDwvZz4KICA8Zz4KICAgIDxyZWN0IHg9IjU5MCIgeT0iOTAiIHdpZHRoPSIxNjAiIGhlaWdodD0iMTIwIiByeD0iMTQiIGZpbGw9IiM0OGNhZTQiLz4KICAgIDx0ZXh0IHg9IjY3MCIgeT0iMTQwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCI+Q2lhbjwvdGV4dD4KICAgIDx0ZXh0IHg9IjY3MCIgeT0iMTYwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEyIj4jNDhjYWU0PC90ZXh0PgogICAgPHRleHQgeD0iNjcwIiB5PSIxODQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPmRldGFsbGVzIHk8L3RleHQ+CiAgICA8dGV4dCB4PSI2NzAiIHk9IjE5OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMCI+ZXN0YWRvcyBhY3Rpdm9zPC90ZXh0PgogIDwvZz4KCiAgPCEtLSBTd2F0Y2hlcyByb3cgMiAtLT4KICA8Zz4KICAgIDxyZWN0IHg9IjUwIiB5PSIyNDAiIHdpZHRoPSIxNjAiIGhlaWdodD0iMTIwIiByeD0iMTQiIGZpbGw9IiNkNGFmMzciLz4KICAgIDx0ZXh0IHg9IjEzMCIgeT0iMjkwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCI+RG9yYWRvPC90ZXh0PgogICAgPHRleHQgeD0iMTMwIiB5PSIzMTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTIiPiNkNGFmMzc8L3RleHQ+CiAgICA8dGV4dCB4PSIxMzAiIHk9IjMzNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMCI+cHJlbWl1bSB5IGJvdG9uPC90ZXh0PgogICAgPHRleHQgeD0iMTMwIiB5PSIzNDgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPmNlbnRyYWwgVHJ1ZWtlPC90ZXh0PgogIDwvZz4KICA8Zz4KICAgIDxyZWN0IHg9IjIzMCIgeT0iMjQwIiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjEyMCIgcng9IjE0IiBmaWxsPSIjZTYzOTQ2Ii8+CiAgICA8dGV4dCB4PSIzMTAiIHk9IjI5MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9ImJvbGQiPkNhcm1lc2k8L3RleHQ+CiAgICA8dGV4dCB4PSIzMTAiIHk9IjMxMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2YzZTVhYiIgZm9udC1zaXplPSIxMiI+I2U2Mzk0NjwvdGV4dD4KICAgIDx0ZXh0IHg9IjMxMCIgeT0iMzM0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwIj5hbGVydGFzPC90ZXh0PgogICAgPHRleHQgeD0iMzEwIiB5PSIzNDgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAiPnkgcGVsaWdybzwvdGV4dD4KICA8L2c+CiAgPGc+CiAgICA8cmVjdCB4PSI0MTAiIHk9IjI0MCIgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxMjAiIHJ4PSIxNCIgZmlsbD0iI2Y0YTI2MSIvPgogICAgPHRleHQgeD0iNDkwIiB5PSIyOTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIj5Db3JhbDwvdGV4dD4KICAgIDx0ZXh0IHg9IjQ5MCIgeT0iMzEwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEyIj4jZjRhMjYxPC90ZXh0PgogICAgPHRleHQgeD0iNDkwIiB5PSIzMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPmF2aXNvcyBzdWF2ZXM8L3RleHQ+CiAgICA8dGV4dCB4PSI0OTAiIHk9IjM0OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMCI+eSBlc3BlcmE8L3RleHQ+CiAgPC9nPgogIDxnPgogICAgPHJlY3QgeD0iNTkwIiB5PSIyNDAiIHdpZHRoPSIxNjAiIGhlaWdodD0iMTIwIiByeD0iMTQiIGZpbGw9IiNmOGY5ZmEiIHN0cm9rZT0iI2NiZDVlMSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8dGV4dCB4PSI2NzAiIHk9IjI5MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9ImJvbGQiPkxpZW56bzwvdGV4dD4KICAgIDx0ZXh0IHg9IjY3MCIgeT0iMzEwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEyIj4jZjhmOWZhPC90ZXh0PgogICAgPHRleHQgeD0iNjcwIiB5PSIzMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiPmZvbmRvcyBkZTwvdGV4dD4KICAgIDx0ZXh0IHg9IjY3MCIgeT0iMzQ4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwIj5sYXMgcGFudGFsbGFzPC90ZXh0PgogIDwvZz4KCiAgPCEtLSBHcmFkaWVudCBiYXIgLS0+CiAgPHJlY3QgeD0iNTAiIHk9IjQwMCIgd2lkdGg9IjcwMCIgaGVpZ2h0PSIyNiIgcng9IjEzIiBmaWxsPSJ1cmwoI2dyYWQpIi8+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImdyYWQiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIwIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMWEyYjRjIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMC41IiBzdG9wLWNvbG9yPSIjMmE5ZDhmIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2Q0YWYzNyIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHRleHQgeD0iNDAwIiB5PSI0MTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSJib2xkIj5HcmFkaWVudGUgZGUgbWFyY2E6IG5hdnkgYSB0ZWFsIGEgZG9yYWRvPC90ZXh0PgoKICA8cmVjdCB4PSI1MCIgeT0iNDQwIiB3aWR0aD0iNzAwIiBoZWlnaHQ9IjQwIiByeD0iMTIiIGZpbGw9IiMxYTJiNGMiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjQ2NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiPlRpcG9ncmFmaWE6IE1vbnRzZXJyYXQgLyBQb3BwaW5zICh0aXR1bG9zKSDCtyBJbnRlciAvIFJvYm90byAoY3VlcnBvKTwvdGV4dD4KPC9zdmc+Cg==" alt="Estilo Visual"/><figcaption class="fig-caption">Figura · Estilo Visual</figcaption></figure>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. Conectar la billetera: cómo funciona</h2>
+<p>Cuando pulsas "Conectar MetaMask":</p>
+<ol><li>La app pide permiso a MetaMask (aparece una ventanita de MetaMask).</li><li>Tú aceptas. MetaMask guarda en la app la dirección de tu cuenta.</li><li>La app <strong>recuerda tu cuenta</strong>: si recargas la página, vuelve a conectar solo.</li><li>Si cambias de cuenta en MetaMask, la app se entera y se actualiza.</li></ol>
+<blockquote class="info"><span class="tag">Nota</span><p>En el teléfono, la firma se delega a la <strong>wallet móvil</strong> (MetaMask mobile) cuando la app se instala como PWA (aplicación instalable).</p></blockquote>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. La app como "aplicación instalable" (PWA)</h2>
+<p>TrueKeate puede instalarse en el teléfono como una app normal:</p>
+<ul><li>Tiene su <strong>manifest</strong> (la tarjeta de presentación que permite instalarla).</li><li>Al instalarla, se abre a pantalla completa, sin barra del navegador.</li><li>El acceso rápido está pensado para que el panel personal sea la primera pantalla.</li></ul>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: existe la tarjeta de instalación, pero <strong>no se ha encontrado</strong> el "trabajador de servicio" (service worker) que permite el modo sin conexión y la caché completa. Hoy, instalable sí; 100 % offline, a confirmar. La app nativa (Android/iOS) es una mejora futura prevista, no algo ya hecho.</p></blockquote>
+</section>
+<section class="seccion" id="s8"><h2 class="seccion">8. ¿Cómo sabemos que la app funciona? Pruebas automáticas</h2>
+<p>La app se prueba con una herramienta llamada <strong>Playwright</strong>, que abre un navegador de verdad y comprueba:</p>
+<ol><li>Que la página principal muestre el logo, las ventajas y el botón.</li><li>Que el botón lleve al panel personal.</li><li>Que dentro del panel se vea la escalera y que un usuario INSCRITO <strong>no pueda</strong> crear trueques (los botones están bloqueados).</li></ol>
+<p>Se prueba en dos tamaños de pantalla: ordenador (Chrome) y móvil (como un Pixel 5), porque TrueKeate es <strong>móvil primero</strong>.</p>
+</section>
+<section class="seccion" id="s9"><h2 class="seccion">9. Qué falta confirmar</h2>
+<ol><li>Los módulos Inventario, Trueke, Socios y Perfil son espacios reservados; su contenido real se completará en una fase posterior → <strong>pendiente de confirmar</strong>.</li><li>La integración real con el servidor (sesión, verificación KYC y envío de operaciones firmadas) hoy se simula en el panel para demostrar el diseño → <strong>pendiente de confirmar</strong> en la integración.</li><li>El service worker de la PWA (modo sin conexión) → <strong>pendiente de confirmar</strong>.</li><li>Las direcciones de los contratos cargadas en la app corresponden al entorno de pruebas; en producción deben cargarse del servidor → <strong>pendiente de confirmar</strong>.</li></ol>
+</section>
+<section class="seccion" id="s10"><h2 class="seccion">10. Glosario de este manual</h2>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Significado</th></tr></thead><tbody><tr><td><strong>Frontend</strong></td><td>La parte de la app que ves y tocas (web y móvil)</td></tr><tr><td><strong>Landing</strong></td><td>Página principal de presentación</td></tr><tr><td><strong>Dashboard</strong></td><td>Panel personal con tus datos y acciones</td></tr><tr><td><strong>Placeholder</strong></td><td>Espacio reservado que aún no tiene contenido</td></tr><tr><td><strong>PWA</strong></td><td>Aplicación web que se puede instalar como app</td></tr><tr><td><strong>Service worker</strong></td><td>Programa en segundo plano que permite usar la app sin conexión</td></tr><tr><td><strong>E2E</strong></td><td>Pruebas de principio a fin, como un usuario real</td></tr><tr><td><strong>Componente</strong></td><td>Pieza de interfaz reutilizable (botón, tarjeta...)</td></tr></tbody></table></div>
+<p>Continúa con el manual <strong>02-Dependencias</strong> para conocer las piezas que usa TrueKeate por dentro.</p>
+</section>
+</main>
+
+</body>
+</html>

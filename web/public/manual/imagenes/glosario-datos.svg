@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <rect width="800" height="54" fill="#1a2b4c"/>
+  <rect y="50" width="800" height="4" fill="#d4af37"/>
+  <text x="400" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">Las 14 carpetas de datos: quien escribe cada una</text>
+
+  <!-- Top sources -->
+  <rect x="40" y="80" width="220" height="80" rx="14" fill="#e63946"/>
+  <text x="150" y="112" text-anchor="middle" fill="#ffffff" font-size="13.5" font-weight="bold">Blockchain</text>
+  <text x="150" y="132" text-anchor="middle" fill="#ffffff" font-size="10.5">unica fuente de verdad</text>
+  <text x="150" y="148" text-anchor="middle" fill="#ffffff" font-size="10.5">para estados del escrow</text>
+
+  <rect x="540" y="80" width="220" height="80" rx="14" fill="#1a2b4c"/>
+  <text x="650" y="112" text-anchor="middle" fill="#ffffff" font-size="13.5" font-weight="bold">Plataforma (API)</text>
+  <text x="650" y="132" text-anchor="middle" fill="#ffffff" font-size="10.5">escribe las carpetas</text>
+  <text x="650" y="148" text-anchor="middle" fill="#ffffff" font-size="10.5">de negocio</text>
+
+  <!-- Vigilante -->
+  <rect x="300" y="80" width="160" height="80" rx="14" fill="#48cae4"/>
+  <text x="380" y="112" text-anchor="middle" fill="#0a1128" font-size="13" font-weight="bold">Vigilante</text>
+  <text x="380" y="130" text-anchor="middle" fill="#0a1128" font-size="10.5">indexador</text>
+  <text x="380" y="148" text-anchor="middle" fill="#0a1128" font-size="10">copia eventos</text>
+
+  <!-- Arrow chain -->
+  <g stroke="#1a2b4c" stroke-width="2.5" fill="none" marker-end="url(#arr)">
+    <line x1="262" y1="120" x2="296" y2="120"/>
+    <line x1="460" y1="120" x2="536" y2="120"/>
+  </g>
+  <text x="279" y="112" text-anchor="middle" fill="#1a2b4c" font-size="9.5">eventos</text>
+  <text x="498" y="112" text-anchor="middle" fill="#1a2b4c" font-size="9.5">escribe</text>
+
+  <!-- Group: espejo -->
+  <rect x="40" y="205" width="220" height="210" rx="16" fill="#e6f4f2" stroke="#1f6f64" stroke-width="2"/>
+  <rect x="40" y="205" width="220" height="36" rx="16" fill="#2a9d8f"/>
+  <rect x="40" y="225" width="220" height="16" fill="#2a9d8f"/>
+  <text x="150" y="229" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="bold">Espejo de la cadena</text>
+  <text x="150" y="245" text-anchor="middle" fill="#ffffff" font-size="9">solo el vigilante escribe</text>
+  <g fill="#2a9d8f">
+    <rect x="60" y="258" width="180" height="30" rx="8"/>
+    <rect x="60" y="294" width="180" height="30" rx="8"/>
+    <rect x="60" y="330" width="180" height="30" rx="8"/>
+    <rect x="60" y="366" width="180" height="30" rx="8"/>
+  </g>
+  <g fill="#ffffff" font-size="10.5">
+    <text x="150" y="278" text-anchor="middle">truekes · estado</text>
+    <text x="150" y="314" text-anchor="middle">kyc · huella merkle</text>
+    <text x="150" y="350" text-anchor="middle">usuarios · tipo</text>
+    <text x="150" y="386" text-anchor="middle">finanzas · saldo BRLT</text>
+  </g>
+
+  <!-- Group: cocina -->
+  <rect x="290" y="205" width="200" height="210" rx="16" fill="#eef2f6" stroke="#8d86a9" stroke-width="2"/>
+  <rect x="290" y="205" width="200" height="36" rx="16" fill="#e9e5f0"/>
+  <rect x="290" y="225" width="200" height="16" fill="#e9e5f0"/>
+  <text x="390" y="229" text-anchor="middle" fill="#1a2b4c" font-size="11.5" font-weight="bold">Cocina del vigilante</text>
+  <g fill="#cbd5e1">
+    <rect x="310" y="258" width="160" height="40" rx="8"/>
+    <rect x="310" y="320" width="160" height="40" rx="8"/>
+  </g>
+  <g fill="#1a2b4c" font-size="10" text-anchor="middle">
+    <text x="390" y="277">auditoria</text>
+    <text x="390" y="290">bitacora, no se borra</text>
+    <text x="390" y="339">indexador_checkpoint</text>
+    <text x="390" y="352">marcapaginas</text>
+  </g>
+  <text x="390" y="400" text-anchor="middle" fill="#1a2b4c" font-size="9.5">cada evento procesado,</text>
+  <text x="390" y="412" text-anchor="middle" fill="#1a2b4c" font-size="9.5">sin duplicar</text>
+
+  <!-- Group: negocio -->
+  <rect x="520" y="205" width="240" height="210" rx="16" fill="#fdf1e7" stroke="#b06a2a" stroke-width="2"/>
+  <rect x="520" y="205" width="240" height="36" rx="16" fill="#f4a261"/>
+  <rect x="520" y="225" width="240" height="16" fill="#f4a261"/>
+  <text x="640" y="229" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">Negocio fuera de la cadena</text>
+  <g fill="#f4a261">
+    <rect x="535" y="252" width="105" height="26" rx="8"/>
+    <rect x="650" y="252" width="105" height="26" rx="8"/>
+    <rect x="535" y="286" width="105" height="26" rx="8"/>
+    <rect x="650" y="286" width="105" height="26" rx="8"/>
+    <rect x="535" y="320" width="105" height="26" rx="8"/>
+    <rect x="650" y="320" width="105" height="26" rx="8"/>
+    <rect x="535" y="354" width="105" height="26" rx="8"/>
+    <rect x="650" y="354" width="105" height="26" rx="8"/>
+  </g>
+  <g fill="#0a1128" font-size="10" text-anchor="middle">
+    <text x="587" y="269">articulos</text>
+    <text x="702" y="269">valoraciones</text>
+    <text x="587" y="303">puntos_encuentro</text>
+    <text x="702" y="303">disputas</text>
+    <text x="587" y="337">imagenes_certificadas</text>
+    <text x="702" y="337">campanas</text>
+    <text x="587" y="371">subastas</text>
+    <text x="702" y="371">suscripciones</text>
+  </g>
+
+  <!-- Bottom note -->
+  <rect x="60" y="440" width="680" height="44" rx="12" fill="#f3e5ab"/>
+  <text x="400" y="458" text-anchor="middle" fill="#0a1128" font-size="11" font-weight="bold">Regla de oro: el vigilante solo copia — nunca escribe en la cadena,</text>
+  <text x="400" y="474" text-anchor="middle" fill="#0a1128" font-size="11">y nadie edita el espejo a mano. Pendiente: encargos y guardianes (C8)</text>
+</svg>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · Cómo sabemos que TrueKeate funciona (las pruebas)</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">03 · Implementación</div>
+    <h1>Cómo sabemos que TrueKeate funciona (las pruebas)</h1>
+    <div class="intro">Versión en lenguaje sencillo del manual técnico de la estrategia y evidencia de <strong>pruebas</strong> de TrueKeate. Aquí contamos cómo el equipo comprueba que la caja fuerte, la moneda, los servidores y la app hacen lo que deben, y qué resultados hay registrados.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>03-Implementacion/08-pruebas.md</b></span>
+      <span>Edición: <b>3 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/03-Implementacion/08-pruebas</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Implementación · Implementacion — Cómo sabemos que TrueKeate funciona (las pruebas)</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>Cómo se prueban los contratos (Forge)</span></a><div class="subs"><a href="#sub1">2.1 Pruebas normales (unit)</a><br><a href="#sub2">2.2 Pruebas con datos al azar (fuzz)</a><br><a href="#sub3">2.3 Pruebas de invariantes (las reglas que nunca se rompen)</a></div></li><li><a href="#s3"><span class="tnum">3</span><span>Cómo se prueban los servidores (Node)</span></a></li><li><a href="#s4"><span class="tnum">4</span><span>Cómo se prueba la app (Playwright)</span></a></li><li><a href="#s5"><span class="tnum">5</span><span>Cómo reproducir las pruebas (por si quieres verlas)</span></a><div class="subs"><a href="#sub4">5.1 Contratos</a><br><a href="#sub5">5.2 Servidores</a><br><a href="#sub6">5.3 App</a></div></li><li><a href="#s6"><span class="tnum">6</span><span>Qué falta confirmar (resumen)</span></a></li><li><a href="#s7"><span class="tnum">7</span><span>Glosario de este manual</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos</h2>
+<p>Antes de dar algo por bueno, TrueKeate lo <strong>prueba en tres frentes</strong>:</p>
+<ol><li><strong>Los contratos (la caja fuerte y la moneda)</strong>: se prueban con "robots de prueba" (Foundry/Forge) que lanzan miles de situaciones, incluso ataques y casos raros.</li><li><strong>Los servidores (vigilante, mensajero y cocina)</strong>: se prueban con simulaciones (Node.js) de la blockchain y la base de datos.</li><li><strong>La app</strong>: se prueban las pantallas con un "navegador robot" (Playwright) que hace clics como una persona real, en ordenador y móvil.</li></ol>
+<p>Los resultados registrados (Fase 4):</p>
+<div class="table-wrap"><table><thead><tr><th>Frente</th><th>Resultado registrado</th></tr></thead><tbody><tr><td>Contratos (Forge)</td><td><strong>62/62</strong> pruebas verdes</td></tr><tr><td>Servidores (Node)</td><td><strong>26/26</strong> pruebas verdes (verificado en este análisis)</td></tr><tr><td>App (Playwright)</td><td><strong>18/18</strong> ejecuciones verdes</td></tr><tr><td>Cobertura de contratos</td><td><strong>89,55 %</strong> de las líneas de código probadas</td></tr></tbody></table></div>
+<blockquote class="info"><span class="tag">Nota</span><p>La <strong>cobertura</strong> mide qué porcentaje del código fue "tocado" por las pruebas. La regla de TrueKeate (gate D38): <strong>al menos 80 % por ciclo</strong>.</p></blockquote>
+<p>En 5 minutos, la idea es simple: como en un restaurante, <strong>nada sale a la mesa sin pasar el control del chef</strong>. Cada pieza tiene su control antes de darla por servida.</p>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. Cómo se prueban los contratos (Forge)</h2>
+<p>Los contratos son programas delicados (manejan objetos de valor), así que se prueban con tres técnicas:</p>
+<h3 class="sub" id="sub1">2.1 Pruebas normales (unit)</h3>
+<p>Casos escritos a mano: "si creo un trueque, el estado debe ser CREADO"; "si un extraño intenta custodiar, debe ser rechazado". Hay <strong>61 pruebas</strong> de este tipo repartidas así:</p>
+<div class="table-wrap"><table><thead><tr><th>Archivo de pruebas</th><th>Cuántas</th><th>Qué prueban</th></tr></thead><tbody><tr><td>Caja fuerte (Escrow.t.sol)</td><td>18</td><td>La máquina de estados del trueque</td></tr><tr><td>Ciclo 3 (Ciclo3.t.sol)</td><td>20</td><td>Moneda, fondo, socios y suscripciones juntos</td></tr><tr><td>Cuenta inteligente (SmartAccount.t.sol)</td><td>14</td><td>Firma, verificación, recuperación</td></tr><tr><td>Caja fuerte, ciclo 8 (EscrowCiclo8.t.sol)</td><td>9</td><td>Disputas, valoraciones, sanciones</td></tr></tbody></table></div>
+<h3 class="sub" id="sub2">2.2 Pruebas con datos al azar (fuzz)</h3>
+<p>El robot lanza <strong>256 combinaciones aleatorias</strong> por prueba: montos extraños, fechas raras, direcciones inventadas... Si algo se rompe, lo encuentra.</p>
+<h3 class="sub" id="sub3">2.3 Pruebas de invariantes (las reglas que nunca se rompen)</h3>
+<p>Son las "leyes de la física" de la plataforma. El robot juega <strong>64 rondas de 100 movimientos aleatorios</strong> y comprueba que las leyes se cumplan siempre:</p>
+<div class="table-wrap"><table><thead><tr><th>Invariante</th><th>La ley que nunca se rompe</th></tr></thead><tbody><tr><td><strong>I1 · Conservación de activos</strong></td><td>La caja fuerte nunca crea ni destruye saldo: lo que entra, sale</td></tr><tr><td><strong>I2 · Sin cancelación con custodia</strong></td><td>No se puede cancelar por las buenas si alguien ya depositó</td></tr><tr><td><strong>I4 · Anulaciones resueltas a tiempo</strong></td><td>Toda disputa se resuelve dentro del plazo</td></tr><tr><td><strong>I5 · Sanción solo tras espera</strong></td><td>La sanción nunca se ejecuta antes del tiempo de espera</td></tr><tr><td><strong>I7 · Completar exige firmas y valoración</strong></td><td>Ningún trueque se completa sin las 2 firmas y 2 valoraciones</td></tr></tbody></table></div>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: el archivo menciona "invariantes I1 a I7" pero solo existen <strong>5 funciones</strong> (I1, I2, I4, I5, I7). Las invariantes I3 (ventanas de apertura) e I6 no tienen función en el archivo actual → <strong>pendiente de confirmar</strong> cómo se cubren.</p></blockquote>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5MYSBwaXJhbWlkZSBkZSBwcnVlYmFzIGRlIFRydWVLZWF0ZTwvdGV4dD4KCiAgPCEtLSBTaWRlIGNhcmRzIC0tPgogIDxyZWN0IHg9IjQwIiB5PSIxMjAiIHdpZHRoPSIxODAiIGhlaWdodD0iMTEwIiByeD0iMTQiIGZpbGw9IiM0OGNhZTQiLz4KICA8dGV4dCB4PSIxMzAiIHk9IjE1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+RnV6emluZzwvdGV4dD4KICA8dGV4dCB4PSIxMzAiIHk9IjE3MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41Ij4yNTYgY29tYmluYWNpb25lczwvdGV4dD4KICA8dGV4dCB4PSIxMzAiIHk9IjE4OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41Ij5hbGVhdG9yaWFzIHBvciBwcnVlYmE8L3RleHQ+CiAgPHRleHQgeD0iMTMwIiB5PSIyMDYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAuNSI+YnVzY2EgZmFsbG9zPC90ZXh0PgoKICA8cmVjdCB4PSI1ODAiIHk9IjEyMCIgd2lkdGg9IjE4MCIgaGVpZ2h0PSIxMTAiIHJ4PSIxNCIgZmlsbD0iIzQ4Y2FlNCIvPgogIDx0ZXh0IHg9IjY3MCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5JbnZhcmlhbnRlczwvdGV4dD4KICA8dGV4dCB4PSI2NzAiIHk9IjE3MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41Ij42NCByb25kYXMgeCAxMDA8L3RleHQ+CiAgPHRleHQgeD0iNjcwIiB5PSIxODgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAuNSI+bW92aW1pZW50b3MgYWxlYXRvcmlvczwvdGV4dD4KICA8dGV4dCB4PSI2NzAiIHk9IjIwNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41Ij5sYXMgcmVnbGFzIG51bmNhIHNlIHJvbXBlbjwvdGV4dD4KCiAgPCEtLSBQeXJhbWlkIHRyYXBlem9pZHMgLS0+CiAgPCEtLSBCYXNlIC0tPgogIDxwb2x5Z29uIHBvaW50cz0iMTcwLDQ1MCA2MzAsNDUwIDU2MCwzNjAgMjQwLDM2MCIgZmlsbD0iIzBhMTEyOCIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iNDAyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEzIiBmb250LXdlaWdodD0iYm9sZCI+Q29udHJhdG9zIChGb3JnZSk8L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSI0MjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmM2U1YWIiIGZvbnQtc2l6ZT0iMTEiPjYxIHBydWViYXMgKyBpbnZhcmlhbnRlczwvdGV4dD4KICA8IS0tIE1pZCAtLT4KICA8cG9seWdvbiBwb2ludHM9IjI0MCwzNjAgNTYwLDM2MCA1MDAsMjYwIDMwMCwyNjAiIGZpbGw9IiMyYTlkOGYiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjMwNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9ImJvbGQiPlNlcnZpZG9yZXMgKE5vZGUpPC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzI0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjExIj4yNiBwcnVlYmFzOiB2aWdpbGFudGUsIG1lbnNhamVybywgQVBJPC90ZXh0PgogIDwhLS0gVG9wIC0tPgogIDxwb2x5Z29uIHBvaW50cz0iMzAwLDI2MCA1MDAsMjYwIDQ3MCwxODAgMzMwLDE4MCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMjA2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEzIiBmb250LXdlaWdodD0iYm9sZCI+QXBwIChQbGF5d3JpZ2h0KTwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjIyNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41Ij4xOCBlamVjdWNpb25lcyBlbjwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjIzOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41Ij5vcmRlbmFkb3IgeSBtb3ZpbDwvdGV4dD4KCiAgPCEtLSBSdWxlIC0tPgogIDxyZWN0IHg9IjIyMCIgeT0iNDU1IiB3aWR0aD0iMzYwIiBoZWlnaHQ9IjMwIiByeD0iMTUiIGZpbGw9IiNlNjM5NDYiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjQ3NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMS41IiBmb250LXdlaWdodD0iYm9sZCI+R2F0ZSBEMzg6IGNvYmVydHVyYSBtaW5pbWEgZGVsIDgwICUgcG9yIGNpY2xvPC90ZXh0Pgo8L3N2Zz4K" alt="Piramide Pruebas"/><figcaption class="fig-caption">Figura · Piramide Pruebas</figcaption></figure>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. Cómo se prueban los servidores (Node)</h2>
+<p>Los servidores (vigilante, mensajero, cocina) se prueban <strong>sin necesidad de una blockchain ni una base de datos reales</strong>: se crean <strong>simulaciones</strong> (mocks) que imitan su comportamiento.</p>
+<div class="table-wrap"><table><thead><tr><th>Servidor</th><th>Cómo se simula</th><th>Qué se comprueba</th></tr></thead><tbody><tr><td><strong>Vigilante</strong> (indexador)</td><td>Base de datos "de mentira" en memoria + blockchain simulada</td><td>Que anota los eventos, no duplica, y guarda su avance</td></tr><tr><td><strong>Mensajero</strong> (relayer)</td><td>Billetera falsa + blockchain simulada</td><td>Las 5 protecciones (red, firma, verificado, límite, bloqueo)</td></tr><tr><td><strong>Cocina</strong> (API)</td><td>Servicio real con almacén en memoria</td><td>Registro, verificación, catálogo, trueques, panel, salud</td></tr></tbody></table></div>
+<p>Resultados verificados en este análisis: <strong>26/26 verdes</strong>. Por archivo:</p>
+<div class="table-wrap"><table><thead><tr><th>Archivo</th><th>Pruebas</th><th>Resultado</th></tr></thead><tbody><tr><td>Vigilante (indexador.test.js)</td><td>5</td><td>5/5 <svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#1a2b4c"><path d="M2.5 8.6 6.4 12.4 13.5 4.2" stroke="#2a9d8f" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></svg></td></tr><tr><td>Mensajero (relayer.test.js)</td><td>7</td><td>7/7 <svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#1a2b4c"><path d="M2.5 8.6 6.4 12.4 13.5 4.2" stroke="#2a9d8f" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></svg></td></tr><tr><td>Cocina (api.test.js)</td><td>7</td><td>7/7 <svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#1a2b4c"><path d="M2.5 8.6 6.4 12.4 13.5 4.2" stroke="#2a9d8f" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></svg></td></tr><tr><td>Ciclo 8 (ciclo8.test.js)</td><td>7</td><td>7/7 <svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#1a2b4c"><path d="M2.5 8.6 6.4 12.4 13.5 4.2" stroke="#2a9d8f" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></svg></td></tr></tbody></table></div>
+<blockquote class="importante"><span class="tag">Importante</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Nota importante: el comando oficial <code>npm test</code> solo ejecuta 19 pruebas (vigilante + mensajero + cocina). El archivo del Ciclo 8 (7 pruebas) <strong>no está incluido</strong> en ese comando y debe ejecutarse aparte para llegar a las</p><ol><li>Detalle técnico documentado.</li></ol></blockquote>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. Cómo se prueba la app (Playwright)</h2>
+<p>La app se prueba con un <strong>navegador robot</strong> que hace clics como una persona:</p>
+<ol><li>Se prepara la versión final de la app (<code>build</code>) y se sirve en el puerto 3000.</li><li>El robot abre las páginas en <strong>2 dispositivos</strong>: un ordenador (Chrome) y un <strong>móvil</strong> (Pixel 5, porque TrueKeate es "móvil primero").</li><li>Cada caso se ejecuta en ambos → 9 casos × 2 dispositivos = <strong>18 ejecuciones</strong>.</li></ol>
+<p>Qué comprueban los 9 casos:</p>
+<p><strong>Portada (4 casos):</strong></p>
+<ol><li>El hero con la marca y el titular aparece.</li><li>Las cifras de la plataforma se ven.</li><li>Las ventajas del trueque se ven.</li><li>El botón lleva a la suite.</li></ol>
+<p><strong>Mi Trueke Central (5 casos):</strong></p>
+<ol><li>La barra superior muestra @usuario y el logo TrueKeat☑.</li><li>La escalera de verificación se ve.</li><li>El módulo bloqueado para INSCRITO se ve atenuado.</li><li>El botón "Conectar MetaMask" aparece sin sesión.</li><li>La barra inferior con su botón central funciona.</li></ol>
+<p>Resultado registrado: <strong>18/18 verdes</strong> (dato reportado en el estado del proyecto — ver pendientes más abajo).</p>
+<blockquote class="info"><span class="tag">Nota</span><p>Límite de alcance: estas pruebas <strong>no usan una billetera real</strong> (MetaMask no está automatizado), ni el backend real, ni la blockchain: son pruebas de las pantallas y del contenido estático.</p></blockquote>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. Cómo reproducir las pruebas (por si quieres verlas)</h2>
+<h3 class="sub" id="sub4">5.1 Contratos</h3>
+<pre><code><span class="pre-label">bash</span>cd sc
+forge test            # 62/62 reportado
+forge coverage        # gate: ≥ 80 % líneas (89,55 % reportado)</code></pre>
+<h3 class="sub" id="sub5">5.2 Servidores</h3>
+<pre><code><span class="pre-label">bash</span>cd backend
+npm test              # 19 pruebas (comando oficial)
+node --test test/*.test.js   # 26 pruebas (incluye ciclo 8) — verificado 26/26</code></pre>
+<h3 class="sub" id="sub6">5.3 App</h3>
+<pre><code><span class="pre-label">bash</span>cd web
+npm run build         # necesario antes (el robot sirve la versión final)
+npx playwright test   # 9 casos × 2 dispositivos (ordenador + móvil)</code></pre>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. Qué falta confirmar (resumen)</h2>
+<ol><li><strong>Contratos</strong>: no fue posible re-ejecutar <code>forge test</code> en el entorno de análisis (faltaba el programa <code>forge</code>): el resultado 62/62 y la cobertura 89,55 % son <strong>datos reportados</strong> en <code>estado_proyecto.md</code> → <strong>pendiente de confirmar</strong> con una re-ejecución local.</li><li><strong>Invariantes</strong>: el archivo declara 5 (I1/I2/I4/I5/I7); I3 e I6 sin función en el archivo actual → <strong>pendiente de confirmar</strong>.</li><li><strong>Sin pruebas con base de datos real (PostgreSQL)</strong>: el vigilante y la cocina se prueban con simulaciones; la conexión real y la reconciliación contra la base de datos quedan <strong>sin evidencia</strong> → <strong>pendiente de confirmar</strong>.</li><li><strong>App</strong>: el resultado 18/18 es un <strong>dato reportado</strong> (no hay archivos de resultados en el repositorio) → <strong>pendiente de confirmar</strong> con una re-ejecución.</li><li><strong>E2E estático</strong>: 4 de los 9 casos cubren páginas provisionales o contenido de maqueta; sin billetera ni backend reales.</li><li><strong>Mensajero</strong>: las pruebas cubren las protecciones con simulaciones; la integración real mensajero ↔ cuenta inteligente en la blockchain no forma parte de <code>npm test</code>.</li><li><strong>Documentación antigua</strong>: un archivo (<code>sc/README.md</code>) conserva métricas de ciclos anteriores (94,96 % de cobertura, por ejemplo) que <strong>no coinciden</strong> con el consolidado vigente de la Fase 4 (89,55 %); la referencia actual es <code>estado_proyecto.md</code>.</li></ol>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. Glosario de este manual</h2>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Significado</th></tr></thead><tbody><tr><td><strong>Prueba (test)</strong></td><td>Comprobación automática de que algo funciona</td></tr><tr><td><strong>Unit</strong></td><td>Prueba de una pieza concreta con un caso escrito</td></tr><tr><td><strong>Fuzz</strong></td><td>Prueba con miles de datos al azar</td></tr><tr><td><strong>Invariante</strong></td><td>Regla que debe cumplirse siempre, pase lo que pase</td></tr><tr><td><strong>Cobertura</strong></td><td>Porcentaje del código que las pruebas tocan</td></tr><tr><td><strong>Gate</strong></td><td>Regla de calidad obligatoria (≥ 80 % de cobertura)</td></tr><tr><td><strong>Mock / simulación</strong></td><td>"Doble de mentira" que imita a blockchain o base de datos</td></tr><tr><td><strong>E2E</strong></td><td>Prueba de extremo a extremo (pantallas completas)</td></tr><tr><td><strong>Playwright</strong></td><td>Navegador robot que prueba la app</td></tr><tr><td><strong>Forge / Foundry</strong></td><td>Herramienta que prueba los contratos</td></tr><tr><td><strong>Suite</strong></td><td>Conjunto de pruebas de un área</td></tr><tr><td><strong>Verde</strong></td><td>Prueba que pasó correctamente (rojo = falló)</td></tr><tr><td><strong>Handler</strong></td><td>"Manos" del robot que hacen movimientos aleatorios en invariantes</td></tr></tbody></table></div>
+<p>¡Fin de la sección de implementación! Con estos 8 manuales entiendes la caja fuerte (01), tu identidad (02), las finanzas (03), el vigilante (04), el mensajero (05), los servicios (06), la app (07) y las pruebas (08) de TrueKeate.</p>
+</section>
+</main>
+
+</body>
+</html>

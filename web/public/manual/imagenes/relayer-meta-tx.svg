@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <rect width="800" height="54" fill="#1a2b4c"/>
+  <rect y="50" width="800" height="4" fill="#d4af37"/>
+  <text x="400" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">El relayer: mensajero que paga el gas</text>
+
+  <!-- Actors -->
+  <g>
+    <rect x="40" y="80" width="150" height="46" rx="12" fill="#48cae4"/>
+    <text x="115" y="101" text-anchor="middle" fill="#0a1128" font-size="12.5" font-weight="bold">Tu (particular)</text>
+    <text x="115" y="117" text-anchor="middle" fill="#0a1128" font-size="9.5">sin pagar gas</text>
+  </g>
+  <g>
+    <rect x="240" y="80" width="150" height="46" rx="12" fill="#2a9d8f"/>
+    <text x="315" y="101" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">La app</text>
+    <text x="315" y="117" text-anchor="middle" fill="#ffffff" font-size="9.5">frontend</text>
+  </g>
+  <g>
+    <rect x="450" y="80" width="160" height="46" rx="12" fill="#1a2b4c"/>
+    <text x="530" y="101" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="bold">El mensajero</text>
+    <text x="530" y="117" text-anchor="middle" fill="#f3e5ab" font-size="9.5">relayer · paga el gas</text>
+  </g>
+  <g>
+    <rect x="680" y="80" width="90" height="46" rx="12" fill="#e63946"/>
+    <text x="725" y="101" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="bold">Blockchain</text>
+    <text x="725" y="117" text-anchor="middle" fill="#ffffff" font-size="9">SmartAccount</text>
+  </g>
+
+  <!-- Lifelines -->
+  <line x1="115" y1="126" x2="115" y2="420" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <line x1="315" y1="126" x2="315" y2="420" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <line x1="530" y1="126" x2="530" y2="420" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <line x1="725" y1="126" x2="725" y2="420" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 4"/>
+
+  <!-- Steps -->
+  <line x1="117" y1="150" x2="313" y2="150" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="215" y="143" text-anchor="middle" fill="#1a2b4c" font-size="10">1. "Quiero custodiar mi objeto"</text>
+
+  <line x1="313" y1="180" x2="119" y2="180" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="216" y="173" text-anchor="middle" fill="#1a2b4c" font-size="10">2. "Firma esta peticion"</text>
+
+  <line x1="117" y1="210" x2="313" y2="210" stroke="#1a2b4c" stroke-width="2" stroke-dasharray="6 3" marker-end="url(#arr)"/>
+  <text x="215" y="203" text-anchor="middle" fill="#1a2b4c" font-size="10">3. Firma lista (sin pagar nada)</text>
+
+  <line x1="317" y1="240" x2="528" y2="240" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="422" y="233" text-anchor="middle" fill="#1a2b4c" font-size="10">4. "Lleva esta peticion, por favor"</text>
+
+  <!-- Protecciones card -->
+  <rect x="330" y="256" width="400" height="76" rx="12" fill="#f3e5ab"/>
+  <text x="530" y="278" text-anchor="middle" fill="#0a1128" font-size="11" font-weight="bold">5. Protecciones (antes de firmar):</text>
+  <text x="530" y="296" text-anchor="middle" fill="#0a1128" font-size="10.5">red correcta · firma nueva (nonce) · usuario verificado</text>
+  <text x="530" y="313" text-anchor="middle" fill="#0a1128" font-size="10.5">limite de 20 por dia · sin bloqueo activo</text>
+  <text x="530" y="328" text-anchor="middle" fill="#0a1128" font-size="10.5">3 fallos en 10 min = bloqueo de 1 hora</text>
+
+  <line x1="532" y1="240" x2="532" y2="254" stroke="#1a2b4c" stroke-width="1.5"/>
+
+  <line x1="532" y1="334" x2="723" y2="334" stroke="#1a2b4c" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="627" y="327" text-anchor="middle" fill="#1a2b4c" font-size="10.5" font-weight="bold">6. Envia y PAGA el gas</text>
+
+  <line x1="723" y1="364" x2="534" y2="364" stroke="#2a9d8f" stroke-width="2" stroke-dasharray="6 3" marker-end="url(#arr)"/>
+  <text x="629" y="357" text-anchor="middle" fill="#2a9d8f" font-size="10.5" font-weight="bold">7. Hecho OK (o error)</text>
+
+  <line x1="530" y1="394" x2="317" y2="394" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="424" y="387" text-anchor="middle" fill="#1a2b4c" font-size="10">Resultado</text>
+
+  <!-- Bottom -->
+  <rect x="150" y="430" width="500" height="52" rx="12" fill="#0a1128"/>
+  <text x="400" y="451" text-anchor="middle" fill="#f3e5ab" font-size="11.5" font-weight="bold">El mensajero paga desde su billetera (cuenta 1)</text>
+  <text x="400" y="469" text-anchor="middle" fill="#ffffff" font-size="10.5">si el saldo baja de 0,5 ETH avisa al Owner para recargar</text>
+</svg>

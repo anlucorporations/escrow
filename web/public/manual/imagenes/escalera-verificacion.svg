@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <rect width="800" height="54" fill="#1a2b4c"/>
+  <rect y="50" width="800" height="4" fill="#d4af37"/>
+  <text x="400" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">Escalera de verificacion (D28)</text>
+
+  <!-- Huella / merkle note -->
+  <rect x="500" y="66" width="285" height="64" rx="12" fill="#0a1128"/>
+  <text x="642" y="88" text-anchor="middle" fill="#f3e5ab" font-size="12" font-weight="bold">La cadena solo recibe tu huella</text>
+  <text x="642" y="106" text-anchor="middle" fill="#ffffff" font-size="11">(raiz merkle) — nunca el documento</text>
+  <text x="642" y="122" text-anchor="middle" fill="#ffffff" font-size="11">ni la selfie</text>
+
+  <!-- Steps ascending -->
+  <rect x="60" y="360" width="210" height="66" rx="14" fill="#48cae4"/>
+  <text x="165" y="389" text-anchor="middle" fill="#0a1128" font-size="15" font-weight="bold">1 · INSCRITO</text>
+  <text x="165" y="409" text-anchor="middle" fill="#0a1128" font-size="11">Billetera + inscripcion</text>
+
+  <rect x="300" y="282" width="210" height="66" rx="14" fill="#2a9d8f"/>
+  <text x="405" y="311" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="bold">2 · VERIFICADO</text>
+  <text x="405" y="331" text-anchor="middle" fill="#ffffff" font-size="11">Correo + telefono confirmados</text>
+
+  <rect x="540" y="204" width="210" height="66" rx="14" fill="#d4af37"/>
+  <text x="645" y="233" text-anchor="middle" fill="#0a1128" font-size="15" font-weight="bold">3 · CERTIFICADO</text>
+  <text x="645" y="253" text-anchor="middle" fill="#0a1128" font-size="11">KYC: documento + selfie</text>
+
+  <!-- Arrow step1 -> step2 -->
+  <path d="M 272 385 C 284 385 288 350 296 350" fill="none" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="272" y="344" text-anchor="middle" fill="#1a2b4c" font-size="10">subes</text>
+
+  <!-- Arrow step2 -> step3 -->
+  <path d="M 512 306 C 524 306 528 272 536 272" fill="none" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="512" y="265" text-anchor="middle" fill="#1a2b4c" font-size="10">subes</text>
+
+  <!-- Arrow step3 -> merkle -->
+  <path d="M 645 202 L 645 134" fill="none" stroke="#1a2b4c" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arr)"/>
+  <text x="656" y="170" fill="#1a2b4c" font-size="10">solo huella</text>
+
+  <!-- Capability cards -->
+  <rect x="60" y="438" width="210" height="38" rx="10" fill="#e2e8f0"/>
+  <text x="165" y="461" text-anchor="middle" fill="#1a2b4c" font-size="11">Solo ver ofertas y catalogo</text>
+
+  <rect x="300" y="438" width="210" height="38" rx="10" fill="#e2e8f0"/>
+  <text x="405" y="454" text-anchor="middle" fill="#1a2b4c" font-size="11">Crear y completar trueques</text>
+  <text x="405" y="468" text-anchor="middle" fill="#1a2b4c" font-size="10">Maximo 3 activos a la vez</text>
+
+  <rect x="540" y="438" width="210" height="38" rx="10" fill="#e2e8f0"/>
+  <text x="645" y="454" text-anchor="middle" fill="#1a2b4c" font-size="11">Todo lo anterior + subastas</text>
+  <text x="645" y="468" text-anchor="middle" fill="#1a2b4c" font-size="10">Reputacion y confianza</text>
+</svg>

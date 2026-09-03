@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · Cómo se conectan los datos de TrueKeate</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">06 · Diagrama Relacional</div>
+    <h1>Cómo se conectan los datos de TrueKeate</h1>
+    <div class="intro">Versión en lenguaje sencillo del manual técnico 06 — Diagrama Relacional. Aquí contamos cómo se unen las 14 carpetas de datos entre sí, con la historia de Ana y Bruno de principio a fin.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>06-Diagrama-Relacional/01-diagrama-relacional.md</b></span>
+      <span>Edición: <b>3 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/06-Diagrama-Relacional/01-diagrama-relacional</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Diagrama Relacional · Diagrama Relacional — Cómo se conectan los datos de TrueKeate</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>El mapa general de las carpetas</span></a></li><li><a href="#s3"><span class="tnum">3</span><span>Las relaciones con candado (1 a muchos reales)</span></a></li><li><a href="#s4"><span class="tnum">4</span><span>Las conexiones sin candado (y por qué existen)</span></a></li><li><a href="#s5"><span class="tnum">5</span><span>El trueque: la pieza central del modelo</span></a></li><li><a href="#s6"><span class="tnum">6</span><span>El espejo de la blockchain: qué copia cada carpeta</span></a></li><li><a href="#s7"><span class="tnum">7</span><span>Las carpetas que escribe la plataforma (sin cadena)</span></a></li><li><a href="#s8"><span class="tnum">8</span><span>La regla de los 10 km (PostGIS)</span></a></li><li><a href="#s9"><span class="tnum">9</span><span>Las garantías: nada se pierde ni se duplica</span></a></li><li><a href="#s10"><span class="tnum">10</span><span>Un ejemplo de principio a fin (con las preguntas que responde la base)</span></a></li><li><a href="#s11"><span class="tnum">11</span><span>Resumen por carpeta (la ficha de cada una)</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos</h2>
+<p>En TrueKeate los datos no viven sueltos: las fichas <strong>se apuntan unas a otras</strong>. Cada ficha tiene una <strong>llave propia</strong> (clave primaria, PK) y puede llevar <strong>candados</strong> (claves foráneas, FK) que apuntan a la llave de otra ficha. Así la base sabe que "este artículo es de Ana" o que "esta valoración pertenece a este trueque".</p>
+<p>La historia de Ana y Bruno, de principio a fin:</p>
+<ol><li><strong>Ana y Bruno se registran</strong> → 2 fichas en <code>usuarios</code>, cada una con su llave propia (id 1 y id 2).</li><li><strong>Ana publica su bicicleta; Bruno, su curso</strong> → 2 fichas en <code>articulos</code>, cada una con un candado que dice "soy de la usuaria 1" / "soy del usuario 2".</li><li><strong>Crean el trueque</strong> → 1 ficha en <code>truekes</code> que apunta a los <strong>2 artículos</strong> y guarda las <strong>2 direcciones</strong> de los participantes.</li><li><strong>La cadena habla</strong> → cada movimiento del escrow (custodia, apertura, completado) actualiza la etiqueta de esa ficha. Es un <strong>espejo</strong> del contrato.</li><li><strong>Se encuentran cerca</strong> → eligen un punto en <code>puntos_encuentro</code> que la base comprueba que esté a menos de <strong>10 km</strong> de ambos (PostGIS).</li><li><strong>Terminan y se valoran</strong> → 2 fichas en <code>valoraciones</code> con candado al trueque: una de Ana a Bruno y otra de Bruno a Ana.</li></ol>
+<p>Para leer este manual necesitas 4 palabras:</p>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Qué significa</th><th>En la historia</th></tr></thead><tbody><tr><td><strong>Llave propia (PK)</strong></td><td>El número de identificación único de cada ficha</td><td>El id de Ana (1)</td></tr><tr><td><strong>Candado (FK)</strong></td><td>Un apunte que dice "esta ficha pertenece a aquella"</td><td>El artículo dice "soy de la usuaria 1"</td></tr><tr><td><strong>1 a muchos</strong></td><td>Una ficha madre puede tener muchas fichas hijas</td><td>Ana puede publicar 10 artículos</td></tr><tr><td><strong>Espejo</strong></td><td>Una ficha que copia el estado de la cadena</td><td>La ficha del trueque</td></tr></tbody></table></div>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. El mapa general de las carpetas</h2>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5NYXBhIGdlbmVyYWwgZGUgbGFzIGNhcnBldGFzIGRlIGRhdG9zPC90ZXh0PgoKICA8IS0tIFVTVUFSSU9TIC0tPgogIDxyZWN0IHg9IjMwMCIgeT0iOTUiIHdpZHRoPSIyMDAiIGhlaWdodD0iMTEwIiByeD0iMTQiIGZpbGw9IiM0OGNhZTQiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjEyNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMy41IiBmb250LXdlaWdodD0iYm9sZCI+VVNVQVJJT1M8L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSIxNDYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPmlkIChQSykgwrcgd2FsbGV0IHVuaWNhPC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMTYzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwIj5lc3RhZG86IGVzY2FsZXJhIEQyODwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjE4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMCI+dGlwbyAvIG5pdmVsIC8gbWVkYWxsYTwvdGV4dD4KCiAgPCEtLSBLWUMgLS0+CiAgPHJlY3QgeD0iNDAiIHk9Ijk1IiB3aWR0aD0iMTkwIiBoZWlnaHQ9Ijg2IiByeD0iMTQiIGZpbGw9IiNlMmU4ZjAiLz4KICA8dGV4dCB4PSIxMzUiIHk9IjEyMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+S1lDPC90ZXh0PgogIDx0ZXh0IHg9IjEzNSIgeT0iMTQyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwIj51c3VhcmlvX2lkIC0mZ3Q7IHVzdWFyaW9zPC90ZXh0PgogIDx0ZXh0IHg9IjEzNSIgeT0iMTYwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwIj5tZXJrbGVfcm9vdCAoaHVlbGxhKTwvdGV4dD4KCiAgPCEtLSBBUlRJQ1VMT1MgLS0+CiAgPHJlY3QgeD0iNDAiIHk9IjIyMCIgd2lkdGg9IjE5MCIgaGVpZ2h0PSI4NiIgcng9IjE0IiBmaWxsPSIjZTJlOGYwIi8+CiAgPHRleHQgeD0iMTM1IiB5PSIyNDciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkFSVElDVUxPUzwvdGV4dD4KICA8dGV4dCB4PSIxMzUiIHk9IjI2NyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMCI+dXN1YXJpb19pZCAtJmd0OyB1c3VhcmlvczwvdGV4dD4KICA8dGV4dCB4PSIxMzUiIHk9IjI4NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMCI+cnVicm8gwrcgZGlzcG9uaWJsZTwvdGV4dD4KCiAgPCEtLSBQVU5UT1MgRU5DVUVOVFJPIC0tPgogIDxyZWN0IHg9IjQwIiB5PSIzNDUiIHdpZHRoPSIxOTAiIGhlaWdodD0iODYiIHJ4PSIxNCIgZmlsbD0iI2UyZThmMCIvPgogIDx0ZXh0IHg9IjEzNSIgeT0iMzY1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5QVU5UT1NfRU5DVUVOVFJPPC90ZXh0PgogIDx0ZXh0IHg9IjEzNSIgeT0iMzg2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwIj51c3VhcmlvX2lkIC0mZ3Q7IHVzdWFyaW9zPC90ZXh0PgogIDx0ZXh0IHg9IjEzNSIgeT0iNDAzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwIj5nZW9nIChQb3N0R0lTKTwvdGV4dD4KICA8dGV4dCB4PSIxMzUiIHk9IjQyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMCI+cmFkaW8gMTAga208L3RleHQ+CgogIDwhLS0gRklOQU5aQVMgLS0+CiAgPHJlY3QgeD0iNTYwIiB5PSI5NSIgd2lkdGg9IjIwMCIgaGVpZ2h0PSI4NiIgcng9IjE0IiBmaWxsPSIjZDRhZjM3Ii8+CiAgPHRleHQgeD0iNjYwIiB5PSIxMjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkZJTkFOWkFTPC90ZXh0PgogIDx0ZXh0IHg9IjY2MCIgeT0iMTQyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwIj51c3VhcmlvX2lkICgxIGEgMSk8L3RleHQ+CiAgPHRleHQgeD0iNjYwIiB5PSIxNjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPnNhbGRvIEJSTFQ8L3RleHQ+CgogIDwhLS0gU1VTQ1JJUENJT05FUyAtLT4KICA8cmVjdCB4PSI1NjAiIHk9IjIyMCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSI4NiIgcng9IjE0IiBmaWxsPSIjZDRhZjM3Ii8+CiAgPHRleHQgeD0iNjYwIiB5PSIyNDciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPlNVU0NSSVBDSU9ORVM8L3RleHQ+CiAgPHRleHQgeD0iNjYwIiB5PSIyNjciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPmVtcHJlc2FfaWQgLSZndDsgdXN1YXJpb3M8L3RleHQ+CiAgPHRleHQgeD0iNjYwIiB5PSIyODUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPmNpY2xvcyBkZSAzMCBkaWFzPC90ZXh0PgoKICA8IS0tIENBTVBBTkFTIC8gU1VCQVNUQVMgLS0+CiAgPHJlY3QgeD0iNTYwIiB5PSIzNDUiIHdpZHRoPSIyMDAiIGhlaWdodD0iODYiIHJ4PSIxNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjY2MCIgeT0iMzY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+Q0FNUEFOQVMgwrcgU1VCQVNUQVM8L3RleHQ+CiAgPHRleHQgeD0iNjYwIiB5PSIzODYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPmVtcHJlc2FfaWQgLSZndDsgdXN1YXJpb3M8L3RleHQ+CiAgPHRleHQgeD0iNjYwIiB5PSI0MDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPmFydGljdWxvX2lkIC0mZ3Q7IGFydGljdWxvczwvdGV4dD4KCiAgPCEtLSBUUlVFS0VTIGNlbnRyYWwgYm90dG9tIC0tPgogIDxyZWN0IHg9IjMwMCIgeT0iMzUwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjExMCIgcng9IjE0IiBmaWxsPSIjMmE5ZDhmIi8+CiAgPHRleHQgeD0iNDAwIiB5PSIzNzgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSJib2xkIj5UUlVFS0VTPC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzk2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwIj5lc2Nyb3dfaWQgKGVzcGVqbyk8L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSI0MTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAiPmFydGljdWxvX2FfaWQgKyBhcnRpY3Vsb19iX2lkPC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iNDI4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwIj51c3VhcmlvX2EgKyB1c3VhcmlvX2I8L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSI0NDQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAiPmV0aXF1ZXRhOiA5IGVzdGFkb3M8L3RleHQ+CgogIDwhLS0gVkFMT1JBQ0lPTkVTICYgRElTUFVUQVMgYm90dG9tIC0tPgogIDxyZWN0IHg9IjQwIiB5PSI0NzAiIHdpZHRoPSIxOTAiIGhlaWdodD0iMCIgZmlsbD0ibm9uZSIvPgoKICA8IS0tIENvbm5lY3Rpb25zIC0tPgogIDxnIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIiBtYXJrZXItZW5kPSJ1cmwoI2FycikiPgogICAgPCEtLSB1c3VhcmlvcyAtPiBreWMgLS0+CiAgICA8bGluZSB4MT0iMjk2IiB5MT0iMTMwIiB4Mj0iMjM0IiB5Mj0iMTM4Ii8+CiAgICA8IS0tIHVzdWFyaW9zIC0+IGFydGljdWxvcyAtLT4KICAgIDxsaW5lIHgxPSIyOTYiIHkxPSIxNzAiIHgyPSIyMzQiIHkyPSIyNDAiLz4KICAgIDwhLS0gdXN1YXJpb3MgLT4gcHVudG9zIC0tPgogICAgPHBhdGggZD0iTSAyOTYgMTgwIEMgMjAwIDIwMCAyMDAgMzIwIDE5MCAzNDUiLz4KICAgIDwhLS0gdXN1YXJpb3MgLT4gZmluYW56YXMgKDEtMSkgLS0+CiAgICA8bGluZSB4MT0iNTAyIiB5MT0iMTMwIiB4Mj0iNTU2IiB5Mj0iMTM4Ii8+CiAgICA8IS0tIHVzdWFyaW9zIC0+IHN1c2NyaXBjaW9uZXMgLS0+CiAgICA8bGluZSB4MT0iNTAyIiB5MT0iMTcwIiB4Mj0iNTU2IiB5Mj0iMjQwIi8+CiAgICA8IS0tIHVzdWFyaW9zIC0+IGNhbXBhbmFzIC0tPgogICAgPHBhdGggZD0iTSA1MDIgMTkwIEMgNjAwIDIyMCA2MjAgMzAwIDY0MCAzNDMiLz4KICAgIDwhLS0gYXJ0aWN1bG9zIC0+IHRydWVrZXMgLS0+CiAgICA8cGF0aCBkPSJNIDIzMCAzMDAgQyAyNjAgMzMwIDMwMCAzNjAgMzMwIDM4MCIvPgogICAgPCEtLSB0cnVla2VzIC0+IHZhbG9yYWNpb25lcy9kaXNwdXRhcyBub3RlIC0tPgogIDwvZz4KCiAgPCEtLSBWQUxPUkFDSU9ORVMgLyBESVNQVVRBUyBjaGlwcyB1bmRlciB0cnVla2VzIC0tPgogIDxyZWN0IHg9IjQwIiB5PSI0NDAiIHdpZHRoPSIxOTAiIGhlaWdodD0iNDYiIHJ4PSIxMiIgZmlsbD0iI2Y0YTI2MSIvPgogIDx0ZXh0IHg9IjEzNSIgeT0iNDYwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+VkFMT1JBQ0lPTkVTPC90ZXh0PgogIDx0ZXh0IHg9IjEzNSIgeT0iNDc2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjkuNSI+dHJ1ZWtlX2lkIC0mZ3Q7IHRydWVrZXM8L3RleHQ+CiAgPHJlY3QgeD0iNTYwIiB5PSI0NDAiIHdpZHRoPSIyMDAiIGhlaWdodD0iNDYiIHJ4PSIxMiIgZmlsbD0iI2Y0YTI2MSIvPgogIDx0ZXh0IHg9IjY2MCIgeT0iNDYwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjExLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5ESVNQVVRBUzwvdGV4dD4KICA8dGV4dCB4PSI2NjAiIHk9IjQ3NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSI5LjUiPnRydWVrZV9pZCAtJmd0OyB0cnVla2VzPC90ZXh0PgogIDxnIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIiBtYXJrZXItZW5kPSJ1cmwoI2FycikiPgogICAgPHBhdGggZD0iTSAzMDAgNDMwIEMgMjIwIDQ0MCAyMDAgNDQ1IDE5MCA0NDIiLz4KICAgIDxwYXRoIGQ9Ik0gNTAyIDQzMCBDIDU2MCA0NDAgNTgwIDQ0NSA2MDAgNDQyIi8+CiAgPC9nPgoKICA8IS0tIEtleSAtLT4KICA8cmVjdCB4PSI2NDAiIHk9IjQ1MiIgd2lkdGg9IjAiIGhlaWdodD0iMCIgZmlsbD0ibm9uZSIvPgo8L3N2Zz4K" alt="Mapa Relaciones"/><figcaption class="fig-caption">Figura · Mapa Relaciones</figcaption></figure>
+<p>En el mapa hay <strong>3 tipos de conexión</strong>:</p>
+<ol><li><strong>Candado real</strong>: la base obliga a que exista la ficha madre (por ejemplo, <code>articulos.usuario_id</code> no puede apuntar a nadie que no exista).</li><li><strong>Conexión lógica (sin candado)</strong>: la ficha lleva el apunte, pero la base no lo vigila; lo cuida la plataforma por código.</li><li><strong>Dirección suelta</strong>: guardamos la dirección de la cadena como texto, sin candado, porque puede cambiar con el tiempo (ver sección 4).</li></ol>
+<p>Las formas de relacionarse:</p>
+<ul><li><strong>1 a muchos</strong>: la más común. Una usuaria → muchos artículos; un trueque → varias valoraciones.</li><li><strong>1 a 1</strong>: cada persona tiene una sola ficha financiera (comparten la llave). También la verificación de identidad (una por persona, aunque la base no lo obliga del todo) y la foto con sello de un artículo.</li><li><strong>Muchos a muchos</strong>: entre personas y artículos se resuelve con la ficha del trueque, que guarda 2 artículos y 2 personas (sección 5).</li><li><strong>Polimorfismo</strong>: la ficha de la foto con sello apunta a un artículo o a un trueque según su tipo (<code>PUBLICACION</code> o <code>RECEPCION</code>).</li></ul>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. Las relaciones con candado (1 a muchos reales)</h2>
+<p>Desde <strong>usuarios</strong> (cada persona puede tener muchas...):</p>
+<div class="table-wrap"><table><thead><tr><th>Ficha hija</th><th>Qué guarda la conexión</th></tr></thead><tbody><tr><td><code>kyc</code></td><td>Su trámite de identidad</td></tr><tr><td><code>articulos</code></td><td>Sus publicaciones</td></tr><tr><td><code>puntos_encuentro</code></td><td>Sus puntos de encuentro</td></tr><tr><td><code>suscripciones</code></td><td>Sus ciclos de pago (si es empresa)</td></tr><tr><td><code>campanas</code></td><td>Sus campañas</td></tr><tr><td><code>subastas</code></td><td>Sus subastas (como empresa) y también como ganadora</td></tr><tr><td><code>finanzas</code></td><td>Su ficha financiera (1 a 1)</td></tr></tbody></table></div>
+<p>Desde <strong>articulos</strong>:</p>
+<div class="table-wrap"><table><thead><tr><th>Ficha hija</th><th>Qué guarda la conexión</th></tr></thead><tbody><tr><td><code>truekes</code></td><td>El artículo se ofrece como artículo A o como artículo B</td></tr><tr><td><code>subastas</code></td><td>El artículo se subasta</td></tr></tbody></table></div>
+<p>Desde <strong>truekes</strong> (la pieza central):</p>
+<div class="table-wrap"><table><thead><tr><th>Ficha hija</th><th>Qué guarda la conexión</th></tr></thead><tbody><tr><td><code>valoraciones</code></td><td>Las notas del trueque</td></tr><tr><td><code>disputas</code></td><td>Los conflictos del trueque</td></tr></tbody></table></div>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. Las conexiones sin candado (y por qué existen)</h2>
+<div class="table-wrap"><table><thead><tr><th>Conexión</th><th>Qué une</th><th>Por qué no lleva candado</th></tr></thead><tbody><tr><td>Foto con sello de un artículo</td><td><code>articulos</code> → <code>imagenes_certificadas</code></td><td>Es lógica: la base no obliga, la plataforma lo cuida</td></tr><tr><td>Punto de encuentro de un trueque</td><td><code>truekes</code> → <code>puntos_encuentro</code></td><td>Es lógica: se acuerda fuera de la base</td></tr><tr><td>Foto polimórfica</td><td><code>imagenes_certificadas</code> → <code>articulos</code> o <code>truekes</code></td><td>Depende del tipo de foto</td></tr><tr><td>Direcciones de participantes</td><td><code>truekes</code>, <code>valoraciones</code>, <code>disputas</code> → <code>usuarios</code></td><td><strong>Historia</strong>: guardamos la dirección tal como era</td></tr><tr><td>Número del escrow</td><td><code>truekes.escrow_id</code> → la cadena</td><td>No apunta a una tabla local: es el puente con la blockchain</td></tr></tbody></table></div>
+<p>¿Por qué las <strong>direcciones no llevan candado</strong>? Porque tu dirección puede cambiar: si pierdes tu cuenta y la recuperas con tus guardianes, el nuevo dueño tiene otra dirección. Si las fichas de los trueques antiguos llevaran candado a tu dirección actual, la historia se rompería. Por eso las fichas guardan la dirección <strong>del momento</strong> como un valor que no se reescribe.</p>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. El trueque: la pieza central del modelo</h2>
+<p>Un trueque es la unión de <strong>2 personas</strong> y <strong>2 artículos</strong> en una sola ficha:</p>
+<ul><li><code>articulo_a_id</code> + <code>usuario_a</code> → qué ofrece Ana y quién es Ana.</li><li><code>articulo_b_id</code> + <code>usuario_b</code> → qué ofrece Bruno y quién es Bruno.</li><li>Los artículos sí llevan candado real (deben existir en <code>articulos</code>); las direcciones se guardan sueltas (sección 4).</li></ul>
+<p>Un artículo puede participar en varios trueques, pero si está marcado como <strong>no disponible</strong> ya no recibe nuevas ofertas.</p>
+<p>Además, la ficha del trueque es el <strong>espejo del contrato Escrow</strong>:</p>
+<div class="table-wrap"><table><thead><tr><th>Evento en la cadena</th><th>Qué hace el vigilante en la ficha</th></tr></thead><tbody><tr><td><code>TruekeCreado</code></td><td>Crea la ficha con etiqueta <code>CREADO</code></td></tr><tr><td><code>CustodiaA</code> / <code>CustodiaB</code></td><td>Cambia la etiqueta a <code>CUSTODIADO</code></td></tr><tr><td><code>AperturaA</code> / <code>AperturaB</code></td><td>Cambia a <code>APERTURA</code> y anota cuándo abrió cada parte</td></tr><tr><td><code>TruekeCompletado</code></td><td>Cambia a <code>COMPLETADO</code></td></tr><tr><td><code>TruekeCancelado</code></td><td>Cambia a <code>ANULADO</code></td></tr><tr><td><code>EscrowBloqueado</code></td><td>Cambia a <code>BLOQUEADO</code></td></tr></tbody></table></div>
+<p>La regla <strong>un escrow = una fila</strong>: el número del escrow es único, así que si el vigilante recibe dos veces el mismo evento, actualiza la misma ficha en vez de duplicarla.</p>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. El espejo de la blockchain: qué copia cada carpeta</h2>
+<div class="table-wrap"><table><thead><tr><th>Carpeta de la base</th><th>Contrato de la cadena</th><th>Qué copia</th></tr></thead><tbody><tr><td><code>truekes</code></td><td>Escrow</td><td>El estado de cada trueque</td></tr><tr><td><code>kyc</code> (huella)</td><td>Smart Account</td><td>La huella merkle de tu KYC</td></tr><tr><td><code>usuarios</code> (dirección)</td><td>Smart Account</td><td>Tu dirección actual (cambia al recuperar la cuenta)</td></tr><tr><td><code>usuarios</code> (tipo)</td><td>Padrón de Socios</td><td>Si pasas a ser SOCIO</td></tr><tr><td><code>finanzas</code> (BRLT)</td><td>BRLT</td><td>El saldo cuando se emite moneda</td></tr><tr><td><code>suscripciones</code></td><td>Suscripción de empresa</td><td>Cada ciclo de pago de 30 días</td></tr><tr><td><code>auditoria</code></td><td>Todos</td><td>Cada evento procesado (bitácora)</td></tr><tr><td><code>indexador_checkpoint</code></td><td>Todos</td><td>El último bloque leído (marcapáginas)</td></tr></tbody></table></div>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5FbCBlc3Blam8gZGUgbGEgYmxvY2tjaGFpbjogcXVlIGNvcGlhIGNhZGEgY2FycGV0YTwvdGV4dD4KCiAgPCEtLSBDb250cmFjdHMgZ3JvdXAgLS0+CiAgPHJlY3QgeD0iNDAiIHk9IjkwIiB3aWR0aD0iMjIwIiBoZWlnaHQ9IjM0MCIgcng9IjE2IiBmaWxsPSIjZmZmMWYwIiBzdHJva2U9IiNlNjM5NDYiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjE1MCIgeT0iMTE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjYTgyMzJkIiBmb250LXNpemU9IjEzLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5Db250cmF0b3MgZW4gbGEgY2FkZW5hPC90ZXh0PgogIDxnIGZpbGw9IiNlNjM5NDYiPgogICAgPHJlY3QgeD0iNjAiIHk9IjE0MCIgd2lkdGg9IjE4MCIgaGVpZ2h0PSI0MCIgcng9IjkiLz4KICAgIDxyZWN0IHg9IjYwIiB5PSIxOTYiIHdpZHRoPSIxODAiIGhlaWdodD0iNDAiIHJ4PSI5Ii8+CiAgICA8cmVjdCB4PSI2MCIgeT0iMjUyIiB3aWR0aD0iMTgwIiBoZWlnaHQ9IjQwIiByeD0iOSIvPgogICAgPHJlY3QgeD0iNjAiIHk9IjMwOCIgd2lkdGg9IjE4MCIgaGVpZ2h0PSI0MCIgcng9IjkiLz4KICAgIDxyZWN0IHg9IjYwIiB5PSIzNjQiIHdpZHRoPSIxODAiIGhlaWdodD0iNDAiIHJ4PSI5Ii8+CiAgPC9nPgogIDxnIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTEiIHRleHQtYW5jaG9yPSJtaWRkbGUiPgogICAgPHRleHQgeD0iMTUwIiB5PSIxNjUiPkVzY3JvdzwvdGV4dD4KICAgIDx0ZXh0IHg9IjE1MCIgeT0iMjIxIj5TbWFydCBBY2NvdW50PC90ZXh0PgogICAgPHRleHQgeD0iMTUwIiB5PSIyNzciPlBhZHJvbiBkZSBTb2Npb3M8L3RleHQ+CiAgICA8dGV4dCB4PSIxNTAiIHk9IjMzMyI+QlJMVCAobW9uZWRhKTwvdGV4dD4KICAgIDx0ZXh0IHg9IjE1MCIgeT0iMzg5Ij5TdXNjcmlwY2lvbiBkZSBlbXByZXNhPC90ZXh0PgogIDwvZz4KCiAgPCEtLSBWaWdpbGFudGUgLS0+CiAgPHJlY3QgeD0iMzMwIiB5PSIxODAiIHdpZHRoPSIxNDAiIGhlaWdodD0iMTMwIiByeD0iMTQiIGZpbGw9IiM0OGNhZTQiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjIzNSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9ImJvbGQiPlZpZ2lsYW50ZTwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjI1NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41Ij5pbmRleGFkb3I8L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSIyNzUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAuNSI+ZXNjdWNoYTwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjI5MSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41Ij5sb3MgZXZlbnRvczwvdGV4dD4KCiAgPCEtLSBNaXJyb3IgZ3JvdXAgLS0+CiAgPHJlY3QgeD0iNTYwIiB5PSI5MCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyNDAiIHJ4PSIxNiIgZmlsbD0iI2U2ZjRmMiIgc3Ryb2tlPSIjMWY2ZjY0IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8cmVjdCB4PSI1NjAiIHk9IjkwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjM0IiByeD0iMTYiIGZpbGw9IiMyYTlkOGYiLz4KICA8cmVjdCB4PSI1NjAiIHk9IjEwOCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIxNiIgZmlsbD0iIzJhOWQ4ZiIvPgogIDx0ZXh0IHg9IjY2MCIgeT0iMTE0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjExLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5DYXJwZXRhcyBlc3Blam88L3RleHQ+CiAgPGcgZmlsbD0iIzJhOWQ4ZiI+CiAgICA8cmVjdCB4PSI1NzUiIHk9IjEzNiIgd2lkdGg9IjE3MCIgaGVpZ2h0PSI0MiIgcng9IjkiLz4KICAgIDxyZWN0IHg9IjU3NSIgeT0iMTkyIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjQyIiByeD0iOSIvPgogICAgPHJlY3QgeD0iNTc1IiB5PSIyNDgiIHdpZHRoPSIxNzAiIGhlaWdodD0iNDIiIHJ4PSI5Ii8+CiAgPC9nPgogIDxnIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPgogICAgPHRleHQgeD0iNjYwIiB5PSIxNTciPnRydWVrZXM8L3RleHQ+CiAgICA8dGV4dCB4PSI2NjAiIHk9IjE3MCI+ZXN0YWRvIGRlbCB0cnVlcXVlPC90ZXh0PgogICAgPHRleHQgeD0iNjYwIiB5PSIyMTMiPmt5YyArIHVzdWFyaW9zPC90ZXh0PgogICAgPHRleHQgeD0iNjYwIiB5PSIyMjYiPmh1ZWxsYSB5IGRpcmVjY2lvbjwvdGV4dD4KICAgIDx0ZXh0IHg9IjY2MCIgeT0iMjY5Ij5maW5hbnphcyArIHN1c2NyaXBjaW9uZXM8L3RleHQ+CiAgICA8dGV4dCB4PSI2NjAiIHk9IjI4MiI+c2FsZG8geSBjaWNsb3M8L3RleHQ+CiAgPC9nPgoKICA8IS0tIEF1ZGl0b3JpYSAtLT4KICA8cmVjdCB4PSI1NjAiIHk9IjM2MCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSI3MCIgcng9IjE0IiBmaWxsPSIjZTllNWYwIiBzdHJva2U9IiM4ZDg2YTkiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNjYwIiB5PSIzODYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTEuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPmF1ZGl0b3JpYTwvdGV4dD4KICA8dGV4dCB4PSI2NjAiIHk9IjQwNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSI5LjUiPmNhZGEgZXZlbnRvIHByb2Nlc2FkbzwvdGV4dD4KICA8dGV4dCB4PSI2NjAiIHk9IjQxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSI5LjUiPnNpbiBkdXBsaWNhciAodHJpcGxlIGxsYXZlKTwvdGV4dD4KCiAgPCEtLSBBcnJvd3MgLS0+CiAgPGcgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIG1hcmtlci1lbmQ9InVybCgjYXJyKSI+CiAgICA8bGluZSB4MT0iMjQyIiB5MT0iMTYwIiB4Mj0iMzI2IiB5Mj0iMjAwIi8+CiAgICA8bGluZSB4MT0iMjQyIiB5MT0iMjE2IiB4Mj0iMzI2IiB5Mj0iMjI1Ii8+CiAgICA8bGluZSB4MT0iMjQyIiB5MT0iMjcyIiB4Mj0iMzI2IiB5Mj0iMjUwIi8+CiAgICA8bGluZSB4MT0iMjQyIiB5MT0iMzI4IiB4Mj0iMzI2IiB5Mj0iMjc1Ii8+CiAgICA8bGluZSB4MT0iMjQyIiB5MT0iMzg0IiB4Mj0iMzI2IiB5Mj0iMjk1Ii8+CiAgICA8cGF0aCBkPSJNIDQ3MiAyNDUgTCA1NTYgMjQ1Ii8+CiAgICA8cGF0aCBkPSJNIDQwMCAzMTIgTCA0MDAgMzk1IEwgNTU2IDM5NSIvPgogIDwvZz4KICA8dGV4dCB4PSIyOTAiIHk9IjI1MCIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSI5Ij5ldmVudG9zPC90ZXh0PgogIDx0ZXh0IHg9IjUxMCIgeT0iMjM2IiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjkuNSI+ZXNwZWpvPC90ZXh0PgogIDx0ZXh0IHg9IjQyMCIgeT0iMzcyIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjkuNSI+Yml0YWNvcmE8L3RleHQ+CgogIDwhLS0gTm90ZSAtLT4KICA8cmVjdCB4PSI0MCIgeT0iNDYwIiB3aWR0aD0iNzIwIiBoZWlnaHQ9IjI2IiByeD0iMTAiIGZpbGw9IiNmM2U1YWIiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjQ3OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSI5LjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5QZW5kaWVudGUgQzg6IGVsIEZvbmRvIGRlIFZhbG9yIHkgbG9zIGV2ZW50b3MgZGUgZGlzcHV0YS9yZXNvbHVjaW9uIGF1biBubyBzZSBjb3BpYW48L3RleHQ+Cjwvc3ZnPgo=" alt="Espejo Blockchain"/><figcaption class="fig-caption">Figura · Espejo Blockchain</figcaption></figure>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: algunos contratos ya emiten eventos que el vigilante <strong>todavía no copia</strong> en este ciclo: el <strong>Fondo de Valor</strong> (contribuciones, cambios de porcentaje, retiros) y los eventos de <strong>disputa/resolución</strong> del escrow (solicitud de anulación, votos, resolución ejecutada, sanción). Se esperan en un ciclo posterior (C8).</p></blockquote>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. Las carpetas que escribe la plataforma (sin cadena)</h2>
+<p>Estas carpetas las llena la propia plataforma, con tu actividad:</p>
+<div class="table-wrap"><table><thead><tr><th>Carpeta</th><th>Contenido</th><th>Cómo se relaciona</th></tr></thead><tbody><tr><td><code>articulos</code></td><td>Tus publicaciones</td><td>Candado a <code>usuarios</code></td></tr><tr><td><code>valoraciones</code></td><td>Tus notas 1-5</td><td>Candado a <code>truekes</code></td></tr><tr><td><code>puntos_encuentro</code></td><td>Tus puntos con mapa</td><td>Candado a <code>usuarios</code></td></tr><tr><td><code>disputas</code></td><td>Los conflictos</td><td>Candado a <code>truekes</code></td></tr><tr><td><code>imagenes_certificadas</code></td><td>Las fotos con sello</td><td>Apunte lógico a artículos o trueques</td></tr><tr><td><code>campanas</code></td><td>Ventas masivas y recolectas</td><td>Candado a <code>usuarios</code></td></tr><tr><td><code>subastas</code></td><td>Subastas de empresa</td><td>Candados a <code>usuarios</code> y <code>articulos</code></td></tr><tr><td><code>finanzas</code></td><td>Saldos</td><td>1 a 1 con <code>usuarios</code> (y espejo parcial de BRLT)</td></tr></tbody></table></div>
+</section>
+<section class="seccion" id="s8"><h2 class="seccion">8. La regla de los 10 km (PostGIS)</h2>
+<p>La base tiene <strong>memoria de mapas</strong> (extensión PostGIS). Guarda coordenadas en dos carpetas:</p>
+<ul><li><code>usuarios</code> guarda el punto de tu dirección de inscripción.</li><li><code>puntos_encuentro</code> guarda el punto de cada lugar de encuentro, con su radio (por defecto 10 km).</li></ul>
+<p>La regla: para que un trueque sea viable, el punto de encuentro debe estar a <strong>menos de 10.000 metros (10 km)</strong> de ambos participantes. La base lo comprueba con una consulta especial (los técnicos escriben <code>ST_DWithin(..., 10000)</code>) y usa un índice espacial para que sea rápida.</p>
+<p>Esto sirve para:</p>
+<ol><li><strong>Sugerir puntos de encuentro</strong> cercanos a ti.</li><li><strong>Filtrar ofertas y trueques</strong> por cercanía.</li><li>Buscar <strong>establecimientos de retiro</strong> aprobados por los Socios en tu zona.</li></ol>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnJNIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjkiIHJlZlk9IjUiIG1hcmtlcldpZHRoPSI3IiBtYXJrZXJIZWlnaHQ9IjciIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj4KICAgICAgPHBhdGggZD0iTTAsMSBMOSw1IEwwLDkgeiIgZmlsbD0iIzFhMmI0YyIvPgogICAgPC9tYXJrZXI+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNTAwIiBmaWxsPSIjZjhmOWZhIi8+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1NCIgZmlsbD0iIzFhMmI0YyIvPgogIDxyZWN0IHk9IjUwIiB3aWR0aD0iODAwIiBoZWlnaHQ9IjQiIGZpbGw9IiNkNGFmMzciLz4KICA8dGV4dCB4PSI0MDAiIHk9IjM0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjIwIiBmb250LXdlaWdodD0iYm9sZCI+TGEgcmVnbGEgZGUgbG9zIDEwIGttIChQb3N0R0lTKTwvdGV4dD4KCiAgPCEtLSBDaXJjbGUgLS0+CiAgPGNpcmNsZSBjeD0iNDAwIiBjeT0iMjU1IiByPSIxNDAiIGZpbGw9IiNlNmY0ZjIiIG9wYWNpdHk9IjAuMzUiIHN0cm9rZT0iIzJhOWQ4ZiIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1kYXNoYXJyYXk9IjggNSIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMTAyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWY2ZjY0IiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+bWVub3MgZGUgMTAuMDAwIG0gKDEwIGttKTwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjExOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFmNmY2NCIgZm9udC1zaXplPSIxMCI+UG9zdEdJUzogU1RfRFdpdGhpbiguLi4sIDEwMDAwKTwvdGV4dD4KCiAgPCEtLSBDZW50ZXIgcG9pbnQgKG1hcCBwaW4pIC0tPgogIDxwYXRoIGQ9Ik0gNDAwIDE4NSBMIDQyOCAyMTMgTCA0MjggMjQ4IEwgNDAwIDI3OCBMIDM3MiAyNDggTCAzNzIgMjEzIFoiIGZpbGw9IiNkNGFmMzciIHN0cm9rZT0iIzhhNmQxZiIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8Y2lyY2xlIGN4PSI0MDAiIGN5PSIyNDgiIHI9IjExIiBmaWxsPSIjZDRhZjM3Ii8+CiAgPGNpcmNsZSBjeD0iNDAwIiBjeT0iMjQ4IiByPSI1IiBmaWxsPSIjMGExMTI4Ii8+CiAgPHJlY3QgeD0iMzI1IiB5PSIzMDUiIHdpZHRoPSIxNTAiIGhlaWdodD0iMjgiIHJ4PSIxMCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzI0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+UHVudG8gZGUgZW5jdWVudHJvPC90ZXh0PgoKICA8IS0tIEFuYSBpbnNpZGUgLS0+CiAgPHJlY3QgeD0iNjAiIHk9IjE5NSIgd2lkdGg9IjE1MCIgaGVpZ2h0PSI1OCIgcng9IjEyIiBmaWxsPSIjZjRhMjYxIi8+CiAgPHRleHQgeD0iMTM1IiB5PSIyMTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkFuYTwvdGV4dD4KICA8dGV4dCB4PSIxMzUiIHk9IjIzNyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSI5LjUiPnN1IGRpcmVjY2lvbiBkZSBpbnNjcmlwY2lvbjwvdGV4dD4KCiAgPCEtLSBCcnVubyBpbnNpZGUgLS0+CiAgPHJlY3QgeD0iNTkwIiB5PSIyNTAiIHdpZHRoPSIxNTAiIGhlaWdodD0iNTgiIHJ4PSIxMiIgZmlsbD0iI2Y0YTI2MSIvPgogIDx0ZXh0IHg9IjY2NSIgeT0iMjc0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5CcnVubzwvdGV4dD4KICA8dGV4dCB4PSI2NjUiIHk9IjI5MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSI5LjUiPnN1IGRpcmVjY2lvbiBkZSBpbnNjcmlwY2lvbjwvdGV4dD4KCiAgPCEtLSBEaXN0YW5jZSBsaW5lcyBpbnNpZGUgLS0+CiAgPGcgc3Ryb2tlPSIjOGE2ZDFmIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjQgNCI+CiAgICA8bGluZSB4MT0iMjEyIiB5MT0iMjMwIiB4Mj0iMzY4IiB5Mj0iMjQwIi8+CiAgICA8bGluZSB4MT0iNTg4IiB5MT0iMjc4IiB4Mj0iNDMyIiB5Mj0iMjUzIi8+CiAgPC9nPgogIDx0ZXh0IHg9IjIzOCIgeT0iMjIyIiBmaWxsPSIjOGE2ZDFmIiBmb250LXNpemU9IjkuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPm1lbm9zIGRlIDEwIGttPC90ZXh0PgogIDx0ZXh0IHg9IjQ3MCIgeT0iMjg1IiBmaWxsPSIjOGE2ZDFmIiBmb250LXNpemU9IjkuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPm1lbm9zIGRlIDEwIGttPC90ZXh0PgoKICA8IS0tIFNvbWVvbmUgZmFyIChvdXRzaWRlKSAtLT4KICA8Y2lyY2xlIGN4PSI3MTUiIGN5PSIxNDAiIHI9IjIyIiBmaWxsPSIjZTllNWYwIiBzdHJva2U9IiM4ZDg2YTkiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNzE1IiB5PSIxNDYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSJib2xkIj5DPC90ZXh0PgogIDx0ZXh0IHg9IjY1MCIgeT0iMTIwIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjkuNSI+YSBtYXMgZGUgMTAga208L3RleHQ+CiAgPGxpbmUgeDE9IjU2MCIgeTE9IjE4MCIgeDI9IjcwMCIgeTI9IjE0NSIgc3Ryb2tlPSIjOGQ4NmE5IiBzdHJva2Utd2lkdGg9IjEuOCIgc3Ryb2tlLWRhc2hhcnJheT0iNCA0Ii8+CgogIDwhLS0gT3V0Y29tZXMgLS0+CiAgPHJlY3QgeD0iODAiIHk9IjM4MCIgd2lkdGg9IjMwMCIgaGVpZ2h0PSI1OCIgcng9IjEyIiBmaWxsPSIjMmE5ZDhmIi8+CiAgPHRleHQgeD0iMjMwIiB5PSI0MDYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPlRydWVxdWUgdmlhYmxlPC90ZXh0PgogIDx0ZXh0IHg9IjIzMCIgeT0iNDI1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwIj50b2RvcyBhIG1lbm9zIGRlIDEwIGttPC90ZXh0PgoKICA8cmVjdCB4PSI0NzAiIHk9IjM4MCIgd2lkdGg9IjMwMCIgaGVpZ2h0PSI1OCIgcng9IjEyIiBmaWxsPSIjZTllNWYwIiBzdHJva2U9IiM4ZDg2YTkiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNjIwIiB5PSI0MDYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSJib2xkIj5UcnVlcXVlIG5vIHZpYWJsZTwvdGV4dD4KICA8dGV4dCB4PSI2MjAiIHk9IjQyNSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMCI+c2Ugc3VnaWVyZW4gb3Ryb3MgcHVudG9zPC90ZXh0PgoKICA8IS0tIEFycm93cyBmcm9tIHBpbiB0byBvdXRjb21lcyAtLT4KICA8ZyBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgbWFya2VyLWVuZD0idXJsKCNhcnJNKSI+CiAgICA8bGluZSB4MT0iNDAwIiB5MT0iMzM1IiB4Mj0iMjU1IiB5Mj0iMzc2Ii8+CiAgICA8bGluZSB4MT0iNDAwIiB5MT0iMzM1IiB4Mj0iNTc1IiB5Mj0iMzc2Ii8+CiAgICA8IS0tIGZhciBwZXJzb24gLT4gbm8gdmlhYmxlIC0tPgogICAgPHBhdGggZD0iTSA3MjAgMTY1IEwgNjYwIDM3NiIvPgogIDwvZz4KCiAgPCEtLSBOb3RlIC0tPgogIDxyZWN0IHg9IjYwIiB5PSI0NjIiIHdpZHRoPSI2ODAiIGhlaWdodD0iMjYiIHJ4PSIxMCIgZmlsbD0iIzFhMmI0YyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iNDgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZjNlNWFiIiBmb250LXNpemU9IjEwLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5TaXJ2ZSBwYXJhIHN1Z2VyaXIgZW5jdWVudHJvcyBjZXJjYW5vcywgZmlsdHJhciBvZmVydGFzIHkgYnVzY2FyIGVzdGFibGVjaW1pZW50b3MgZGUgcmV0aXJvPC90ZXh0Pgo8L3N2Zz4K" alt="Radio 10km"/><figcaption class="fig-caption">Figura · Radio 10km</figcaption></figure>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: la plataforma planea una consulta tipo "puntos cercanos a una dirección" (latitud, longitud y radio), pero el punto exacto de la API aún no está implementado.</p></blockquote>
+</section>
+<section class="seccion" id="s9"><h2 class="seccion">9. Las garantías: nada se pierde ni se duplica</h2>
+<p>El sistema de datos tiene una cadena de garantías:</p>
+<ol><li><strong>Bitácora de solo añadir</strong>: cada evento procesado se anota en <code>auditoria</code> y no se borra nunca.</li><li><strong>Cada evento se procesa una sola vez</strong>: la triple llave (transacción + posición + contrato) lo impide.</li><li><strong>Cada escrow tiene una sola fila</strong>: si llega dos veces el mismo evento, se actualiza, no se duplica.</li><li><strong>Marcapáginas para reprocesar</strong>: el vigilante guarda el último bloque leído por contrato y puede volver a barrer desde cualquier bloque.</li><li><strong>Reconciliación</strong>: el vigilante compara su copia con la cadena. <svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: la comparación fina de detalles se completa en un ciclo posterior.</li></ol>
+<p>Reglas de integridad destacadas:</p>
+<div class="table-wrap"><table><thead><tr><th>Regla</th><th>Efecto</th></tr></thead><tbody><tr><td><code>wallet</code> única</td><td>No puede haber dos cuentas con la misma dirección</td></tr><tr><td>Un escrow = una fila</td><td>El número del escrow es único</td></tr><tr><td>Una valoración por persona y trueque</td><td>Nadie puede votar dos veces</td></tr><tr><td>Notas entre 1 y 5</td><td>La base rechaza un 7 o un 0</td></tr><tr><td>Triple llave de eventos</td><td>Ningún evento se procesa dos veces</td></tr></tbody></table></div>
+</section>
+<section class="seccion" id="s10"><h2 class="seccion">10. Un ejemplo de principio a fin (con las preguntas que responde la base)</h2>
+<p>Sigue la historia de Ana y Bruno <strong>dentro de las carpetas</strong>:</p>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5FamVtcGxvIGRlIHByaW5jaXBpbyBhIGZpbjogQW5hIHkgQnJ1bm88L3RleHQ+CgogIDwhLS0gU3RhZ2UgbGFiZWxzIC0tPgogIDx0ZXh0IHg9IjYwIiB5PSI4MCIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMSIgZm9udC13ZWlnaHQ9ImJvbGQiPjEgwrcgSWRlbnRpZGFkPC90ZXh0PgogIDx0ZXh0IHg9IjYwIiB5PSIxNzUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSJib2xkIj4yIMK3IENhdGFsb2dvPC90ZXh0PgogIDx0ZXh0IHg9IjYwIiB5PSIyNzUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSJib2xkIj4zIMK3IEVsIHRydWVxdWUgKGVzcGVqbyBkZWwgRXNjcm93KTwvdGV4dD4KICA8dGV4dCB4PSI2MCIgeT0iNDIwIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+NCDCtyBDaWVycmUgeSBjb25maWFuemE8L3RleHQ+CgogIDwhLS0gUm93MSBwZXJzb25hcyAtLT4KICA8Zz4KICAgIDxyZWN0IHg9IjYwIiB5PSI5MCIgd2lkdGg9IjMyMCIgaGVpZ2h0PSI2MiIgcng9IjEzIiBmaWxsPSIjZjRhMjYxIi8+CiAgICA8dGV4dCB4PSIyMjAiIHk9IjExNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+dXN1YXJpb3M6IEFuYTwvdGV4dD4KICAgIDx0ZXh0IHg9IjIyMCIgeT0iMTMzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwLjUiPmlkIDEgwrcgd2FsbGV0IDB4Li4uQTwvdGV4dD4KICA8L2c+CiAgPGc+CiAgICA8cmVjdCB4PSI0MjAiIHk9IjkwIiB3aWR0aD0iMzIwIiBoZWlnaHQ9IjYyIiByeD0iMTMiIGZpbGw9IiNmNGEyNjEiLz4KICAgIDx0ZXh0IHg9IjU4MCIgeT0iMTE0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj51c3VhcmlvczogQnJ1bm88L3RleHQ+CiAgICA8dGV4dCB4PSI1ODAiIHk9IjEzMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41Ij5pZCAyIMK3IHdhbGxldCAweC4uLkI8L3RleHQ+CiAgPC9nPgoKICA8IS0tIFJvdzIgYXJ0aWN1bG9zIC0tPgogIDxnPgogICAgPHJlY3QgeD0iNjAiIHk9IjE4NSIgd2lkdGg9IjMyMCIgaGVpZ2h0PSI2MiIgcng9IjEzIiBmaWxsPSIjZTJlOGYwIi8+CiAgICA8dGV4dCB4PSIyMjAiIHk9IjIwOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+YXJ0aWN1bG9zOiBiaWNpY2xldGE8L3RleHQ+CiAgICA8dGV4dCB4PSIyMjAiIHk9IjIyOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMC41Ij51c3VhcmlvX2lkIC0mZ3Q7IEFuYSAoaWQgMSk8L3RleHQ+CiAgPC9nPgogIDxnPgogICAgPHJlY3QgeD0iNDIwIiB5PSIxODUiIHdpZHRoPSIzMjAiIGhlaWdodD0iNjIiIHJ4PSIxMyIgZmlsbD0iI2UyZThmMCIvPgogICAgPHRleHQgeD0iNTgwIiB5PSIyMDkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSJib2xkIj5hcnRpY3Vsb3M6IGN1cnNvIGRlIGZvdG9ncmFmaWE8L3RleHQ+CiAgICA8dGV4dCB4PSI1ODAiIHk9IjIyOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMC41Ij51c3VhcmlvX2lkIC0mZ3Q7IEJydW5vIChpZCAyKTwvdGV4dD4KICA8L2c+CgogIDwhLS0gUm93MyB0cnVlcXVlIC0tPgogIDxyZWN0IHg9IjYwIiB5PSIyODUiIHdpZHRoPSI2ODAiIGhlaWdodD0iMTAwIiByeD0iMTQiIGZpbGw9IiM0OGNhZTQiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjMxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMy41IiBmb250LXdlaWdodD0iYm9sZCI+dHJ1ZWtlczogZXNjcm93IDQyPC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzM0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjExIj5hcnRpY3VsbyBBIC0mZ3Q7IGJpY2ljbGV0YSBkZSBBbmEgwrcgYXJ0aWN1bG8gQiAtJmd0OyBjdXJzbyBkZSBCcnVubzwvdGV4dD4KICA8cmVjdCB4PSIyNDAiIHk9IjM0NiIgd2lkdGg9IjMyMCIgaGVpZ2h0PSIyOCIgcng9IjkiIGZpbGw9IiMxYTJiNGMiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjM2NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMC41IiBmb250LXdlaWdodD0iYm9sZCI+Q1JFQURPIC0mZ3Q7IENVU1RPRElBRE8gLSZndDsgQVBFUlRVUkEgLSZndDsgQ09NUExFVEFETzwvdGV4dD4KCiAgPCEtLSBSb3c0IHZhbG9yYWNpb25lcyAtLT4KICA8Zz4KICAgIDxyZWN0IHg9IjYwIiB5PSI0MzAiIHdpZHRoPSIzMjAiIGhlaWdodD0iNTYiIHJ4PSIxMyIgZmlsbD0iI2Q0YWYzNyIvPgogICAgPHRleHQgeD0iMjIwIiB5PSI0NTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTEuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPnZhbG9yYWNpb25lczogQW5hIHZhbG9yYSBhIEJydW5vPC90ZXh0PgogICAgPHRleHQgeD0iMjIwIiB5PSI0NzEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPjUgbm90YXMgZGVsIDEgYWwgNTwvdGV4dD4KICA8L2c+CiAgPGc+CiAgICA8cmVjdCB4PSI0MjAiIHk9IjQzMCIgd2lkdGg9IjMyMCIgaGVpZ2h0PSI1NiIgcng9IjEzIiBmaWxsPSIjZDRhZjM3Ii8+CiAgICA8dGV4dCB4PSI1ODAiIHk9IjQ1MyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMS41IiBmb250LXdlaWdodD0iYm9sZCI+dmFsb3JhY2lvbmVzOiBCcnVubyB2YWxvcmEgYSBBbmE8L3RleHQ+CiAgICA8dGV4dCB4PSI1ODAiIHk9IjQ3MSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMCI+NSBub3RhcyBkZWwgMSBhbCA1PC90ZXh0PgogIDwvZz4KCiAgPCEtLSBBcnJvd3MgLS0+CiAgPGcgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIuNSIgZmlsbD0ibm9uZSIgbWFya2VyLWVuZD0idXJsKCNhcnIpIj4KICAgIDxsaW5lIHgxPSIyMjAiIHkxPSIxNTQiIHgyPSIyMjAiIHkyPSIxODEiLz4KICAgIDxsaW5lIHgxPSI1ODAiIHkxPSIxNTQiIHgyPSI1ODAiIHkyPSIxODEiLz4KICAgIDxsaW5lIHgxPSIyMjAiIHkxPSIyNDkiIHgyPSIzMjAiIHkyPSIyODEiLz4KICAgIDxsaW5lIHgxPSI1ODAiIHkxPSIyNDkiIHgyPSI0ODAiIHkyPSIyODEiLz4KICAgIDxwYXRoIGQ9Ik0gMjIwIDM4NyBMIDIyMCA0MjYiLz4KICAgIDxwYXRoIGQ9Ik0gNTgwIDM4NyBMIDU4MCA0MjYiLz4KICA8L2c+Cjwvc3ZnPgo=" alt="Ejemplo Ana Bruno"/><figcaption class="fig-caption">Figura · Ejemplo Ana Bruno</figcaption></figure>
+<p>Y estas son las <strong>preguntas típicas</strong> que la base responde al unir carpetas:</p>
+<div class="table-wrap"><table><thead><tr><th>Pregunta</th><th>Cómo la responde la base</th></tr></thead><tbody><tr><td>¿En qué estado está el trueque?</td><td>Busca la ficha en <code>truekes</code> por su número de escrow y lee la etiqueta</td></tr><tr><td>¿Qué peldaño tiene Ana?</td><td>Lee <code>usuarios.estado</code> (la escalera D28) y su trámite en <code>kyc</code></td></tr><tr><td>¿Quién participó y con qué?</td><td>Lee las 2 direcciones y los 2 artículos de la ficha del trueque</td></tr><tr><td>¿Qué notas recibió Bruno?</td><td>Busca las valoraciones del trueque</td></tr><tr><td>¿Hay puntos de encuentro cerca?</td><td>Pregunta al mapa de PostGIS (regla de los 10 km)</td></tr><tr><td>¿Pagó la empresa este mes?</td><td>Busca sus ciclos en <code>suscripciones</code></td></tr><tr><td>¿Qué eventos ya se procesaron?</td><td>Lee la bitácora <code>auditoria</code> y el marcapáginas <code>indexador_checkpoint</code></td></tr></tbody></table></div>
+</section>
+<section class="seccion" id="s11"><h2 class="seccion">11. Resumen por carpeta (la ficha de cada una)</h2>
+<div class="table-wrap"><table><thead><tr><th>Carpeta</th><th>Llave propia</th><th>Candados reales</th><th>Conexiones lógicas / sueltas</th></tr></thead><tbody><tr><td><code>usuarios</code></td><td>sí</td><td>—</td><td>la dirección <code>wallet</code> es su llave natural en la cadena</td></tr><tr><td><code>kyc</code></td><td>sí</td><td>a <code>usuarios</code></td><td>la huella (espejo) y quién la revisó</td></tr><tr><td><code>articulos</code></td><td>sí</td><td>a <code>usuarios</code></td><td>su foto con sello (sin candado)</td></tr><tr><td><code>truekes</code></td><td>sí</td><td>a <code>articulos</code> (×2)</td><td>número del escrow, direcciones, punto de encuentro</td></tr><tr><td><code>valoraciones</code></td><td>sí</td><td>a <code>truekes</code></td><td>las direcciones de quién valora a quién</td></tr><tr><td><code>puntos_encuentro</code></td><td>sí</td><td>a <code>usuarios</code></td><td>sus coordenadas en el mapa</td></tr><tr><td><code>disputas</code></td><td>sí</td><td>a <code>truekes</code></td><td>quien la pide y el registro de votos</td></tr><tr><td><code>imagenes_certificadas</code></td><td>sí</td><td>—</td><td>apunte polimórfico a artículo o trueque</td></tr><tr><td><code>suscripciones</code></td><td>sí</td><td>a <code>usuarios</code> (empresa)</td><td>el recibo de la transacción</td></tr><tr><td><code>campanas</code></td><td>sí</td><td>a <code>usuarios</code></td><td>los artículos de la campaña</td></tr><tr><td><code>subastas</code></td><td>sí</td><td>a <code>usuarios</code> (×2) y <code>articulos</code></td><td>el número del escrow y el nivel del ganador</td></tr><tr><td><code>finanzas</code></td><td>su llave es la de <code>usuarios</code></td><td>a <code>usuarios</code> (1 a 1)</td><td>saldos, stocks y porcentajes</td></tr><tr><td><code>auditoria</code></td><td>sí</td><td>—</td><td>la dirección del evento y su triple llave</td></tr><tr><td><code>indexador_checkpoint</code></td><td>el nombre del contrato</td><td>—</td><td>el último bloque leído</td></tr></tbody></table></div>
+<blockquote class="info"><span class="tag">Nota</span><p>Conclusión sencilla: <strong>la identidad está en <code>usuarios</code>, el intercambio en <code>truekes</code>, y todo lo demás cuelga de esos dos puntos con candados y apuntes.</strong> Así TrueKeate puede responder cualquier pregunta sobre quién tiene qué, en qué estado está, y a quién hay que creerle.</p></blockquote>
+</section>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+    <marker id="arrGold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#8a6d1f"/>
+    </marker>
+  </defs>
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <rect width="800" height="54" fill="#1a2b4c"/>
+  <rect y="50" width="800" height="4" fill="#d4af37"/>
+  <text x="400" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">Los 9 estados del escrow y sus transiciones</text>
+
+  <!-- ACTIVO alias pill -->
+  <rect x="25" y="62" width="147" height="24" rx="12" fill="none" stroke="#c5a065" stroke-width="1.5" stroke-dasharray="5 3"/>
+  <text x="98" y="78" text-anchor="middle" fill="#8a6d1f" font-size="9.5" font-weight="bold">ACTIVO = alias de CREADO</text>
+
+  <!-- Row 1: happy path -->
+  <rect x="12" y="95" width="160" height="62" rx="14" fill="#48cae4"/>
+  <text x="92" y="122" text-anchor="middle" fill="#0a1128" font-size="13" font-weight="bold">CREADO</text>
+  <text x="92" y="140" text-anchor="middle" fill="#0a1128" font-size="9.5">acuerdo registrado</text>
+
+  <rect x="217" y="95" width="160" height="62" rx="14" fill="#2a9d8f"/>
+  <text x="297" y="122" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">CUSTODIADO</text>
+  <text x="297" y="140" text-anchor="middle" fill="#ffffff" font-size="9.5">objetos en la caja fuerte</text>
+
+  <rect x="422" y="95" width="160" height="62" rx="14" fill="#48cae4"/>
+  <text x="502" y="122" text-anchor="middle" fill="#0a1128" font-size="13" font-weight="bold">APERTURA</text>
+  <text x="502" y="140" text-anchor="middle" fill="#0a1128" font-size="9.5">ambos confirman listos</text>
+
+  <rect x="627" y="95" width="160" height="62" rx="14" fill="#d4af37"/>
+  <text x="707" y="122" text-anchor="middle" fill="#0a1128" font-size="13" font-weight="bold">COMPLETADO</text>
+  <text x="707" y="140" text-anchor="middle" fill="#0a1128" font-size="9.5">entregas cruzadas</text>
+
+  <!-- Row 2: exception states -->
+  <rect x="12" y="260" width="160" height="62" rx="14" fill="#e2e8f0"/>
+  <text x="92" y="287" text-anchor="middle" fill="#1a2b4c" font-size="13" font-weight="bold">ANULADO</text>
+  <text x="92" y="305" text-anchor="middle" fill="#1a2b4c" font-size="9.5">cada uno recupera lo suyo</text>
+
+  <rect x="217" y="260" width="160" height="62" rx="14" fill="#f4a261"/>
+  <text x="297" y="287" text-anchor="middle" fill="#0a1128" font-size="13" font-weight="bold">EN_DISPUTA</text>
+  <text x="297" y="305" text-anchor="middle" fill="#0a1128" font-size="9.5">alguien pidio anular</text>
+
+  <rect x="422" y="260" width="160" height="62" rx="14" fill="#1a2b4c"/>
+  <text x="502" y="287" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">RESOLUCION_SOCIOS</text>
+  <text x="502" y="305" text-anchor="middle" fill="#ffffff" font-size="9.5">votan los Socios (2 de 3)</text>
+
+  <!-- Row 3: bloqueado -->
+  <rect x="422" y="424" width="160" height="46" rx="14" fill="#e63946"/>
+  <text x="502" y="443" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">BLOQUEADO</text>
+  <text x="502" y="459" text-anchor="middle" fill="#ffffff" font-size="9">congelado · sancion 6 h</text>
+
+  <!-- Row1 happy arrows -->
+  <line x1="176" y1="136" x2="213" y2="136" stroke="#1a2b4c" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="195" y="129" text-anchor="middle" fill="#1a2b4c" font-size="8" paint-order="stroke" stroke="#ffffff" stroke-width="2.5">A y B depositan</text>
+
+  <line x1="381" y1="136" x2="418" y2="136" stroke="#1a2b4c" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="400" y="129" text-anchor="middle" fill="#1a2b4c" font-size="8" paint-order="stroke" stroke="#ffffff" stroke-width="2.5">confirman apertura</text>
+
+  <line x1="586" y1="136" x2="623" y2="136" stroke="#1a2b4c" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="605" y="129" text-anchor="middle" fill="#1a2b4c" font-size="8" paint-order="stroke" stroke="#ffffff" stroke-width="2.5">2 firmas + valoraciones</text>
+
+  <!-- CREADO -> ANULADO -->
+  <line x1="160" y1="159" x2="160" y2="256" stroke="#1a2b4c" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="170" y="205" fill="#1a2b4c" font-size="9" font-weight="bold">cancelar antes</text>
+  <text x="170" y="217" fill="#1a2b4c" font-size="9" font-weight="bold">de depositar</text>
+
+  <!-- CUSTODIADO -> EN_DISPUTA -->
+  <line x1="300" y1="159" x2="300" y2="256" stroke="#1a2b4c" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="310" y="205" fill="#1a2b4c" font-size="9" font-weight="bold">alguien pide</text>
+  <text x="310" y="217" fill="#1a2b4c" font-size="9" font-weight="bold">la anulacion</text>
+
+  <!-- EN_DISPUTA -> ANULADO (plazo) -->
+  <line x1="215" y1="296" x2="176" y2="296" stroke="#1a2b4c" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="195" y="288" text-anchor="middle" fill="#1a2b4c" font-size="7.5" paint-order="stroke" stroke="#ffffff" stroke-width="2.5">plazo 5 dias</text>
+
+  <!-- EN_DISPUTA -> RESOLUCION_SOCIOS -->
+  <line x1="381" y1="296" x2="418" y2="296" stroke="#1a2b4c" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="400" y="288" text-anchor="middle" fill="#1a2b4c" font-size="8" paint-order="stroke" stroke="#ffffff" stroke-width="2.5">votan Socios</text>
+
+  <!-- RESOLUCION -> ANULADO (votan anular) -->
+  <path d="M 470 322 L 470 360 L 92 360 L 92 323" fill="none" stroke="#1a2b4c" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="300" y="352" text-anchor="middle" fill="#1a2b4c" font-size="9" font-weight="bold" paint-order="stroke" stroke="#ffffff" stroke-width="2.5">votan anular</text>
+
+  <!-- RESOLUCION -> COMPLETADO (votan completar) -->
+  <line x1="575" y1="265" x2="623" y2="135" stroke="#8a6d1f" stroke-width="2.5" marker-end="url(#arrGold)"/>
+  <text x="556" y="232" fill="#8a6d1f" font-size="9" font-weight="bold" paint-order="stroke" stroke="#ffffff" stroke-width="3">votan completar</text>
+
+  <!-- RESOLUCION -> BLOQUEADO (sancion timelock) -->
+  <line x1="502" y1="324" x2="502" y2="420" stroke="#e63946" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="514" y="372" fill="#e63946" font-size="9" font-weight="bold">sancion tras</text>
+  <text x="514" y="384" fill="#e63946" font-size="9" font-weight="bold">espera de 6 h</text>
+
+  <!-- Terminal dots -->
+  <g fill="#1a2b4c">
+    <circle cx="92" cy="322" r="4"/>
+    <circle cx="707" cy="157" r="4"/>
+  </g>
+  <circle cx="502" cy="470" r="4" fill="#e63946"/>
+
+  <!-- Legend -->
+  <text x="400" y="494" text-anchor="middle" fill="#1a2b4c" font-size="8.5">
+    Terminales: COMPLETADO · ANULADO · BLOQUEADO   |   ACTIVO es sinonimo legado de CREADO (solo lectura, nunca se asigna)
+  </text>
+</svg>

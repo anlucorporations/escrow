@@ -4,8 +4,8 @@
 |---|---|
 | Proyecto | **TrueKeate** (DApp Web3 de trueques con escrow) |
 | Archivo | `RepoTecnico/estado_proyecto.md` |
-| Fase actual | **4 — Pruebas** (E2E 18/18 · backend 26/26 · Foundry 62/62 con invariantes) |
-| Última actualización | Fase 4 completada: suite E2E Playwright **18/18**, backend **26/26**, Foundry **62/62** (61 unit/fuzz + invariantes I1/I2/I4/I5/I7), cobertura Forge global ≥80 % (gate D38) |
+| Fase actual | **5 — Manuales** (completada: técnicos + literales + 33 SVG + 16 PDF + Ayuda `/help/manual`) |
+| Última actualización | Fase 5 (@manuales) completada: 16 manuales técnicos, 16 literales, 33 diagramas SVG, 16 PDF y sección de Ayuda integrada |
 
 ---
 
@@ -59,6 +59,20 @@ Detalle E2E (9 casos × 2 proyectos):
 **Hallazgos corregidos durante Fase 4** (ninguno funcional):
 - E2E fallaba por fonts del sistema ausentes en el entorno headless → resuelto instalando fuentes DejaVu + fontconfig (no es defecto de la app).
 - Locator de la escalera D28 en strict mode (texto `INSCRITO` presente en escalón y badge) → acotado a `getByRole("list")` (práctica Playwright).
+
+## ✅ Cierre de la Fase 5 — Manuales (@manuales)
+
+Workflow de 10 agentes en 5 roles sobre el código real (`sc/`, `backend/`, `web/`):
+
+| Rol | Entregable | Detalle |
+|---|---|---|
+| 🔧 TÉCNICO (×4) | `RepoTecnico/Manuales/**` — **16 manuales técnicos** | 01-Tecnologia (plataforma, stack Web3/backend/frontend), 02-Dependencias (versiones exactas), 03-Implementacion (contratos, identidad, finanzas, indexador, relayer, API, frontend, pruebas), 04-Despliegue, 05-Diccionario-de-Datos (14 tablas + enum 9 estados), 06-Diagrama-Relacional. Jerarquía `##/###/####` con referencias `ruta:línea` al código real; discrepancias reales detectadas marcadas como observación o "pendiente de confirmar" |
+| ✍️ LITERARIO (×3) | `docs/Manuales/**` — **16 manuales de usuario** | Mismo árbol que los técnicos; lenguaje sencillo, apartado "Empezar en 5 minutos", pasos numerados, ejemplos cotidianos y 37 marcadores `<!-- GENERAR_IMAGEN -->` + bloques mermaid |
+| 🎨 CREATIVO | `docs/imagenes/` — **33 SVG** | Diagramas con la paleta "Bóveda Digital" leída de `web/app/globals.css` (navy/teal/cyan/gold/crimson/coral): estados-escrow (9 estados), escalera-verificacion (D28), flujo-truque, arquitectura, glosarios, etc. |
+| 📄 ASISTENTE PDF | `docs/Manuales/pdf/` — **16 PDF** (+16 HTML en `pdf/html/` + `README.md` + `web/scripts/generar-pdfs.mjs`) | A4 con portada TrueKeate, índice navegable, avisos codificados por color, 37 SVG embebidos y headers/footers "Página X de Y" (Playwright Chromium con fontconfig) |
+| 🧩 INTEGRADOR | Ayuda en plataforma: `web/app/help/manual/page.tsx` + `web/lib/manual-data.ts` (16 manuales, 6 grupos) | `/help/manual` con acordeones `<details>`, 33 imágenes desde `/manual/imagenes/`, 16 enlaces PDF `/manual/pdf/`; footer de la landing `/` con enlace "📖 Ayuda · Manuales TrueKeate" (sin romper textos ni rutas existentes) |
+
+**Verificaciones**: build Next.js OK (`○ /help/manual` prerenderizado estático); E2E Playwright **18/18** tras la integración (footer añadido no rompe `landing.spec.ts`); todas las imágenes y PDF referenciados existen en `web/public/manual/` (0 rotas); corrección aplicada: marcador `flujo-trueque.svg` → `flujo-truque.svg` (nombre real del archivo) en 2 literales.
 
 ## ✅ Cierre de la Fase 2 — Documentación sincronizada
 
@@ -171,10 +185,12 @@ criterios Gherkin/EARS alineados), `arquitectura_tecnica.md` (secciones 1–10, 
 - [x] **Push realizado en los 3 repos** ✅: rama `escrow-dsh-GCP` en `0f5e521` publicada en **GitHub**, **GitLab.com** y **gitlab.codecrypto.academy** (token HTTPS configurado globalmente; contenido heredado reemplazado por lo construido con forced update)
 - [x] **D11 resuelto**: acceso a `gitlab.codecrypto.academy` habilitado vía token (credential helper global)
 - [x] **Fase 4 — Pruebas completadas** ✅: Foundry 62/62 (unit/fuzz + invariantes), backend 26/26, E2E Playwright 18/18 (chromium + mobile-chrome); cobertura Forge ≥80 % (D38) verificada
-- [ ] (Fase 5) Manuales de uso y técnicos
+- [x] **Push e75e69a (Fase 4) en los 3 repos** ✅: rama `escrow-dsh-GCP` publicada en **GitHub**, **GitLab.com** y **gitlab.codecrypto.academy**
+- [x] **Fase 5 — Manuales completados (@manuales)** ✅: 16 manuales técnicos (`RepoTecnico/Manuales/`), 16 manuales de usuario (`docs/Manuales/`), 33 SVG (`docs/imagenes/`), 16 PDF (`docs/Manuales/pdf/`) y Ayuda integrada en `/help/manual` (web). E2E 18/18 y build OK tras integración.
+- [ ] (Fase 5) Confirmación final del director y push
 
 ## Próximos pasos
 
-1. **Fase 4 completa**: todas las pruebas de la plataforma en verde — Foundry 62/62, backend 26/26, E2E 18/18.
-2. Siguiente: **Fase 5** (manuales de uso + técnicos, skill `@manuales`).
+1. **Fase 5 completada**: manuales técnicos + de usuario + gráficos + PDF + Ayuda en `/help/manual`.
+2. **Proyecto completo** (Fases 1–5). Pendiente: confirmación del director y push del commit de cierre a los 3 repos.
 3. Los commits se crean localmente en `escrow-dsh-GCP`; el push a GitHub/GitLab se hace solo por orden del director (`/push`).

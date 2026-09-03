@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <rect width="800" height="54" fill="#1a2b4c"/>
+  <rect y="50" width="800" height="4" fill="#d4af37"/>
+  <text x="400" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">Mapa de pantallas de la app</text>
+
+  <!-- Portada -->
+  <rect x="40" y="210" width="160" height="90" rx="14" fill="#d4af37"/>
+  <text x="120" y="246" text-anchor="middle" fill="#0a1128" font-size="13" font-weight="bold">Portada</text>
+  <text x="120" y="264" text-anchor="middle" fill="#0a1128" font-size="10.5">pagina publica</text>
+  <text x="120" y="280" text-anchor="middle" fill="#0a1128" font-size="10.5">ruta: /</text>
+
+  <!-- Dashboard -->
+  <rect x="280" y="210" width="180" height="90" rx="14" fill="#2a9d8f"/>
+  <text x="370" y="246" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">Mi Trueke Central</text>
+  <text x="370" y="264" text-anchor="middle" fill="#ffffff" font-size="10.5">/suite/dashboard</text>
+  <text x="370" y="280" text-anchor="middle" fill="#ffffff" font-size="10.5">nivel + conectar wallet</text>
+
+  <!-- BottomNav label -->
+  <rect x="250" y="320" width="260" height="34" rx="10" fill="#1a2b4c"/>
+  <text x="380" y="342" text-anchor="middle" fill="#f3e5ab" font-size="11.5" font-weight="bold">barra inferior de 5 botones</text>
+
+  <!-- Module boxes -->
+  <g>
+    <rect x="600" y="80" width="170" height="72" rx="12" fill="#48cae4"/>
+    <text x="685" y="108" text-anchor="middle" fill="#0a1128" font-size="12.5" font-weight="bold">Inventario</text>
+    <text x="685" y="126" text-anchor="middle" fill="#0a1128" font-size="10">tus objetos</text>
+    <text x="685" y="142" text-anchor="middle" fill="#e63946" font-size="9.5" font-weight="bold">en construccion</text>
+  </g>
+  <g>
+    <rect x="600" y="170" width="170" height="72" rx="12" fill="#48cae4"/>
+    <text x="685" y="198" text-anchor="middle" fill="#0a1128" font-size="12.5" font-weight="bold">Trueke Central</text>
+    <text x="685" y="216" text-anchor="middle" fill="#0a1128" font-size="10">crear y ver trueques</text>
+    <text x="685" y="232" text-anchor="middle" fill="#e63946" font-size="9.5" font-weight="bold">en construccion</text>
+  </g>
+  <g>
+    <rect x="600" y="260" width="170" height="72" rx="12" fill="#48cae4"/>
+    <text x="685" y="288" text-anchor="middle" fill="#0a1128" font-size="12.5" font-weight="bold">Socios</text>
+    <text x="685" y="306" text-anchor="middle" fill="#0a1128" font-size="10">gobernanza y votos</text>
+    <text x="685" y="322" text-anchor="middle" fill="#e63946" font-size="9.5" font-weight="bold">en construccion</text>
+  </g>
+  <g>
+    <rect x="600" y="350" width="170" height="72" rx="12" fill="#48cae4"/>
+    <text x="685" y="378" text-anchor="middle" fill="#0a1128" font-size="12.5" font-weight="bold">Perfil</text>
+    <text x="685" y="396" text-anchor="middle" fill="#0a1128" font-size="10">tus datos</text>
+    <text x="685" y="412" text-anchor="middle" fill="#e63946" font-size="9.5" font-weight="bold">en construccion</text>
+  </g>
+
+  <!-- Arrows -->
+  <g stroke="#1a2b4c" stroke-width="2.5" fill="none" marker-end="url(#arr)">
+    <line x1="202" y1="255" x2="276" y2="255"/>
+    <path d="M 460 255 L 596 116"/>
+    <path d="M 460 255 L 596 206"/>
+    <path d="M 460 255 L 596 296"/>
+    <path d="M 460 255 L 596 386"/>
+  </g>
+  <text x="239" y="246" text-anchor="middle" fill="#1a2b4c" font-size="9.5">Comenzar</text>
+  <text x="239" y="258" text-anchor="middle" fill="#1a2b4c" font-size="9.5">a truequear</text>
+
+  <!-- Placeholder note -->
+  <rect x="60" y="440" width="540" height="42" rx="12" fill="#f3e5ab"/>
+  <text x="330" y="457" text-anchor="middle" fill="#0a1128" font-size="11" font-weight="bold">Los modulos en construccion muestran: "Este modulo se completa en la</text>
+  <text x="330" y="473" text-anchor="middle" fill="#0a1128" font-size="11">integracion final. Acceso segun rol y estado". No se prometen funcionales.</text>
+</svg>

@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <rect width="800" height="54" fill="#1a2b4c"/>
+  <rect y="50" width="800" height="4" fill="#d4af37"/>
+  <text x="400" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">De donde salen los datos del trueque</text>
+
+  <!-- Blockchain group -->
+  <rect x="40" y="90" width="220" height="330" rx="16" fill="#fff1f0" stroke="#e63946" stroke-width="2"/>
+  <text x="150" y="118" text-anchor="middle" fill="#a8232d" font-size="14" font-weight="bold">Blockchain</text>
+  <text x="150" y="136" text-anchor="middle" fill="#a8232d" font-size="10.5">contrato Escrow</text>
+  <g>
+    <rect x="60" y="160" width="180" height="46" rx="10" fill="#e63946"/>
+    <text x="150" y="188" text-anchor="middle" fill="#ffffff" font-size="10.5">evento: TruekeCreado</text>
+  </g>
+  <g>
+    <rect x="60" y="222" width="180" height="46" rx="10" fill="#e63946"/>
+    <text x="150" y="250" text-anchor="middle" fill="#ffffff" font-size="10.5">evento: CustodiaA / CustodiaB</text>
+  </g>
+  <g>
+    <rect x="60" y="284" width="180" height="46" rx="10" fill="#e63946"/>
+    <text x="150" y="312" text-anchor="middle" fill="#ffffff" font-size="10.5">evento: AperturaA / AperturaB</text>
+  </g>
+  <g>
+    <rect x="60" y="346" width="180" height="46" rx="10" fill="#e63946"/>
+    <text x="150" y="374" text-anchor="middle" fill="#ffffff" font-size="10.5">evento: TruekeCompletado</text>
+  </g>
+
+  <!-- Vigilante -->
+  <rect x="330" y="180" width="140" height="120" rx="14" fill="#48cae4"/>
+  <text x="400" y="230" text-anchor="middle" fill="#0a1128" font-size="13" font-weight="bold">Vigilante</text>
+  <text x="400" y="250" text-anchor="middle" fill="#0a1128" font-size="10.5">indexador</text>
+  <text x="400" y="270" text-anchor="middle" fill="#0a1128" font-size="10.5">lee cada 5 s</text>
+
+  <!-- Base -->
+  <rect x="560" y="150" width="200" height="180" rx="16" fill="#e6f4f2" stroke="#1f6f64" stroke-width="2"/>
+  <rect x="560" y="150" width="200" height="34" rx="16" fill="#2a9d8f"/>
+  <rect x="560" y="168" width="200" height="16" fill="#2a9d8f"/>
+  <text x="660" y="174" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="bold">Base de datos</text>
+  <rect x="575" y="196" width="170" height="40" rx="8" fill="#2a9d8f"/>
+  <text x="660" y="220" text-anchor="middle" fill="#ffffff" font-size="10.5">tabla truekes (espejo)</text>
+  <text x="660" y="252" text-anchor="middle" fill="#1f6f64" font-size="10">inserta la fila (CREADO)</text>
+  <text x="660" y="270" text-anchor="middle" fill="#1f6f64" font-size="10">cambia la etiqueta</text>
+  <text x="660" y="288" text-anchor="middle" fill="#1f6f64" font-size="10">(CUSTODIADO, APERTURA...)</text>
+  <text x="660" y="314" text-anchor="middle" fill="#1f6f64" font-size="10">hasta COMPLETADO</text>
+
+  <!-- Bitacora -->
+  <rect x="560" y="370" width="200" height="50" rx="14" fill="#e9e5f0" stroke="#8d86a9" stroke-width="1.5"/>
+  <text x="660" y="392" text-anchor="middle" fill="#1a2b4c" font-size="11.5" font-weight="bold">Bitacora auditoria</text>
+  <text x="660" y="408" text-anchor="middle" fill="#1a2b4c" font-size="9.5">anota cada evento, sin duplicar</text>
+
+  <!-- Arrows -->
+  <g stroke="#1a2b4c" stroke-width="2" fill="none" marker-end="url(#arr)">
+    <line x1="242" y1="183" x2="326" y2="210"/>
+    <line x1="242" y1="245" x2="326" y2="230"/>
+    <line x1="242" y1="307" x2="326" y2="270"/>
+    <line x1="242" y1="369" x2="326" y2="290"/>
+    <line x1="472" y1="240" x2="556" y2="240"/>
+    <path d="M 400 302 L 400 395 L 556 395"/>
+  </g>
+  <text x="280" y="255" fill="#1a2b4c" font-size="9">eventos</text>
+  <text x="510" y="231" fill="#1a2b4c" font-size="9.5">copias</text>
+  <text x="420" y="370" fill="#1a2b4c" font-size="9.5">registro imborrable</text>
+
+  <!-- Note -->
+  <rect x="40" y="450" width="720" height="36" rx="10" fill="#f3e5ab"/>
+  <text x="400" y="472" text-anchor="middle" fill="#0a1128" font-size="10.5" font-weight="bold">Regla: un escrow = una fila. Si llega dos veces el mismo evento, se actualiza la misma fila (nunca se duplica)</text>
+</svg>

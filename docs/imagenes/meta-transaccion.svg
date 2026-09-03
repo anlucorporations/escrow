@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <rect width="800" height="54" fill="#1a2b4c"/>
+  <rect y="50" width="800" height="4" fill="#d4af37"/>
+  <text x="400" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">Firmar sin pagar gas: la meta-transaccion</text>
+
+  <!-- Actor headers -->
+  <g>
+    <rect x="40" y="80" width="140" height="46" rx="12" fill="#48cae4"/>
+    <text x="110" y="101" text-anchor="middle" fill="#0a1128" font-size="12.5" font-weight="bold">Ana</text>
+    <text x="110" y="117" text-anchor="middle" fill="#0a1128" font-size="9.5">particular</text>
+  </g>
+  <g>
+    <rect x="245" y="80" width="150" height="46" rx="12" fill="#2a9d8f"/>
+    <text x="320" y="101" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">App web</text>
+    <text x="320" y="117" text-anchor="middle" fill="#ffffff" font-size="9.5">frontend</text>
+  </g>
+  <g>
+    <rect x="470" y="80" width="150" height="46" rx="12" fill="#1a2b4c"/>
+    <text x="545" y="101" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="bold">Relayer</text>
+    <text x="545" y="117" text-anchor="middle" fill="#f3e5ab" font-size="9">mensajero que paga</text>
+  </g>
+  <g>
+    <rect x="690" y="80" width="90" height="46" rx="12" fill="#e63946"/>
+    <text x="735" y="101" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="bold">Blockchain</text>
+    <text x="735" y="117" text-anchor="middle" fill="#ffffff" font-size="8.5">SmartAccount</text>
+  </g>
+
+  <!-- Lifelines -->
+  <line x1="110" y1="126" x2="110" y2="430" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <line x1="320" y1="126" x2="320" y2="430" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <line x1="545" y1="126" x2="545" y2="430" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <line x1="735" y1="126" x2="735" y2="430" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 4"/>
+
+  <!-- 1 -->
+  <line x1="112" y1="150" x2="318" y2="150" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="215" y="143" text-anchor="middle" fill="#1a2b4c" font-size="10">1. Quiere custodiar su bici</text>
+  <!-- 2 -->
+  <line x1="318" y1="182" x2="114" y2="182" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="216" y="175" text-anchor="middle" fill="#1a2b4c" font-size="10">2. MetaMask pide firma (sin coste)</text>
+  <!-- 3 -->
+  <line x1="112" y1="214" x2="318" y2="214" stroke="#1a2b4c" stroke-width="2" stroke-dasharray="6 3" marker-end="url(#arr)"/>
+  <text x="215" y="207" text-anchor="middle" fill="#1a2b4c" font-size="10">3. Firma digital lista</text>
+  <!-- 4 -->
+  <line x1="322" y1="246" x2="543" y2="246" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="432" y="239" text-anchor="middle" fill="#1a2b4c" font-size="10">4. Envia la firma al relayer</text>
+  <!-- 5 note over relayer -->
+  <rect x="330" y="266" width="400" height="40" rx="10" fill="#f3e5ab"/>
+  <text x="530" y="283" text-anchor="middle" fill="#0a1128" font-size="10" font-weight="bold">5. El relayer comprueba: numero de serie (nonce),</text>
+  <text x="530" y="297" text-anchor="middle" fill="#0a1128" font-size="10">estado de la cuenta y limite diario (20 operaciones)</text>
+  <line x1="545" y1="258" x2="545" y2="268" stroke="#1a2b4c" stroke-width="1.5"/>
+  <!-- 6 -->
+  <line x1="547" y1="330" x2="733" y2="330" stroke="#1a2b4c" stroke-width="2.5" marker-end="url(#arr)"/>
+  <text x="640" y="323" text-anchor="middle" fill="#1a2b4c" font-size="10" font-weight="bold">6. Envia la operacion y PAGA el gas</text>
+  <!-- 7 -->
+  <line x1="733" y1="362" x2="549" y2="362" stroke="#2a9d8f" stroke-width="2" stroke-dasharray="6 3" marker-end="url(#arr)"/>
+  <text x="640" y="355" text-anchor="middle" fill="#2a9d8f" font-size="10" font-weight="bold">7. Confirmada OK</text>
+  <!-- 8 back -->
+  <line x1="545" y1="394" x2="322" y2="394" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="433" y="387" text-anchor="middle" fill="#1a2b4c" font-size="10">Resultado</text>
+  <line x1="320" y1="420" x2="112" y2="420" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="216" y="413" text-anchor="middle" fill="#1a2b4c" font-size="10">"Tu objeto quedo custodiado OK"</text>
+
+  <!-- Bottom note -->
+  <rect x="140" y="440" width="520" height="44" rx="12" fill="#0a1128"/>
+  <text x="400" y="459" text-anchor="middle" fill="#f3e5ab" font-size="11.5" font-weight="bold">Ana no pago nada: el relayer asumio el gas</text>
+  <text x="400" y="475" text-anchor="middle" fill="#ffffff" font-size="10">Las empresas no usan el mensajero: envian directo y pagan su propio gas</text>
+</svg>
