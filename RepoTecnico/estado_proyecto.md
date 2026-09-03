@@ -4,8 +4,8 @@
 |---|---|
 | Proyecto | **TrueKeate** (DApp Web3 de trueques con escrow) |
 | Archivo | `RepoTecnico/estado_proyecto.md` |
-| Fase actual | **ENTREGADO** — 5 fases completadas (Concepto → Auditoría → Desarrollo → Pruebas → Manuales) |
-| Última actualización | **Entrega final confirmada por el director**: push `c8fc77e` (Fase 5) en los 3 repos — proyecto TrueKeate completo |
+| Fase actual | **ENTREGADO** — 5 fases completadas + verificación de cuentas y scripts de operación |
+| Última actualización | Verificación cuentas (0=Owner, 1=Relayer) + scripts `reiniciar-plataforma.sh` y `bootstrap-owner.sh` (producción, bajo orden del director) |
 
 ---
 
@@ -188,9 +188,18 @@ criterios Gherkin/EARS alineados), `arquitectura_tecnica.md` (secciones 1–10, 
 - [x] **Push e75e69a (Fase 4) en los 3 repos** ✅: rama `escrow-dsh-GCP` publicada en **GitHub**, **GitLab.com** y **gitlab.codecrypto.academy**
 - [x] **Fase 5 — Manuales completados (@manuales)** ✅: 16 manuales técnicos (`RepoTecnico/Manuales/`), 16 manuales de usuario (`docs/Manuales/`), 33 SVG (`docs/imagenes/`), 16 PDF (`docs/Manuales/pdf/`) y Ayuda integrada en `/help/manual` (web). E2E 18/18 y build OK tras integración.
 - [x] **Entrega final ✅** — Proyecto TrueKeate completado (Fases 1–5) y confirmado por el director; push de cierre `c8fc77e` en **GitHub**, **GitLab.com** y **gitlab.codecrypto.academy** (rama `escrow-dsh-GCP`).
+- [x] **Verificación de cuentas (post-entrega)** ✅:
+  - Cuenta 0 `0xf39F…2266` = **Owner/deployer**: todas las txs de `run-latest.json` firmadas desde ella (RF-15.1); `owner()` on-chain = cuenta 0.
+  - Cuenta 1 `0x7099…79C8` = **Relayer + gastos de la plataforma** (RF-15.2, `relayer.js`, test de integración).
+  - Hueco detectado y cerrado: el Owner NO quedaba CERTIFICADO/SOCIO en la plataforma → nuevos scripts de operación.
+- [x] **Scripts de operación (producción)** ✅:
+  - `backend/scripts/reiniciar-plataforma.sh` (+ `.mjs`): reset total de la BD off-chain (TRUNCATE CASCADE de las 14 tablas) **sin tocar anvil**; exige `--confirmar` + confirmación `BORRAR`; `--check` diagnóstico y `--respaldo` (pg_dump). Solo se ejecuta por orden del director.
+  - `backend/scripts/bootstrap-owner.sh` (+ `.mjs`): registra al Owner (cuenta 0) en BD como CERTIFICADO + tipo/nivel SOCIO + GDPR, lo admite como Socio on-chain (`admitirSocioDirecto`) y opcionalmente despliega su SmartAccount (`--smart-account`).
+  - Doc: `RepoTecnico/Manuales/04-Despliegue/02-reinicio-y-bootstrap.md` (enlazado desde el manual de despliegue).
 
 ## Próximos pasos
 
-1. **✅ Proyecto ENTREGADO** — Fases 1–5 completadas y publicadas en los 3 repos (rama `escrow-dsh-GCP`, `c8fc77e`).
-2. Mejoras futuras opcionales (fuera de alcance): APK nativa (D40), integración con `mcc-postgres` real en GCP (D25), auditoría externa de seguridad previa a producción (D24), integración del 1 % de trueques al FondoDeValor (D7, marcado "pendiente de confirmar" en manuales).
-3. Los commits se crean localmente en `escrow-dsh-GCP`; el push a GitHub/GitLab se hace solo por orden del director (`/push`).
+1. **✅ Proyecto ENTREGADO** — Fases 1–5 completadas y publicadas en los 3 repos (rama `escrow-dsh-GCP`).
+2. Operación (solo por orden del director): `backend/scripts/reiniciar-plataforma.sh --confirmar` (reset BD off-chain sin tocar anvil) y `backend/scripts/bootstrap-owner.sh --confirmar` (Owner CERTIFICADO/SOCIO) — ver `RepoTecnico/Manuales/04-Despliegue/02-reinicio-y-bootstrap.md`.
+3. Mejoras futuras opcionales (fuera de alcance): APK nativa (D40), integración con `mcc-postgres` real en GCP (D25), auditoría externa de seguridad previa a producción (D24), integración del 1 % de trueques al FondoDeValor (D7, marcado "pendiente de confirmar" en manuales), root merkle real del KYC para la escalera on-chain del Owner (D28).
+4. Los commits se crean localmente en `escrow-dsh-GCP`; el push a GitHub/GitLab se hace solo por orden del director (`/push`).

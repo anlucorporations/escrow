@@ -263,6 +263,10 @@ npm start        # servir el build (usa Playwright en E2E)
 
 ## 8. Operación y monitoreo
 
+> 📎 **Operación adicional**: reinicio limpio de la BD off-chain (sin tocar anvil) y bootstrap
+> del Owner como CERTIFICADO + SOCIO → ver **`04-Despliegue/02-reinicio-y-bootstrap.md`**
+> (`backend/scripts/reiniciar-plataforma.sh` y `backend/scripts/bootstrap-owner.sh`).
+
 ### 8.1 Health-checks reales
 
 | Servicio | Endpoint/función | Fuente |
