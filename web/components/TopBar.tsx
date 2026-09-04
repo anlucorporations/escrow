@@ -11,6 +11,7 @@ import Link from "next/link";
 import { useEthereum } from "@/lib/ethereum";
 import { useSesion } from "@/lib/sesion";
 import { Button } from "@/components/Button";
+import { EscudoEstado } from "@/components/EscudoEstado";
 
 const ETIQUETA_ESTADO: Record<string, string> = {
   INSCRITO: "Inscrito",
@@ -24,7 +25,7 @@ function walletCorta(account: string) {
 
 export function TopBar() {
   const { account, conectado, desconectar } = useEthereum();
-  const { acceso } = useSesion();
+  const { acceso, cerrarSesion } = useSesion();
   const [abierto, setAbierto] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -52,7 +53,10 @@ export function TopBar() {
           Sin billetera
         </span>
       ) : (
-        <div className="relative" ref={menuRef}>
+        <div className="flex items-center gap-2">
+          {/* Escudo de estado D28 → acceso rápido a Verificar/Certificar */}
+          <EscudoEstado />
+          <div className="relative" ref={menuRef}>
           {/* Botón del menú de usuario */}
           <button
             onClick={() => setAbierto((v) => !v)}
@@ -137,6 +141,7 @@ export function TopBar() {
                 <button
                   onClick={() => {
                     desconectar();
+                    cerrarSesion();
                     setAbierto(false);
                   }}
                   className="block w-full rounded-pill px-3 py-2 text-left text-sm text-crimson hover:bg-crimson/5"
@@ -146,6 +151,7 @@ export function TopBar() {
               </div>
             </div>
           )}
+          </div>
         </div>
       )}
     </header>

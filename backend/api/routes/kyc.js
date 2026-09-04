@@ -1,31 +1,87 @@
 // =============================================================================
-// TrueKeate — Router /kyc (Ciclo 6)
-// Verificación en 2 etapas (D28, CU-02):
-//   Etapa 1: códigos en correo y teléfono → estado VERIFICADO.
-//   Etapa 2: documento + selfie (servicio verificador + revisión humana Owner RF-18.4)
-//            → estado CERTIFICADO.
+// TrueKeate — Router /kyc (Ciclo 6 + verificación con código de correo)
+// Escalera D28 (CU-02):
+//   Etapa 1 (VERIFICACIÓN): se genera un código de 6 dígitos para el correo.
+//     - Con SMTP configurado (KYC_EMAIL_USER/PASS) se envía por Nodemailer (D37).
+//     - Sin SMTP (demo/desarrollo) el código se devuelve en la respuesta
+//       (campo `codigoDemo`) para poder completar el flujo en la UI.
+//   Etapa 2 (CERTIFICACIÓN): documento + selfie → servicio verificador externo
+//     (pendiente) + revisión humana del Owner (RF-18.4) → estado CERTIFICADO.
 // =============================================================================
 import { Router } from 'express';
+import { randomInt } from 'node:crypto';
 import { requiereSesion } from '../lib/auth.js';
+
+const CODIGO_TTL_MS = 10 * 60 * 1000; // 10 minutos
+
+/** Almacén en memoria de códigos: wallet -> {codigo, expira}. */
+const codigos = new Map();
+
+async function enviarCodigoCorreo(correo, codigo) {
+  const user = process.env.KYC_EMAIL_USER;
+  const pass = process.env.KYC_EMAIL_PASS;
+  if (!user || !pass) {
+    return { enviado: false, motivo: 'SMTP no configurado (KYC_EMAIL_USER/PASS) — modo demo' };
+  }
+  try {
+    const { createTransport } = await import('nodemailer');
+    const tx = createTransport({
+      host: process.env.KYC_EMAIL_HOST || 'smtp.gmail.com',
+      port: Number(process.env.KYC_EMAIL_PORT || 465),
+      secure: true,
+      auth: { user, pass },
+    });
+    await tx.sendMail({
+      from: user,
+      to: correo,
+      subject: 'TrueKeate — Código de verificación de correo',
+      text: `Tu código de verificación TrueKeate es: ${codigo}. Vence en 10 minutos.`,
+    });
+    return { enviado: true };
+  } catch (e) {
+    console.error('[kyc] error enviando correo:', e.message);
+    return { enviado: false, motivo: e.message };
+  }
+}
 
 export function crearRouterKyc({ almacen }) {
   const r = Router();
 
-  // POST /kyc/init — inicia la verificación (etapa 1: códigos correo/teléfono)
+  // POST /kyc/init — inicia la VERIFICACIÓN: genera código y lo envía al correo
   r.post('/init', requiereSesion(almacen), async (req, res) => {
     const u = await almacen.getUsuario(req.wallet);
+    if (!u) return res.status(404).json({ error: 'usuario_inexistente' });
+    if (!u.correo) {
+      return res.status(400).json({ error: 'correo_requerido', detalle: 'inscríbete con correo (RF-01.2b)' });
+    }
+    const codigo = String(randomInt(100000, 999999));
+    codigos.set(req.wallet, { codigo, expira: Date.now() + CODIGO_TTL_MS });
+    const envio = await enviarCodigoCorreo(u.correo, codigo);
     const k = await almacen.initKyc(req.wallet);
-    // En producción se envían códigos por email (Nodemailer+SMTP — D37) e in-app.
-    res.json({ kyc: k, aviso: 'códigos enviados al correo y teléfono (etapa 1 — D28)', usuario: u });
+    res.json({
+      kyc: k,
+      aviso: envio.enviado
+        ? `Código enviado a ${u.correo} (vence en 10 min)`
+        : `Código generado (${envio.motivo})`,
+      // Solo en demo/sin SMTP: la UI puede mostrar el código para completar el flujo.
+      ...(envio.enviado ? {} : { codigoDemo: codigo }),
+    });
   });
 
-  // POST /kyc/verify-codes — confirma códigos → VERIFICADO (etapa 1)
+  // POST /kyc/verify-codes — valida el código de correo → VERIFICADO (etapa 1)
   r.post('/verify-codes', requiereSesion(almacen), async (req, res) => {
-    const { codigoCorreo, codigoTelefono } = req.body;
-    if (!codigoCorreo || !codigoTelefono) {
-      return res.status(400).json({ error: 'codigos_requeridos' });
+    const { codigoCorreo } = req.body;
+    if (!codigoCorreo) {
+      return res.status(400).json({ error: 'codigo_requerido', detalle: 'código del correo (etapa 1 — D28)' });
     }
-    // En producción los códigos se validan contra los generados (hash + vencimiento).
+    const pendiente = codigos.get(req.wallet);
+    if (!pendiente || pendiente.expira < Date.now()) {
+      return res.status(422).json({ error: 'codigo_expirado', detalle: 'solicita un código nuevo (/kyc/init)' });
+    }
+    if (String(codigoCorreo).trim() !== pendiente.codigo) {
+      return res.status(422).json({ error: 'codigo_invalido' });
+    }
+    codigos.delete(req.wallet);
     const u = await almacen.actualizarUsuario(req.wallet, { estado: 'VERIFICADO' });
     const k = await almacen.actualizarKyc(req.wallet, { etapa: 1 });
     res.json({ usuario: u, kyc: k });
@@ -37,7 +93,6 @@ export function crearRouterKyc({ almacen }) {
     if (!documentoRef || !selfieRef) {
       return res.status(400).json({ error: 'documento_y_selfie_requeridos' });
     }
-    // El documento/selfie se cifran en reposo (D17); solo hashes/refs se guardan aquí.
     const k = await almacen.actualizarKyc(req.wallet, {
       documentoRef, selfieRef,
       estado: 'PENDIENTE', // revisión humana del Owner (RF-18.4)

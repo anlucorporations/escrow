@@ -95,9 +95,10 @@ test('KYC: códigos → VERIFICADO; submit + revisión Owner → CERTIFICADO (D2
   await inscribir(walletA);
   const token = sesionDe(walletA);
 
-  await request(app).post('/kyc/init').set('Authorization', `Bearer ${token}`);
-
-  const v = await request(app).post('/kyc/verify-codes').set('Authorization', `Bearer ${token}`).send({ codigoCorreo: '123456', codigoTelefono: '654321' });
+  const initResp = await request(app).post('/kyc/init').set('Authorization', `Bearer ${token}`);
+  const codigoDemo = initResp.body.codigoDemo;
+  assert.ok(codigoDemo, 'kyc/init debe devolver codigoDemo sin SMTP');
+  const v = await request(app).post('/kyc/verify-codes').set('Authorization', `Bearer ${token}`).send({ codigoCorreo: codigoDemo });
   assert.equal(v.status, 200);
   assert.equal(v.body.usuario.estado, 'VERIFICADO');
 
@@ -129,9 +130,11 @@ test('truekes: Verificado crea (máx 3 activos RF-14.4) y valida valoración 1�
   await inscribir(walletB, 'b@x.com');
   const tokA = sesionDe(walletA); // A ya es CERTIFICADO (test KYC) con 5 artículos
   const tokB = sesionDe(walletB);
-  // B → VERIFICADO
-  await request(app).post('/kyc/init').set('Authorization', `Bearer ${tokB}`);
-  await request(app).post('/kyc/verify-codes').set('Authorization', `Bearer ${tokB}`).send({ codigoCorreo: '1', codigoTelefono: '2' });
+  // B → VERIFICADO (con código de correo)
+  const initResp = await request(app).post('/kyc/init').set('Authorization', `Bearer ${tokB}`);
+  const codigoDemo = initResp.body.codigoDemo;
+  assert.ok(codigoDemo, 'kyc/init debe devolver codigoDemo sin SMTP');
+  await request(app).post('/kyc/verify-codes').set('Authorization', `Bearer ${tokB}`).send({ codigoCorreo: codigoDemo });
 
   // B publica su artículo; el artículo de A se toma de su catálogo existente.
   const artB = await request(app).post('/catalog/articulos').set('Authorization', `Bearer ${tokB}`).send({ titulo: 'Curso B', rubro: 'Educacion' });

@@ -32,8 +32,10 @@ async function inscribir(w) {
 async function certificar(w) {
   await inscribir(w);
   const tok = sesion(w);
-  await request(app).post('/kyc/init').set('Authorization', `Bearer ${tok}`);
-  await request(app).post('/kyc/verify-codes').set('Authorization', `Bearer ${tok}`).send({ codigoCorreo: '1', codigoTelefono: '2' });
+  const initResp = await request(app).post('/kyc/init').set('Authorization', `Bearer ${tok}`);
+  const codigoDemo = initResp.body.codigoDemo;
+  assert.ok(codigoDemo, 'kyc/init debe devolver codigoDemo sin SMTP');
+  await request(app).post('/kyc/verify-codes').set('Authorization', `Bearer ${tok}`).send({ codigoCorreo: codigoDemo });
   return tok;
 }
 

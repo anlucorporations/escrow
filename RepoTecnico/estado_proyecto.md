@@ -4,8 +4,8 @@
 |---|---|
 | Proyecto | **TrueKeate** (DApp Web3 de trueques con escrow) |
 | Archivo | `RepoTecnico/estado_proyecto.md` |
-| Fase actual | **ENTREGADO + DESPLEGADO en GCP** + control de acceso + navegación PC/móvil + Panel Owner + **6 pantallas de la suite integradas** |
-| Última actualización | Ciclos faltantes completados: Inventario, Intercambio, Perfil, Finanzas, Disputas y Gobernanza conectadas al backend real |
+| Fase actual | **ENTREGADO + DESPLEGADO en GCP** + login wallet único + escudo D28 + Verificar/Certificar |
+| Última actualización | Login único con la billetera; escudo de estado D28 en la barra; procesos Verificación (código correo) y Certificación (KYC) con UI |
 
 ---
 
@@ -57,6 +57,28 @@
   (firma de la cuenta 0 → 200 en los 5 endpoints; relayer OK wallet `0x7099…79C8`).
   `web/app/suite/admin/page.tsx` + `lib/api.ts` (iniciarSesion/admin*). Protección de URL por rol
   en `SuiteGuard` (un usuario sin permiso que escriba la URL ve "No tienes acceso").
+
+## ✅ Mejoras de UX reportadas al operar (login único, escudo D28, Verificar/Certificar)
+
+1. **Login único con la billetera**: al conectar se pide UNA firma EIP-191 que emite el token de
+   sesión global (persistido en `SesionProvider` + localStorage). Las 6 páginas dejan de pedir
+   autenticación propia (`useSesionAutenticada` ahora lee el token global). Sesiones persistidas en
+   PostgreSQL (tabla `sesiones`, 24 h) para Cloud Run multi-instancia. Componente
+   `BotonConectarLogin`.
+2. **Escudo de estado D28 en la barra** (`EscudoEstado` en TopBar): INSCRITO=escudo amarillo →
+   `/suite/verificacion` · VERIFICADO=verde → `/suite/certificacion` · CERTIFICADO=verde con brillo
+   dorado → `/suite/perfil`.
+3. **Verificación (etapa 1)**: `/kyc/init` genera código de 6 dígitos y lo envía al correo; sin
+   SMTP configurado devuelve `codigoDemo` (modo demo) — página `/suite/verificacion` funcional.
+4. **Certificación (etapa 2)**: `/kyc/submit` registra documento+selfie → PENDIENTE de revisión
+   Owner (RF-18.4) → CERTIFICADO — página `/suite/certificacion` funcional.
+5. **Propuesta de metodología** para el envío real por SMTP (Nodemailer, secretos, persistencia de
+   códigos) y el KYC automático con verificador externo:
+   `RepoTecnico/PROPUESTA_VERIFICACION_CERTIFICACION.md`.
+
+Verificación: backend **32/32** · E2E **43 passed** (6 nuevos de escalera D28 × proyectos) ·
+flujo verificación validado en vivo en GCP (register→login→kyc/init genera código→verify OK).
+Desplegado en Cloud Run (`backend:login-kyc`, `web:login-escudo`).
 
 ## ✅ Ciclos faltantes completados — 6 pantallas de la suite integradas
 

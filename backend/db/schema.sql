@@ -259,6 +259,16 @@ CREATE TABLE IF NOT EXISTS indexador_checkpoint (
     updated_at     TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Sesiones de usuario (login con la billetera — firma EIP-191). Persistidas para
+-- que el token sobreviva entre instancias de Cloud Run (RF-16, login único).
+CREATE TABLE IF NOT EXISTS sesiones (
+    token        TEXT PRIMARY KEY,
+    wallet       CHAR(42) NOT NULL REFERENCES usuarios(wallet),
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    expires_at   TIMESTAMPTZ NOT NULL DEFAULT (now() + interval '24 hours')
+);
+CREATE INDEX IF NOT EXISTS idx_sesiones_wallet ON sesiones(wallet);
+
 -- =============================================================================
 -- Índices y helpers
 -- =============================================================================

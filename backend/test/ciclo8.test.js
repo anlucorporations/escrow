@@ -53,8 +53,10 @@ async function sesion(w) {
 async function usuarioCertificado(w) {
   await request(app).post('/auth/register').send({ wallet: w, correo: `${w.slice(2, 8)}@x.com`, telefono: '+580000', consentimientoGdpr: true });
   const tok = await sesion(w);
-  await request(app).post('/kyc/init').set('Authorization', `Bearer ${tok}`);
-  await request(app).post('/kyc/verify-codes').set('Authorization', `Bearer ${tok}`).send({ codigoCorreo: '1', codigoTelefono: '2' });
+  const initResp = await request(app).post('/kyc/init').set('Authorization', `Bearer ${tok}`);
+  const codigoDemo = initResp.body.codigoDemo;
+  assert.ok(codigoDemo, 'kyc/init debe devolver codigoDemo sin SMTP');
+  await request(app).post('/kyc/verify-codes').set('Authorization', `Bearer ${tok}`).send({ codigoCorreo: codigoDemo });
   await request(app).post('/kyc/submit').set('Authorization', `Bearer ${tok}`).send({ documentoRef: 'd', selfieRef: 's' });
   await request(app).post('/kyc/review').set('Authorization', `Bearer ${tok}`).send({ wallet: w, aprobar: true });
   return tok;
@@ -89,8 +91,10 @@ const wPostor2 = ethers.Wallet.createRandom().address.toLowerCase();
 async function usuarioEmpresa(w) {
   await request(app).post('/auth/register').send({ wallet: w, correo: `${w.slice(2, 8)}@emp.com`, telefono: '+580000', consentimientoGdpr: true });
   const tok = await sesion(w);
-  await request(app).post('/kyc/init').set('Authorization', `Bearer ${tok}`);
-  await request(app).post('/kyc/verify-codes').set('Authorization', `Bearer ${tok}`).send({ codigoCorreo: '1', codigoTelefono: '2' });
+  const initResp = await request(app).post('/kyc/init').set('Authorization', `Bearer ${tok}`);
+  const codigoDemo = initResp.body.codigoDemo;
+  assert.ok(codigoDemo, 'kyc/init debe devolver codigoDemo sin SMTP');
+  await request(app).post('/kyc/verify-codes').set('Authorization', `Bearer ${tok}`).send({ codigoCorreo: codigoDemo });
   await request(app).post('/kyc/submit').set('Authorization', `Bearer ${tok}`).send({ documentoRef: 'd', selfieRef: 's' });
   await request(app).post('/kyc/review').set('Authorization', `Bearer ${tok}`).send({ wallet: w, aprobar: true });
   // clasificar como EMPRESA (tipo)

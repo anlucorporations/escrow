@@ -13,6 +13,8 @@ export interface UsuarioPublico {
   tipo: "PARTICULAR" | "EMPRESA" | "SOCIO";
   nivel: "INICIADO" | "COMUN" | "FRECUENTE" | "SOCIO";
   estado: "INSCRITO" | "VERIFICADO" | "CERTIFICADO";
+  /** Correo registrado (visible solo en consultas propias). */
+  correo?: string | null;
 }
 
 export interface EstadoInscripcion {
@@ -306,4 +308,42 @@ export function publicarArticulo(
 /** POST /catalog/:id/despublicar — marca un artículo propio como no disponible. */
 export function despublicarArticulo(token: string, id: number): Promise<{ ok: boolean; articulo?: ArticuloCatalogo }> {
   return pedirAuth<{ ok: boolean }>(`/catalog/${id}/despublicar`, token, { metodo: "POST", body: {} });
+}
+
+// =============================================================================
+// KYC / escalera D28 (verificación con código de correo y certificación)
+// =============================================================================
+
+export interface KycInitResult {
+  kyc: { wallet?: string; estado?: string; etapa?: number } | null;
+  aviso: string;
+  codigoDemo?: string; // solo sin SMTP configurado (modo demo/desarrollo)
+}
+
+export interface KycStatusResult {
+  estado: "INSCRITO" | "VERIFICADO" | "CERTIFICADO" | null;
+  kyc: { wallet?: string; estado?: string; etapa?: number; revisadoPor?: string } | null;
+}
+
+/** POST /kyc/init — inicia la verificación: genera y envía el código al correo. */
+export function iniciarVerificacion(token: string): Promise<KycInitResult> {
+  return pedirAuth<KycInitResult>("/kyc/init", token, { metodo: "POST", body: {} });
+}
+
+/** POST /kyc/verify-codes — valida el código del correo → VERIFICADO. */
+export function verificarCodigo(token: string, codigoCorreo: string): Promise<{ usuario: UsuarioPublico; kyc: unknown }> {
+  return pedirAuth<{ usuario: UsuarioPublico; kyc: unknown }>("/kyc/verify-codes", token, {
+    metodo: "POST",
+    body: { codigoCorreo },
+  });
+}
+
+/** GET /kyc/status — estado de la escalera D28. */
+export function estadoKyc(token: string): Promise<KycStatusResult> {
+  return pedirAuth<KycStatusResult>("/kyc/status", token);
+}
+
+/** POST /kyc/submit — envía documento + selfie → PENDIENTE (revisión Owner). */
+export function enviarKyc(token: string, datos: { documentoRef: string; selfieRef: string }): Promise<{ kyc: unknown; aviso: string }> {
+  return pedirAuth<{ kyc: unknown; aviso: string }>("/kyc/submit", token, { metodo: "POST", body: datos });
 }

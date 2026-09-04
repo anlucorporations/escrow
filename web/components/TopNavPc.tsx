@@ -11,10 +11,11 @@ import { useEthereum } from "@/lib/ethereum";
 import { useSesion } from "@/lib/sesion";
 import { seccionesPara } from "@/lib/navegacion";
 import { Button } from "@/components/Button";
+import { BotonConectarLogin } from "@/components/BotonConectarLogin";
 
 export function TopNavPc() {
   const pathname = usePathname() ?? "";
-  const { conectado, account, conectar, conectando } = useEthereum();
+  const { conectado, account } = useEthereum();
   const { acceso } = useSesion();
 
   const inscrito = acceso.fase === "inscrito" ? acceso.usuario : null;
@@ -36,11 +37,9 @@ export function TopNavPc() {
         {!conectado ? (
           <>
             <p className="mr-auto text-sm text-navy-800/60">
-              Conecta tu billetera para acceder a tus secciones.
+              Conecta tu billetera e inicia sesión (una firma) para acceder a tus secciones.
             </p>
-            <Button onClick={() => void conectar()} disabled={conectando} className="!px-3 !py-1.5 !text-xs">
-              {conectando ? "Conectando…" : "Conectar MetaMask"}
-            </Button>
+            <BotonConectarLogin className="!px-3 !py-1.5 !text-xs" />
           </>
         ) : noInscrito ? (
           <>

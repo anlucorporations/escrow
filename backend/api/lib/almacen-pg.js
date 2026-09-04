@@ -343,11 +343,25 @@ export async function crearAlmacenPg(pool) {
       }));
     },
 
-    // ------------------------------------------------------------ sesiones (memoria)
+    // ------------------------------------------------------------ sesiones (persistidas)
+    async guardarSesion(token, wallet) {
+      await pool.query(
+        `INSERT INTO sesiones (token, wallet, expires_at)
+         VALUES ($1, $2, now() + interval '24 hours')
+         ON CONFLICT (token) DO UPDATE SET expires_at = now() + interval '24 hours'`,
+        [token, NORMALIZA_WALLET(wallet)]
+      );
+    },
+    async getSesion(token) {
+      const r = await pool.query(
+        `SELECT wallet FROM sesiones WHERE token = $1 AND expires_at > now()`,
+        [token]
+      );
+      if (r.rowCount === 0) return null;
+      return { wallet: r.rows[0].wallet.trim().toLowerCase(), token };
+    },
     crearEncargo: base.crearEncargo,
     listarEncargos: base.listarEncargos,
-    guardarSesion: base.guardarSesion,
-    getSesion: base.getSesion,
   };
 }
 

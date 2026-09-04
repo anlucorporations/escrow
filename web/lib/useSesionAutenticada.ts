@@ -1,51 +1,30 @@
 "use client";
 
 // =============================================================================
-// TrueKeate — Hook de sesión autenticada (firma EIP-191 → token Bearer)
-// Comparte la lógica de autenticación del panel Owner (RF-16 + /auth/session)
-// para que todas las páginas de la suite que necesitan el backend autenticado
-// (truekes, finanzas, disputas, gobernanza…) usen el mismo mecanismo.
+// TrueKeate — Hook de sesión autenticada (login ÚNICO con la billetera)
+// Ya NO firma por página: lee el token global del SesionProvider (emitido al
+// conectar la wallet, decisión del director). Las páginas de la suite que
+// necesitan el backend autenticado usan token/autenticar de la sesión global.
 // =============================================================================
-import { useCallback, useEffect, useState } from "react";
-import { useEthereum } from "@/lib/ethereum";
-import { iniciarSesion } from "@/lib/api";
+import { useSesion } from "@/lib/sesion";
 
 export interface SesionAutenticada {
   token: string | null;
+  /** Dispara el login único (firma EIP-191) si aún no hay token. */
   autenticar: () => Promise<void>;
-  cargando: boolean;   // firmando o pidiendo
+  cargando: boolean;
   error: string | null;
 }
 
 export function useSesionAutenticada(): SesionAutenticada {
-  const { account, signer, conectado } = useEthereum();
-  const [token, setToken] = useState<string | null>(null);
-  const [cargando, setCargando] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { token, autenticar, autenticando } = useSesion();
 
-  const autenticar = useCallback(async () => {
-    if (!signer) {
-      setError("Desbloquea tu billetera para firmar (RF-16).");
-      return;
-    }
-    setCargando(true);
-    setError(null);
-    try {
-      const firma = await signer.signMessage("TrueKeate: iniciar sesión");
-      const sesion = await iniciarSesion(firma);
-      setToken(sesion.token);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "fallo de autenticación");
-    } finally {
-      setCargando(false);
-    }
-  }, [signer]);
-
-  // Al cambiar de cuenta se invalida el token anterior.
-  useEffect(() => {
-    setToken(null);
-    setError(null);
-  }, [account]);
-
-  return { token, autenticar, cargando, error };
+  return {
+    token,
+    autenticar: async () => {
+      await autenticar();
+    },
+    cargando: autenticando,
+    error: null,
+  };
 }

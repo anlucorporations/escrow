@@ -16,6 +16,7 @@ import { useEthereum } from "@/lib/ethereum";
 import { useSesion } from "@/lib/sesion";
 import { seccionesPara } from "@/lib/navegacion";
 import { Button } from "@/components/Button";
+import { BotonConectarLogin } from "@/components/BotonConectarLogin";
 
 const RUTA_CATALOGO = "/suite/mercado";
 const RUTA_INSCRIPCION = "/suite/inscripcion";
@@ -24,7 +25,6 @@ const RUTA_INSCRIPCION = "/suite/inscripcion";
 const RUTAS_SIN_INSCRIPCION = [RUTA_CATALOGO, RUTA_INSCRIPCION];
 
 function PantallaConectar() {
-  const { conectar, conectando } = useEthereum();
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-4 py-16 text-center">
       <div className="rounded-card border border-navy-800/10 bg-white p-8 shadow-md">
@@ -34,13 +34,11 @@ function PantallaConectar() {
         </h1>
         <p className="mx-auto mt-2 max-w-md text-sm text-navy-800/60">
           El área de la suite es privada. Conecta tu billetera (MetaMask) para
-          verificar tu inscripción. El público en general solo tiene acceso a la
-          página de inicio.
+          iniciar sesión con tu cuenta (una sola firma). El público en general
+          solo tiene acceso a la página de inicio.
         </p>
         <div className="mt-6 flex justify-center">
-          <Button onClick={() => void conectar()} disabled={conectando}>
-            {conectando ? "Conectando…" : "Conectar MetaMask"}
-          </Button>
+          <BotonConectarLogin />
         </div>
         <p className="mt-4 text-xs text-navy-800/40">
           <Link href="/" className="underline hover:text-teal-500">
@@ -119,9 +117,12 @@ export function SuiteGuard({ children }: { children: ReactNode }) {
       nivel: acceso.usuario.nivel,
       estado: acceso.usuario.estado,
     });
-    const coincide = permitidas.some(
-      (s) => pathname === s.href || pathname.startsWith(`${s.href}/`)
-    );
+    // Rutas de proceso de la escalera D28 (Verificación/Certificación): accesibles
+    // para cualquier usuario inscrito (el contenido valida el estado y redirige).
+    const RUTAS_PROCESO = ["/suite/verificacion", "/suite/certificacion"];
+    const coincide =
+      RUTAS_PROCESO.some((r) => pathname.startsWith(r)) ||
+      permitidas.some((s) => pathname === s.href || pathname.startsWith(`${s.href}/`));
     if (!coincide) return <PantallaSinPermiso />;
     return <>{children}</>;
   }
