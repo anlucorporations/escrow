@@ -41,7 +41,7 @@ export function TopBar() {
   const inscrito = acceso.fase === "inscrito" ? acceso.usuario : null;
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between bg-navy-900 px-4 py-2 text-white shadow">
+    <header className="flex items-center justify-between bg-navy-900 px-4 py-2 text-white shadow">
       <Link href="/suite/dashboard" className="flex items-center gap-2" aria-label="Inicio de la suite">
         <span className="text-xl">⇄</span>
         <span className="font-display font-bold">TrueKeat☑</span>

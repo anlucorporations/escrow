@@ -4,8 +4,8 @@
 |---|---|
 | Proyecto | **TrueKeate** (DApp Web3 de trueques con escrow) |
 | Archivo | `RepoTecnico/estado_proyecto.md` |
-| Fase actual | **ENTREGADO + DESPLEGADO en GCP** + control de acceso por estados |
-| Última actualización | Control de acceso implementado y desplegado: suite exige wallet; no inscrito → solo catálogo; inscripción formal con botón en menú de usuario |
+| Fase actual | **ENTREGADO + DESPLEGADO en GCP** + control de acceso + propuesta navegación PC/móvil |
+| Última actualización | Propuesta navegación PC/móvil aprobada (Opción B) e implementada: TopNavPc ≥lg + BottomNav por rol |
 
 ---
 
@@ -40,6 +40,15 @@
 - [x] **Auditoría de coherencia (6 lentes C1–C6)** — sincronía entre documentos verificada y
   correcciones aplicadas (cabeceras, CU-04/18/23/24/31, diccionario, estados del escrow,
   nomenclatura unificada, informes marcados históricos).
+
+- [x] **Propuesta navegación PC/móvil** — `PROPUESTA_NAVEGACION_PC_MOVIL.md`: evaluación de dos suites
+  separadas vs una suite con doble presentación. **Decisión del director: Opción B** (una sola suite;
+  PC ≥lg con barra superior de secciones por Tipo de Usuario + móvil con BottomNav inferior filtrada
+  por rol). Implementación: `lib/navegacion.ts` (matriz única RF-14/D14/D28), `TopNavPc.tsx`,
+  `BottomNav` dinámica con "Más", layout `lg:`/`hidden`, placeholders `/suite/admin`, `/suite/finanzas`,
+  `/suite/disputas`. **Desplegado en GCP** (web `nav-pc-movil`) y **verificado en vivo**: PC 1366px →
+  barra superior por rol + bottom oculta; móvil 393px → bottom con central hexagonal + barra PC oculta.
+  Tests E2E: **21/21** (3 skipped por plataforma).
 
 ## ✅ Control de acceso por estados (decisión del director, post-entrega)
 

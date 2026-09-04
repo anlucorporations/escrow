@@ -10,11 +10,22 @@ import { test, expect, type Page } from "@playwright/test";
 
 const CUENTA = "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266";
 
+interface UsuarioSim {
+  tipo: "PARTICULAR" | "EMPRESA" | "SOCIO";
+  nivel: "INICIADO" | "COMUN" | "FRECUENTE" | "SOCIO";
+  estado: "INSCRITO" | "VERIFICADO" | "CERTIFICADO";
+}
+
 /** Inyecta una wallet simulada (MetaMask mock) y el estado de inscripción. */
-async function simularWallet(page: Page, inscrito: boolean, estado = "INSCRITO") {
+async function simularWallet(
+  page: Page,
+  inscrito: boolean,
+  usuario: UsuarioSim = { tipo: "PARTICULAR", nivel: "INICIADO", estado: "INSCRITO" }
+) {
   await page.addInitScript(
-    ([cuenta, est, estadoInicial]) => {
+    ([cuenta, est, usr]) => {
       let estaInscrito = Boolean(est);
+      const usuarioSim = usr as unknown as UsuarioSim;
 
       // Wallet simulada (RF-16): expone eth_requestAccounts / accountsChanged.
       (window as unknown as Record<string, unknown>).ethereum = {
@@ -40,12 +51,7 @@ async function simularWallet(page: Page, inscrito: boolean, estado = "INSCRITO")
               estaInscrito
                 ? {
                     inscrito: true,
-                    usuario: {
-                      wallet: cuenta,
-                      tipo: "PARTICULAR",
-                      nivel: "INICIADO",
-                      estado: estadoInicial ?? "INSCRITO",
-                    },
+                    usuario: { wallet: cuenta, ...usuarioSim },
                   }
                 : { inscrito: false, usuario: null }
             ),
@@ -57,7 +63,7 @@ async function simularWallet(page: Page, inscrito: boolean, estado = "INSCRITO")
           return new Response(
             JSON.stringify({
               inscrito: true,
-              usuario: { wallet: cuenta, tipo: "PARTICULAR", nivel: "INICIADO", estado: "INSCRITO" },
+              usuario: { wallet: cuenta, ...usuarioSim },
             }),
             { status: 200, headers: { "Content-Type": "application/json" } }
           );
@@ -76,7 +82,7 @@ async function simularWallet(page: Page, inscrito: boolean, estado = "INSCRITO")
         return origFetch(input, init);
       };
     },
-    [CUENTA, inscrito ? estado : null, estado] as unknown as string[]
+    [CUENTA, inscrito ? true : null, usuario] as unknown as string[]
   );
 }
 
@@ -84,7 +90,8 @@ test.describe("Suite de usuario — control de acceso", () => {
   test("sin billetera: el público NO accede a la suite (solo landing)", async ({ page }) => {
     await page.goto("/suite/dashboard");
     await expect(page.getByText("Conecta tu billetera para continuar")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Conectar MetaMask" })).toBeVisible();
+    // Puede haber un botón en la barra PC y otro en el guard; basta con que exista uno.
+    await expect(page.getByRole("button", { name: "Conectar MetaMask" }).first()).toBeVisible();
     // El contenido privado NO se muestra
     await expect(page.getByRole("heading", { name: "Mi Trueke Central" })).toHaveCount(0);
   });
@@ -103,7 +110,7 @@ test.describe("Suite de usuario — control de acceso", () => {
   });
 
   test("wallet inscrita (INSCRITO): ve el dashboard con la escalera D28", async ({ page }) => {
-    await simularWallet(page, true, "INSCRITO");
+    await simularWallet(page, true, { tipo: "PARTICULAR", nivel: "INICIADO", estado: "INSCRITO" });
     await page.goto("/suite/dashboard");
     await expect(page.getByRole("heading", { name: "Mi Trueke Central" })).toBeVisible();
 
@@ -138,11 +145,43 @@ test.describe("Suite de usuario — control de acceso", () => {
     await expect(page.getByRole("heading", { name: "Mi Trueke Central" })).toBeVisible();
   });
 
-  test("la navegación inferior móvil tiene el botón central hexagonal", async ({ page }) => {
+  test("móvil: la navegación inferior tiene el botón central hexagonal", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "mobile-chrome", "solo móvil (RNF-08.4)");
+    // Wallet inscrita para que la BottomNav muestre las secciones completas.
+    await simularWallet(page, true, { tipo: "PARTICULAR", nivel: "INICIADO", estado: "VERIFICADO" });
     await page.goto("/suite/mercado");
     const central = page.getByRole("link", { name: "Trueke" });
     await expect(central).toBeVisible();
     await expect(page.getByRole("link", { name: "Mercado" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Perfil" })).toBeVisible();
+    // En móvil la barra superior de secciones PC no se muestra.
+    await expect(page.getByRole("navigation", { name: "Secciones de la suite" })).toBeHidden();
+  });
+
+  test("PC: la barra superior de secciones se muestra según el rol (RF-14)", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "solo escritorio");
+    await simularWallet(page, true, { tipo: "PARTICULAR", nivel: "INICIADO", estado: "VERIFICADO" });
+    await page.goto("/suite/dashboard");
+    // Barra superior PC con las secciones permitidas para Verificado
+    await expect(page.getByRole("navigation", { name: "Secciones de la suite" })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Mi Trueke Central/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Intercambio/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Inventario/ })).toBeVisible();
+    // La BottomNav móvil NO se muestra en escritorio
+    await expect(page.locator("nav[aria-label='Navegación principal']")).toBeHidden();
+  });
+
+  test("PC: el menú filtra secciones según el tipo de usuario (Socio ve gobernanza)", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "solo escritorio");
+    await simularWallet(page, true, { tipo: "SOCIO", nivel: "SOCIO", estado: "CERTIFICADO" });
+    await page.goto("/suite/dashboard");
+    const nav = page.getByRole("navigation", { name: "Secciones de la suite" });
+    // Un Particular Certificado NO vería estas secciones; el Socio sí:
+    await expect(nav.getByRole("link", { name: /Socios/ })).toBeVisible(); // /suite/gobernanza
+    await expect(nav.getByRole("link", { name: /Disputas/ })).toBeVisible();
+    await expect(nav.getByRole("link", { name: /Finanzas/ })).toBeVisible();
+    await expect(nav.getByRole("link", { name: /Admin/ })).toBeVisible();
+    // La sección central del bottom (móvil) NO aparece en la barra superior PC.
+    await expect(page.locator("nav[aria-label='Navegación principal']")).toBeHidden();
   });
 });
