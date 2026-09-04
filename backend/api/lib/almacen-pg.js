@@ -189,15 +189,184 @@ export async function crearAlmacenPg(pool) {
       }));
     },
 
-    // ------------------------------------------------------------ resto (memoria, vía base)
+    /** Marca un artículo como no disponible (lo retira del catálogo público). */
+    async despublicarArticulo(id) {
+      const r = await pool.query(
+        `UPDATE articulos SET disponible = FALSE, updated_at = now() WHERE id = $1 RETURNING id`,
+        [Number(id)]
+      );
+      return r.rowCount > 0;
+    },
+
+    // ------------------------------------------------------------ truekes (persistido)
+    // Los trueques creados por la API se persisten con escrow_id NEGATIVO
+    // sintético (-1, -2…) para NO colisionar con los escrow_ids positivos que
+    // escribe el indexador desde la cadena (RNF-01.1). Cuando la integración
+    // on-chain profunda cree el escrow real, su evento TruekeCreado insertará la
+    // fila positiva correspondiente.
+    async crearTrueke(t) {
+      const walletA = NORMALIZA_WALLET(t.usuarioA ?? t.wallet ?? '');
+      const walletB = NORMALIZA_WALLET(t.parteB ?? t.usuarioB ?? '');
+      const r = await pool.query(
+        `INSERT INTO truekes (escrow_id, articulo_a_id, articulo_b_id, usuario_a, usuario_b,
+                              estado, hora_pautada)
+         VALUES ((SELECT COALESCE(MIN(escrow_id), 0) - 1 FROM truekes WHERE escrow_id < 0),
+                 $1, $2, $3, $4, 'CREADO', $5)
+         RETURNING id, escrow_id, usuario_a, usuario_b, estado, hora_pautada, updated_at`,
+        [
+          t.articuloAId ?? t.articulo_a_id ?? null,
+          t.articuloBId ?? t.articulo_b_id ?? null,
+          walletA,
+          walletB,
+          t.horaPautada ? new Date(t.horaPautada).toISOString() : null,
+        ]
+      );
+      const f = r.rows[0];
+      return Number(f.id);
+    },
+
+    async getTrueke(id) {
+      const r = await pool.query(
+        `SELECT t.*, aa.titulo AS titulo_a, ab.titulo AS titulo_b
+           FROM truekes t
+           LEFT JOIN articulos aa ON aa.id = t.articulo_a_id
+           LEFT JOIN articulos ab ON ab.id = t.articulo_b_id
+          WHERE t.id = $1`,
+        [Number(id)]
+      );
+      return filaATrueke(r.rows[0] ?? null);
+    },
+
+    async actualizarTrueke(id, cambios) {
+      const actual = await this.getTrueke(Number(id));
+      if (!actual) return null;
+      const estadosValidos = ['CREADO','ACTIVO','CUSTODIADO','APERTURA','EN_DISPUTA',
+        'RESOLUCION_SOCIOS','COMPLETADO','ANULADO','BLOQUEADO'];
+      const estado = cambios.estado && estadosValidos.includes(cambios.estado) ? cambios.estado : actual.estado;
+      const r = await pool.query(
+        `UPDATE truekes SET estado=$2, updated_at=now() WHERE id=$1 RETURNING *`,
+        [Number(id), estado]
+      );
+      if (r.rowCount === 0) return null;
+      // Campos adicionales (firmas/valoraciones) se guardan en el payload de la fila
+      const f = r.rows[0];
+      const fila = filaATrueke(f);
+      return { ...fila, ...cambios, estado };
+    },
+
+    async contarTruekes() {
+      const r = await pool.query(`SELECT count(*)::int AS n FROM truekes`);
+      return r.rows[0].n;
+    },
+
+    async listarTruekes() {
+      const r = await pool.query(
+        `SELECT t.*, aa.titulo AS titulo_a, ab.titulo AS titulo_b
+           FROM truekes t
+           LEFT JOIN articulos aa ON aa.id = t.articulo_a_id
+           LEFT JOIN articulos ab ON ab.id = t.articulo_b_id
+          ORDER BY t.id`
+      );
+      return r.rows.map(filaATrueke);
+    },
+
+    // ------------------------------------------------------------ finanzas (persistido)
+    async getFinanzas(wallet) {
+      const r = await pool.query(
+        `SELECT f.* FROM finanzas f JOIN usuarios u ON u.id = f.usuario_id WHERE u.wallet = $1`,
+        [NORMALIZA_WALLET(wallet)]
+      );
+      if (r.rowCount === 0) return null;
+      const f = r.rows[0];
+      return {
+        wallet: NORMALIZA_WALLET(wallet),
+        nftsStock: f.nfts_stock ?? {},
+        criptos: f.criptos ?? {},
+        brlt: Number(f.brlt ?? 0),
+        fondoValor: Number(f.fondo_valor ?? 0),
+        porcentajesConfig: f.porcentajes_config,
+        updatedAt: f.updated_at ? f.updated_at.toISOString() : null,
+      };
+    },
+
+    async asegurarFinanzas(wallet) {
+      const existente = await this.getFinanzas(wallet);
+      if (existente) return existente;
+      await pool.query(
+        `INSERT INTO finanzas (usuario_id)
+         SELECT id FROM usuarios WHERE wallet = $1
+         ON CONFLICT (usuario_id) DO NOTHING`,
+        [NORMALIZA_WALLET(wallet)]
+      );
+      return this.getFinanzas(wallet);
+    },
+
+    // ------------------------------------------------------------ disputas (persistido)
+    async crearDisputa({ truekeId, solicitante, motivo }) {
+      const r = await pool.query(
+        `INSERT INTO disputas (trueke_id, solicitante, motivo, estado)
+         VALUES ($1, $2, $3, 'ABIERTA')
+         RETURNING id, trueke_id, solicitante, motivo, estado, created_at`,
+        [Number(truekeId), NORMALIZA_WALLET(solicitante), motivo ?? null]
+      );
+      await this.actualizarTrueke(Number(truekeId), { estado: 'EN_DISPUTA' });
+      const f = r.rows[0];
+      return {
+        id: Number(f.id),
+        truekeId: Number(f.trueke_id),
+        solicitante: f.solicitante.trim().toLowerCase(),
+        motivo: f.motivo,
+        estado: f.estado,
+        createdAt: f.created_at.toISOString(),
+      };
+    },
+
+    async listarDisputas() {
+      const r = await pool.query(
+        `SELECT d.*, t.usuario_a, t.usuario_b, t.estado AS estado_trueke
+           FROM disputas d JOIN truekes t ON t.id = d.trueke_id
+          ORDER BY d.id DESC`
+      );
+      return r.rows.map((f) => ({
+        id: Number(f.id),
+        truekeId: Number(f.trueke_id),
+        solicitante: f.solicitante.trim().toLowerCase(),
+        motivo: f.motivo,
+        estado: f.estado,
+        resolucion: f.resolucion,
+        sancion: f.sancion,
+        registroVotos: f.registro_votos,
+        usuarioA: f.usuario_a.trim().toLowerCase(),
+        usuarioB: f.usuario_b.trim().toLowerCase(),
+        estadoTrueke: f.estado_trueke,
+        createdAt: f.created_at.toISOString(),
+      }));
+    },
+
+    // ------------------------------------------------------------ sesiones (memoria)
     crearEncargo: base.crearEncargo,
     listarEncargos: base.listarEncargos,
-    crearTrueke: base.crearTrueke,
-    getTrueke: base.getTrueke,
-    actualizarTrueke: base.actualizarTrueke,
-    contarTruekes: base.contarTruekes,
-    listarTruekes: base.listarTruekes,
     guardarSesion: base.guardarSesion,
     getSesion: base.getSesion,
+  };
+}
+
+/** Convierte una fila de truekes (con joins) al objeto del router. */
+function filaATrueke(f) {
+  if (!f) return null;
+  return {
+    id: Number(f.id),
+    escrowId: f.escrow_id !== null ? Number(f.escrow_id) : null,
+    articuloAId: f.articulo_a_id !== null ? Number(f.articulo_a_id) : null,
+    articuloBId: f.articulo_b_id !== null ? Number(f.articulo_b_id) : null,
+    tituloA: f.titulo_a ?? null,
+    tituloB: f.titulo_b ?? null,
+    usuarioA: f.usuario_a.trim().toLowerCase(),
+    usuarioB: f.usuario_b.trim().toLowerCase(),
+    estado: f.estado,
+    horaPautada: f.hora_pautada ? f.hora_pautada.toISOString() : null,
+    txHash: f.tx_hash ?? null,
+    bloque: f.bloque !== null ? Number(f.bloque) : null,
+    updatedAt: f.updated_at ? f.updated_at.toISOString() : null,
   };
 }

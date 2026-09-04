@@ -127,25 +127,43 @@ test('catalog: solo Verificado/Certificado publica; límite por nivel (D14/RF-04
 
 test('truekes: Verificado crea (máx 3 activos RF-14.4) y valida valoración 1–5 (D18)', async () => {
   await inscribir(walletB, 'b@x.com');
-  const tokA = sesionDe(walletA);
+  const tokA = sesionDe(walletA); // A ya es CERTIFICADO (test KYC) con 5 artículos
   const tokB = sesionDe(walletB);
   // B → VERIFICADO
   await request(app).post('/kyc/init').set('Authorization', `Bearer ${tokB}`);
   await request(app).post('/kyc/verify-codes').set('Authorization', `Bearer ${tokB}`).send({ codigoCorreo: '1', codigoTelefono: '2' });
 
-  const c = await request(app).post('/truekes').set('Authorization', `Bearer ${tokA}`).send({ parteB: wB, activoA: { token: '0x1', cantidad: 100 }, activoB: { token: '0x2', cantidad: 50 }, horaPautada: 9999999999 });
-  assert.equal(c.status, 201);
+  // B publica su artículo; el artículo de A se toma de su catálogo existente.
+  const artB = await request(app).post('/catalog/articulos').set('Authorization', `Bearer ${tokB}`).send({ titulo: 'Curso B', rubro: 'Educacion' });
+  assert.equal(artB.status, 201, JSON.stringify(artB.body));
+  const catalogo = await request(app).get('/catalog');
+  const artDeA = catalogo.body.articulos.find((a) => a.wallet === wA);
+  assert.ok(artDeA, 'A debe tener un artículo en el catálogo (tests previos)');
 
-  // custodiar lado A
-  const cu = await request(app).post(`/truekes/${c.body.trueke.id}/custodiar`).set('Authorization', `Bearer ${tokA}`).send({ lado: 'A' });
+  // B (Verificado) crea el trueque ofreciendo su artículo por uno de A
+  const c = await request(app).post('/truekes').set('Authorization', `Bearer ${tokB}`).send({
+    parteB: wA,
+    articuloAId: artB.body.articulo.id,
+    articuloBId: artDeA.id,
+    horaPautada: '2030-01-01T12:00:00Z',
+  });
+  assert.equal(c.status, 201, JSON.stringify(c.body));
+
+  // GET /truekes — mis trueques (B los ve)
+  const mios = await request(app).get('/truekes').set('Authorization', `Bearer ${tokB}`);
+  assert.equal(mios.status, 200);
+  assert.ok(mios.body.truekes.some((t) => t.id === c.body.trueke.id));
+
+  // custodiar lado A (el creador B custodia su lado A)
+  const cu = await request(app).post(`/truekes/${c.body.trueke.id}/custodiar`).set('Authorization', `Bearer ${tokB}`).send({ lado: 'A' });
   assert.equal(cu.status, 200);
   assert.equal(cu.body.trueke.estado, 'CUSTODIADO');
 
   // valoración fuera de rango
-  const bad = await request(app).post(`/truekes/${c.body.trueke.id}/valoracion`).set('Authorization', `Bearer ${tokA}`).send({ valorado: wB, aceptacion: 6, honestidad: 5, seguridad: 5, confiabilidad: 5, compromiso: 5 });
+  const bad = await request(app).post(`/truekes/${c.body.trueke.id}/valoracion`).set('Authorization', `Bearer ${tokB}`).send({ valorado: wA, aceptacion: 6, honestidad: 5, seguridad: 5, confiabilidad: 5, compromiso: 5 });
   assert.equal(bad.status, 400);
 
-  const val = await request(app).post(`/truekes/${c.body.trueke.id}/valoracion`).set('Authorization', `Bearer ${tokA}`).send({ valorado: wB, aceptacion: 5, honestidad: 4, seguridad: 5, confiabilidad: 5, compromiso: 5 });
+  const val = await request(app).post(`/truekes/${c.body.trueke.id}/valoracion`).set('Authorization', `Bearer ${tokB}`).send({ valorado: wA, aceptacion: 5, honestidad: 4, seguridad: 5, confiabilidad: 5, compromiso: 5 });
   assert.equal(val.status, 200);
 });
 

@@ -4,8 +4,8 @@
 |---|---|
 | Proyecto | **TrueKeate** (DApp Web3 de trueques con escrow) |
 | Archivo | `RepoTecnico/estado_proyecto.md` |
-| Fase actual | **ENTREGADO + DESPLEGADO en GCP** + control de acceso + navegación PC/móvil + Panel Owner real |
-| Última actualización | Panel del Owner (/suite/admin) implementado con datos reales del backend (firma EIP-191 → token → endpoints RF-13.1) |
+| Fase actual | **ENTREGADO + DESPLEGADO en GCP** + control de acceso + navegación PC/móvil + Panel Owner + **6 pantallas de la suite integradas** |
+| Última actualización | Ciclos faltantes completados: Inventario, Intercambio, Perfil, Finanzas, Disputas y Gobernanza conectadas al backend real |
 
 ---
 
@@ -57,6 +57,29 @@
   (firma de la cuenta 0 → 200 en los 5 endpoints; relayer OK wallet `0x7099…79C8`).
   `web/app/suite/admin/page.tsx` + `lib/api.ts` (iniciarSesion/admin*). Protección de URL por rol
   en `SuiteGuard` (un usuario sin permiso que escriba la URL ve "No tienes acceso").
+
+## ✅ Ciclos faltantes completados — 6 pantallas de la suite integradas
+
+Las pantallas que quedaron como placeholder ("se completa en el Ciclo 8") se integraron con el
+backend real (orden del director, 2026-09-04):
+
+| Pantalla | Funcionalidad | Backend |
+|---|---|---|
+| **Inventario** `/suite/inventario` | Publica artículos AtoA (Verificado/Certificado), lista los propios, retira del mercado | `POST /catalog/articulos`, `POST /catalog/:id/despublicar` (nuevo) |
+| **Intercambio** `/suite/intercambio` | Crea trueques (artículo A ⇄ B de otro), lista mis trueques, custodiar, firmar, valorar 1–5 | `GET/POST /truekes`, `custodiar`, `firma-recepcion`, `valoracion` |
+| **Perfil** `/suite/perfil` | Identidad (wallet, tipo, estado D28, escalera) + reputación D12/D30 | `GET /reputacion/mi` |
+| **Finanzas** `/suite/finanzas` | Saldos NFTs/criptos; BRLT y fondo SOLO Socio/Owner (D5/RF-14.7) | `GET /finanzas/mi` (nuevo) |
+| **Disputas** `/suite/disputas` | Disputas donde soy parte; solicitar anulación (D13) → EN_DISPUTA | `GET/POST /disputas` (nuevo) |
+| **Gobernanza** `/suite/gobernanza` | Padrón y propuestas del SociosRegistry on-chain; Socio vota (D21) | `GET /gobernanza/socios|propuestas`, `POST /gobernanza/votar` (nuevo) |
+
+**Backend**: almacén híbrido `almacen-pg.js` persiste truekes (escrow_id sintético negativo para no
+colisionar con on-chain, RNF-01.1), finanzas y disputas en PostgreSQL; routers nuevos
+`finanzas.js`, `disputas.js`, `gobernanza.js` (ABI del registry corregido al struct real de 11
+campos). Sesión autenticada compartida por firma EIP-191 (`useSesionAutenticada`). Protección de URL
+por rol en `SuiteGuard`.
+
+**Verificación**: backend **32/32** (5 archivos de tests) · E2E **37 passed** (12 nuevos de pantallas
+× 2 proyectos) · build OK. Desplegado en Cloud Run.
 
 ## ✅ Control de acceso por estados (decisión del director, post-entrega)
 

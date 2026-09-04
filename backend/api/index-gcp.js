@@ -55,6 +55,11 @@ async function main() {
   // ---- Red on-chain (anvil/GCP) ---------------------------------------------
   const rpc = process.env.RPC_URL || 'http://127.0.0.1:8545';
   const provider = new ethers.JsonRpcProvider(rpc);
+  deps.proveedor = provider; // siempre disponible (lo usan gobernanza/truekes)
+  deps.registryAddress =
+    process.env.REGISTRY_ADDRESS ||
+    contratos.SociosRegistry?.direccion ||
+    null;
 
   // ---- Relayer EIP-712 (RF-09.2, RF-15.2) -----------------------------------
   const pkRelayer = process.env.RELAYER_PRIVATE_KEY;
@@ -71,7 +76,6 @@ async function main() {
       smartAccountFactory: factoryDir,
       abiSmartAccount: abiSA,
     });
-    deps.proveedor = provider;
     deps.contratoEscrow = contratos.Escrow?.direccion;
     deps.escrowAbi = contratos.Escrow?.abi;
     deps.walletEmpresas = wallet; // cuenta de la plataforma para empresas (R1)

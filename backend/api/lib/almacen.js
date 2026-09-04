@@ -11,6 +11,8 @@ export function crearAlmacen() {
     articulos: new Map(),    // id -> articulo
     encargos: new Map(),     // id -> encargo
     truekes: new Map(),      // id -> trueke
+    finanzas: new Map(),     // id(usuario) -> finanzas
+    disputas: new Map(),     // id -> disputa
     sesiones: new Map(),     // token -> {wallet}
   };
   let proxArticulo = 1;
@@ -69,16 +71,85 @@ export function crearAlmacen() {
     listarArticulos() {
       return [...estado.articulos.values()];
     },
+    /** Marca un artículo como no disponible (lo retira del catálogo público). */
+    despublicarArticulo(id) {
+      const a = estado.articulos.get(Number(id));
+      if (!a) return null;
+      a.disponible = false;
+      return a;
+    },
     crearEncargo(e) {
       const id = proxEncargo++;
       estado.encargos.set(id, { id, estado: 'ACTIVO', createdAt: new Date().toISOString(), ...e });
       return estado.encargos.get(id);
     },
 
+    // ------------------------------------------------------------ finanzas (memoria)
+    getFinanzas(wallet) {
+      const u = estado.usuarios.get(wallet);
+      if (!u) return null;
+      const id = u.id ?? wallet;
+      return estado.finanzas?.get(id) ?? null;
+    },
+    asegurarFinanzas(wallet) {
+      const u = estado.usuarios.get(wallet);
+      if (!u) return null;
+      const id = u.id ?? wallet;
+      if (!estado.finanzas) estado.finanzas = new Map();
+      if (!estado.finanzas.has(id)) {
+        estado.finanzas.set(id, {
+          wallet,
+          nftsStock: {},
+          criptos: {},
+          brlt: 0,
+          fondoValor: 0,
+          porcentajesConfig: { trueque: 1, suscripciones: 10, brlt: 5 },
+          updatedAt: new Date().toISOString(),
+        });
+      }
+      return estado.finanzas.get(id);
+    },
+
+    // ------------------------------------------------------------ disputas (memoria)
+    crearDisputa({ truekeId, solicitante, motivo }) {
+      const t = estado.truekes.get(Number(truekeId));
+      if (!t) return null;
+      if (!estado.disputas) estado.disputas = new Map();
+      const id = (estado.disputas.size || 0) + 1;
+      const d = {
+        id,
+        truekeId: Number(truekeId),
+        solicitante,
+        motivo: motivo ?? null,
+        estado: 'ABIERTA',
+        createdAt: new Date().toISOString(),
+        usuarioA: t.usuarioA,
+        usuarioB: t.usuarioB,
+      };
+      estado.disputas.set(id, d);
+      t.estado = 'EN_DISPUTA';
+      return d;
+    },
+    listarDisputas() {
+      return [...(estado.disputas?.values() ?? [])];
+    },
+
     // ------------------------------------------------------------ truekes (espejo de escrow)
     crearTrueke(t) {
       const id = proxTrueke++;
-      estado.truekes.set(id, { id, estado: 'CREADO', createdAt: new Date().toISOString(), ...t });
+      // Modelo unificado: usuarioA/usuarioB (la API crea con escrowId sintético negativo)
+      estado.truekes.set(id, {
+        id,
+        escrowId: t.escrowId ?? -id,
+        usuarioA: t.usuarioA ?? null,
+        usuarioB: t.usuarioB ?? (t.parteB ?? null),
+        articuloAId: t.articuloAId ?? t.articulo_a_id ?? null,
+        articuloBId: t.articuloBId ?? t.articulo_b_id ?? null,
+        estado: 'CREADO',
+        horaPautada: t.horaPautada ?? null,
+        createdAt: new Date().toISOString(),
+        ...t,
+      });
       return id; // devuelve el id numérico
     },
     getTrueke(id) {

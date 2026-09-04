@@ -39,6 +39,20 @@ export function crearRouterCatalog({ almacen }) {
     res.json({ articulos: todos.filter((a) => a.disponible !== false) });
   });
 
+  // POST /catalog/:id/despublicar — el dueño retira su artículo del catálogo
+  r.post('/:id/despublicar', requiereSesion(almacen), async (req, res) => {
+    const id = Number(req.params.id);
+    const todos = await almacen.listarArticulos();
+    const articulo = todos.find((a) => Number(a.id) === id);
+    if (!articulo) return res.status(404).json({ error: 'articulo_inexistente' });
+    const dueno = articulo.wallet ?? articulo.usuarioWallet;
+    if (!dueno || dueno.toLowerCase() !== req.wallet) {
+      return res.status(403).json({ error: 'no_autorizado', detalle: 'solo el dueño puede despublicar' });
+    }
+    await almacen.despublicarArticulo(id);
+    res.json({ ok: true });
+  });
+
   // POST /catalog/encargos — solicitar artículo fuera del mercado (Particular; CU-07)
   r.post('/encargos', requiereSesion(almacen), async (req, res) => {
     const { articuloDeseado, oferta } = req.body;
