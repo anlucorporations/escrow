@@ -4,8 +4,8 @@
 |---|---|
 | Proyecto | **TrueKeate** (DApp Web3 de trueques con escrow) |
 | Archivo | `RepoTecnico/estado_proyecto.md` |
-| Fase actual | **ENTREGADO + DESPLEGADO en GCP** + control de acceso + propuesta navegación PC/móvil |
-| Última actualización | Propuesta navegación PC/móvil aprobada (Opción B) e implementada: TopNavPc ≥lg + BottomNav por rol |
+| Fase actual | **ENTREGADO + DESPLEGADO en GCP** + control de acceso + navegación PC/móvil + Panel Owner real |
+| Última actualización | Panel del Owner (/suite/admin) implementado con datos reales del backend (firma EIP-191 → token → endpoints RF-13.1) |
 
 ---
 
@@ -49,6 +49,14 @@
   `/suite/disputas`. **Desplegado en GCP** (web `nav-pc-movil`) y **verificado en vivo**: PC 1366px →
   barra superior por rol + bottom oculta; móvil 393px → bottom con central hexagonal + barra PC oculta.
   Tests E2E: **21/21** (3 skipped por plataforma).
+
+- [x] **Panel del Owner REAL (`/suite/admin`, RF-13.1)** — corrección del placeholder: el Owner
+  conectado ve ahora datos operativos reales del backend (usuarios, contratos con direcciones, KPIs
+  de disputas, estado de la BD, salud de relayer/indexador). Autenticación: firma EIP-191
+  ("TrueKeate: iniciar sesión") → token Bearer → `GET /admin/*`. Verificado en vivo contra GCP
+  (firma de la cuenta 0 → 200 en los 5 endpoints; relayer OK wallet `0x7099…79C8`).
+  `web/app/suite/admin/page.tsx` + `lib/api.ts` (iniciarSesion/admin*). Protección de URL por rol
+  en `SuiteGuard` (un usuario sin permiso que escriba la URL ve "No tienes acceso").
 
 ## ✅ Control de acceso por estados (decisión del director, post-entrega)
 

@@ -184,4 +184,18 @@ test.describe("Suite de usuario — control de acceso", () => {
     // La sección central del bottom (móvil) NO aparece en la barra superior PC.
     await expect(page.locator("nav[aria-label='Navegación principal']")).toBeHidden();
   });
+
+  test("panel Admin (RF-13.1): el Owner ve el dashboard y pide autenticar por firma", async ({ page }) => {
+    await simularWallet(page, true, { tipo: "SOCIO", nivel: "SOCIO", estado: "CERTIFICADO" });
+    await page.goto("/suite/admin");
+    await expect(page.getByRole("heading", { name: /Panel del Owner/ })).toBeVisible();
+    // Sin token todavía: pide autenticarse (firma EIP-191 de la wallet).
+    await expect(page.getByRole("button", { name: /Autenticar como Owner/ })).toBeVisible();
+  });
+
+  test("protección por URL: un Particular Certificado NO entra a /suite/admin", async ({ page }) => {
+    await simularWallet(page, true, { tipo: "PARTICULAR", nivel: "INICIADO", estado: "CERTIFICADO" });
+    await page.goto("/suite/admin");
+    await expect(page.getByText("No tienes acceso a esta sección")).toBeVisible();
+  });
 });
