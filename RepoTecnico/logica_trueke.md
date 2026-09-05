@@ -46,6 +46,9 @@
 | **NFT on-chain real por ítem** | Cada Bien/Servicio/Artículo del inventario se mintea como NFT on-chain (contrato real, no mock); el trueque referencia tokens, no solo filas de BD. |
 | **Bifurcación de cierre Conforme / No Conforme** | El día del encuentro, cada parte firma **Recibido Conforme** (abre valoración del NFT recibido) o **No Conforme** (abre disputa). Reemplaza la firma genérica actual. |
 | **Modelo abierto-publicado** | A publica su NFT + descripción de lo que quiere recibir; B lo acepta en el Mercado (a diferencia del alta directa actual donde A fija el artículo B ajeno). |
+| **Tipos de trueque: 4 categorías + combinaciones** | Categorías base: **Artículo, Servicio, Bien, Cripto**. El tipo del trueque = **par oferta/requerido** (p. ej. Artículo→Servicio, Bien→Cripto). Cada combinación se diferencia visualmente con **icono y color propios**. |
+| **Desempate de la propuesta de encuentro** | Propone el punto/fecha/hora quien gane por: **1. nivel D12** (INICIADO→SOCIO), **2. reputación** si hay empate de nivel, **3. el que publicó el trueke (A)** si persiste el empate. |
+| **Estado PROPUESTO off-chain hasta el acuerdo** | El trueke ofertado en el Mercado es una **fila BD en estado PROPUESTO sin espejo on-chain**; al acordar B pasa a CREADO y arranca el ciclo on-chain. Evita gas por ofertas no aceptadas. |
 
 ## 4. Brechas vs. implementación actual (auditoría sobre código)
 
@@ -64,8 +67,9 @@
 
 ## 5. Pendiente de confirmar (no inventar)
 
-- Nomenclatura exacta de los **tipos de trueque** y sus **iconos/colores** de diferenciación visual.
-- Regla de desempate de la propuesta de encuentro (¿nivel primero o reputación primero? ¿qué pasa si ambos son iguales?).
 - Alcance de "valoración del NFT recibido": ¿dimensiones D18 (aceptación/honestidad/seguridad/confiabilidad/compromiso) sobre el NFT, o solo 1–5 global?
-- Si el **estado PROPUESTO** (trueke ofertado en Mercado esperando acuerdo) es off-chain (BD) o necesita espejo on-chain.
+- Si la **firma Recibido Conforme/No Conforme** convive con el estado CUSTODIADO/APERTURA actual del escrow o sustituye la firma de recepción genérica (mapeo de estados al migrar).
 - Impacto en RF-05/RF-14 existentes y en los 61 tests Foundry / 32 backend / E2E al migrar.
+- Plan de migración por fases (orden de tocar BD → contrato NFT → backend → web → pruebas) pendiente de aprobación del director.
+
+> ✅ **Resuelto por el director**: tipos = 4 categorías + combinaciones con icono/color; desempate = nivel → reputación → A; estado ofertado = PROPUESTO off-chain hasta el acuerdo.
