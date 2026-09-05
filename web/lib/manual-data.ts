@@ -64,6 +64,11 @@ export const gruposManuales: GrupoManual[] =   [
       "carpeta": "06-Diagrama-Relacional",
       "etiqueta": "Cómo se conectan los datos",
       "descripcion": "Las relaciones entre las tablas, el espejo de la blockchain, la regla de los 10 km y un ejemplo completo de principio a fin."
+    },
+    {
+      "carpeta": "07-Wallets-y-Cuentas",
+      "etiqueta": "Tu billetera y tus cuentas",
+      "descripcion": "Manuales prácticos para conectar tu billetera (MetaMask) a la red de pruebas de TrueKeate: cómo crearla e instalarla, añadir la red RPC, importar las cuentas de prueba, ver el token BRLT y los NFTs de tus trueques, firmar y autorizar, con fichas didácticas de repaso."
     }
   ];
 
@@ -2618,6 +2623,1093 @@ export const manuales: ManualAyuda[] =   [
             "Resumen por carpeta: usuarios tiene llave propia y la dirección wallet es su llave natural en la cadena · kyc tiene llave propia y candado a usuarios, con la huella (espejo) y quién la revisó · articulos tiene llave propia y candado a usuarios, más su foto con sello sin candado · truekes tiene llave propia y candados a articulos (dos veces), con el número del escrow, las direcciones y el punto de encuentro sueltos · valoraciones tiene llave propia y candado a truekes · puntos_encuentro tiene llave propia y candado a usuarios, con sus coordenadas en el mapa · disputas tiene llave propia y candado a truekes, con quién la pide y el registro de votos.",
             "Continúa el resumen: imagenes_certificadas tiene llave propia y apunte polimórfico a artículo o trueque · suscripciones tiene llave propia y candado a usuarios (empresa), con el recibo de la transacción · campanas tiene llave propia y candado a usuarios · subastas tiene llave propia y candados a usuarios (dos veces) y a articulos, con el número del escrow y el nivel del ganador · finanzas usa como llave la de usuarios, con candado 1 a 1 · auditoria tiene llave propia, con la dirección del evento y su triple llave · indexador_checkpoint usa el nombre del contrato y guarda el último bloque leído.",
             "Conclusión sencilla: la identidad está en usuarios, el intercambio en truekes, y todo lo demás cuelga de esos dos puntos con candados y apuntes. Así TrueKeate puede responder cualquier pregunta sobre quién tiene qué, en qué estado está y a quién hay que creerle."
+          ],
+          "subsecciones": []
+        }
+      ]
+    },
+    {
+      "id": "01-instalacion-wallet",
+      "carpeta": "07-Wallets-y-Cuentas",
+      "titulo": "Cómo crear tu billetera (PC y móvil)",
+      "resumen": "Manual en lenguaje sencillo del manual técnico de instalación y creación de wallet: TrueKeate no lleva billetera propia, usa la billetera de tu navegador o de tu móvil llamada MetaMask. Aquí te contamos cómo instalarla, crearla y dejarla lista en 5 minutos, y cómo guardar tu frase semilla.",
+      "secciones": [
+        {
+          "titulo": "1. Empezar en 5 minutos",
+          "parrafos": [
+            "Resumen de todo lo que necesitas hacer (los detalles están más abajo):",
+            "1. En el ordenador: instala la extensión de MetaMask en tu navegador (Chrome, Edge, Brave o Firefox).",
+            "2. En el móvil: instala la app de MetaMask (Google Play o App Store).",
+            "3. Crea tu billetera y guarda muy bien la frase semilla (12 palabras).",
+            "4. Abre la web de TrueKeate: https://truekeate-web-593453426217.europe-west1.run.app",
+            "5. Pulsa el botón Conectar MetaMask e iniciar sesión y acepta el permiso para ver tus cuentas.",
+            "Nota importante: esta red es de pruebas. El dinero que veas (ETH, BRLT…) es simbólico y no vale nada real. No uses aquí cuentas con dinero real."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "2. La billetera que usa TrueKeate",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "2.1 TrueKeate no guarda tu billetera",
+              "parrafos": [
+                "TrueKeate no tiene su propia billetera dentro de la web.",
+                "La web lee la billetera que tu navegador pone a su disposición (se llama window.ethereum). Eso lo hace MetaMask, u otra billetera compatible.",
+                "Si no tienes ninguna billetera instalada, la web te avisa con este mensaje: MetaMask no está instalado. Instálalo o usa una wallet compatible."
+              ]
+            },
+            {
+              "titulo": "2.2 Conectar no es firmar",
+              "parrafos": [
+                "Al pulsar el botón de conectar, MetaMask pide permiso solo para ver tus cuentas. No firma nada ni mueve dinero en ese momento.",
+                "Si ya te habías conectado antes, al recargar la página la web te reconoce sola (guarda tu cuenta en el navegador).",
+                "Si cambias de cuenta o bloqueas MetaMask, la web se entera al momento y reacciona sola."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "3. Instalar MetaMask en el ordenador (PC)",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "3.1 Dónde descargarla (solo fuentes oficiales)",
+              "parrafos": [
+                "Descarga la extensión únicamente desde:",
+                "1. Chrome, Edge o Brave: la tienda Chrome Web Store, buscando MetaMask (el editor oficial se llama MetaMask, de Consensys).",
+                "2. Firefox: los Add-ons de Firefox, buscando MetaMask.",
+                "3. La página oficial https://metamask.io/download/ (te enlaza a las tiendas oficiales).",
+                "Desconfía de extensiones con nombres parecidos o de anuncios. La extensión oficial nunca te pide tu frase semilla y pide permisos limitados."
+              ]
+            },
+            {
+              "titulo": "3.2 Pasos de instalación",
+              "parrafos": [
+                "1. Pulsa Añadir a Chrome (o el botón equivalente de tu navegador).",
+                "2. Confirma en la ventana que aparece.",
+                "3. Fija el icono del zorrito en la barra de extensiones (opción fijar) para tenerlo a mano.",
+                "4. Abre la extensión: te ofrecerá Empezar y podrás Crear una wallet o Importar una wallet.",
+                "5. Si es la primera vez, acepta el aviso de uso (no hace falta compartir datos)."
+              ]
+            },
+            {
+              "titulo": "3.3 Comprobar que quedó lista",
+              "parrafos": [
+                "Al abrir la extensión debes ver su pantalla con saldo 0 ETH y el selector de red en la parte superior.",
+                "En la web de TrueKeate, el botón Conectar MetaMask e iniciar sesión dejará de mostrar el aviso de que MetaMask no está instalado."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "4. Instalar MetaMask en el móvil",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "4.1 Dónde descargarla",
+              "parrafos": [
+                "Android: Google Play, buscando MetaMask – Blockchain Wallet (editor Consensys).",
+                "iPhone: App Store, buscando MetaMask – Crypto Wallet (editor Consensys).",
+                "Después de instalarla, tienes que crear o importar la billetera dentro de la app (usa la misma frase semilla que en el PC si quieres la misma cuenta)."
+              ]
+            },
+            {
+              "titulo": "4.2 Cómo usar TrueKeate desde el móvil (hoy)",
+              "parrafos": [
+                "La versión móvil de la plataforma se entrega como PWA (una web que se puede añadir a la pantalla de inicio). La forma que funciona hoy en la práctica es:",
+                "1. Abre la app de MetaMask en tu móvil.",
+                "2. Usa su navegador interno (botón de navegador dentro de la app).",
+                "3. Escribe la dirección de TrueKeate: https://truekeate-web-593453426217.europe-west1.run.app",
+                "4. Conecta y firma como en el PC: la app móvil hace de billetera.",
+                "Pendiente de confirmar: la firma delegada desde la PWA instalada a la app de MetaMask (enlace profundo) está pensada en el diseño pero no se ha verificado que funcione. Hoy el método que sí funciona es el navegador interno de la app de MetaMask. El modo sin conexión (service worker) de la PWA también está pendiente de confirmar."
+              ],
+              "imagen": "flujo-instalacion.svg"
+            }
+          ]
+        },
+        {
+          "titulo": "5. Crear una billetera nueva",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "5.1 La frase semilla: la llave de todo",
+              "parrafos": [
+                "Al crear la billetera, MetaMask genera una frase semilla de 12 palabras (también acepta importar frases de 24 palabras).",
+                "La frase ES tu billetera: quien la tenga puede usar tus cuentas. MetaMask te pedirá confirmarla escribiendo algunas palabras al azar.",
+                "Reglas para guardarla:",
+                "1. Anótala en papel, sin conexión (nunca en capturas de pantalla, notas del móvil ni correos).",
+                "2. No la compartas con nadie, ni siquiera con un supuesto soporte técnico.",
+                "3. Guarda una copia en un segundo sitio seguro. Nadie puede recuperarla por ti."
+              ]
+            },
+            {
+              "titulo": "5.2 La contraseña o el PIN",
+              "parrafos": [
+                "La contraseña (PC) o el PIN o la biometría (móvil) solo protegen el acceso a la app en tu dispositivo.",
+                "No es la clave de la billetera y no sirve para recuperar la frase.",
+                "Si bloqueas MetaMask en el PC, la web guarda tu cuenta pero no podrás firmar hasta desbloquear la extensión."
+              ],
+              "imagen": "crear-wallet.svg"
+            }
+          ]
+        },
+        {
+          "titulo": "6. Red de pruebas: el ETH no vale dinero",
+          "parrafos": [
+            "Todos los contratos de TrueKeate viven hoy en una red de pruebas (anvil, número de red 31337). No hay una red de producción definida, así que la red de producción queda pendiente de confirmar.",
+            "En esa red, el dinero es ETH simbólico de pruebas, sin valor real.",
+            "Aunque conectes una cuenta con activos reales de otras redes, no los pierdes, pero cualquier operación de prueba consume ETH de prueba, y las claves de las cuentas de desarrollo son públicas (ver manual 03-cuentas-anvil). Nunca uses en esta red cuentas con valor real.",
+            "Recomendación: crea cuentas de prueba dedicadas (las del anvil) y no las mezcles con tu billetera personal."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "7. ¿Y otras billeteras? (alternativas)",
+          "parrafos": [
+            "La web acepta cualquier billetera que se conecte al navegador igual que MetaMask (por ejemplo Brave Wallet o Coinbase Wallet).",
+            "WalletConnect no está integrado hoy en la plataforma: usarlo para conectar a TrueKeate no es posible y queda pendiente de confirmar como vía alternativa. Los requisitos del proyecto fijan MetaMask como billetera.",
+            "En el móvil, la vía equivalente y sí disponible es el navegador interno de la app de MetaMask (apartado 4.2)."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "8. Ficha didáctica",
+          "parrafos": [
+            "¿Qué es? Una billetera (wallet) es una aplicación que guarda tus claves y firma por ti sin mostrarlas. TrueKeate usa MetaMask: extensión en el PC y app en el móvil.",
+            "¿Para qué sirve? Para conectarte a TrueKeate, iniciar sesión firmando un mensaje, autorizar los trueques y ver tus activos de prueba (ETH, BRLT, NFTs).",
+            "Pasos clave: 1) Instalar MetaMask (PC o móvil). 2) Crear o importar la billetera. 3) Guardar la frase semilla en papel. 4) Abrir la web de TrueKeate y pulsar Conectar MetaMask e iniciar sesión. 5) Aceptar el permiso para ver cuentas.",
+            "Errores comunes: descargar extensiones falsas con nombres parecidos · Confundir conectar (ver cuentas) con firmar o enviar dinero · Tener seleccionada otra red y no ver los saldos de prueba · Compartir la frase semilla con un supuesto soporte.",
+            "Consejo de seguridad: la frase semilla se escribe en papel y no se comparte jamás. En esta red de pruebas solo usa cuentas sin valor real: las claves de las cuentas de prueba son públicas (ver manual 03-cuentas-anvil)."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "9. Lo que falta por confirmar (resumen)",
+          "parrafos": [
+            "1. La firma delegada desde la PWA instalada a la app de MetaMask (enlace profundo): pendiente de confirmar.",
+            "2. El modo sin conexión de la PWA (service worker): pendiente de confirmar.",
+            "3. La integración de WalletConnect como vía alternativa: pendiente de confirmar.",
+            "4. La red de producción definitiva del proyecto (hoy todo funciona sobre la red de pruebas): pendiente de confirmar."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "10. Glosario de este manual",
+          "parrafos": [
+            "Wallet o billetera = aplicación que guarda tus claves y firma por ti · MetaMask = la billetera que usa TrueKeate (extensión y app) · Extensión = programa que se añade al navegador · Frase semilla = 12 o 24 palabras que son la llave de tu billetera · Conectar = dar permiso a la web para ver tus cuentas (no firma nada) · Firmar = demostrar con tu clave que un mensaje es tuyo · Red de pruebas = red donde el dinero es simbólico y no vale nada real · ETH = la moneda de esa red de pruebas · PWA = web que se puede instalar como una app en el móvil"
+          ],
+          "subsecciones": []
+        }
+      ]
+    },
+    {
+      "id": "02-conexion-red-rpc",
+      "carpeta": "07-Wallets-y-Cuentas",
+      "titulo": "Conecta TrueKeate a tu billetera (red RPC)",
+      "resumen": "Manual en lenguaje sencillo de la conexión de tu wallet a la red del proyecto: TrueKeate vive en una red de pruebas llamada anvil; aquí te damos los datos exactos de esa red (RPC, cadena 31337) y los pasos para añadirla una sola vez en MetaMask, en el ordenador y en el móvil, más cómo comprobar que la conexión funciona.",
+      "secciones": [
+        {
+          "titulo": "1. Empezar en 5 minutos",
+          "parrafos": [
+            "Estos son los pasos rápidos (los detalles están más abajo):",
+            "1. Abre MetaMask y pulsa el selector de red (arriba).",
+            "2. Pulsa Añadir red y elige Añadir una red manualmente.",
+            "3. Copia estos datos: Nombre de red TrueKeate Anvil (pruebas); Nueva URL de RPC https://mcc-foundry-anvil-slzlptbcla-ew.a.run.app; ID de cadena (Chain ID) 31337; Símbolo de moneda ETH; Explorador de bloques (dejar vacío).",
+            "4. Pulsa Guardar. MetaMask comprobará que la red responde.",
+            "5. Asegúrate de que la red queda seleccionada antes de operar en la web.",
+            "Esto se hace una sola vez. La plataforma no añade la red por ti: no tiene código para cambiar la red de tu billetera automáticamente."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "2. Los datos de la red, explicados",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "2.1 ¿Qué es una RPC?",
+              "parrafos": [
+                "RPC es la puerta por la que tu billetera habla con la blockchain.",
+                "La URL de RPC de TrueKeate apunta a un anvil remoto: una blockchain de pruebas alojada en la nube de Google."
+              ]
+            },
+            {
+              "titulo": "2.2 Los parámetros auditados (2026-09-04)",
+              "parrafos": [
+                "Nombre de red (sugerido): TrueKeate Anvil (pruebas). Es libre, solo para que la reconozcas.",
+                "Nueva URL de RPC: https://mcc-foundry-anvil-slzlptbcla-ew.a.run.app (anvil/Foundry remoto en Google Cloud Run).",
+                "ID de cadena: 31337 (en hexadecimal es 0x7a69).",
+                "Símbolo de moneda: ETH (la moneda nativa de pruebas).",
+                "Decimales: 18 (el estándar de ETH).",
+                "Explorador de bloques: dejarlo vacío, no hay explorador configurado (pendiente de confirmar)."
+              ]
+            },
+            {
+              "titulo": "2.3 De dónde salen estos datos",
+              "parrafos": [
+                "El número de red 31337 es el entorno de pruebas del proyecto, verificado en los archivos de configuración y en los tests.",
+                "Las direcciones de los contratos de esa red están fijadas en el código de la web y del backend.",
+                "Nota de trazabilidad: en documentación antigua del despliegue aparece otra URL de anvil. La URL de este manual es la verificada el 2026-09-04 como la RPC actual del proyecto."
+              ],
+              "imagen": "red-rpc.svg"
+            }
+          ]
+        },
+        {
+          "titulo": "3. Añadir la red en MetaMask (ordenador)",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "3.1 Aviso importante",
+              "parrafos": [
+                "La plataforma no añade ni cambia la red por ti: no existe código que lo haga. La red se añade una vez, a mano, en MetaMask.",
+                "Estos pasos son para la extensión de MetaMask en el PC."
+              ]
+            },
+            {
+              "titulo": "3.2 Pasos",
+              "parrafos": [
+                "1. Abre MetaMask y pulsa el selector de red en la parte superior (suele mostrar Ethereum Mainnet).",
+                "2. Pulsa Añadir red y elige Añadir una red manualmente.",
+                "3. Rellena el formulario con los datos del apartado 2.2: Nombre de red TrueKeate Anvil (pruebas); Nueva URL de RPC https://mcc-foundry-anvil-slzlptbcla-ew.a.run.app; ID de cadena 31337; Símbolo de moneda ETH; Explorador de bloques (opcional) dejar vacío.",
+                "4. Pulsa Guardar. MetaMask validará la RPC (debe responder) y dejará seleccionada la red nueva."
+              ]
+            },
+            {
+              "titulo": "3.3 Seleccionar la red al usar la plataforma",
+              "parrafos": [
+                "Antes de operar conviene tener la red TrueKeate Anvil (pruebas) seleccionada en el selector.",
+                "La lectura de saldos puede funcionar desde otra red, pero la firma va contra la red seleccionada en MetaMask: si el número de red no coincide, el servidor rechaza la firma (los trueques se firman con intents y el relayer comprueba que el chainId sea el esperado)."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "4. Añadir la red en MetaMask (móvil)",
+          "parrafos": [
+            "1. Abre MetaMask en el móvil.",
+            "2. Pulsa el icono de red (parte superior).",
+            "3. Pulsa Añadir red y elige la pestaña Personalizada (custom).",
+            "4. Introduce los mismos datos del apartado 2.2 y pulsa Guardar.",
+            "5. Si usas el navegador interno de MetaMask para la web, la red seleccionada en la app es la que se usa al firmar."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "5. Comprobar que la conexión funciona",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "5.1 Desde MetaMask",
+              "parrafos": [
+                "El selector debe mostrar el nombre de red que elegiste.",
+                "Debe verse el saldo en ETH de la cuenta activa. Las cuentas 0 a 9 del anvil tienen fondos de prueba; la cuenta 10 (Irene) no los tiene (ver el manual 03-cuentas-anvil)."
+              ]
+            },
+            {
+              "titulo": "5.2 Desde la consola (para personas técnicas)",
+              "parrafos": [
+                "Puedes verificar la red y un saldo con herramientas de línea de comandos:",
+                "1. ¿Qué número de red responde el RPC? Debe decir 31337: cast chain-id --rpc-url https://mcc-foundry-anvil-slzlptbcla-ew.a.run.app",
+                "2. Saldo de la cuenta 0 (el Owner) en esa red: cast balance 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --rpc-url https://mcc-foundry-anvil-slzlptbcla-ew.a.run.app",
+                "Los contratos del proyecto se consultan igual por esa RPC (por ejemplo, el saldo del token BRLT o el dueño de un NFT)."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "6. Avisos importantes de la red de pruebas",
+          "parrafos": [
+            "Es una red de PRUEBAS: el ETH es simbólico y las claves privadas de las cuentas de prueba son públicas (ver 03-cuentas-anvil). No uses fondos reales ni cuentas de producción.",
+            "El anvil remoto puede reiniciarse (es una operación de entorno). El estado podría reiniciarse o cambiar: si una cuenta pierde el saldo o un contrato no responde, comprueba que la red sigue viva (apartado 5.2).",
+            "El relayer (la cuenta 1, de la plataforma) paga el gas de los trueques de los usuarios particulares: normalmente tú no necesitas tener ETH. En un plan de contingencia podría cambiar, pendiente de confirmar."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "7. Ficha didáctica",
+          "parrafos": [
+            "¿Qué es? Una red RPC es la puerta por la que tu billetera habla con la blockchain de pruebas de TrueKeate (anvil remoto, red 31337).",
+            "¿Para qué sirve? Para que MetaMask sepa dónde están tus saldos de prueba (ETH, BRLT, NFTs) y para firmar la sesión y los trueques en la red correcta.",
+            "Pasos clave: 1) En MetaMask: selector de red, Añadir red, Añadir manualmente. 2) Copiar: nombre, URL de RPC, Chain ID 31337, símbolo ETH. 3) Guardar y seleccionar la red. 4) Comprobar que se ve el saldo en ETH.",
+            "Errores comunes: dejar seleccionada Ethereum Mainnet y no ver los saldos de prueba · Escribir mal la URL de RPC o el Chain ID · Dejar la red sin seleccionar y que el servidor rechace la firma · Esperar que la web añada la red por ti (no lo hace).",
+            "Consejo de seguridad: es una red de pruebas con claves públicas: nunca la uses con cuentas que tengan valor real. Guarda esta red solo para probar TrueKeate."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "8. Lo que falta por confirmar (resumen)",
+          "parrafos": [
+            "1. Explorador de bloques para esta red: pendiente de confirmar (dejar el campo vacío).",
+            "2. El plan de contingencia en el que el usuario pagaría el gas (hoy lo paga el relayer): pendiente de confirmar.",
+            "3. La URL de anvil documentada en manuales antiguos de despliegue frente a la auditada el 2026-09-04: la de este manual es la actual."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "9. Glosario de este manual",
+          "parrafos": [
+            "RPC = la puerta por la que se habla con la blockchain · Chain ID = el número de identificación de la red (aquí 31337) · Red de pruebas = red donde el dinero es simbólico y no vale nada real · Anvil = simulador de blockchain que usa el proyecto para probar · Relayer = la cuenta de la plataforma que paga el gas de los trueques · Saldo = cuánto dinero tiene una cuenta · Firmar = demostrar con tu clave que un mensaje es tuyo"
+          ],
+          "subsecciones": []
+        }
+      ]
+    },
+    {
+      "id": "03-cuentas-anvil",
+      "carpeta": "07-Wallets-y-Cuentas",
+      "titulo": "Las cuentas de prueba (importar en tu billetera)",
+      "resumen": "Manual en lenguaje sencillo de las cuentas del anvil (desarrollo y pruebas): TrueKeate usa cuentas de prueba ya creadas para que pruebes con usuarios de ejemplo (Ana, Bruno, Carla…). Aquí te contamos cuáles son, sus claves privadas públicas, cómo importarlas en MetaMask (PC y móvil) y las advertencias de seguridad.",
+      "secciones": [
+        {
+          "titulo": "1. Empezar en 5 minutos",
+          "parrafos": [
+            "Ejemplo: quieres entrar en la web como Ana (cuenta 2).",
+            "1. Copia la clave privada de Ana: 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a.",
+            "2. Abre MetaMask, pulsa el icono de perfil (arriba a la derecha), elige Añadir cuenta o cuenta de hardware y luego Importar cuenta.",
+            "3. Deja el tipo en Clave privada, pega la clave y pulsa Importar.",
+            "4. Comprueba que la dirección nueva coincide con la de Ana: 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC.",
+            "5. Abre la web de TrueKeate y pulsa Conectar MetaMask e iniciar sesión: ahora la plataforma te reconoce como Ana.",
+            "Si prefieres importar todas las cuentas de golpe, puedes importar en MetaMask la frase semilla completa del anvil (apartado 2.2): como el camino de derivación es el mismo que usa MetaMask, obtendrás las mismas direcciones.",
+            "Aviso muy importante: estas claves son públicas (aparecen en la documentación del framework) y solo sirven para pruebas. Nunca las uses con dinero real ni en producción."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "2. ¿Qué son las cuentas de prueba (anvil)?",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "2.1 De dónde salen",
+              "parrafos": [
+                "El anvil (la blockchain de pruebas) genera por defecto 20 cuentas a partir de un mnemónico estándar conocido y financia con ETH de prueba las primeras 10 (índices 0 a 9).",
+                "Son las cuentas con las que se despliegan los contratos, opera el relayer y se prueban los flujos."
+              ]
+            },
+            {
+              "titulo": "2.2 El mnemónico estándar (público)",
+              "parrafos": [
+                "El mnemónico es: test test test test test test test test test test test junk.",
+                "Es el mnemónico por defecto del framework y aparece en su documentación pública: cualquiera puede derivar estas claves.",
+                "Por eso jamás deben usarse fuera de pruebas."
+              ]
+            },
+            {
+              "titulo": "2.3 El camino de derivación (solo para curiosos)",
+              "parrafos": [
+                "El camino es m/44'/60'/0'/0/N, donde N es el número de la cuenta (0, 1, 2, …).",
+                "Es el mismo camino que usa MetaMask para sus cuentas: por eso, si importas la frase semilla del anvil en MetaMask, obtienes las mismas direcciones."
+              ]
+            },
+            {
+              "titulo": "2.4 Los dos roles operativos",
+              "parrafos": [
+                "Cuenta 0, Owner / Admin: desplegó los contratos y es la autoridad del panel de administración.",
+                "Cuenta 1, Relayer / plataforma: paga el gas de los trueques de los usuarios (meta-transacciones). Es la billetera del servidor."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "3. La tabla de cuentas de prueba (0 a 12)",
+          "parrafos": [
+            "0 Owner / Admin: dirección 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, clave 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80. Despliega contratos y tiene el panel Owner. Tiene fondos.",
+            "1 Relayer / plataforma: dirección 0x70997970C51812dc3A010C7d01b50e0d17dc79C8, clave 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d. Paga el gas (meta-tx) y es la billetera del backend. Tiene fondos.",
+            "2 Ana: dirección 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC, clave 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a. Usuario particular de prueba. Tiene fondos.",
+            "3 Bruno: dirección 0x90F79bf6EB2c4f870365E785982E1f101E93b906, clave 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6. Usuario particular de prueba. Tiene fondos.",
+            "4 Carla: dirección 0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65, clave 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a. Usuario particular de prueba. Tiene fondos.",
+            "5 Diego: dirección 0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc, clave 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba. Usuario particular de prueba. Tiene fondos.",
+            "6 Elena: dirección 0x976EA74026E726554dB657fA54763abd0C3a0aa9, clave 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e. Usuario particular de prueba. Tiene fondos.",
+            "7 Fabián: dirección 0x14dC79964da2C08b23698B3D3cc7Ca32193d9955, clave 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356. Usuario particular de prueba. Tiene fondos.",
+            "8 Gisela: dirección 0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f, clave 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97. Usuario particular de prueba. Tiene fondos.",
+            "9 Héctor: dirección 0xa0Ee7A142d267C1f36714E4a8F75612F20a79720, clave 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6. Usuario particular de prueba. Tiene fondos.",
+            "10 Irene: dirección 0xBcd4042DE499D14e55001CcbB24a551F3b954096, clave 0xf214f2b2cd398c806f84e317254e0f0b801d0643303237d97a22a48e01628897. Sin fondos en este anvil (solo se financian 0 a 9 por defecto).",
+            "11 Javier: dirección 0x71bE63f3384f5fb98995898A86B02Fb2426c5788, clave 0x701b615bbdfb9de65240bc28bd21bbc0d996645a3dd57e7b12bc2bdf6f192c82. Sin fondos por defecto (ver apartado 7).",
+            "12 Karen: dirección 0xFABB0ac9d68B0B445fB7357272Ff202C5651694a, clave 0xa267530f49f8280200edf313ee7af6b827f2a8bce2897751d06a843f644967b1. Sin fondos por defecto (ver apartado 7).",
+            "Notas de la tabla: tener fondos significa que el anvil financia por defecto los índices 0 a 9 con ETH de prueba. Los nombres (Ana, Bruno…) son usuarios de ejemplo para pruebas y manuales; su rol concreto (particular, empresa, socio) y su estado en la base de datos dependen de la inscripción hecha en cada entorno (pendiente de confirmar por entorno)."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "4. Importar una cuenta en MetaMask (ordenador)",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "4.1 Por qué importarlas",
+              "parrafos": [
+                "La web de TrueKeate solo muestra y firma con las cuentas que MetaMask tiene cargadas. Para que la plataforma vea a Ana (o a cualquier cuenta), hay que importar su clave privada en MetaMask."
+              ]
+            },
+            {
+              "titulo": "4.2 Pasos",
+              "parrafos": [
+                "1. Abre MetaMask, pulsa el icono de perfil (arriba a la derecha) y elige Cambiar cuenta (o Cuentas).",
+                "2. Pulsa Añadir cuenta o cuenta de hardware y luego Importar cuenta.",
+                "3. En el tipo, deja Clave privada y pega la clave de la tabla (por ejemplo, la de Ana, índice 2).",
+                "4. Pulsa Importar.",
+                "5. La cuenta aparece en el selector con su dirección. Comprueba que coincide con la de la tabla (así detectas erratas al copiar).",
+                "Ejemplo de comprobación para personas técnicas con la herramienta cast: cast wallet address --private-key 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a debe devolver la dirección de Ana 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "5. Importar una cuenta en MetaMask (móvil)",
+          "parrafos": [
+            "1. Abre MetaMask en el móvil y pulsa el icono de perfil o cuentas.",
+            "2. Pulsa Añadir cuenta y luego Importar cuenta.",
+            "3. Pega la clave privada y pulsa Importar."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "6. Cambiar de cuenta y desconectar en la plataforma",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "6.1 Cambiar de cuenta",
+              "parrafos": [
+                "Cambia la cuenta activa en MetaMask (selector de cuentas). La web se entera al momento y actualiza la cuenta mostrada."
+              ]
+            },
+            {
+              "titulo": "6.2 Qué pasa al cambiar de cuenta",
+              "parrafos": [
+                "La plataforma vuelve a comprobar el estado de inscripción de la nueva cuenta y descarta la sesión de la cuenta anterior: el permiso de sesión está asociado a la billetera que lo firmó.",
+                "Con la cuenta nueva tendrás que volver a firmar la sesión (te lo pedirá la web).",
+                "Si la lista de cuentas queda vacía (MetaMask bloqueada o cuenta eliminada), la web se desconecta y limpia lo guardado."
+              ]
+            },
+            {
+              "titulo": "6.3 Desconectar",
+              "parrafos": [
+                "En la barra superior de la plataforma hay un botón Desconectar billetera. Al pulsarlo se limpia la cuenta y la sesión."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "7. Advertencias obligatorias",
+          "parrafos": [
+            "Irene (cuenta 10) no tiene fondos: si un flujo necesita que Irene pague gas o reciba ETH, primero hay que financiarla. No hay un grifo (faucet) automático verificado en este entorno: el mecanismo de financiación queda pendiente de confirmar.",
+            "Las cuentas 11 (Javier) y 12 (Karen) tampoco tienen fondos por defecto.",
+            "Solo pruebas: el mnemónico es público y todas las claves derivadas son conocidas. Nunca uses estas cuentas (ni fondos reales) en producción.",
+            "En producción, las claves del Owner y del relayer viven en el cajón de secretos de Google (Secret Manager); las claves de este manual solo sirven para el anvil de pruebas.",
+            "Cualquiera que conozca la clave privada puede firmar por esa cuenta: no compartas las claves de la tabla fuera del equipo de pruebas."
+          ],
+          "imagen": "importar-cuenta.svg",
+          "subsecciones": []
+        },
+        {
+          "titulo": "8. Ficha didáctica",
+          "parrafos": [
+            "¿Qué es? Son las cuentas de prueba que crea el anvil (la blockchain de pruebas) a partir de un mnemónico estándar público. Cada una tiene dirección y clave privada conocidas.",
+            "¿Para qué sirve? Para probar TrueKeate con usuarios de ejemplo (Ana, Bruno, Carla…): importas una cuenta en MetaMask y la web te reconoce. La cuenta 0 es el Owner y la 1 es el relayer (paga el gas).",
+            "Pasos clave: 1) Copiar la clave privada de la cuenta elegida. 2) MetaMask, Añadir cuenta, Importar cuenta. 3) Pegar la clave (tipo Clave privada) e importar. 4) Verificar que la dirección coincide con la tabla. 5) Conectar en la web e iniciar sesión.",
+            "Errores comunes: pegar la clave con espacios o incompleta (la dirección no coincide) · Usar estas cuentas con dinero real · Esperar que Irene (cuenta 10), Javier (11) o Karen (12) tengan fondos: no los tienen por defecto · Importar la cuenta pero dejar otra seleccionada en MetaMask.",
+            "Consejo de seguridad: el mnemónico y todas las claves son públicos: solo úsalos en la red de pruebas y nunca con fondos reales. En producción las claves del Owner y del relayer viven en el Secret Manager, no en manuales."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "9. Lo que falta por confirmar (resumen)",
+          "parrafos": [
+            "1. El rol concreto y el estado de cada usuario de ejemplo (Ana…Karen) en la base de datos depende del entorno: pendiente de confirmar por entorno.",
+            "2. El mecanismo para financiar a Irene (cuenta 10, sin fondos): pendiente de confirmar (no hay faucet verificado)."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "10. Glosario de este manual",
+          "parrafos": [
+            "Anvil = simulador de blockchain que usa el proyecto para probar · Mnemónico = la frase de 12/24 palabras que genera las cuentas · Clave privada = la llave secreta de una cuenta: quien la tiene, firma por ella · Dirección = la matrícula pública de una cuenta (empieza por 0x) · Importar cuenta = cargar una clave privada en MetaMask para poder usarla · Owner = cuenta 0: la autoridad que despliega y administra · Relayer = cuenta 1: la plataforma, paga el gas de los trueques · Faucet o grifo = mecanismo que regala monedas de prueba"
+          ],
+          "subsecciones": []
+        }
+      ]
+    },
+    {
+      "id": "04-token-brlt",
+      "carpeta": "07-Wallets-y-Cuentas",
+      "titulo": "Añade el token BRLT a tu billetera",
+      "resumen": "Manual en lenguaje sencillo de cómo agregar el token BRLT (BorloTokens) a tu billetera: el BRLT es el euro de pruebas de TrueKeate, un token interno que la plataforma usa como valor de compensación; para verlo en MetaMask hay que añadirlo una vez, a mano. Incluye los pasos para PC y móvil, cómo comprobar el saldo y los avisos de seguridad.",
+      "secciones": [
+        {
+          "titulo": "1. Empezar en 5 minutos",
+          "parrafos": [
+            "Ejemplo: quieres ver el saldo BRLT de Ana en tu billetera.",
+            "1. Abre MetaMask y comprueba que tienes seleccionada la red de TrueKeate (cadena 31337). Si no la tienes, sigue el manual 02-conexion-red-rpc.",
+            "2. Ve a la pestaña Activos y pulsa el botón Importar tokens.",
+            "3. Elige la pestaña Token personalizado y pega esta dirección: 0x6f6f570f45833e249e27022648a26f4076f48f78.",
+            "4. Al pegar la dirección, MetaMask rellena solo el símbolo (BRLT) y los decimales (18) leyendo el contrato. Si no lo hace, escríbelos a mano.",
+            "5. Pulsa Añadir token personalizado y luego Importar tokens.",
+            "6. BRLT aparece en tu lista de Activos. Si esa cuenta tiene saldo, lo verás ahí mismo.",
+            "¿No ves saldo? Puede que sea normal: BRLT solo existe si los Socios de la plataforma lo emitieron (ver apartado 2.3). Comprueba también que la cuenta activa es la correcta y que la red es la 31337.",
+            "Los datos están auditados el 2026-09-04 en la red de pruebas (anvil, cadena 31337)."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "2. ¿Qué es BRLT?",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "2.1 Un token de contrato (ERC-20), no la moneda de la red",
+              "parrafos": [
+                "BRLT es un token estándar ERC-20: como una ficha que se puede dividir en 18 decimales. En la cadena vive en el contrato BorloTokens.",
+                "No lo confundas con ETH: ETH es la moneda nativa de la red de pruebas (la que paga el combustible de las operaciones). BRLT es el valor interno de la plataforma.",
+                "Datos del token: dirección del contrato 0x6f6f570f45833e249e27022648a26f4076f48f78; símbolo BRLT; decimales 18; estándar ERC-20 (balanceOf, transfer, …); nombre real del contrato BorloTokens."
+              ]
+            },
+            {
+              "titulo": "2.2 ¿Quién crea BRLT?",
+              "parrafos": [
+                "No se crea desde la billetera ni desde la plataforma libremente. BRLT lo emite un mecanismo de la plataforma (el padrón de Socios) solo después de una votación de los Socios con quórum de al menos 2/3.",
+                "Hay un tope inicial de emisión (1.000.000 BRLT); subir ese tope también necesita votación de los Socios.",
+                "Una parte de cada emisión se reserva automáticamente para el fondo de valor de la comunidad."
+              ]
+            },
+            {
+              "titulo": "2.3 ¿Quién puede ver su saldo BRLT?",
+              "parrafos": [
+                "Aquí hay una regla con dos caras.",
+                "Dentro de la plataforma web (módulo de Finanzas): el saldo BRLT solo es visible y gestionable para Socios y Owner. Si eres un particular registrado, la web te mostrará un aviso: el saldo BRLT solo es visible y gestionable para Socios y Owner.",
+                "En tu billetera (MetaMask): la regla de la plataforma no aplica. Si una cuenta tiene BRLT, cualquier wallet puede leer su propio saldo desde la blockchain. La regla no te impide ver tus tokens en MetaMask."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "3. Añadir BRLT en MetaMask (ordenador)",
+          "parrafos": [
+            "1. Abre MetaMask y selecciona la red del proyecto (cadena 31337).",
+            "2. Pestaña Activos, botón Importar tokens.",
+            "3. Pestaña Token personalizado: en Dirección del contrato de tokens pega 0x6f6f570f45833e249e27022648a26f4076f48f78. Al pegarla, MetaMask autocompleta símbolo (BRLT) y decimales (18); si no, escríbelos a mano.",
+            "4. Pulsa Añadir token personalizado y luego Importar tokens.",
+            "5. BRLT aparecerá en Activos con su saldo (si lo hay)."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "4. Añadir BRLT en MetaMask (móvil)",
+          "parrafos": [
+            "1. En MetaMask móvil, selecciona la red del proyecto (cadena 31337) en el selector de red (arriba).",
+            "2. Pestaña Activos, Importar tokens, pestaña Personalizado.",
+            "3. Pega la dirección 0x6f6f570f45833e249e27022648a26f4076f48f78.",
+            "4. Verifica que el símbolo es BRLT y los decimales 18, y pulsa Importar."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "5. Comprobar el saldo BRLT",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "5.1 Desde MetaMask",
+              "parrafos": [
+                "La tarjeta BRLT de la pestaña Activos muestra el saldo de la cuenta activa.",
+                "Si no aparece saldo aunque creas que debería haberlo: revisa que la cuenta activa es la correcta y que la red seleccionada es la 31337."
+              ]
+            },
+            {
+              "titulo": "5.2 Por la blockchain (verificación fiable)",
+              "parrafos": [
+                "Para personas curiosas o técnicas, se puede preguntar directamente al contrato cuántos BRLT tiene una dirección (en este caso, Ana, cuenta 2).",
+                "Ejemplo: cast call 0x6f6f570f45833e249e27022648a26f4076f48f78 balanceOf(address)(uint256) 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC --rpc-url https://mcc-foundry-anvil-slzlptbcla-ew.a.run.app",
+                "El número sale en unidades mínimas (18 decimales): para leerlo como BRLT, divide entre 1.000.000.000.000.000.000. Las billeteras ya hacen esa división por ti."
+              ]
+            },
+            {
+              "titulo": "5.3 ¿Por qué mi saldo es 0?",
+              "parrafos": [
+                "El saldo puede ser 0 aunque la cuenta esté registrada en la plataforma: los BRLT solo existen si se emitieron mediante una propuesta aprobada por los Socios (apartado 2.2).",
+                "El estado actual de las emisiones en cada entorno es pendiente de confirmar: si necesitas BRLT de prueba para un flujo, consulta al equipo técnico si ya hay emisiones hechas."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "6. Avisos importantes",
+          "parrafos": [
+            "BRLT no está en listas públicas de tokens (es una red de pruebas): por eso MetaMask no lo muestra hasta que lo importas a mano con este manual.",
+            "Red de pruebas: el BRLT no tiene valor real. No lo compres ni lo vendas.",
+            "La dirección del contrato puede cambiar si se reinicia el anvil de pruebas: pendiente de confirmar por entorno. Antes de importar, verifica la dirección actual en el registro de contratos del proyecto (backend/contratos.json).",
+            "Desconfía de un token llamado BRLT que apunte a otra dirección: usa siempre la dirección auditada de este manual."
+          ],
+          "imagen": "token-brlt.svg",
+          "subsecciones": []
+        },
+        {
+          "titulo": "7. Ficha didáctica",
+          "parrafos": [
+            "¿Qué es? El BRLT es el token interno de TrueKeate (contrato BorloTokens, estándar ERC-20, 18 decimales). Vive en la red de pruebas en la dirección 0x6f6f…48f78.",
+            "¿Para qué sirve? Ser el valor de compensación de la plataforma. En la web solo Socios y Owner ven su saldo BRLT; en la billetera, cualquiera con BRLT puede ver el suyo.",
+            "Pasos clave: 1) Seleccionar la red 31337. 2) Activos, Importar tokens, Token personalizado. 3) Pegar la dirección 0x6f6f570f45833e249e27022648a26f4076f48f78. 4) Verificar símbolo BRLT y decimales 18. 5) Importar.",
+            "Errores comunes: confundir BRLT con ETH · Aceptar un BRLT de otra dirección · Tener la red equivocada (fuera de 31337 el contrato no existe) · Esperar saldo cuando los Socios aún no emitieron BRLT.",
+            "Consejo de seguridad: el token con el mismo símbolo pero distinta dirección es un clásico del fraude: la única dirección válida del BorloTokens del proyecto es la auditada 0x6f6f…48f78. Y recuerda: es una red de pruebas, sin valor real."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "8. Lo que falta por confirmar (resumen)",
+          "parrafos": [
+            "1. Estado actual de las emisiones de BRLT en cada entorno (si hay saldo que ver): pendiente de confirmar.",
+            "2. Si la dirección del contrato cambia tras un reinicio del anvil: verificar antes de importar (pendiente de confirmar por entorno)."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "9. Glosario de este manual",
+          "parrafos": [
+            "Token = un activo digital que vive en la blockchain · ERC-20 = estándar de tokens fungibles (todos iguales y divisibles) · Decimales = en cuántas partes se puede dividir un token (18 = muy divisible) · ETH = la moneda de la red de pruebas; paga el combustible (gas) · Importar tokens = añadir un token a mano en MetaMask para poder verlo · Socios = miembros de la comunidad que votan las decisiones (emisiones de BRLT) · Quórum = número mínimo de votos necesario para aprobar algo"
+          ],
+          "subsecciones": []
+        }
+      ]
+    },
+    {
+      "id": "05-nfts-trueques",
+      "carpeta": "07-Wallets-y-Cuentas",
+      "titulo": "Ver los NFTs de tus trueques en la billetera",
+      "resumen": "Manual en lenguaje sencillo de cómo ver en tu billetera los NFTs de tus trueques: cuando haces un trueque en TrueKeate, el objeto ofrecido se representa como un NFT (un certificado digital único) en la red de pruebas. Aquí te contamos qué es ese NFT, cómo añadirlo a MetaMask y cómo comprobar que es tuyo en la blockchain.",
+      "secciones": [
+        {
+          "titulo": "1. Empezar en 5 minutos",
+          "parrafos": [
+            "Para ver un NFT necesitas dos datos: la dirección del contrato y el número del token (su ID). Sin el ID no se puede importar.",
+            "1. Abre MetaMask y comprueba que tienes la red de TrueKeate (cadena 31337) seleccionada.",
+            "2. Ve a la pestaña NFTs (junto a Activos) y pulsa el botón Importar NFTs.",
+            "3. Rellena: Dirección 0x99dbe4aea58e518c50a1c04ae9b48c9f6354612f e ID: el número del token (por ejemplo, 1).",
+            "4. Pulsa Añadir.",
+            "5. MetaMask comprueba que el contrato es de NFTs y que la cuenta activa posee ese token. Si es tuya, el NFT se añade a tu colección.",
+            "Antes de importar necesitas saber qué ID tienes. Ese dato no está en la web: hay que comprobarlo en la blockchain (apartado 5).",
+            "Los datos están auditados el 2026-09-04 en la red de pruebas (anvil, cadena 31337)."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "2. ¿Qué es el NFT de los trueques?",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "2.1 Un certificado único (ERC-721)",
+              "parrafos": [
+                "Un NFT es un token no fungible: es único, no se puede partir ni cambiar por otro igual. Sirve para representar esto es mío y es único.",
+                "El contrato de pruebas de TrueKeate se llama TrueKeateNFT y su símbolo es TKANFT.",
+                "Datos del contrato: dirección 0x99dbe4aea58e518c50a1c04ae9b48c9f6354612f; nombre TrueKeate NFT; símbolo TKANFT; estándar ERC-721 (balanceOf, ownerOf, mint, …)."
+              ]
+            },
+            {
+              "titulo": "2.2 Un NFT de pruebas (importante)",
+              "parrafos": [
+                "TrueKeateNFT es un contrato de pruebas (un mock): en el entorno de desarrollo representa los objetos y certificados de los trueques.",
+                "El contrato definitivo que representará los objetos del trueque en producción es pendiente de confirmar (hoy solo existe este mock).",
+                "Los números de token (IDs) se asignan en orden desde el 1: el primer NFT minteado es el 1, el siguiente el 2, y así.",
+                "En el despliegue básico no se mintea ningún NFT: los que existan en cada entorno dependen de las pruebas y flujos hechos. Qué IDs existen ahora en la red remota es pendiente de confirmar."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "3. Añadir un NFT en MetaMask (ordenador)",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "3.1 Requisitos previos",
+              "parrafos": [
+                "1. Tener seleccionada la red del proyecto (cadena 31337).",
+                "2. Conocer la dirección del contrato: 0x99dbe4aea58e518c50a1c04ae9b48c9f6354612f.",
+                "3. Conocer el ID del token (un número entero, por ejemplo 1)."
+              ]
+            },
+            {
+              "titulo": "3.2 Pasos",
+              "parrafos": [
+                "1. Abre MetaMask y ve a la pestaña NFTs.",
+                "2. Pulsa Importar NFTs (o el icono de importar).",
+                "3. Rellena los dos campos: Dirección 0x99dbe4aea58e518c50a1c04ae9b48c9f6354612f e ID: el número de tu token (por ejemplo 1).",
+                "4. Pulsa Añadir. MetaMask valida que el contrato es ERC-721 y que la cuenta activa posee ese token."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "4. Añadir un NFT en MetaMask (móvil)",
+          "parrafos": [
+            "1. En MetaMask móvil, selecciona la red del proyecto (cadena 31337).",
+            "2. Pestaña NFTs, Importar NFTs.",
+            "3. Pega la dirección del contrato y el token ID, y pulsa Añadir."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "5. Comprobar que el NFT es tuyo (la parte fiable)",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "5.1 Qué muestra MetaMask (limitación conocida)",
+              "parrafos": [
+                "El contrato de pruebas no incluye imagen ni descripción (no define metadatos). Por eso MetaMask puede mostrar el NFT sin imagen, o fallar la vista previa. El comportamiento exacto de la interfaz con metadatos vacíos es pendiente de confirmar.",
+                "No te preocupes: la propiedad no depende de la imagen. Se comprueba en la blockchain."
+              ]
+            },
+            {
+              "titulo": "5.2 La fuente de verdad: preguntar al contrato",
+              "parrafos": [
+                "En la blockchain cada NFT guarda quién es su dueño. Dos preguntas útiles: ¿cuántos NFTs de este contrato tiene una cuenta? Se cuenta con balanceOf. ¿De quién es el token número X? Se pregunta con ownerOf.",
+                "Ejemplo para personas técnicas con la herramienta cast: RPC=https://mcc-foundry-anvil-slzlptbcla-ew.a.run.app y NFT=0x99dbe4aea58e518c50a1c04ae9b48c9f6354612f; luego cast call $NFT balanceOf(address)(uint256) 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC --rpc-url $RPC para saber cuántos NFTs TKANFT tiene Ana (cuenta 2), y cast call $NFT ownerOf(uint256)(address) 1 --rpc-url $RPC para saber quién es el dueño del token 1.",
+                "Si ownerOf da error, ese token no existe en esta red en este momento. Si balanceOf da 0, esa cuenta no tiene NFTs de este contrato.",
+                "No hay un explorador de bloques configurado para el anvil remoto (pendiente de confirmar); por ahora, la verificación fiable es preguntar al contrato (como arriba)."
+              ]
+            },
+            {
+              "titulo": "5.3 Y dentro de la plataforma web",
+              "parrafos": [
+                "El módulo de Finanzas muestra NFTs en stock de la cuenta conectada, pero ese dato es el registrado en la base de datos (un espejo), no una lectura directa de la blockchain. Para confirmar la propiedad real de un token hay que consultar la cadena (apartado 5.2)."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "6. Avisos importantes",
+          "parrafos": [
+            "Es un contrato de pruebas: cualquiera puede mintear (crear) un NFT de este contrato para cualquier cuenta. Poseer uno no certifica nada sobre tu identidad ni tu estado en la plataforma.",
+            "Red de pruebas: estos NFTs no tienen valor real.",
+            "Los token IDs y saldos dependen del estado de cada anvil (si se reinicia, pueden cambiar): si ownerOf falla o balanceOf da 0, el NFT no existe en ese momento en esa red."
+          ],
+          "imagen": "nft-trueques.svg",
+          "subsecciones": []
+        },
+        {
+          "titulo": "7. Ficha didáctica",
+          "parrafos": [
+            "¿Qué es? El NFT de los trueques (contrato TrueKeateNFT, estándar ERC-721, símbolo TKANFT) es un certificado digital único que representa el objeto de un trueque en la red de pruebas. Dirección: 0x99db…612f.",
+            "¿Para qué sirve? Para ver en tu billetera los NFTs y certificados de tus trueques de prueba y comprobar quién es el dueño de cada token en la blockchain.",
+            "Pasos clave: 1) Seleccionar la red 31337. 2) Pestaña NFTs, Importar NFTs. 3) Pegar la dirección 0x99dbe4aea58e518c50a1c04ae9b48c9f6354612f y el ID del token. 4) Añadir. 5) Para confirmar propiedad, preguntar a la cadena (ownerOf y balanceOf).",
+            "Errores comunes: importar sin saber el ID del token · Tener la red equivocada (no aparece) · Esperar imagen o descripción (este contrato de pruebas no tiene metadatos) · Fiarse de una captura en vez de comprobar ownerOf.",
+            "Consejo de seguridad: la fuente de verdad es la blockchain (ownerOf), no la interfaz: si el contrato no dice que eres el dueño, no lo eres, muestre lo que muestre la wallet. Y recuerda: es un NFT de pruebas, sin valor real."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "8. Lo que falta por confirmar (resumen)",
+          "parrafos": [
+            "1. Qué token IDs existen ahora en la red remota (depende de los mints hechos por pruebas y flujos): pendiente de confirmar.",
+            "2. Cómo muestra MetaMask un NFT sin metadatos (imagen y descripción): pendiente de confirmar.",
+            "3. El contrato definitivo de representación de objetos del trueque: pendiente de confirmar (hoy solo existe el mock de pruebas)."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "9. Glosario de este manual",
+          "parrafos": [
+            "NFT = token no fungible: único e irrepetible · ERC-721 = estándar de NFTs (cada token es distinto) · Token ID = el número de matrícula de un NFT (1, 2, 3…) · Mock = programa de pruebas que imita al real para poder probar · Mint = crear (acuñar) un token nuevo · ownerOf y balanceOf = preguntas al contrato: ¿de quién es este token? y ¿cuántos tiene esta cuenta? · Metadatos = la imagen y la descripción que acompañan a un NFT"
+          ],
+          "subsecciones": []
+        }
+      ]
+    },
+    {
+      "id": "06-interactuar-wallet",
+      "carpeta": "07-Wallets-y-Cuentas",
+      "titulo": "Firmar y autorizar en la plataforma",
+      "resumen": "Manual en lenguaje sencillo de la interacción con tu billetera en la plataforma: cuándo aparece MetaMask, qué significa conectar, iniciar sesión firmando el mensaje TrueKeate: iniciar sesión y, en el futuro, autorizar los pasos de un trueque con intents. También te enseña a distinguir una firma de una transacción.",
+      "secciones": [
+        {
+          "titulo": "1. Empezar en 5 minutos",
+          "parrafos": [
+            "Ejemplo: quieres entrar en la web de TrueKeate como Ana.",
+            "1. Importa la cuenta de Ana en MetaMask (manual 03-cuentas-anvil) y selecciona la red de TrueKeate (cadena 31337).",
+            "2. Abre la web de TrueKeate: https://truekeate-web-593453426217.europe-west1.run.app",
+            "3. Pulsa el botón Conectar MetaMask e iniciar sesión.",
+            "4. En MetaMask aparece el diálogo Conectar con TrueKeate: es un permiso para ver tus cuentas (no firma nada). Pulsa aprobar.",
+            "5. Si la cuenta está inscrita, MetaMask te pide firmar el mensaje de sesión: TrueKeate: iniciar sesión. Firma.",
+            "6. ¡Ya estás dentro! La sesión queda guardada. Al recargar la página, la web te reconoce sin volver a preguntar.",
+            "Importante: firmar la sesión no cuesta gas ni necesita ETH. Es solo una firma, no un pago.",
+            "Los datos están auditados el 2026-09-04 en la red de pruebas (anvil, cadena 31337)."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "2. Conectar la billetera: ¿qué ocurre al pulsar el botón?",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "2.1 Los tres pasos del botón oficial",
+              "parrafos": [
+                "El botón Conectar MetaMask e iniciar sesión hace tres cosas, en orden:",
+                "1. Conectar: MetaMask abre el diálogo Conectar con TrueKeate. Es un permiso para ver tus cuentas. No es una firma ni una transacción.",
+                "2. Consultar: la web pregunta al servidor si esa wallet está inscrita en TrueKeate.",
+                "3. Autenticar: si está inscrita, la web pide la firma de sesión (apartado 3)."
+              ]
+            },
+            {
+              "titulo": "2.2 ¿Y si mi cuenta no está inscrita?",
+              "parrafos": [
+                "Si la wallet no está inscrita, la suite (tu área privada) queda bloqueada: solo podrás ver el catálogo y la pantalla de inscripción.",
+                "Para operar hay que completar la inscripción formal: correo, teléfono, dirección y consentimiento de protección de datos.",
+                "Los botones Conectar MetaMask que aparecen en otras pantallas (por ejemplo, en Mi Trueke Central) solo conectan la cuenta: no firman la sesión. El botón completo para entrar es el de Conectar e iniciar sesión."
+              ]
+            },
+            {
+              "titulo": "2.3 Al recargar la página",
+              "parrafos": [
+                "La web guarda tu cuenta y tu sesión en el navegador. Al recargar, restaura la cuenta y, si la sesión pertenece a esa misma cuenta, también la sesión: no tendrás que firmar otra vez.",
+                "Si MetaMask está bloqueada, la web conserva la cuenta pero no puede firmar: te pedirá desbloquear la billetera cuando haga falta."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "3. Firmar la sesión: el mensaje TrueKeate: iniciar sesión",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "3.1 Qué es exactamente",
+              "parrafos": [
+                "Para iniciar sesión, TrueKeate pide firmar un mensaje concreto: TrueKeate: iniciar sesión.",
+                "Firma ese mensaje con tu billetera. El servidor comprueba quién lo firmó (sin que tú envíes nunca tu clave privada) y emite un pase de sesión que la web guarda en el navegador.",
+                "Ese pase se usa en todas las llamadas de tu área privada: es tu carné mientras estás dentro."
+              ]
+            },
+            {
+              "titulo": "3.2 Qué verás en MetaMask",
+              "parrafos": [
+                "MetaMask muestra un diálogo de firma de mensaje con el texto TrueKeate: iniciar sesión.",
+                "Es una firma, no una transacción: no consume gas ni requiere saldo de ETH.",
+                "Si la rechazas, simplemente no entras: la web registra el fallo y te deja sin sesión. Puedes volver a intentarlo."
+              ]
+            },
+            {
+              "titulo": "3.3 Una sola firma para todo (login único)",
+              "parrafos": [
+                "Con una sola firma de sesión accedes a todas las secciones de tu área privada según tu tipo y estado (particular, empresa, socio…).",
+                "Si cambias de cuenta o cierras sesión, el pase de la cuenta anterior se descarta: con la nueva cuenta hay que volver a firmar (manual 03-cuentas-anvil, apartado 6)."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "4. Autorizar los pasos de un trueque",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "4.1 Qué ocurre HOY en la web (verificado)",
+              "parrafos": [
+                "Las acciones de un trueque en la web (custodiar mi lado, firmar la recepción y valorar) se envían al servidor con tu sesión (el pase del apartado 3). No abren ninguna ventana de MetaMask ni piden firma.",
+                "El servidor registra el paso en su base de datos (el espejo del trueque)."
+              ]
+            },
+            {
+              "titulo": "4.2 El diseño a futuro: firmar la intención y que la plataforma pague",
+              "parrafos": [
+                "El diseño previsto (meta-transacciones) es que tú firmes tu intención (un documento tipado llamado EIP-712) y un servicio de la plataforma (el relayer) ejecute el paso pagando el combustible (gas) por ti.",
+                "Esa parte on-chain existe y está probada en el código (contrato SmartAccount más relayer), pero la web todavía NO te pide esa firma: no hay botones en la interfaz que la soliciten hoy.",
+                "Por lo tanto, firmar un intent EIP-712 desde la web queda pendiente de confirmar hasta que se integre en la interfaz."
+              ]
+            },
+            {
+              "titulo": "4.3 Qué significa cada botón del trueque",
+              "parrafos": [
+                "Custodiar mi lado: marca el trueque como custodiado en la base de datos. No abre MetaMask.",
+                "Firmar recepción: registra que recibiste lo pactado. No abre MetaMask.",
+                "Valorar (1–5): guarda tu valoración del trueque. No abre MetaMask.",
+                "El avance on-chain del trueque (el contrato Escrow con sus estados) está desplegado y probado en el código, pero la gestión desde la wallet (firmar intents para custodiar o completar) es la parte pendiente de la integración, pendiente de confirmar."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "5. ¿Firma o transacción? Lo que puede pedirte MetaMask",
+          "parrafos": [
+            "Cuando uses TrueKeate (ahora o en el futuro) puedes encontrarte con cuatro tipos de ventana en MetaMask. Conviene saber distinguirlos:",
+            "1. Conectar con TrueKeate (ver cuentas): es un permiso para ver tus cuentas. Sin firma. No gasta ETH.",
+            "2. TrueKeate: iniciar sesión (mensaje): es la firma de sesión. Firma de mensaje. No gasta ETH (sin gas).",
+            "3. Firma de datos tipados TrueKeate SmartAccount: tu intención de un paso del trueque (diseño). Firma de datos. No gasta ETH para ti: la plataforma (relayer) paga el gas. Hoy sin interfaz, pendiente de confirmar.",
+            "4. Confirmar transacción (con gas en ETH): ejecutar algo directamente en la cadena. Transacción. Sí gasta ETH de pruebas; sin interfaz verificada, pendiente de confirmar.",
+            "Regla mnemotécnica: permiso = solo ver tus cuentas, sin firma y sin gas · firma de mensaje = demuestras que controlas la cuenta, sin gas · firma de datos tipados = autorizas una operación concreta y el relayer paga el gas (cuando exista la interfaz) · transacción = ejecutas y pagas el gas tú."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "6. Avisos importantes",
+          "parrafos": [
+            "Conectar no es firmar: dar permiso para ver tus cuentas no revela tu clave ni firma nada. La única firma que pide la app al entrar es el mensaje de sesión.",
+            "Una firma es vinculante: revisa siempre el texto exacto que firmas (aquí, siempre TrueKeate: iniciar sesión) y comprueba que estás en la web oficial de TrueKeate (evita sitios suplantadores).",
+            "Verifica la red activa (cadena 31337) antes de confirmar cualquier cosa en MetaMask.",
+            "Si un día ves una firma de datos tipados TrueKeate SmartAccount, revisa que el mensaje describe exactamente la operación que quieres autorizar antes de firmar."
+          ],
+          "imagen": "flujo-firma.svg",
+          "subsecciones": []
+        },
+        {
+          "titulo": "7. Ficha didáctica",
+          "parrafos": [
+            "¿Qué es? Es la forma en que tu billetera participa en TrueKeate: conectar (permiso para ver cuentas), firmar la sesión (TrueKeate: iniciar sesión) y, en el futuro, firmar intents de trueque.",
+            "¿Para qué sirve? Para entrar en tu área privada demostrando que controlas tu cuenta (sin enviar tu clave) y para autorizar los pasos de tus trueques. Firmar la sesión no cuesta gas.",
+            "Pasos clave: 1) Conectar MetaMask (permiso de cuentas, sin firma). 2) Si estás inscrito, firmar TrueKeate: iniciar sesión. 3) Operar: hoy las acciones del trueque van con tu sesión (sin MetaMask). 4) Al cambiar de cuenta, volver a firmar.",
+            "Errores comunes: confundir conectar con firmar (o firmar con pagar) · Rechazar la firma y creer que algo falló (solo no entras) · Cambiar de cuenta y esperar seguir con la misma sesión (se descarta) · Esperar que la web pida hoy la firma de intents EIP-712 (todavía no existe esa interfaz).",
+            "Consejo de seguridad: revisa siempre el texto que firmas y la URL de la web. Regla: permiso = ver · firma = autorizar (sin gas) · transacción = ejecutar y pagar gas. En esta red el gas es ETH simbólico de pruebas, pero el hábito de revisar cada ventana se lleva a las redes reales."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "8. Lo que falta por confirmar (resumen)",
+          "parrafos": [
+            "1. La firma de intents EIP-712 desde la web (no existe interfaz hoy; la pieza on-chain SmartAccount más relayer sí está implementada y probada): pendiente de confirmar.",
+            "2. El avance on-chain real de los trueques desde la wallet (escrow con sus estados): pendiente de confirmar en esta integración.",
+            "3. Las transacciones directas con gas (casos de empresas o fallback) no tienen interfaz verificada: pendiente de confirmar."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "9. Glosario de este manual",
+          "parrafos": [
+            "Conectar = dar permiso a la web para ver tus cuentas (sin firma) · Firma de mensaje = demostrar que controlas una cuenta firmando un texto · Pase de sesión (token) = el carné que la web guarda tras tu firma de entrada · Gas = el combustible que pagan las operaciones de la red · Relayer = servicio de la plataforma que pagará el gas de tus trueques · EIP-712 = formato de firma de datos tipados (estructurados) usado en el diseño de trueques · Escrow = depósito intermediario: nadie cobra hasta que ambas partes cumplen"
+          ],
+          "subsecciones": []
+        }
+      ]
+    },
+    {
+      "id": "08-fichas-didacticas",
+      "carpeta": "07-Wallets-y-Cuentas",
+      "titulo": "Fichas didácticas: repaso de los 6 temas",
+      "resumen": "Compendio en lenguaje sencillo del manual técnico Fichas didácticas (tarjetas de estudio): estas fichas resumen lo esencial de cada tema de Wallets y cuentas para repasar en 5 minutos: ¿qué es?, ¿para qué sirve?, pasos clave, errores comunes y consejo de seguridad. Cada ficha es la versión corta de su manual completo (archivos 01 a 06 de esta carpeta).",
+      "secciones": [
+        {
+          "titulo": "1. Empezar en 5 minutos: cómo usar este compendio",
+          "parrafos": [
+            "Cada ficha es la versión corta de su manual completo (archivos 01 a 06 de esta carpeta), que termina con su propia Ficha didáctica más detallada.",
+            "1. Elige el tema que quieres repasar (apartados 3 a 8).",
+            "2. Lee su ficha rápida: es la idea clave de un vistazo.",
+            "3. Si necesitas los pasos completos o los datos exactos, abre el manual correspondiente (cada ficha enlaza al suyo).",
+            "4. Termina con el apartado 9: la tabla ¿firma o transacción? es la que resume el comportamiento de la billetera en toda la plataforma.",
+            "Los datos están auditados el 2026-09-04 en la red de pruebas (anvil, cadena 31337)."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "2. El mapa de las fichas",
+          "parrafos": [
+            "El mapa de las fichas relaciona cada tema con su manual completo:",
+            "1. La billetera (wallet): fichas rápidas Qué es y Conectar a TrueKeate; manual 01-instalacion-wallet.",
+            "2. La red de pruebas (RPC): fichas Qué es, Parámetros y Verificar red; manual 02-conexion-red-rpc.",
+            "3. Las cuentas de prueba: fichas Cuentas anvil, Roles y Con o sin fondos; manual 03-cuentas-anvil.",
+            "4. El token BRLT: fichas Qué es y Saldo y transferencias; manual 04-token-brlt.",
+            "5. Los NFTs de trueques: fichas Qué es y Verificar propiedad; manual 05-nfts-trueques.",
+            "6. Firmar y autorizar: fichas Login, Intents y relayer y Firma contra transacción; manual 06-interactuar-wallet."
+          ],
+          "imagen": "mapa-fichas.svg",
+          "subsecciones": []
+        },
+        {
+          "titulo": "3. Ficha 1 · La billetera (wallet)",
+          "parrafos": [
+            "¿Qué es? Una aplicación que guarda tus claves privadas y firma por ti sin exponerlas. En TrueKeate la billetera es MetaMask (extensión en el ordenador, app en el móvil). La billetera no guarda tus tokens: guarda las claves; los saldos viven en la blockchain y ella solo los lee y muestra.",
+            "¿Para qué sirve? Conectarte a TrueKeate, firmar el inicio de sesión y ver tus activos de la red de pruebas: ETH (moneda de la red), BRLT (token interno) y los NFTs de los trueques.",
+            "Pasos clave: 1) Instalar MetaMask (solo fuentes oficiales). 2) Añadir una vez la red de TrueKeate (cadena 31337), la plataforma no la añade por ti. 3) Importar una cuenta de prueba (por ejemplo la de Ana, con su clave privada). 4) Entrar en la web y pulsar Conectar MetaMask e iniciar sesión.",
+            "Errores comunes: tener seleccionada otra red (los saldos no aparecen) · Confundir conectar (permiso para ver) con firmar o pagar · Usar estas cuentas de prueba con dinero real.",
+            "Consejo de seguridad: el mnemónico del anvil (test test test test test test test test test test test junk) es público: nunca lo uses con fondos reales ni en producción. La frase semilla no se comparte jamás.",
+            "Manual completo: 01-instalacion-wallet (su sección Ficha didáctica)."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "4. Ficha 2 · La red de pruebas (RPC)",
+          "parrafos": [
+            "¿Qué es? La red donde vive TrueKeate de pruebas: un nodo anvil y Foundry remoto con cadena 31337 y moneda nativa ETH (simbólico de pruebas). Su RPC es https://mcc-foundry-anvil-slzlptbcla-ew.a.run.app. En esa red están los contratos del proyecto (Escrow, BRLT, TrueKeateNFT, …).",
+            "¿Para qué sirve? Que tu billetera sepa a qué cadena conectarse. Si la billetera apunta a otra red, no encontrará tus BRLT ni tus NFTs, aunque la cuenta sea la correcta.",
+            "Pasos clave: 1) MetaMask, selector de red, Añadir red, Añadir una red manualmente. 2) Rellenar: nombre sugerido TrueKeate Anvil (pruebas), RPC de arriba, Chain ID 31337, símbolo ETH, decimales 18, explorador vacío. 3) Guardar y verificar que la red queda seleccionada.",
+            "Errores comunes: escribir mal la URL del RPC · Confundir el RPC con la URL de la web o de la API (son servicios distintos) · Poner el Chain ID de otra cadena.",
+            "Consejo de seguridad: el ETH de esta red es simbólico de pruebas: nunca confundas esta cadena con Ethereum real (Chain ID 1) ni conectes a ella una billetera con fondos reales.",
+            "Manual completo: 02-conexion-red-rpc (su sección Ficha didáctica)."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "5. Ficha 3 · Las cuentas de prueba (anvil)",
+          "parrafos": [
+            "¿Qué es? Las cuentas que crea el anvil a partir de un mnemónico estándar público. Anvil financia con ETH de prueba las 10 primeras (índices 0 a 9). La cuenta 0 es el Owner y Admin, la 1 es el Relayer (paga el gas de los trueques) y las cuentas 2 a 9 son usuarios de ejemplo: Ana (2), Bruno (3), Carla (4), Diego (5), Elena (6), Fabián (7), Gisela (8), Héctor (9). Irene (10), Javier (11) y Karen (12) no tienen fondos por defecto.",
+            "¿Para qué sirve? Probar la plataforma con usuarios de ejemplo: importas la cuenta de Ana en MetaMask y la web te reconoce como Ana.",
+            "Pasos clave: 1) Elegir la cuenta en la tabla del manual 03. 2) MetaMask, Añadir cuenta, Importar cuenta, pegar su clave privada (tipo Clave privada). 3) Comprobar que la dirección resultante coincide con la de la tabla. 4) Conectar en la web e iniciar sesión.",
+            "Errores comunes: mezclar claves entre cuentas (cada clave deriva en UNA dirección) · Pensar que las 20 cuentas tienen fondos (solo 0 a 9) · Usar estas cuentas fuera de pruebas.",
+            "Consejo de seguridad: cualquiera que conozca una clave privada puede firmar por esa cuenta: estas claves son solo para el anvil de pruebas. En producción, las claves del Owner y del relayer viven en el cajón de secretos (Secret Manager), no en manuales.",
+            "Manual completo: 03-cuentas-anvil (su sección Ficha didáctica)."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "6. Ficha 4 · El token BRLT",
+          "parrafos": [
+            "¿Qué es? El token interno de TrueKeate (contrato BorloTokens, estándar ERC-20, 18 decimales), desplegado en la red 31337 en la dirección 0x6f6f570f45833e249e27022648a26f4076f48f78. Es la stablecoin de la plataforma: se emite solo tras votación de los Socios (quórum mayor o igual a 2/3), no se crea desde la billetera.",
+            "¿Para qué sirve? Ser el valor de compensación interno. En la web, el saldo BRLT solo es visible para Socios y Owner; en tu billetera, si tienes BRLT puedes ver el tuyo sin problema.",
+            "Pasos clave: 1) Red 31337 seleccionada. 2) MetaMask, Activos, Importar tokens, Token personalizado. 3) Pegar la dirección de arriba: MetaMask autocompleta símbolo BRLT y decimales 18. 4) Añadir token personalizado e Importar.",
+            "Errores comunes: confundir BRLT con ETH (ETH es la moneda que paga el gas) · Aceptar un BRLT de otra dirección · Esperar saldo cuando los Socios aún no emitieron BRLT (puede ser 0 aunque estés registrado) · Leer el saldo con la red equivocada.",
+            "Consejo de seguridad: tokens con el mismo símbolo pero distinta dirección son un clásico del fraude: la única dirección válida del BorloTokens es 0x6f6f…48f78. Las transferencias son irreversibles: revisa la dirección destino completa antes de enviar, incluso en pruebas.",
+            "Manual completo: 04-token-brlt (su sección Ficha didáctica)."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "7. Ficha 5 · Los NFTs de trueques",
+          "parrafos": [
+            "¿Qué es? Un NFT es un certificado digital único (estándar ERC-721). El de TrueKeate es el contrato TrueKeateNFT (símbolo TKANFT), dirección 0x99dbe4aea58e518c50a1c04ae9b48c9f6354612f, y es un contrato de pruebas (mock): representa los objetos y certificados de los trueques en el entorno de desarrollo.",
+            "¿Para qué sirve? Ver en tu billetera los NFTs de tus trueques de prueba y comprobar quién es el dueño de cada token.",
+            "Pasos clave: 1) Red 31337 seleccionada. 2) MetaMask, pestaña NFTs, Importar NFTs. 3) Pegar la dirección del contrato y el ID del token (número entero, por ejemplo 1; los IDs van en orden desde el 1). 4) Añadir. 5) Para confirmar propiedad, preguntar al contrato (ownerOf y balanceOf).",
+            "Errores comunes: importar sin saber el ID del token · Tener la red equivocada · Esperar imagen o descripción (este contrato de pruebas no tiene metadatos: puede verse sin imagen) · Fiarse de una captura en vez de comprobar en la cadena quién es el dueño.",
+            "Consejo de seguridad: cualquiera puede mintear (crear) NFTs de este contrato de pruebas: poseer uno no certifica nada fuera del desarrollo. La fuente de verdad es la blockchain (ownerOf), no la imagen.",
+            "Manual completo: 05-nfts-trueques (su sección Ficha didáctica)."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "8. Ficha 6 · Firmar y autorizar",
+          "parrafos": [
+            "¿Qué es? La forma en que tu billetera participa en TrueKeate: conectar (permiso para ver cuentas, sin firma), firmar la sesión (TrueKeate: iniciar sesión, sin gas) y, en el futuro, firmar intents de trueque.",
+            "¿Para qué sirve? Entrar en tu área privada demostrando que controlas tu cuenta (sin enviar tu clave privada) y autorizar los pasos de tus trueques. El diseño previsto: tú firmas tu intención (formato EIP-712) y el relayer (pieza de la plataforma) paga el gas.",
+            "Pasos clave: 1) Pulsar Conectar MetaMask e iniciar sesión. 2) Aprobar el permiso de cuentas. 3) Si estás inscrito, firmar el mensaje de sesión. 4) Operar: hoy las acciones del trueque (custodiar, firmar recepción, valorar) van con tu sesión, sin abrir MetaMask. 5) Al cambiar de cuenta, volver a firmar.",
+            "Errores comunes: confundir conectar con firmar (o firmar con pagar) · Rechazar la firma y creer que algo falló (solo no entras) · Cambiar de cuenta y esperar conservar la sesión anterior · Esperar que la web pida hoy la firma de intents EIP-712 (esa interfaz todavía no existe).",
+            "Consejo de seguridad: revisa siempre el texto exacto que firmas y la URL de la web (evita sitios suplantadores). Regla mnemotécnica: permiso = ver · firma = autorizar (sin gas) · transacción = ejecutar y pagar gas.",
+            "Manual completo: 06-interactuar-wallet (su sección Ficha didáctica)."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "9. La tabla que lo resume todo: ¿firma o transacción?",
+          "parrafos": [
+            "Conectar con TrueKeate (ver cuentas): es un permiso para ver tus cuentas, sin firma, y no gasta ETH.",
+            "TrueKeate: iniciar sesión: es la firma de sesión, una firma de mensaje, y no gasta ETH (sin gas).",
+            "Firma de datos tipados TrueKeate SmartAccount: tu intención de un paso del trueque (diseño); es una firma de datos y no gasta ETH para ti (el relayer paga). Hoy sin interfaz, pendiente de confirmar.",
+            "Confirmar transacción (con gas en ETH): ejecutar algo directamente en la cadena; es una transacción y sí gasta ETH de pruebas. Sin interfaz verificada, pendiente de confirmar."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "10. Ficha didáctica del compendio",
+          "parrafos": [
+            "¿Qué es? Un repaso rápido en fichas de los 6 temas de Wallets y cuentas: billetera, red RPC, cuentas de prueba, BRLT, NFTs y firma.",
+            "¿Para qué sirve? Recordar en pocos minutos la idea de cada tema y saber a qué manual completo ir cuando necesitas los pasos o datos exactos.",
+            "Pasos clave: 1) Repasar las fichas 1 a 6 (apartados 3 a 8). 2) Memorizar la regla: permiso = ver · firma = sin gas · transacción = pagar gas (apartado 9). 3) Ante la duda, abrir el manual del tema.",
+            "Errores comunes: estudiarse solo la ficha sin mirar el manual cuando se va a operar · Confundir los activos (ETH contra BRLT contra NFT) · Confundir conectar, firmar y pagar.",
+            "Consejo de seguridad: repasa siempre dos datos antes de operar: la red activa (cadena 31337) y el texto exacto que firmas. Todo lo de este compendio es de la red de pruebas: nada tiene valor real."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "11. Lo que falta por confirmar (resumen)",
+          "parrafos": [
+            "1. Firma de intents EIP-712 desde la web (no existe interfaz hoy; la pieza on-chain SmartAccount más relayer está implementada y probada): pendiente de confirmar.",
+            "2. Avance on-chain real de los trueques desde la wallet (escrow con sus estados): pendiente de confirmar en esta integración.",
+            "3. Qué token IDs de TrueKeateNFT existen ahora en la red remota y estado de emisiones de BRLT: pendiente de confirmar por entorno.",
+            "4. Comportamiento de MetaMask con NFTs sin metadatos y contratos definitivos de representación de objetos: pendiente de confirmar."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "12. Glosario de este compendio",
+          "parrafos": [
+            "Wallet o billetera = aplicación que guarda tus claves y firma por ti (MetaMask) · RPC = la dirección del nodo al que se conecta la billetera · Chain ID = el número de identidad de una cadena (aquí, 31337) · Anvil = el simulador de blockchain de pruebas del proyecto · Clave privada = la llave secreta de una cuenta: quien la tiene, firma por ella · ETH = moneda de la red de pruebas; paga el gas · BRLT = token interno ERC-20 de la plataforma · NFT = certificado digital único (ERC-721) · Gas = el combustible que pagan las operaciones · Relayer = servicio de la plataforma que paga el gas de los trueques · EIP-191 y EIP-712 = formatos de firma (mensaje simple o datos estructurados) · Pendiente de confirmar = dato o función que aún no se ha podido verificar"
           ],
           "subsecciones": []
         }

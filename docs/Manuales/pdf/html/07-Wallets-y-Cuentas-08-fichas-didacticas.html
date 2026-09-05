@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · Fichas didácticas: repaso de los 6 temas</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">07 · Wallets y Cuentas</div>
+    <h1>Fichas didácticas: repaso de los 6 temas</h1>
+    <div class="intro">Compendio en lenguaje sencillo del manual técnico "Fichas didácticas (tarjetas de estudio)". Estas fichas resumen lo esencial de cada tema de <strong>Wallets y cuentas</strong> para repasar en 5 minutos: ¿qué es?, ¿para qué sirve?, pasos clave, errores comunes y consejo de seguridad.  Cada ficha es la versión corta de su manual completo (archivos 01–06 de esta carpeta), que termina con su propia <strong>Ficha didáctica</strong> más detallada.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>07-Wallets-y-Cuentas/08-fichas-didacticas.md</b></span>
+      <span>Edición: <b>4 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/07-Wallets-y-Cuentas/08-fichas-didacticas</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Wallets y Cuentas · Wallets Y Cuentas — Fichas didácticas: repaso de los 6 temas</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos: cómo usar este compendio</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>El mapa de las fichas</span></a></li><li><a href="#s3"><span class="tnum">3</span><span>Ficha 1 · La billetera (wallet)</span></a></li><li><a href="#s4"><span class="tnum">4</span><span>Ficha 2 · La red de pruebas (RPC)</span></a></li><li><a href="#s5"><span class="tnum">5</span><span>Ficha 3 · Las cuentas de prueba (anvil)</span></a></li><li><a href="#s6"><span class="tnum">6</span><span>Ficha 4 · El token BRLT</span></a></li><li><a href="#s7"><span class="tnum">7</span><span>Ficha 5 · Los NFTs de trueques</span></a></li><li><a href="#s8"><span class="tnum">8</span><span>Ficha 6 · Firmar y autorizar</span></a></li><li><a href="#s9"><span class="tnum">9</span><span>La tabla que lo resume todo: ¿firma o transacción?</span></a></li><li><a href="#s10"><span class="tnum">10</span><span>Ficha didáctica del compendio</span></a></li><li><a href="#s11"><span class="tnum">11</span><span>Lo que falta por confirmar (resumen)</span></a></li><li><a href="#s12"><span class="tnum">12</span><span>Glosario de este compendio</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<blockquote class="info"><span class="tag">Nota</span><p>🔎 Datos auditados el 2026-09-04 en la red de pruebas (anvil, cadena 31337).</p></blockquote>
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos: cómo usar este compendio</h2>
+<ol><li>Elige el tema que quieres repasar (apartados 3 a 8).</li><li>Lee su ficha rápida: es la idea clave de un vistazo.</li><li>Si necesitas los pasos completos o los datos exactos, abre el manual correspondiente (cada ficha enlaza al suyo).</li><li>Termina con el apartado 9: la tabla <em>"¿firma o transacción?"</em> es la que resume el comportamiento de la billetera en toda la plataforma.</li></ol>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. El mapa de las fichas</h2>
+<div class="table-wrap"><table><thead><tr><th>Tema</th><th>Fichas rápidas</th><th>Manual completo</th></tr></thead><tbody><tr><td>1. La billetera (wallet)</td><td>Qué es · Conectar a TrueKeate</td><td>[01 · Cómo crear tu billetera](01-instalacion-wallet.md)</td></tr><tr><td>2. La red de pruebas (RPC)</td><td>Qué es · Parámetros · Verificar red</td><td>[02 · Conecta TrueKeate a tu billetera](02-conexion-red-rpc.md)</td></tr><tr><td>3. Las cuentas de prueba</td><td>Cuentas anvil · Roles · Con/sin fondos</td><td>[03 · Las cuentas de prueba](03-cuentas-anvil.md)</td></tr><tr><td>4. El token BRLT</td><td>Qué es · Saldo y transferencias</td><td>[04 · Añade el token BRLT a tu billetera](04-token-brlt.md)</td></tr><tr><td>5. Los NFTs de trueques</td><td>Qué es · Verificar propiedad</td><td>[05 · Ver los NFTs de tus trueques](05-nfts-trueques.md)</td></tr><tr><td>6. Firmar y autorizar</td><td>Login · Intents y relayer · Firma vs transacción</td><td>[06 · Firmar y autorizar en la plataforma](06-interactuar-wallet.md)</td></tr></tbody></table></div>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5NYXBhIGRlIGxhcyA2IGZpY2hhcyBkZSBXYWxsZXRzIHkgY3VlbnRhczwvdGV4dD4KCiAgPCEtLSBGaWxhIHN1cGVyaW9yOiAxLTItMyAtLT4KICA8cmVjdCB4PSI1MCIgeT0iOTAiIHdpZHRoPSIyMDAiIGhlaWdodD0iOTIiIHJ4PSIxMyIgZmlsbD0iIzQ4Y2FlNCIvPgogIDx0ZXh0IHg9IjE1MCIgeT0iMTIyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEzLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj4xIMK3IExhIGJpbGxldGVyYTwvdGV4dD4KICA8dGV4dCB4PSIxNTAiIHk9IjE0MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41Ij5NZXRhTWFzazogZXh0ZW5zacOzbiB5IGFwcDwvdGV4dD4KICA8dGV4dCB4PSIxNTAiIHk9IjE1OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMCI+Y3JlYXIgwrcgaW1wb3J0YXIgwrcgY29uZWN0YXI8L3RleHQ+CgogIDxyZWN0IHg9IjMwMCIgeT0iOTAiIHdpZHRoPSIyMDAiIGhlaWdodD0iOTIiIHJ4PSIxMyIgZmlsbD0iIzQ4Y2FlNCIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMTIyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEzLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj4yIMK3IFJlZCBkZSBwcnVlYmFzPC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMTQyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwLjUiPlJQQyBhbnZpbCDCtyBjYWRlbmEgMzEzMzc8L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSIxNTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPmHDsWFkaXIgcmVkIGVuIE1ldGFNYXNrPC90ZXh0PgoKICA8cmVjdCB4PSI1NTAiIHk9IjkwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjkyIiByeD0iMTMiIGZpbGw9IiM0OGNhZTQiLz4KICA8dGV4dCB4PSI2NTAiIHk9IjEyMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMy41IiBmb250LXdlaWdodD0iYm9sZCI+MyDCtyBDdWVudGFzIGFudmlsPC90ZXh0PgogIDx0ZXh0IHg9IjY1MCIgeT0iMTQyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwLjUiPm1uZW3Ds25pY28gcMO6YmxpY28gwrcgcm9sZXM8L3RleHQ+CiAgPHRleHQgeD0iNjUwIiB5PSIxNTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPk93bmVyIMK3IFJlbGF5ZXIgwrcgdXN1YXJpb3M8L3RleHQ+CgogIDwhLS0gRmlsYSBpbmZlcmlvcjogNC01LTYgLS0+CiAgPHJlY3QgeD0iNTUwIiB5PSIyNjAiIHdpZHRoPSIyMDAiIGhlaWdodD0iOTIiIHJ4PSIxMyIgZmlsbD0iI2Y0YTI2MSIvPgogIDx0ZXh0IHg9IjY1MCIgeT0iMjkyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEzLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj40IMK3IFRva2VuIEJSTFQ8L3RleHQ+CiAgPHRleHQgeD0iNjUwIiB5PSIzMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAuNSI+Qm9ybG9Ub2tlbnMgwrcgRVJDLTIwIMK3IDE4IGRlYy48L3RleHQ+CiAgPHRleHQgeD0iNjUwIiB5PSIzMjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPmRpcmVjY2nDs24gMHg2ZjZm4oCmNDhmNzg8L3RleHQ+CgogIDxyZWN0IHg9IjMwMCIgeT0iMjYwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjkyIiByeD0iMTMiIGZpbGw9IiNlOWU1ZjAiIHN0cm9rZT0iIzhkODZhOSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjI5MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMy41IiBmb250LXdlaWdodD0iYm9sZCI+NSDCtyBORlRzIGRlIHRydWVxdWVzPC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iMzEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwLjUiPlRydWVLZWF0ZU5GVCDCtyBFUkMtNzIxIMK3IFRLQU5GVDwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjMyOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMCI+ZGlyZWNjacOzbiAweDk5ZGLigKY2MTJmPC90ZXh0PgoKICA8cmVjdCB4PSI1MCIgeT0iMjYwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjkyIiByeD0iMTMiIGZpbGw9IiNkNGFmMzciLz4KICA8dGV4dCB4PSIxNTAiIHk9IjI5MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMy41IiBmb250LXdlaWdodD0iYm9sZCI+NiDCtyBGaXJtYXIgeSBhdXRvcml6YXI8L3RleHQ+CiAgPHRleHQgeD0iMTUwIiB5PSIzMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAuNSI+c2VzacOzbiDCtyBpbnRlbnRzIEVJUC03MTI8L3RleHQ+CiAgPHRleHQgeD0iMTUwIiB5PSIzMjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPnJlbGF5ZXIgcGFnYSBlbCBnYXM8L3RleHQ+CgogIDwhLS0gUmVzdWx0YWRvIC0tPgogIDxyZWN0IHg9IjIwMCIgeT0iNDMwIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjYwIiByeD0iMTMiIGZpbGw9IiMyYTlkOGYiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjQ1NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMy41IiBmb250LXdlaWdodD0iYm9sZCI+UmVwYXNhIGxhIHRhYmxhOiDCv2Zpcm1hIG8gdHJhbnNhY2Npw7NuPzwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjQ3NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMC41Ij5wZXJtaXNvID0gdmVyIMK3IGZpcm1hID0gYXV0b3JpemFyIChzaW4gZ2FzKSDCtyB0cmFuc2FjY2nDs24gPSBwYWdhciBnYXM8L3RleHQ+CgogIDwhLS0gRmxlY2hhcyAtLT4KICA8ZyBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMi41IiBmaWxsPSJub25lIiBtYXJrZXItZW5kPSJ1cmwoI2FycikiPgogICAgPGxpbmUgeDE9IjI1MCIgeTE9IjEzNiIgeDI9IjI5NiIgeTI9IjEzNiIvPgogICAgPGxpbmUgeDE9IjUwMCIgeTE9IjEzNiIgeDI9IjU0NiIgeTI9IjEzNiIvPgogICAgPGxpbmUgeDE9IjY1MCIgeTE9IjE4MiIgeDI9IjY1MCIgeTI9IjI1NiIvPgogICAgPGxpbmUgeDE9IjU1MCIgeTE9IjMwNiIgeDI9IjUwNCIgeTI9IjMwNiIvPgogICAgPGxpbmUgeDE9IjMwMCIgeTE9IjMwNiIgeDI9IjI1NCIgeTI9IjMwNiIvPgogICAgPHBhdGggZD0iTSAxNTAgMzUyIEwgMTUwIDM4NSBMIDQwMCAzODUgTCA0MDAgNDI2Ii8+CiAgPC9nPgogIDx0ZXh0IHg9IjI3MyIgeT0iMTI4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjExIj5zZWd1aXI8L3RleHQ+CiAgPHRleHQgeD0iNTIzIiB5PSIxMjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTEiPnNlZ3VpcjwvdGV4dD4KICA8dGV4dCB4PSI2NjMiIHk9IjI0NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMSI+c2VndWlyPC90ZXh0PgogIDx0ZXh0IHg9IjUyNyIgeT0iMjk4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjExIj5zZWd1aXI8L3RleHQ+CiAgPHRleHQgeD0iMjc3IiB5PSIyOTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTEiPnNlZ3VpcjwvdGV4dD4KPC9zdmc+Cg==" alt="Mapa Fichas"/><figcaption class="fig-caption">Figura · Mapa Fichas</figcaption></figure>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. Ficha 1 · La billetera (wallet)</h2>
+<p><strong>¿Qué es?</strong> Una aplicación que guarda tus <strong>claves privadas</strong> y firma por ti sin exponerlas. En TrueKeate la billetera es <strong>MetaMask</strong> (extensión en el ordenador, app en el móvil). La billetera <strong>no guarda tus tokens</strong>: guarda las claves; los saldos viven en la blockchain y ella solo los lee y muestra.</p>
+<p><strong>¿Para qué sirve?</strong> Conectarte a TrueKeate, firmar el inicio de sesión y ver tus activos de la red de pruebas: ETH (moneda de la red), BRLT (token interno) y los NFTs de los trueques.</p>
+<p><strong>Pasos clave</strong> 1) Instalar MetaMask (solo fuentes oficiales). 2) Añadir una vez la red de TrueKeate (cadena 31337) — la plataforma no la añade por ti. 3) Importar una cuenta de prueba (por ejemplo la de Ana, con su clave privada). 4) Entrar en la web y pulsar "Conectar MetaMask e iniciar sesión".</p>
+<p><strong>Errores comunes</strong> Tener seleccionada otra red (los saldos "no aparecen") · Confundir conectar (permiso para ver) con firmar o pagar · Usar estas cuentas de prueba con dinero real.</p>
+<p><strong>Consejo de seguridad</strong> El mnemónico del anvil (<code>test test test test test test test test test test test junk</code>) es <strong>público</strong>: nunca lo uses con fondos reales ni en producción. La frase semilla no se comparte jamás.</p>
+<blockquote class="info"><span class="tag">Nota</span><p>Manual completo: [01 · Cómo crear tu billetera](01-instalacion-wallet.md) → su sección <strong>Ficha didáctica</strong>.</p></blockquote>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. Ficha 2 · La red de pruebas (RPC)</h2>
+<p><strong>¿Qué es?</strong> La red donde vive TrueKeate de pruebas: un nodo <strong>anvil/Foundry remoto</strong> con cadena <strong>31337</strong> y moneda nativa <strong>ETH</strong> (simbólico de pruebas). Su RPC es: <code>https://mcc-foundry-anvil-slzlptbcla-ew.a.run.app</code>. En esa red están los contratos del proyecto (Escrow, BRLT, TrueKeateNFT, …).</p>
+<p><strong>¿Para qué sirve?</strong> Que tu billetera sepa a qué cadena conectarse. Si la billetera apunta a otra red, no encontrará tus BRLT ni tus NFTs, aunque la cuenta sea la correcta.</p>
+<p><strong>Pasos clave</strong> 1) MetaMask → selector de red → "Añadir red" → "Añadir una red manualmente". 2) Rellenar: nombre sugerido "TrueKeate Anvil (pruebas)", RPC de arriba, Chain ID <code>31337</code>, símbolo <code>ETH</code>, decimales <code>18</code>, explorador vacío. 3) Guardar y verificar que la red queda seleccionada.</p>
+<p><strong>Errores comunes</strong> Escribir mal la URL del RPC · Confundir el RPC con la URL de la web o de la API (son servicios distintos) · Poner el Chain ID de otra cadena.</p>
+<p><strong>Consejo de seguridad</strong> El ETH de esta red es <strong>simbólico de pruebas</strong>: nunca confundas esta cadena con Ethereum real (Chain ID 1) ni conectes a ella una billetera con fondos reales.</p>
+<blockquote class="info"><span class="tag">Nota</span><p>Manual completo: [02 · Conecta TrueKeate a tu billetera](02-conexion-red-rpc.md) → su sección <strong>Ficha didáctica</strong>.</p></blockquote>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. Ficha 3 · Las cuentas de prueba (anvil)</h2>
+<p><strong>¿Qué es?</strong> Las cuentas que crea el anvil a partir de un <strong>mnemónico estándar público</strong>. Anvil financia con ETH de prueba las <strong>10 primeras (índices 0–9)</strong>. La cuenta 0 es el <strong>Owner/Admin</strong>, la 1 es el <strong>Relayer</strong> (paga el gas de los trueques) y las cuentas 2–9 son usuarios de ejemplo: <strong>Ana</strong> (2), Bruno (3), Carla (4), Diego (5), Elena (6), Fabián (7), Gisela (8), Héctor (9). Irene (10), Javier (11) y Karen (12) <strong>no tienen fondos</strong> por defecto.</p>
+<p><strong>¿Para qué sirve?</strong> Probar la plataforma con usuarios de ejemplo: importas la cuenta de Ana en MetaMask y la web te reconoce como Ana.</p>
+<p><strong>Pasos clave</strong> 1) Elegir la cuenta en la tabla del manual 03. 2) MetaMask → "Añadir cuenta" → "Importar cuenta" → pegar su <strong>clave privada</strong> (tipo "Clave privada"). 3) Comprobar que la dirección resultante coincide con la de la tabla. 4) Conectar en la web e iniciar sesión.</p>
+<p><strong>Errores comunes</strong> Mezclar claves entre cuentas (cada clave deriva en UNA dirección) · Pensar que las 20 cuentas tienen fondos (solo 0–9) · Usar estas cuentas fuera de pruebas.</p>
+<p><strong>Consejo de seguridad</strong> Cualquiera que conozca una clave privada puede firmar por esa cuenta: estas claves son <strong>solo para el anvil de pruebas</strong>. En producción, las claves del Owner y del relayer viven en el cajón de secretos (Secret Manager), no en manuales.</p>
+<blockquote class="info"><span class="tag">Nota</span><p>Manual completo: [03 · Las cuentas de prueba](03-cuentas-anvil.md) → su sección <strong>Ficha didáctica</strong>.</p></blockquote>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. Ficha 4 · El token BRLT</h2>
+<p><strong>¿Qué es?</strong> El token interno de TrueKeate (contrato <strong>BorloTokens</strong>, estándar <strong>ERC-20</strong>, <strong>18 decimales</strong>), desplegado en la red 31337 en la dirección <code>0x6f6f570f45833e249e27022648a26f4076f48f78</code>. Es la "stablecoin" de la plataforma: se emite solo tras votación de los <strong>Socios</strong> (quórum ≥2/3), no se crea desde la billetera.</p>
+<p><strong>¿Para qué sirve?</strong> Ser el valor de compensación interno. En la <strong>web</strong>, el saldo BRLT solo es visible para <strong>Socios y Owner</strong>; en tu <strong>billetera</strong>, si tienes BRLT puedes ver el tuyo sin problema.</p>
+<p><strong>Pasos clave</strong> 1) Red 31337 seleccionada. 2) MetaMask → Activos → "Importar tokens" → "Token personalizado". 3) Pegar la dirección de arriba: MetaMask autocompleta símbolo <code>BRLT</code> y decimales <code>18</code>. 4) "Añadir token personalizado" → Importar.</p>
+<p><strong>Errores comunes</strong> Confundir BRLT con ETH (ETH es la moneda que paga el gas) · Aceptar un "BRLT" de otra dirección · Esperar saldo cuando los Socios aún no emitieron BRLT (puede ser 0 aunque estés registrado) · Leer el saldo con la red equivocada.</p>
+<p><strong>Consejo de seguridad</strong> Tokens con el mismo símbolo pero distinta dirección son un clásico del fraude: la única dirección válida del BorloTokens es <code>0x6f6f…48f78</code>. Las transferencias son <strong>irreversibles</strong>: revisa la dirección destino completa antes de enviar, incluso en pruebas.</p>
+<blockquote class="info"><span class="tag">Nota</span><p>Manual completo: [04 · Añade el token BRLT a tu billetera](04-token-brlt.md) → su sección <strong>Ficha didáctica</strong>.</p></blockquote>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. Ficha 5 · Los NFTs de trueques</h2>
+<p><strong>¿Qué es?</strong> Un <strong>NFT</strong> es un certificado digital único (estándar <strong>ERC-721</strong>). El de TrueKeate es el contrato <strong>TrueKeateNFT</strong> (símbolo <strong>TKANFT</strong>), dirección <code>0x99dbe4aea58e518c50a1c04ae9b48c9f6354612f</code>, y es un <strong>contrato de pruebas</strong> (mock): representa los objetos/certificados de los trueques en el entorno de desarrollo.</p>
+<p><strong>¿Para qué sirve?</strong> Ver en tu billetera los NFTs de tus trueques de prueba y comprobar quién es el dueño de cada token.</p>
+<p><strong>Pasos clave</strong> 1) Red 31337 seleccionada. 2) MetaMask → pestaña "NFTs" → "Importar NFTs". 3) Pegar la dirección del contrato + el <strong>ID del token</strong> (número entero, p. ej. <code>1</code>; los IDs van en orden desde el 1). 4) "Añadir". 5) Para confirmar propiedad, preguntar al contrato (<code>ownerOf</code>/<code>balanceOf</code>).</p>
+<p><strong>Errores comunes</strong> Importar sin saber el ID del token · Tener la red equivocada · Esperar imagen o descripción (este contrato de pruebas no tiene metadatos: puede verse sin imagen) · Fiarse de una captura en vez de comprobar en la cadena quién es el dueño.</p>
+<p><strong>Consejo de seguridad</strong> Cualquiera puede mintear (crear) NFTs de este contrato de pruebas: poseer uno <strong>no certifica nada</strong> fuera del desarrollo. La fuente de verdad es la blockchain (<code>ownerOf</code>), no la imagen.</p>
+<blockquote class="info"><span class="tag">Nota</span><p>Manual completo: [05 · Ver los NFTs de tus trueques](05-nfts-trueques.md) → su sección <strong>Ficha didáctica</strong>.</p></blockquote>
+</section>
+<section class="seccion" id="s8"><h2 class="seccion">8. Ficha 6 · Firmar y autorizar</h2>
+<p><strong>¿Qué es?</strong> La forma en que tu billetera participa en TrueKeate: <strong>conectar</strong> (permiso para ver cuentas, sin firma), <strong>firmar la sesión</strong> (<em>"TrueKeate: iniciar sesión"</em>, sin gas) y, en el futuro, <strong>firmar intents de trueque</strong>.</p>
+<p><strong>¿Para qué sirve?</strong> Entrar en tu área privada demostrando que controlas tu cuenta (sin enviar tu clave privada) y autorizar los pasos de tus trueques. El diseño previsto: tú firmas tu intención (formato EIP-712) y el <strong>relayer</strong> (pieza de la plataforma) paga el gas.</p>
+<p><strong>Pasos clave</strong> 1) Pulsar "Conectar MetaMask e iniciar sesión". 2) Aprobar el permiso de cuentas. 3) Si estás inscrito, firmar el mensaje de sesión. 4) Operar: hoy las acciones del trueque (custodiar, firmar recepción, valorar) van con tu sesión, sin abrir MetaMask. 5) Al cambiar de cuenta, volver a firmar.</p>
+<p><strong>Errores comunes</strong> Confundir conectar con firmar (o firmar con pagar) · Rechazar la firma y creer que algo falló (solo no entras) · Cambiar de cuenta y esperar conservar la sesión anterior · Esperar que la web pida hoy la firma de intents EIP-712 (esa UI todavía no existe).</p>
+<p><strong>Consejo de seguridad</strong> Revisa siempre el texto exacto que firmas y la URL de la web (evita sitios suplantadores). Regla mnemotécnica: <strong>permiso = ver · firma = autorizar (sin gas) · transacción = ejecutar y pagar gas</strong>.</p>
+<blockquote class="info"><span class="tag">Nota</span><p>Manual completo: [06 · Firmar y autorizar en la plataforma](06-interactuar-wallet.md) → su sección <strong>Ficha didáctica</strong>.</p></blockquote>
+</section>
+<section class="seccion" id="s9"><h2 class="seccion">9. La tabla que lo resume todo: ¿firma o transacción?</h2>
+<div class="table-wrap"><table><thead><tr><th>Ventana en MetaMask</th><th>Qué es</th><th>¿Firma o transacción?</th><th>¿Gasta ETH?</th></tr></thead><tbody><tr><td>"Conectar con TrueKeate" (ver cuentas)</td><td>Permiso para ver tus cuentas</td><td>Permiso (sin firma)</td><td>No</td></tr><tr><td>"TrueKeate: iniciar sesión"</td><td>Firma de sesión</td><td>Firma de mensaje</td><td><strong>No</strong> (sin gas)</td></tr><tr><td>Firma de datos tipados "TrueKeate SmartAccount"</td><td>Tu intención de un paso del trueque (diseño)</td><td>Firma de datos</td><td><strong>No para ti</strong>: el relayer paga · hoy <strong>sin UI</strong> → pendiente de confirmar</td></tr><tr><td>Confirmar transacción (con gas en ETH)</td><td>Ejecutar algo directamente en la cadena</td><td>Transacción</td><td><strong>Sí</strong>, gas en ETH de pruebas · sin UI verificada → pendiente de confirmar</td></tr></tbody></table></div>
+</section>
+<section class="seccion" id="s10"><h2 class="seccion">10. Ficha didáctica del compendio</h2>
+<div class="table-wrap"><table><thead><tr><th>Campo</th><th>Contenido</th></tr></thead><tbody><tr><td><strong>¿Qué es?</strong></td><td>Un repaso rápido en fichas de los 6 temas de Wallets y cuentas: billetera, red RPC, cuentas de prueba, BRLT, NFTs y firma.</td></tr><tr><td><strong>¿Para qué sirve?</strong></td><td>Recordar en pocos minutos la idea de cada tema y saber a qué manual completo ir cuando necesitas los pasos o datos exactos.</td></tr><tr><td><strong>Pasos clave</strong></td><td>1) Repasar las fichas 1–6 (apartados 3–8). 2) Memorizar la regla: permiso = ver · firma = sin gas · transacción = pagar gas (apartado 9). 3) Ante la duda, abrir el manual del tema.</td></tr><tr><td><strong>Errores comunes</strong></td><td>Estudiarse solo la ficha sin mirar el manual cuando se va a operar · Confundir los activos (ETH vs BRLT vs NFT) · Confundir conectar, firmar y pagar.</td></tr><tr><td><strong>Consejo de seguridad</strong></td><td>Repasa siempre dos datos antes de operar: la <strong>red activa</strong> (cadena 31337) y el <strong>texto exacto que firmas</strong>. Todo lo de este compendio es de la red de pruebas: nada tiene valor real.</td></tr></tbody></table></div>
+</section>
+<section class="seccion" id="s11"><h2 class="seccion">11. Lo que falta por confirmar (resumen)</h2>
+<ol><li>Firma de intents EIP-712 desde la web (no existe UI hoy; la pieza on-chain SmartAccount + relayer está implementada y probada) → <strong>pendiente de confirmar</strong>.</li><li>Avance on-chain real de los trueques desde la wallet (escrow con sus estados) → <strong>pendiente de confirmar</strong> en esta integración.</li><li>Qué token IDs de TrueKeateNFT existen ahora en la red remota y estado de emisiones de BRLT → <strong>pendiente de confirmar</strong> por entorno.</li><li>Comportamiento de MetaMask con NFTs sin metadatos y contratos definitivos de representación de objetos → <strong>pendiente de confirmar</strong>.</li></ol>
+</section>
+<section class="seccion" id="s12"><h2 class="seccion">12. Glosario de este compendio</h2>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Significado</th></tr></thead><tbody><tr><td><strong>Wallet / billetera</strong></td><td>Aplicación que guarda tus claves y firma por ti (MetaMask)</td></tr><tr><td><strong>RPC</strong></td><td>La "dirección" del nodo al que se conecta la billetera</td></tr><tr><td><strong>Chain ID</strong></td><td>El número de identidad de una cadena (aquí, 31337)</td></tr><tr><td><strong>Anvil</strong></td><td>El simulador de blockchain de pruebas del proyecto</td></tr><tr><td><strong>Clave privada</strong></td><td>La llave secreta de una cuenta: quien la tiene, firma por ella</td></tr><tr><td><strong>ETH</strong></td><td>Moneda de la red de pruebas; paga el gas</td></tr><tr><td><strong>BRLT</strong></td><td>Token interno ERC-20 de la plataforma</td></tr><tr><td><strong>NFT</strong></td><td>Certificado digital único (ERC-721)</td></tr><tr><td><strong>Gas</strong></td><td>El "combustible" que pagan las operaciones</td></tr><tr><td><strong>Relayer</strong></td><td>Servicio de la plataforma que paga el gas de los trueques</td></tr><tr><td><strong>EIP-191 / EIP-712</strong></td><td>Formatos de firma (mensaje simple / datos estructurados)</td></tr><tr><td><strong>Pendiente de confirmar</strong></td><td>Dato o función que aún no se ha podido verificar</td></tr></tbody></table></div>
+</section>
+</main>
+
+</body>
+</html>

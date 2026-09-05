@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+    <marker id="arrR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#e63946"/>
+    </marker>
+  </defs>
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <rect width="800" height="54" fill="#1a2b4c"/>
+  <rect y="50" width="800" height="4" fill="#d4af37"/>
+  <text x="400" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">Crear tu billetera: la frase semilla (12 palabras)</text>
+
+  <!-- Pasos -->
+  <rect x="40" y="60" width="480" height="50" rx="12" fill="#f4a261"/>
+  <text x="280" y="92" text-anchor="middle" fill="#1a2b4c" font-size="13" font-weight="bold">1 · Abrir MetaMask y pulsar «Empezar»</text>
+
+  <rect x="40" y="120" width="480" height="50" rx="12" fill="#48cae4"/>
+  <text x="280" y="152" text-anchor="middle" fill="#0a1128" font-size="13" font-weight="bold">2 · Elegir: «Crear una wallet»</text>
+
+  <rect x="40" y="180" width="480" height="50" rx="12" fill="#e9e5f0" stroke="#8d86a9" stroke-width="1.5"/>
+  <text x="280" y="205" text-anchor="middle" fill="#1a2b4c" font-size="12.5" font-weight="bold">3 · Crear una contraseña local</text>
+  <text x="280" y="224" text-anchor="middle" fill="#1a2b4c" font-size="10.5">(solo protege el acceso a tu dispositivo)</text>
+
+  <rect x="40" y="240" width="480" height="50" rx="12" fill="#d4af37"/>
+  <text x="280" y="265" text-anchor="middle" fill="#0a1128" font-size="12.5" font-weight="bold">4 · MetaMask genera la frase semilla</text>
+  <text x="280" y="284" text-anchor="middle" fill="#0a1128" font-size="10.5">(12 palabras: la llave de tu billetera)</text>
+
+  <rect x="40" y="300" width="480" height="50" rx="12" fill="#2a9d8f"/>
+  <text x="280" y="325" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">5 · Guárdala en papel, fuera de línea</text>
+  <text x="280" y="344" text-anchor="middle" fill="#ffffff" font-size="10.5">(nunca en capturas, notas del móvil ni correos)</text>
+
+  <rect x="40" y="360" width="480" height="50" rx="12" fill="#48cae4"/>
+  <text x="280" y="392" text-anchor="middle" fill="#0a1128" font-size="13" font-weight="bold">6 · Confirma algunas palabras al azar</text>
+
+  <rect x="40" y="420" width="480" height="50" rx="12" fill="#2a9d8f"/>
+  <text x="280" y="445" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">7 · ¡Wallet creada! Tu dirección (0x…)</text>
+  <text x="280" y="464" text-anchor="middle" fill="#ffffff" font-size="10.5">es tu identidad en la red de pruebas</text>
+
+  <!-- Aviso -->
+  <rect x="560" y="250" width="230" height="120" rx="14" fill="#e63946"/>
+  <text x="675" y="272" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">¡Aviso de seguridad!</text>
+  <text x="675" y="292" text-anchor="middle" fill="#ffffff" font-size="10.5">La frase semilla es la llave</text>
+  <text x="675" y="306" text-anchor="middle" fill="#ffffff" font-size="10.5">de tu billetera.</text>
+  <text x="675" y="326" text-anchor="middle" fill="#ffffff" font-size="10.5">Nunca la compartas, ni</text>
+  <text x="675" y="340" text-anchor="middle" fill="#ffffff" font-size="10.5">con un «soporte técnico».</text>
+  <text x="675" y="360" text-anchor="middle" fill="#ffffff" font-size="10.5">Nadie puede recuperarla por ti.</text>
+
+  <!-- Flechas verticales -->
+  <g stroke="#1a2b4c" stroke-width="2.5" fill="none" marker-end="url(#arr)">
+    <line x1="280" y1="110" x2="280" y2="116"/>
+    <line x1="280" y1="170" x2="280" y2="176"/>
+    <line x1="280" y1="230" x2="280" y2="236"/>
+    <line x1="280" y1="290" x2="280" y2="296"/>
+    <line x1="280" y1="350" x2="280" y2="356"/>
+    <line x1="280" y1="410" x2="280" y2="416"/>
+  </g>
+  <!-- Flecha discontinua hacia el aviso -->
+  <g stroke="#e63946" stroke-width="2.5" fill="none" stroke-dasharray="6 4" marker-end="url(#arrR)">
+    <line x1="520" y1="325" x2="556" y2="325"/>
+  </g>
+</svg>

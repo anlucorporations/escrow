@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · Conecta TrueKeate a tu billetera (red RPC)</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">07 · Wallets y Cuentas</div>
+    <h1>Conecta TrueKeate a tu billetera (red RPC)</h1>
+    <div class="intro">Versión en lenguaje sencillo del manual técnico "Conexión de la wallet a la red del proyecto (RPC)". TrueKeate vive en una <strong>red de pruebas</strong> llamada anvil. Para ver tus saldos y firmar, tu billetera debe saber cómo llegar a esa red. Aquí te damos los datos y los pasos.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>07-Wallets-y-Cuentas/02-conexion-red-rpc.md</b></span>
+      <span>Edición: <b>4 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/07-Wallets-y-Cuentas/02-conexion-red-rpc</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Wallets y Cuentas · Wallets Y Cuentas — Conecta TrueKeate a tu billetera (red RPC)</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>Los datos de la red, explicados</span></a><div class="subs"><a href="#sub1">2.1 ¿Qué es una RPC?</a><br><a href="#sub2">2.2 Los parámetros auditados (2026-09-04)</a><br><a href="#sub3">2.3 De dónde salen estos datos</a></div></li><li><a href="#s3"><span class="tnum">3</span><span>Añadir la red en MetaMask (ordenador)</span></a><div class="subs"><a href="#sub4">3.1 Aviso importante</a><br><a href="#sub5">3.2 Pasos</a><br><a href="#sub6">3.3 Seleccionar la red al usar la plataforma</a></div></li><li><a href="#s4"><span class="tnum">4</span><span>Añadir la red en MetaMask (móvil)</span></a></li><li><a href="#s5"><span class="tnum">5</span><span>Comprobar que la conexión funciona</span></a><div class="subs"><a href="#sub7">5.1 Desde MetaMask</a><br><a href="#sub8">5.2 Desde la consola (para personas técnicas)</a></div></li><li><a href="#s6"><span class="tnum">6</span><span>Avisos importantes de la red de pruebas</span></a></li><li><a href="#s7"><span class="tnum">7</span><span>Ficha didáctica</span></a></li><li><a href="#s8"><span class="tnum">8</span><span>Lo que falta por confirmar (resumen)</span></a></li><li><a href="#s9"><span class="tnum">9</span><span>Glosario de este manual</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos</h2>
+<p>Estos son los pasos rápidos (los detalles están más abajo):</p>
+<ol><li>Abre MetaMask y pulsa el <strong>selector de red</strong> (arriba).</li><li>Pulsa <strong>"Añadir red"</strong> → <strong>"Añadir una red manualmente"</strong>.</li><li>Copia estos datos:</li></ol>
+<div class="table-wrap"><table><thead><tr><th>Campo</th><th>Valor</th></tr></thead><tbody><tr><td>Nombre de red</td><td><code>TrueKeate Anvil (pruebas)</code></td></tr><tr><td>Nueva URL de RPC</td><td><code>https://mcc-foundry-anvil-slzlptbcla-ew.a.run.app</code></td></tr><tr><td>ID de cadena (Chain ID)</td><td><code>31337</code></td></tr><tr><td>Símbolo de moneda</td><td><code>ETH</code></td></tr><tr><td>Explorador de bloques</td><td><em>(dejar vacío)</em></td></tr></tbody></table></div>
+<ol><li>Pulsa <strong>Guardar</strong>. MetaMask comprobará que la red responde.</li><li>Asegúrate de que la red queda <strong>seleccionada</strong> antes de operar en la web.</li></ol>
+<blockquote class="info"><span class="tag">Nota</span><p>Esto se hace <strong>una sola vez</strong>. La plataforma no añade la red por ti: no tiene código para cambiar la red de tu billetera automáticamente.</p></blockquote>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. Los datos de la red, explicados</h2>
+<h3 class="sub" id="sub1">2.1 ¿Qué es una RPC?</h3>
+<ul><li>RPC es la "puerta" por la que tu billetera habla con la blockchain.</li><li>La URL de RPC de TrueKeate apunta a un <strong>anvil remoto</strong> (una blockchain de pruebas alojada en la nube de Google).</li></ul>
+<h3 class="sub" id="sub2">2.2 Los parámetros auditados (2026-09-04)</h3>
+<div class="table-wrap"><table><thead><tr><th>Parámetro</th><th>Valor</th><th>Notas</th></tr></thead><tbody><tr><td>Nombre de red (sugerido)</td><td><code>TrueKeate Anvil (pruebas)</code></td><td>es libre, solo para que la reconozcas</td></tr><tr><td><strong>Nueva URL de RPC</strong></td><td><code>https://mcc-foundry-anvil-slzlptbcla-ew.a.run.app</code></td><td>anvil/Foundry remoto (Google Cloud Run)</td></tr><tr><td><strong>ID de cadena</strong></td><td><code>31337</code></td><td>en hexadecimal es <code>0x7a69</code></td></tr><tr><td>Símbolo de moneda</td><td><code>ETH</code></td><td>moneda nativa de pruebas</td></tr><tr><td>Decimales</td><td><code>18</code></td><td>el estándar de ETH</td></tr><tr><td>Explorador de bloques</td><td><em>(dejar vacío)</em></td><td>no hay explorador configurado → <strong>pendiente de confirmar</strong></td></tr></tbody></table></div>
+<h3 class="sub" id="sub3">2.3 De dónde salen estos datos</h3>
+<ul><li>El número de red <code>31337</code> es el entorno de pruebas del proyecto, verificado en los archivos de configuración y en los tests.</li><li>Las direcciones de los contratos de esa red están fijadas en el código de la web y del backend.</li></ul>
+<blockquote class="info"><span class="tag">Nota</span><p>Nota de trazabilidad: en documentación antigua del despliegue aparece otra URL de anvil. La URL de este manual es la <strong>verificada el 2026-09-04</strong> como la RPC actual del proyecto.</p></blockquote>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICAgIDxtYXJrZXIgaWQ9ImFyclQiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMmE5ZDhmIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5Db25lY3RhIHR1IGJpbGxldGVyYSBhIGxhIHJlZCBSUEMgZGUgVHJ1ZUtlYXRlPC90ZXh0PgoKICA8IS0tIENvbnRlbmVkb3I6IFR1IGRpc3Bvc2l0aXZvIC0tPgogIDxyZWN0IHg9IjMwIiB5PSI3MiIgd2lkdGg9IjMxMCIgaGVpZ2h0PSIzODAiIHJ4PSIxNiIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjNDhjYWU0IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8cmVjdCB4PSI0NSIgeT0iODAiIHdpZHRoPSIyODAiIGhlaWdodD0iMzAiIHJ4PSI4IiBmaWxsPSIjNDhjYWU0Ii8+CiAgPHRleHQgeD0iMTg1IiB5PSIxMDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSJib2xkIj5UVSBESVNQT1NJVElWTzwvdGV4dD4KCiAgPCEtLSBNZXRhTWFzayAtLT4KICA8cmVjdCB4PSI1NSIgeT0iMTMwIiB3aWR0aD0iMjcwIiBoZWlnaHQ9IjkyIiByeD0iMTMiIGZpbGw9IiMxYTJiNGMiLz4KICA8dGV4dCB4PSIxOTAiIHk9IjE2MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9ImJvbGQiPk1ldGFNYXNrPC90ZXh0PgogIDx0ZXh0IHg9IjE5MCIgeT0iMTgyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjExIj50dSBiaWxsZXRlcmEgKGV4dGVuc2nDs24gbyBhcHApPC90ZXh0PgogIDx0ZXh0IHg9IjE5MCIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZjNlNWFiIiBmb250LXNpemU9IjEwLjUiPmd1YXJkYSB0dXMgY2xhdmVzIHkgZmlybWEgcG9yIHRpPC90ZXh0PgoKICA8IS0tIFdlYiBUcnVlS2VhdGUgLS0+CiAgPHJlY3QgeD0iNTUiIHk9IjMzMCIgd2lkdGg9IjI3MCIgaGVpZ2h0PSI5MiIgcng9IjEzIiBmaWxsPSIjMmE5ZDhmIi8+CiAgPHRleHQgeD0iMTkwIiB5PSIzNjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTUiIGZvbnQtd2VpZ2h0PSJib2xkIj5XZWIgZGUgVHJ1ZUtlYXRlPC90ZXh0PgogIDx0ZXh0IHg9IjE5MCIgeT0iMzgyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjExIj5uYXZlZ2Fkb3IgKHdpbmRvdy5ldGhlcmV1bSk8L3RleHQ+CiAgPHRleHQgeD0iMTkwIiB5PSI0MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAuNSI+cGlkZSBjb25lY3RhciBwYXJhIHZlciB0dXMgY3VlbnRhczwvdGV4dD4KCiAgPCEtLSBDb250ZW5lZG9yOiBOdWJlIGRlIEdvb2dsZSAtLT4KICA8cmVjdCB4PSI0NjAiIHk9IjcyIiB3aWR0aD0iMzEwIiBoZWlnaHQ9IjM4MCIgcng9IjE2IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiNkNGFmMzciIHN0cm9rZS13aWR0aD0iMiIvPgogIDxyZWN0IHg9IjQ3NSIgeT0iODAiIHdpZHRoPSIyODAiIGhlaWdodD0iMzAiIHJ4PSI4IiBmaWxsPSIjZDRhZjM3Ii8+CiAgPHRleHQgeD0iNjE1IiB5PSIxMDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSJib2xkIj5OVUJFIERFIEdPT0dMRTwvdGV4dD4KCiAgPCEtLSBBbnZpbCBSUEMgLS0+CiAgPHJlY3QgeD0iNDc1IiB5PSIxMzAiIHdpZHRoPSIyNzAiIGhlaWdodD0iOTIiIHJ4PSIxMyIgZmlsbD0iI2Y0YTI2MSIvPgogIDx0ZXh0IHg9IjYxMCIgeT0iMTU2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEzLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5BbnZpbCAvIEZvdW5kcnkgcmVtb3RvPC90ZXh0PgogIDx0ZXh0IHg9IjYxMCIgeT0iMTc4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjExIj5ibG9ja2NoYWluIGRlIHBydWViYXMgKFJQQyk8L3RleHQ+CiAgPHRleHQgeD0iNjEwIiB5PSIxOTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAuNSI+Y2FkZW5hIDMxMzM3IMK3IEVUSCBzaW1iw7NsaWNvPC90ZXh0PgogIDx0ZXh0IHg9IjYxMCIgeT0iMjEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwLjUiPmNvbnRyYXRvczogRXNjcm93LCBCUkxULCBORlRzPC90ZXh0PgoKICA8IS0tIFJlbGF5ZXIgLS0+CiAgPHJlY3QgeD0iNDc1IiB5PSIzMzAiIHdpZHRoPSIyNzAiIGhlaWdodD0iOTIiIHJ4PSIxMyIgZmlsbD0iIzJhOWQ4ZiIvPgogIDx0ZXh0IHg9IjYxMCIgeT0iMzYwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjE1IiBmb250LXdlaWdodD0iYm9sZCI+UmVsYXllciBkZSBsYSBwbGF0YWZvcm1hPC90ZXh0PgogIDx0ZXh0IHg9IjYxMCIgeT0iMzgyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjExIj5jdWVudGEgMSDCtyBiaWxsZXRlcmEgZGVsIHNlcnZpZG9yPC90ZXh0PgogIDx0ZXh0IHg9IjYxMCIgeT0iNDAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwLjUiPnBhZ2EgZWwgZ2FzIGRlIGxvcyB0cnVlcXVlcyBwb3IgdGk8L3RleHQ+CgogIDwhLS0gRmxlY2hhcyBkaXNwb3NpdGl2byAtPiBhbnZpbCAtLT4KICA8ZyBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMi41IiBmaWxsPSJub25lIiBtYXJrZXItZW5kPSJ1cmwoI2FycikiPgogICAgPGxpbmUgeDE9IjMyNSIgeTE9IjE2MCIgeDI9IjQ3MSIgeTI9IjE2MCIvPgogICAgPGxpbmUgeDE9IjMyNSIgeTE9IjE5NSIgeDI9IjQ3MSIgeTI9IjE5NSIvPgogICAgPGxpbmUgeDE9IjMyNSIgeTE9IjM2MCIgeDI9IjQ3MSIgeTI9IjM2MCIvPgogIDwvZz4KICA8dGV4dCB4PSI0MDAiIHk9IjE1MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9ImJvbGQiPjEgwrcgYcOxYWRpciByZWQgbWFudWFsbWVudGU8L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSIxODciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiIGZvbnQtd2VpZ2h0PSJib2xkIj4zIMK3IGZpcm1hIHNlc2nDs24geSB0cnVlcXVlczwvdGV4dD4KICA8dGV4dCB4PSI0MDAiIHk9IjM1MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9ImJvbGQiPjIgwrcgbGVlIGNvbnRyYXRvcyB5IHNhbGRvczwvdGV4dD4KCiAgPCEtLSBGbGVjaGEgcmVsYXllciAtPiBhbnZpbCAoZGVudHJvIGRlIGxhIG51YmUpIC0tPgogIDxnIHN0cm9rZT0iIzJhOWQ4ZiIgc3Ryb2tlLXdpZHRoPSIyLjUiIGZpbGw9Im5vbmUiIG1hcmtlci1lbmQ9InVybCgjYXJyVCkiPgogICAgPGxpbmUgeDE9IjYxMCIgeTE9IjMzMCIgeDI9IjYxMCIgeTI9IjIyNiIvPgogIDwvZz4KICA8dGV4dCB4PSI2MjIiIHk9IjI4MCIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9ImJvbGQiPjQgwrcgcGFnYSBlbCBnYXMgcG9yIHRpPC90ZXh0PgoKICA8IS0tIENvbmV4aW9uIE1ldGFNYXNrIDwtPiBXZWIgLS0+CiAgPGcgc3Ryb2tlPSIjOGQ4NmE5IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIG1hcmtlci1lbmQ9InVybCgjYXJyKSIgbWFya2VyLXN0YXJ0PSJ1cmwoI2FycikiPgogICAgPGxpbmUgeDE9IjE5MCIgeTE9IjIyNiIgeDI9IjE5MCIgeTI9IjMyNiIvPgogIDwvZz4KICA8dGV4dCB4PSIyMDUiIHk9IjI4MiIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSI5LjUiPmxhIHdlYiBsZWUgdHUgYmlsbGV0ZXJhPC90ZXh0PgoKICA8IS0tIE5vdGEgZGF0b3MgUlBDIC0tPgogIDxyZWN0IHg9IjMwIiB5PSI0NTgiIHdpZHRoPSI3NDAiIGhlaWdodD0iMzgiIHJ4PSIxMCIgZmlsbD0iIzBhMTEyOCIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iNDc1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZjNlNWFiIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+UlBDOiBodHRwczovL21jYy1mb3VuZHJ5LWFudmlsLXNsemxwdGJjbGEtZXcuYS5ydW4uYXBwIMK3IENoYWluIElEIDMxMzM3IMK3IE1vbmVkYTogRVRIPC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iNDkxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwIj5MYSByZWQgc2UgYcOxYWRlIFVOQSBzb2xhIHZleiBhIG1hbm87IGxhIHBsYXRhZm9ybWEgbm8gY2FtYmlhIHR1IHJlZCBwb3IgdGk8L3RleHQ+Cjwvc3ZnPgo=" alt="Red Rpc"/><figcaption class="fig-caption">Figura · Red Rpc</figcaption></figure>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. Añadir la red en MetaMask (ordenador)</h2>
+<h3 class="sub" id="sub4">3.1 Aviso importante</h3>
+<ul><li>La plataforma <strong>no añade ni cambia la red por ti</strong>: no existe código que lo haga. La red se añade <strong>una vez, a mano</strong>, en MetaMask.</li><li>Estos pasos son para la extensión de MetaMask en el PC.</li></ul>
+<h3 class="sub" id="sub5">3.2 Pasos</h3>
+<ol><li>Abre MetaMask y pulsa el <strong>selector de red</strong> en la parte superior (suele mostrar "Ethereum Mainnet").</li><li>Pulsa <strong>"Añadir red"</strong> → <strong>"Añadir una red manualmente"</strong>.</li><li>Rellena el formulario con los datos del apartado 2.2:<ul><li><em>Nombre de red</em>: <code>TrueKeate Anvil (pruebas)</code></li><li><em>Nueva URL de RPC</em>: <code>https://mcc-foundry-anvil-slzlptbcla-ew.a.run.app</code></li><li><em>ID de cadena</em>: <code>31337</code></li><li><em>Símbolo de moneda</em>: <code>ETH</code></li><li><em>Explorador de bloques (opcional)</em>: <strong>dejar vacío</strong>.</li></ul></li><li>Pulsa <strong>Guardar</strong>. MetaMask validará la RPC (debe responder) y dejará seleccionada la red nueva.</li></ol>
+<h3 class="sub" id="sub6">3.3 Seleccionar la red al usar la plataforma</h3>
+<ul><li>Antes de operar conviene tener la red <code>TrueKeate Anvil (pruebas)</code> <strong>seleccionada</strong> en el selector.</li><li>La lectura de saldos puede funcionar desde otra red, pero la <strong>firma</strong> va contra la red seleccionada en MetaMask: si el número de red no coincide, el servidor rechaza la firma (los trueques se firman con intents y el relayer comprueba que el <code>chainId</code> sea el esperado).</li></ul>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. Añadir la red en MetaMask (móvil)</h2>
+<ol><li>Abre MetaMask en el móvil.</li><li>Pulsa el icono de <strong>red</strong> (parte superior).</li><li><strong>Añadir red</strong> → pestaña <strong>Personalizada</strong> (custom).</li><li>Introduce los mismos datos del apartado 2.2 y pulsa <strong>Guardar</strong>.</li><li>Si usas el navegador interno de MetaMask para la web, la red seleccionada en la app es la que se usa al firmar.</li></ol>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. Comprobar que la conexión funciona</h2>
+<h3 class="sub" id="sub7">5.1 Desde MetaMask</h3>
+<ul><li>El selector debe mostrar el nombre de red que elegiste.</li><li>Debe verse el saldo en <strong>ETH</strong> de la cuenta activa. Las cuentas 0 a 9 del anvil tienen fondos de prueba; la cuenta 10 (Irene) no — ver el manual <code>03-cuentas-anvil.md</code>.</li></ul>
+<h3 class="sub" id="sub8">5.2 Desde la consola (para personas técnicas)</h3>
+<p>Puedes verificar la red y un saldo con herramientas de línea de comandos:</p>
+<pre><code><span class="pre-label">bash</span># ¿Qué número de red responde el RPC? Debe decir 31337
+cast chain-id --rpc-url https://mcc-foundry-anvil-slzlptbcla-ew.a.run.app
+
+# Saldo de la cuenta 0 (el Owner) en esa red
+cast balance 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
+  --rpc-url https://mcc-foundry-anvil-slzlptbcla-ew.a.run.app</code></pre>
+<p>Los contratos del proyecto se consultan igual por esa RPC (por ejemplo, el saldo del token BRLT o el dueño de un NFT).</p>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. Avisos importantes de la red de pruebas</h2>
+<ul><li><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Es una red de <strong>PRUEBAS</strong>: el ETH es <strong>simbólico</strong> y las claves privadas de las cuentas de prueba son <strong>públicas</strong> (ver <code>03-cuentas-anvil.md</code>). <strong>No uses fondos reales ni cuentas de producción.</strong></li><li><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> El anvil remoto puede <strong>reiniciarse</strong> (es una operación de entorno). El estado podría reiniciarse o cambiar: si una cuenta pierde el saldo o un contrato no responde, comprueba que la red sigue viva (apartado 5.2).</li><li>El <strong>relayer</strong> (la cuenta 1, de la plataforma) paga el gas de los trueques de los usuarios particulares: normalmente <strong>tú no necesitas tener ETH</strong>. En un plan de contingencia podría cambiar → <strong>pendiente de confirmar</strong>.</li></ul>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. Ficha didáctica</h2>
+<div class="table-wrap"><table><thead><tr><th>Campo</th><th>Contenido</th></tr></thead><tbody><tr><td><strong>¿Qué es?</strong></td><td>Una red RPC es la "puerta" por la que tu billetera habla con la blockchain de pruebas de TrueKeate (anvil remoto, red 31337).</td></tr><tr><td><strong>¿Para qué sirve?</strong></td><td>Para que MetaMask sepa dónde están tus saldos de prueba (ETH, BRLT, NFTs) y para firmar la sesión y los trueques en la red correcta.</td></tr><tr><td><strong>Pasos clave</strong></td><td>1) En MetaMask: selector de red → Añadir red → Añadir manualmente. 2) Copiar: nombre, URL de RPC, Chain ID <code>31337</code>, símbolo <code>ETH</code>. 3) Guardar y seleccionar la red. 4) Comprobar que se ve el saldo en ETH.</td></tr><tr><td><strong>Errores comunes</strong></td><td>Dejar seleccionada "Ethereum Mainnet" y no ver los saldos de prueba · Escribir mal la URL de RPC o el Chain ID · Dejar la red sin seleccionar y que el servidor rechace la firma · Esperar que la web añada la red por ti (no lo hace).</td></tr><tr><td><strong>Consejo de seguridad</strong></td><td>Es una red de pruebas con claves públicas: nunca la uses con cuentas que tengan valor real. Guarda esta red solo para probar TrueKeate.</td></tr></tbody></table></div>
+</section>
+<section class="seccion" id="s8"><h2 class="seccion">8. Lo que falta por confirmar (resumen)</h2>
+<ol><li>Explorador de bloques para esta red → <strong>pendiente de confirmar</strong> (dejar el campo vacío).</li><li>El plan de contingencia en el que el usuario pagaría el gas (hoy lo paga el relayer) → <strong>pendiente de confirmar</strong>.</li><li>La URL de anvil documentada en manuales antiguos de despliegue frente a la auditada el 2026-09-04: la de este manual es la <strong>actual</strong>.</li></ol>
+</section>
+<section class="seccion" id="s9"><h2 class="seccion">9. Glosario de este manual</h2>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Significado</th></tr></thead><tbody><tr><td><strong>RPC</strong></td><td>La puerta por la que se habla con la blockchain</td></tr><tr><td><strong>Chain ID</strong></td><td>El número de identificación de la red (aquí <code>31337</code>)</td></tr><tr><td><strong>Red de pruebas</strong></td><td>Red donde el dinero es simbólico y no vale nada real</td></tr><tr><td><strong>Anvil</strong></td><td>Simulador de blockchain que usa el proyecto para probar</td></tr><tr><td><strong>Relayer</strong></td><td>La cuenta de la plataforma que paga el gas de los trueques</td></tr><tr><td><strong>Saldo</strong></td><td>Cuánto dinero tiene una cuenta</td></tr><tr><td><strong>Firmar</strong></td><td>Demostrar con tu clave que un mensaje es tuyo</td></tr></tbody></table></div>
+</section>
+</main>
+
+</body>
+</html>

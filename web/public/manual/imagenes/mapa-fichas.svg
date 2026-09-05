@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <rect width="800" height="54" fill="#1a2b4c"/>
+  <rect y="50" width="800" height="4" fill="#d4af37"/>
+  <text x="400" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">Mapa de las 6 fichas de Wallets y cuentas</text>
+
+  <!-- Fila superior: 1-2-3 -->
+  <rect x="50" y="90" width="200" height="92" rx="13" fill="#48cae4"/>
+  <text x="150" y="122" text-anchor="middle" fill="#0a1128" font-size="13.5" font-weight="bold">1 · La billetera</text>
+  <text x="150" y="142" text-anchor="middle" fill="#0a1128" font-size="10.5">MetaMask: extensión y app</text>
+  <text x="150" y="158" text-anchor="middle" fill="#0a1128" font-size="10">crear · importar · conectar</text>
+
+  <rect x="300" y="90" width="200" height="92" rx="13" fill="#48cae4"/>
+  <text x="400" y="122" text-anchor="middle" fill="#0a1128" font-size="13.5" font-weight="bold">2 · Red de pruebas</text>
+  <text x="400" y="142" text-anchor="middle" fill="#0a1128" font-size="10.5">RPC anvil · cadena 31337</text>
+  <text x="400" y="158" text-anchor="middle" fill="#0a1128" font-size="10">añadir red en MetaMask</text>
+
+  <rect x="550" y="90" width="200" height="92" rx="13" fill="#48cae4"/>
+  <text x="650" y="122" text-anchor="middle" fill="#0a1128" font-size="13.5" font-weight="bold">3 · Cuentas anvil</text>
+  <text x="650" y="142" text-anchor="middle" fill="#0a1128" font-size="10.5">mnemónico público · roles</text>
+  <text x="650" y="158" text-anchor="middle" fill="#0a1128" font-size="10">Owner · Relayer · usuarios</text>
+
+  <!-- Fila inferior: 4-5-6 -->
+  <rect x="550" y="260" width="200" height="92" rx="13" fill="#f4a261"/>
+  <text x="650" y="292" text-anchor="middle" fill="#0a1128" font-size="13.5" font-weight="bold">4 · Token BRLT</text>
+  <text x="650" y="312" text-anchor="middle" fill="#0a1128" font-size="10.5">BorloTokens · ERC-20 · 18 dec.</text>
+  <text x="650" y="328" text-anchor="middle" fill="#0a1128" font-size="10">dirección 0x6f6f…48f78</text>
+
+  <rect x="300" y="260" width="200" height="92" rx="13" fill="#e9e5f0" stroke="#8d86a9" stroke-width="1.5"/>
+  <text x="400" y="292" text-anchor="middle" fill="#1a2b4c" font-size="13.5" font-weight="bold">5 · NFTs de trueques</text>
+  <text x="400" y="312" text-anchor="middle" fill="#1a2b4c" font-size="10.5">TrueKeateNFT · ERC-721 · TKANFT</text>
+  <text x="400" y="328" text-anchor="middle" fill="#1a2b4c" font-size="10">dirección 0x99db…612f</text>
+
+  <rect x="50" y="260" width="200" height="92" rx="13" fill="#d4af37"/>
+  <text x="150" y="292" text-anchor="middle" fill="#0a1128" font-size="13.5" font-weight="bold">6 · Firmar y autorizar</text>
+  <text x="150" y="312" text-anchor="middle" fill="#0a1128" font-size="10.5">sesión · intents EIP-712</text>
+  <text x="150" y="328" text-anchor="middle" fill="#0a1128" font-size="10">relayer paga el gas</text>
+
+  <!-- Resultado -->
+  <rect x="200" y="430" width="400" height="60" rx="13" fill="#2a9d8f"/>
+  <text x="400" y="456" text-anchor="middle" fill="#ffffff" font-size="13.5" font-weight="bold">Repasa la tabla: ¿firma o transacción?</text>
+  <text x="400" y="476" text-anchor="middle" fill="#ffffff" font-size="10.5">permiso = ver · firma = autorizar (sin gas) · transacción = pagar gas</text>
+
+  <!-- Flechas -->
+  <g stroke="#1a2b4c" stroke-width="2.5" fill="none" marker-end="url(#arr)">
+    <line x1="250" y1="136" x2="296" y2="136"/>
+    <line x1="500" y1="136" x2="546" y2="136"/>
+    <line x1="650" y1="182" x2="650" y2="256"/>
+    <line x1="550" y1="306" x2="504" y2="306"/>
+    <line x1="300" y1="306" x2="254" y2="306"/>
+    <path d="M 150 352 L 150 385 L 400 385 L 400 426"/>
+  </g>
+  <text x="273" y="128" text-anchor="middle" fill="#1a2b4c" font-size="11">seguir</text>
+  <text x="523" y="128" text-anchor="middle" fill="#1a2b4c" font-size="11">seguir</text>
+  <text x="663" y="245" text-anchor="middle" fill="#1a2b4c" font-size="11">seguir</text>
+  <text x="527" y="298" text-anchor="middle" fill="#1a2b4c" font-size="11">seguir</text>
+  <text x="277" y="298" text-anchor="middle" fill="#1a2b4c" font-size="11">seguir</text>
+</svg>

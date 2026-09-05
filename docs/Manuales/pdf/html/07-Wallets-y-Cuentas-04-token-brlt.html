@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · Añade el token BRLT a tu billetera</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">07 · Wallets y Cuentas</div>
+    <h1>Añade el token BRLT a tu billetera</h1>
+    <div class="intro">Versión en lenguaje sencillo del manual técnico "Agregar el token BRLT (BorloTokens) a la wallet". El <strong>BRLT</strong> es el "euro de pruebas" de TrueKeate: un token interno que la plataforma usa como valor de compensación. Para verlo en MetaMask hay que <strong>añadirlo una vez, a mano</strong>.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>07-Wallets-y-Cuentas/04-token-brlt.md</b></span>
+      <span>Edición: <b>4 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/07-Wallets-y-Cuentas/04-token-brlt</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Wallets y Cuentas · Wallets Y Cuentas — Añade el token BRLT a tu billetera</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>¿Qué es BRLT?</span></a><div class="subs"><a href="#sub1">2.1 Un token de contrato (ERC-20), no la moneda de la red</a><br><a href="#sub2">2.2 ¿Quién crea BRLT?</a><br><a href="#sub3">2.3 ¿Quién puede ver su saldo BRLT?</a></div></li><li><a href="#s3"><span class="tnum">3</span><span>Añadir BRLT en MetaMask (ordenador)</span></a></li><li><a href="#s4"><span class="tnum">4</span><span>Añadir BRLT en MetaMask (móvil)</span></a></li><li><a href="#s5"><span class="tnum">5</span><span>Comprobar el saldo BRLT</span></a><div class="subs"><a href="#sub4">5.1 Desde MetaMask</a><br><a href="#sub5">5.2 Por la blockchain (verificación fiable)</a><br><a href="#sub6">5.3 ¿Por qué mi saldo es 0?</a></div></li><li><a href="#s6"><span class="tnum">6</span><span>Avisos importantes</span></a></li><li><a href="#s7"><span class="tnum">7</span><span>Ficha didáctica</span></a></li><li><a href="#s8"><span class="tnum">8</span><span>Lo que falta por confirmar (resumen)</span></a></li><li><a href="#s9"><span class="tnum">9</span><span>Glosario de este manual</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<blockquote class="info"><span class="tag">Nota</span><p>🔎 Datos auditados el 2026-09-04 en la red de pruebas (anvil, cadena 31337).</p></blockquote>
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos</h2>
+<p>Ejemplo: quieres ver el saldo BRLT de <strong>Ana</strong> en tu billetera.</p>
+<ol><li>Abre MetaMask y comprueba que tienes <strong>seleccionada la red de TrueKeate</strong> (cadena 31337). Si no la tienes, sigue el manual [02 · Conecta TrueKeate a tu billetera](02-conexion-red-rpc.md).</li><li>Pestaña <strong>"Activos"</strong> → botón <strong>"Importar tokens"</strong>.</li><li>Elige la pestaña <strong>"Token personalizado"</strong> y pega esta dirección:</li></ol>
+<pre><code>   0x6f6f570f45833e249e27022648a26f4076f48f78</code></pre>
+<ol><li>Al pegar la dirección, MetaMask <strong>rellena solo</strong> el símbolo (<code>BRLT</code>) y los decimales (<code>18</code>) leyendo el contrato. Si no lo hace, escríbelos a mano.</li><li>Pulsa <strong>"Añadir token personalizado"</strong> → <strong>"Importar tokens"</strong>.</li><li>BRLT aparece en tu lista de <em>Activos</em>. Si esa cuenta tiene saldo, lo verás ahí mismo.</li></ol>
+<blockquote class="info"><span class="tag">Nota</span><p>¿No ves saldo? Puede que sea normal: BRLT solo existe si los Socios de la plataforma lo emitieron (ver apartado 2.3). Comprueba también que la cuenta activa es la correcta y que la red es la 31337.</p></blockquote>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. ¿Qué es BRLT?</h2>
+<h3 class="sub" id="sub1">2.1 Un token de contrato (ERC-20), no la moneda de la red</h3>
+<ul><li>BRLT es un <strong>token estándar ERC-20</strong>: como una ficha que se puede dividir en 18 decimales. En la cadena vive en el contrato <strong>BorloTokens</strong>.</li><li>No lo confundas con <strong>ETH</strong>: ETH es la moneda nativa de la red de pruebas (la que paga el "combustible" de las operaciones). BRLT es el valor interno de la plataforma.</li></ul>
+<div class="table-wrap"><table><thead><tr><th>Dato</th><th>Valor</th></tr></thead><tbody><tr><td>Dirección del contrato</td><td><code>0x6f6f570f45833e249e27022648a26f4076f48f78</code></td></tr><tr><td>Símbolo</td><td><code>BRLT</code></td></tr><tr><td>Decimales</td><td><code>18</code></td></tr><tr><td>Estándar</td><td>ERC-20 (<code>balanceOf</code>, <code>transfer</code>, …)</td></tr><tr><td>Nombre real del contrato</td><td>BorloTokens</td></tr></tbody></table></div>
+<h3 class="sub" id="sub2">2.2 ¿Quién crea BRLT?</h3>
+<ul><li>No se "crea" desde la billetera ni desde la plataforma libremente. BRLT lo emite un mecanismo de la plataforma (el padrón de Socios) <strong>solo después de una votación de los Socios</strong> con quórum de al menos 2/3.</li><li>Hay un tope inicial de emisión (1.000.000 BRLT); subir ese tope también necesita votación de los Socios.</li><li>Una parte de cada emisión se reserva automáticamente para el fondo de valor de la comunidad.</li></ul>
+<h3 class="sub" id="sub3">2.3 ¿Quién puede ver su saldo BRLT?</h3>
+<p>Aquí hay una regla con dos caras:</p>
+<ul><li><strong>Dentro de la plataforma web</strong> (módulo de Finanzas): el saldo BRLT solo es visible y gestionable para <strong>Socios y Owner</strong>. Si eres un particular registrado, la web te mostrará un aviso: <em>"El saldo BRLT solo es visible y gestionable para Socios y Owner"</em>.</li><li><strong>En tu billetera (MetaMask)</strong>: la regla de la plataforma no aplica. Si una cuenta tiene BRLT, cualquier wallet puede leer <strong>su propio saldo</strong> desde la blockchain. La regla no te impide ver tus tokens en MetaMask.</li></ul>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. Añadir BRLT en MetaMask (ordenador)</h2>
+<ol><li>Abre MetaMask y selecciona la <strong>red del proyecto</strong> (cadena 31337).</li><li>Pestaña <strong>"Activos"</strong> → botón <strong>"Importar tokens"</strong>.</li><li>Pestaña <strong>"Token personalizado"</strong>:<ul><li><em>Dirección del contrato de tokens</em>: <code>0x6f6f570f45833e249e27022648a26f4076f48f78</code></li><li>Al pegarla, MetaMask autocompleta símbolo (<code>BRLT</code>) y decimales (<code>18</code>); si no, escríbelos a mano.</li></ul></li><li>Pulsa <strong>"Añadir token personalizado"</strong> → <strong>"Importar tokens"</strong>.</li><li>BRLT aparecerá en <em>Activos</em> con su saldo (si lo hay).</li></ol>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. Añadir BRLT en MetaMask (móvil)</h2>
+<ol><li>En MetaMask móvil, selecciona la red del proyecto (cadena 31337) en el selector de red (arriba).</li><li>Pestaña <strong>"Activos"</strong> → <strong>"Importar tokens"</strong> → pestaña <strong>"Personalizado"</strong>.</li><li>Pega la dirección <code>0x6f6f570f45833e249e27022648a26f4076f48f78</code>.</li><li>Verifica que el símbolo es <code>BRLT</code> y los decimales <code>18</code> → <strong>"Importar"</strong>.</li></ol>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. Comprobar el saldo BRLT</h2>
+<h3 class="sub" id="sub4">5.1 Desde MetaMask</h3>
+<ul><li>La tarjeta "BRLT" de la pestaña <em>Activos</em> muestra el saldo de la cuenta activa.</li><li>Si no aparece saldo aunque creas que debería haberlo: revisa que la cuenta activa es la correcta y que la red seleccionada es la 31337.</li></ul>
+<h3 class="sub" id="sub5">5.2 Por la blockchain (verificación fiable)</h3>
+<p>Para personas curiosas o técnicas, se puede preguntar directamente al contrato cuántos BRLT tiene una dirección (en este caso, Ana, cuenta 2):</p>
+<pre><code><span class="pre-label">bash</span>cast call 0x6f6f570f45833e249e27022648a26f4076f48f78 \
+  "balanceOf(address)(uint256)" 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC \
+  --rpc-url https://mcc-foundry-anvil-slzlptbcla-ew.a.run.app</code></pre>
+<p>El número sale en unidades mínimas (18 decimales): para leerlo como BRLT, divide entre 1.000.000.000.000.000.000. Las billeteras ya hacen esa división por ti.</p>
+<h3 class="sub" id="sub6">5.3 ¿Por qué mi saldo es 0?</h3>
+<ul><li>El saldo puede ser 0 <strong>aunque la cuenta esté registrada</strong> en la plataforma: los BRLT solo existen si se emitieron mediante una propuesta aprobada por los Socios (apartado 2.2).</li><li>El estado actual de las emisiones en cada entorno es <strong>pendiente de confirmar</strong>: si necesitas BRLT de prueba para un flujo, consulta al equipo técnico si ya hay emisiones hechas.</li></ul>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. Avisos importantes</h2>
+<ul><li><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> BRLT no está en listas públicas de tokens (es una red de pruebas): por eso MetaMask no lo muestra hasta que lo <strong>importas a mano</strong> con este manual.</li><li><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> <strong>Red de pruebas</strong>: el BRLT no tiene valor real. No lo compres ni lo vendas.</li><li><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> La dirección del contrato puede cambiar si se reinicia el anvil de pruebas → <strong>pendiente de confirmar</strong> por entorno. Antes de importar, verifica la dirección actual en el registro de contratos del proyecto (<code>backend/contratos.json</code>).</li><li><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Desconfía de un token llamado "BRLT" que apunte a <strong>otra dirección</strong>: usa siempre la dirección auditada de este manual.</li></ul>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICAgIDxtYXJrZXIgaWQ9ImFyclIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjZTYzOTQ2Ii8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5Bw7FhZGUgZWwgdG9rZW4gQlJMVCBhIHR1IGJpbGxldGVyYSAocmVkIGRlIHBydWViYXMpPC90ZXh0PgoKICA8IS0tIFBhc28gMSAtLT4KICA8cmVjdCB4PSIyMDAiIHk9IjYwIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwIiByeD0iMTIiIGZpbGw9IiNmNGEyNjEiLz4KICA8dGV4dCB4PSI0MDAiIHk9Ijg2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj4xIMK3IFJlZCBkZSBUcnVlS2VhdGUgc2VsZWNjaW9uYWRhICgzMTMzNyk8L3RleHQ+CgogIDwhLS0gUGFzbyAyIC0tPgogIDxyZWN0IHg9IjIwMCIgeT0iMTEyIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwIiByeD0iMTIiIGZpbGw9IiM0OGNhZTQiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjEzOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+MiDCtyBQZXN0YcOxYSDCq0FjdGl2b3PCuyDihpIgwqtJbXBvcnRhciB0b2tlbnPCuzwvdGV4dD4KCiAgPCEtLSBQYXNvIDMgLS0+CiAgPHJlY3QgeD0iMjAwIiB5PSIxNjQiIHdpZHRoPSI0MDAiIGhlaWdodD0iNDgiIHJ4PSIxMiIgZmlsbD0iIzQ4Y2FlNCIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMTg0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjExLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj4zIMK3IFBlc3Rhw7FhIMKrVG9rZW4gcGVyc29uYWxpemFkb8K7OiBwZWdhIGxhIGRpcmVjY2nDs248L3RleHQ+CiAgPHRleHQgeD0iNDAwIiB5PSIyMDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSJib2xkIj4weDZmNmY1NzBmNDU4MzNlMjQ5ZTI3MDIyNjQ4YTI2ZjQwNzZmNDhmNzg8L3RleHQ+CgogIDwhLS0gUGFzbyA0IC0tPgogIDxyZWN0IHg9IjIwMCIgeT0iMjI0IiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwIiByeD0iMTIiIGZpbGw9IiNlOWU1ZjAiIHN0cm9rZT0iIzhkODZhOSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjI1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+NCDCtyBNZXRhTWFzayByZWxsZW5hIHNvbG86IHPDrW1ib2xvIEJSTFQgwrcgMTggZGVjaW1hbGVzPC90ZXh0PgoKICA8IS0tIFBhc28gNSAtLT4KICA8cmVjdCB4PSIyMDAiIHk9IjI3NiIgd2lkdGg9IjQwMCIgaGVpZ2h0PSI0MCIgcng9IjEyIiBmaWxsPSIjNDhjYWU0Ii8+CiAgPHRleHQgeD0iNDAwIiB5PSIzMDIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPjUgwrcgwqtBw7FhZGlyIHRva2VuIHBlcnNvbmFsaXphZG/CuyDihpIgwqtJbXBvcnRhcsK7PC90ZXh0PgoKICA8IS0tIFBhc28gNiAtLT4KICA8cmVjdCB4PSIyMDAiIHk9IjMyOCIgd2lkdGg9IjQwMCIgaGVpZ2h0PSI0MCIgcng9IjEyIiBmaWxsPSIjMmE5ZDhmIi8+CiAgPHRleHQgeD0iNDAwIiB5PSIzNTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPjYgwrcgQlJMVCBhcGFyZWNlIGVuIMKrQWN0aXZvc8K7IGNvbiBzdSBzYWxkbzwvdGV4dD4KCiAgPCEtLSBEZWNpc2lvbiAtLT4KICA8cmVjdCB4PSIyMDAiIHk9IjM4MCIgd2lkdGg9IjQwMCIgaGVpZ2h0PSI0OCIgcng9IjEyIiBmaWxsPSIjZDRhZjM3Ii8+CiAgPHRleHQgeD0iNDAwIiB5PSI0MDkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTMuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPsK/RWwgc2FsZG8gYXBhcmVjZSBlbiAwPzwvdGV4dD4KCiAgPCEtLSBObzogbGlzdG8gLS0+CiAgPHJlY3QgeD0iMTAwIiB5PSI0NDQiIHdpZHRoPSIyODAiIGhlaWdodD0iNTAiIHJ4PSIxMiIgZmlsbD0iIzJhOWQ4ZiIvPgogIDx0ZXh0IHg9IjI0MCIgeT0iNDY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5ObyDihpIgwqFMaXN0byE8L3RleHQ+CiAgPHRleHQgeD0iMjQwIiB5PSI0ODUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAuNSI+eWEgdmVzIHR1IEJSTFQgZGUgbGEgcmVkIGRlIHBydWViYXM8L3RleHQ+CgogIDwhLS0gU2k6IHNhbGRvIDAsIGNvbXByb2JhciAtLT4KICA8cmVjdCB4PSI0MjAiIHk9IjQ0NCIgd2lkdGg9IjI4MCIgaGVpZ2h0PSI1MCIgcng9IjEyIiBmaWxsPSIjZTYzOTQ2Ii8+CiAgPHRleHQgeD0iNTYwIiB5PSI0NjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTEuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPlPDrSDihpIgc2FsZG8gZW4gMDogY29tcHJ1ZWJhPC90ZXh0PgogIDx0ZXh0IHg9IjU2MCIgeT0iNDc4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjkuNSI+bGEgY3VlbnRhIGFjdGl2YSB5IGxhIHJlZCAzMTMzNzs8L3RleHQ+CiAgPHRleHQgeD0iNTYwIiB5PSI0OTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iOS41Ij7Cv2xvcyBTb2Npb3MgeWEgZW1pdGllcm9uIEJSTFQ/PC90ZXh0PgoKICA8IS0tIEZsZWNoYXMgdmVydGljYWxlcyAtLT4KICA8ZyBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMi41IiBmaWxsPSJub25lIiBtYXJrZXItZW5kPSJ1cmwoI2FycikiPgogICAgPGxpbmUgeDE9IjQwMCIgeTE9IjEwMCIgeDI9IjQwMCIgeTI9IjEwOCIvPgogICAgPGxpbmUgeDE9IjQwMCIgeTE9IjE1MiIgeDI9IjQwMCIgeTI9IjE2MCIvPgogICAgPGxpbmUgeDE9IjQwMCIgeTE9IjIxMiIgeDI9IjQwMCIgeTI9IjIyMCIvPgogICAgPGxpbmUgeDE9IjQwMCIgeTE9IjI2NCIgeDI9IjQwMCIgeTI9IjI3MiIvPgogICAgPGxpbmUgeDE9IjQwMCIgeTE9IjMxNiIgeDI9IjQwMCIgeTI9IjMyNCIvPgogICAgPGxpbmUgeDE9IjQwMCIgeTE9IjM2OCIgeDI9IjQwMCIgeTI9IjM3NiIvPgogICAgPGxpbmUgeDE9IjI0MCIgeTE9IjQyOCIgeDI9IjI0MCIgeTI9IjQ0MCIvPgogICAgPGxpbmUgeDE9IjU2MCIgeTE9IjQyOCIgeDI9IjU2MCIgeTI9IjQ0MCIvPgogIDwvZz4KICA8dGV4dCB4PSIyNTIiIHk9IjQ0MiIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMSIgZm9udC13ZWlnaHQ9ImJvbGQiPm5vPC90ZXh0PgogIDx0ZXh0IHg9IjU3MiIgeT0iNDQyIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+c8OtPC90ZXh0PgoKICA8IS0tIEJ1Y2xlOiBzYWxkbyAwIC0+IHZvbHZlciBhIGltcG9ydGFyIChwYXNvIDUpIC0tPgogIDxnIHN0cm9rZT0iI2U2Mzk0NiIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIiBzdHJva2UtZGFzaGFycmF5PSI2IDQiIG1hcmtlci1lbmQ9InVybCgjYXJyUikiPgogICAgPHBhdGggZD0iTSA2NjAgNDQ0IEwgNjYwIDI5NiBMIDYwMyAyOTYiLz4KICA8L2c+CiAgPHRleHQgeD0iNjcyIiB5PSIzODYiIGZpbGw9IiNlNjM5NDYiIGZvbnQtc2l6ZT0iMTAiIGZvbnQtd2VpZ2h0PSJib2xkIj52dWVsdmUgYWwgcGFzbyA1PC90ZXh0Pgo8L3N2Zz4K" alt="Token Brlt"/><figcaption class="fig-caption">Figura · Token Brlt</figcaption></figure>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. Ficha didáctica</h2>
+<div class="table-wrap"><table><thead><tr><th>Campo</th><th>Contenido</th></tr></thead><tbody><tr><td><strong>¿Qué es?</strong></td><td>El BRLT es el token interno de TrueKeate (contrato BorloTokens, estándar ERC-20, 18 decimales). Vive en la red de pruebas en la dirección <code>0x6f6f…48f78</code>.</td></tr><tr><td><strong>¿Para qué sirve?</strong></td><td>Ser el valor de compensación de la plataforma. En la web solo Socios y Owner ven su saldo BRLT; en la billetera, cualquiera con BRLT puede ver el suyo.</td></tr><tr><td><strong>Pasos clave</strong></td><td>1) Seleccionar la red 31337. 2) Activos → Importar tokens → Token personalizado. 3) Pegar la dirección <code>0x6f6f570f45833e249e27022648a26f4076f48f78</code>. 4) Verificar símbolo <code>BRLT</code> y decimales <code>18</code>. 5) Importar.</td></tr><tr><td><strong>Errores comunes</strong></td><td>Confundir BRLT con ETH · Aceptar un "BRLT" de otra dirección · Tener la red equivocada (fuera de 31337 el contrato no existe) · Esperar saldo cuando los Socios aún no emitieron BRLT.</td></tr><tr><td><strong>Consejo de seguridad</strong></td><td>El token con el mismo símbolo pero distinta dirección es un clásico del fraude: la única dirección válida del BorloTokens del proyecto es la auditada <code>0x6f6f…48f78</code>. Y recuerda: es una red de pruebas, sin valor real.</td></tr></tbody></table></div>
+</section>
+<section class="seccion" id="s8"><h2 class="seccion">8. Lo que falta por confirmar (resumen)</h2>
+<ol><li>Estado actual de las emisiones de BRLT en cada entorno (si hay saldo que ver) → <strong>pendiente de confirmar</strong>.</li><li>Si la dirección del contrato cambia tras un reinicio del anvil → verificar antes de importar (<strong>pendiente de confirmar</strong> por entorno).</li></ol>
+</section>
+<section class="seccion" id="s9"><h2 class="seccion">9. Glosario de este manual</h2>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Significado</th></tr></thead><tbody><tr><td><strong>Token</strong></td><td>Un activo digital que vive en la blockchain</td></tr><tr><td><strong>ERC-20</strong></td><td>Estándar de tokens fungibles (todos iguales y divisibles)</td></tr><tr><td><strong>Decimales</strong></td><td>En cuántas partes se puede dividir un token (18 = muy divisible)</td></tr><tr><td><strong>ETH</strong></td><td>La moneda de la red de pruebas; paga el "combustible" (gas)</td></tr><tr><td><strong>Importar tokens</strong></td><td>Añadir un token a mano en MetaMask para poder verlo</td></tr><tr><td><strong>Socios</strong></td><td>Miembros de la comunidad que votan las decisiones (emisiones de BRLT)</td></tr><tr><td><strong>Quórum</strong></td><td>Número mínimo de votos necesario para aprobar algo</td></tr></tbody></table></div>
+</section>
+</main>
+
+</body>
+</html>

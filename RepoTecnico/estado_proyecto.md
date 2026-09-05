@@ -58,6 +58,22 @@
   `web/app/suite/admin/page.tsx` + `lib/api.ts` (iniciarSesion/admin*). Protección de URL por rol
   en `SuiteGuard` (un usuario sin permiso que escriba la URL ve "No tienes acceso").
 
+## ✅ Manuales de wallet con fichas didácticas (tema 07-Wallets-y-Cuentas)
+
+Auditados los datos reales antes de crear los contenidos (RPC `…anvil-slzlptbcla-ew.a.run.app`,
+chain 31337, cuentas anvil 0–12 con claves del mnemónico estándar, contratos BRLT
+`0x6f6f…48f78` / TrueKeateNFT `0x99db…612f`). 6 manuales técnicos + compendio de fichas
+(`RepoTecnico/Manuales/07-Wallets-y-Cuentas/`), 7 manuales literales con fichas didácticas
+("¿Qué es? · ¿Para qué sirve? · Pasos clave · Errores comunes · Consejo de seguridad"),
+8 diagramas SVG, 7 PDF descargables. Temas: (1) instalar/crear wallet PC y móvil, (2) conexión
+red RPC, (3) importar cuentas anvil 2–12 con usuario (Ana…Karen; cuenta 10 sin fondos),
+(4) añadir token BRLT, (5) verificar NFTs de trueques, (6) firmar/autorizar/completar con la
+wallet. Integrados en `/help/manual` (grupo "Tu billetera y tus cuentas", 23 manuales totales).
+
+**Bug corregido durante la verificación**: los estáticos nuevos se copiaban con permisos 600
+(root) y el contenedor corre como `node` → 500 en SVG/JSON. Fix en `web/Dockerfile`
+(`COPY --chown=node:node /app/public`). Verificado en producción: SVG/PDF/manifest → 200.
+
 ## ✅ Mejoras de UX reportadas al operar (login único, escudo D28, Verificar/Certificar)
 
 1. **Login único con la billetera**: al conectar se pide UNA firma EIP-191 que emite el token de

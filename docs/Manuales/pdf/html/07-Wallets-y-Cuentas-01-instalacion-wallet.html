@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · Cómo crear tu billetera (PC y móvil)</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">07 · Wallets y Cuentas</div>
+    <h1>Cómo crear tu billetera (PC y móvil)</h1>
+    <div class="intro">Versión en lenguaje sencillo del manual técnico "Instalación y creación de wallet". TrueKeate no lleva billetera propia: usa la billetera de tu navegador o de tu móvil, llamada <strong>MetaMask</strong>. Aquí te contamos cómo instalarla, crearla y dejarla lista en 5 minutos.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>07-Wallets-y-Cuentas/01-instalacion-wallet.md</b></span>
+      <span>Edición: <b>4 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/07-Wallets-y-Cuentas/01-instalacion-wallet</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Wallets y Cuentas · Wallets Y Cuentas — Cómo crear tu billetera (PC y móvil)</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>La billetera que usa TrueKeate</span></a><div class="subs"><a href="#sub1">2.1 TrueKeate no guarda tu billetera</a><br><a href="#sub2">2.2 Conectar no es firmar</a></div></li><li><a href="#s3"><span class="tnum">3</span><span>Instalar MetaMask en el ordenador (PC)</span></a><div class="subs"><a href="#sub3">3.1 Dónde descargarla (solo fuentes oficiales)</a><br><a href="#sub4">3.2 Pasos de instalación</a><br><a href="#sub5">3.3 Comprobar que quedó lista</a></div></li><li><a href="#s4"><span class="tnum">4</span><span>Instalar MetaMask en el móvil</span></a><div class="subs"><a href="#sub6">4.1 Dónde descargarla</a><br><a href="#sub7">4.2 Cómo usar TrueKeate desde el móvil (hoy)</a></div></li><li><a href="#s5"><span class="tnum">5</span><span>Crear una billetera nueva</span></a><div class="subs"><a href="#sub8">5.1 La frase semilla: la llave de todo</a><br><a href="#sub9">5.2 La contraseña o el PIN</a></div></li><li><a href="#s6"><span class="tnum">6</span><span>Red de pruebas: el ETH no vale dinero</span></a></li><li><a href="#s7"><span class="tnum">7</span><span>¿Y otras billeteras? (alternativas)</span></a></li><li><a href="#s8"><span class="tnum">8</span><span>Ficha didáctica</span></a></li><li><a href="#s9"><span class="tnum">9</span><span>Lo que falta por confirmar (resumen)</span></a></li><li><a href="#s10"><span class="tnum">10</span><span>Glosario de este manual</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos</h2>
+<p>Resumen de todo lo que necesitas hacer (los detalles están más abajo):</p>
+<ol><li><strong>En el ordenador</strong>: instala la extensión de MetaMask en tu navegador (Chrome, Edge, Brave o Firefox).</li><li><strong>En el móvil</strong>: instala la app de MetaMask (Google Play o App Store).</li><li><strong>Crea tu billetera</strong> y guarda muy bien la <strong>frase semilla</strong> (12 palabras).</li><li>Abre la web de TrueKeate: <code>https://truekeate-web-593453426217.europe-west1.run.app</code></li><li>Pulsa el botón <strong>"🔗 Conectar MetaMask e iniciar sesión"</strong> y acepta el permiso para ver tus cuentas.</li></ol>
+<blockquote class="importante"><span class="tag">Importante</span><p>Nota importante: esta red es de <strong>pruebas</strong>. El dinero que veas (ETH, BRLT…) es simbólico y no vale nada real. No uses aquí cuentas con dinero real.</p></blockquote>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. La billetera que usa TrueKeate</h2>
+<h3 class="sub" id="sub1">2.1 TrueKeate no guarda tu billetera</h3>
+<ul><li>TrueKeate <strong>no tiene su propia billetera</strong> dentro de la web.</li><li>La web lee la billetera que tu navegador pone a su disposición (se llama <code>window.ethereum</code>). Eso lo hace MetaMask, u otra billetera compatible.</li><li>Si no tienes ninguna billetera instalada, la web te avisa con este mensaje: <strong>"MetaMask no está instalado. Instálalo o usa una wallet compatible"</strong>.</li></ul>
+<h3 class="sub" id="sub2">2.2 Conectar no es firmar</h3>
+<ul><li>Al pulsar el botón de conectar, MetaMask pide permiso <strong>solo para ver tus cuentas</strong>. No firma nada ni mueve dinero en ese momento.</li><li>Si ya te habías conectado antes, al recargar la página la web te reconoce sola (guarda tu cuenta en el navegador).</li><li>Si cambias de cuenta o bloqueas MetaMask, la web se entera al momento y reacciona sola.</li></ul>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. Instalar MetaMask en el ordenador (PC)</h2>
+<h3 class="sub" id="sub3">3.1 Dónde descargarla (solo fuentes oficiales)</h3>
+<p>Descarga la extensión <strong>únicamente</strong> desde:</p>
+<ul><li><strong>Chrome, Edge o Brave</strong>: tienda "Chrome Web Store" → busca <em>"MetaMask"</em> (el editor oficial se llama <em>MetaMask</em> / Consensys).</li><li><strong>Firefox</strong>: "Add-ons de Firefox" → busca <em>"MetaMask"</em>.</li><li>Página oficial: <code>https://metamask.io/download/</code> (te enlaza a las tiendas oficiales).</li></ul>
+<blockquote class="warn"><span class="tag">Aviso</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Desconfía de extensiones con nombres parecidos o de anuncios. La extensión oficial nunca te pide tu frase semilla y pide permisos limitados.</p></blockquote>
+<h3 class="sub" id="sub4">3.2 Pasos de instalación</h3>
+<ol><li>Pulsa <strong>"Añadir a Chrome"</strong> (o el botón equivalente de tu navegador).</li><li>Confirma en la ventana que aparece.</li><li>Fija el icono del zorrito en la barra de extensiones (opción "fijar") para tenerlo a mano.</li><li>Abre la extensión: te ofrecerá <strong>"Empezar"</strong> → podrás <em>Crear una wallet</em> o <em>Importar una wallet</em>.</li><li>Si es la primera vez, acepta el aviso de uso (no hace falta compartir datos).</li></ol>
+<h3 class="sub" id="sub5">3.3 Comprobar que quedó lista</h3>
+<ul><li>Al abrir la extensión debes ver su pantalla con saldo <strong>0 ETH</strong> y el selector de red en la parte superior.</li><li>En la web de TrueKeate, el botón <strong>"🔗 Conectar MetaMask e iniciar sesión"</strong> dejará de mostrar el aviso de "MetaMask no está instalado".</li></ul>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. Instalar MetaMask en el móvil</h2>
+<h3 class="sub" id="sub6">4.1 Dónde descargarla</h3>
+<ul><li><strong>Android</strong>: Google Play → <em>"MetaMask – Blockchain Wallet"</em> (editor Consensys).</li><li><strong>iPhone</strong>: App Store → <em>"MetaMask – Crypto Wallet"</em> (editor Consensys).</li></ul>
+<p>Después de instalarla, tienes que <strong>crear o importar la billetera</strong> dentro de la app (usa la misma frase semilla que en el PC si quieres la misma cuenta).</p>
+<h3 class="sub" id="sub7">4.2 Cómo usar TrueKeate desde el móvil (hoy)</h3>
+<p>La versión móvil de la plataforma se entrega como <strong>PWA</strong> (una web que se puede añadir a la pantalla de inicio). La forma que funciona hoy en la práctica es:</p>
+<ol><li>Abre la app de MetaMask en tu móvil.</li><li>Usa su <strong>navegador interno</strong> (botón de navegador dentro de la app).</li><li>Escribe la dirección de TrueKeate: <code>https://truekeate-web-593453426217.europe-west1.run.app</code></li><li>Conecta y firma como en el PC: la app móvil hace de billetera.</li></ol>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Pendiente de confirmar: la firma delegada desde la PWA instalada a la app de MetaMask (enlace profundo) está pensada en el diseño pero <strong>no se ha verificado</strong> que funcione. Hoy el método que sí funciona es el navegador interno de la app de MetaMask. El modo sin conexión (service worker) de la PWA también está <strong>pendiente de confirmar</strong>.</p></blockquote>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICAgIDxtYXJrZXIgaWQ9ImFyclciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMmE5ZDhmIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5JbnN0YWxhciBNZXRhTWFzayB5IGNvbmVjdGFyIFRydWVLZWF0ZSAoUEMgeSBtw7N2aWwpPC90ZXh0PgoKICA8IS0tIEE6IGluaWNpbyAtLT4KICA8cmVjdCB4PSIyNTAiIHk9IjY0IiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQ2IiByeD0iMTMiIGZpbGw9IiNmNGEyNjEiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjkyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEzIiBmb250LXdlaWdodD0iYm9sZCI+UXVpZXJvIHVzYXIgVHJ1ZUtlYXRlPC90ZXh0PgoKICA8IS0tIERlY2lzaW9uIC0tPgogIDxyZWN0IHg9IjI1MCIgeT0iMTIyIiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQ2IiByeD0iMTMiIGZpbGw9IiNmM2U1YWIiIHN0cm9rZT0iI2M1YTA2NSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iNDAwIiB5PSIxNTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSJib2xkIj7Cv0Rlc2RlIGTDs25kZSB0ZSBjb25lY3Rhcz88L3RleHQ+CgogIDwhLS0gUmFtYSBpenF1aWVyZGE6IE9yZGVuYWRvciAtLT4KICA8cmVjdCB4PSIzMCIgeT0iMTg2IiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjYwIiByeD0iMTIiIGZpbGw9IiM0OGNhZTQiLz4KICA8dGV4dCB4PSIxODAiIHk9IjIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+SW5zdGFsYXIgZXh0ZW5zacOzbiBNZXRhTWFzazwvdGV4dD4KICA8dGV4dCB4PSIxODAiIHk9IjIzMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMCI+Q2hyb21lIFdlYiBTdG9yZSDCtyBGaXJlZm94IMK3IG1ldGFtYXNrLmlvPC90ZXh0PgoKICA8cmVjdCB4PSIzMCIgeT0iMjYwIiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjYwIiByeD0iMTIiIGZpbGw9IiMyYTlkOGYiLz4KICA8dGV4dCB4PSIxODAiIHk9IjI4NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+Q3JlYXIgbyBpbXBvcnRhciBsYSBiaWxsZXRlcmE8L3RleHQ+CiAgPHRleHQgeD0iMTgwIiB5PSIzMDYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAiPnkgZ3VhcmRhciBsYSBmcmFzZSBzZW1pbGxhICgxMiBwYWxhYnJhcyk8L3RleHQ+CgogIDxyZWN0IHg9IjMwIiB5PSIzMzQiIHdpZHRoPSIzMDAiIGhlaWdodD0iNjAiIHJ4PSIxMiIgZmlsbD0iI2U5ZTVmMCIgc3Ryb2tlPSIjOGQ4NmE5IiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDx0ZXh0IHg9IjE4MCIgeT0iMzYwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5BYnJpciBsYSB3ZWIgZGUgVHJ1ZUtlYXRlPC90ZXh0PgogIDx0ZXh0IHg9IjE4MCIgeT0iMzgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwIj5lbiBlbCBuYXZlZ2Fkb3IgZGVsIG9yZGVuYWRvcjwvdGV4dD4KCiAgPCEtLSBSYW1hIGRlcmVjaGE6IE3Ds3ZpbCAtLT4KICA8cmVjdCB4PSI0NzAiIHk9IjE4NiIgd2lkdGg9IjMwMCIgaGVpZ2h0PSI2MCIgcng9IjEyIiBmaWxsPSIjNDhjYWU0Ii8+CiAgPHRleHQgeD0iNjIwIiB5PSIyMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkluc3RhbGFyIGxhIGFwcCBNZXRhTWFzazwvdGV4dD4KICA8dGV4dCB4PSI2MjAiIHk9IjIzMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMCI+R29vZ2xlIFBsYXkgwrcgQXBwIFN0b3JlPC90ZXh0PgoKICA8cmVjdCB4PSI0NzAiIHk9IjI2MCIgd2lkdGg9IjMwMCIgaGVpZ2h0PSI2MCIgcng9IjEyIiBmaWxsPSIjMmE5ZDhmIi8+CiAgPHRleHQgeD0iNjIwIiB5PSIyODYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkNyZWFyIG8gaW1wb3J0YXIgbGEgYmlsbGV0ZXJhPC90ZXh0PgogIDx0ZXh0IHg9IjYyMCIgeT0iMzA2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwIj5kZW50cm8gZGUgbGEgYXBwIChtaXNtYSBmcmFzZSBxdWUgZWwgUEMpPC90ZXh0PgoKICA8cmVjdCB4PSI0NzAiIHk9IjMzNCIgd2lkdGg9IjMwMCIgaGVpZ2h0PSI2MCIgcng9IjEyIiBmaWxsPSIjZTllNWYwIiBzdHJva2U9IiM4ZDg2YTkiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNjIwIiB5PSIzNjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkFicmlyIGxhIHdlYiBkZSBUcnVlS2VhdGU8L3RleHQ+CiAgPHRleHQgeD0iNjIwIiB5PSIzODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiPmVuIGVsIG5hdmVnYWRvciBpbnRlcm5vIGRlIE1ldGFNYXNrPC90ZXh0PgoKICA8IS0tIFVuaW9uIC0tPgogIDxyZWN0IHg9IjE2MCIgeT0iNDA2IiB3aWR0aD0iNDgwIiBoZWlnaHQ9IjQ0IiByeD0iMTIiIGZpbGw9IiNkNGFmMzciLz4KICA8dGV4dCB4PSI0MDAiIHk9IjQzMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9ImJvbGQiPlB1bHNhcjogQ29uZWN0YXIgTWV0YU1hc2sgZSBpbmljaWFyIHNlc2nDs248L3RleHQ+CgogIDxyZWN0IHg9IjIwMCIgeT0iNDYyIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjM2IiByeD0iMTIiIGZpbGw9IiMyYTlkOGYiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjQ3NyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMC41IiBmb250LXdlaWdodD0iYm9sZCI+TWV0YU1hc2sgcGlkZSBwZXJtaXNvIHBhcmEgdmVyIHR1cyBjdWVudGFzPC90ZXh0PgogIDx0ZXh0IHg9IjQwMCIgeT0iNDkxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwIj7CoUxpc3RvISBMYSB3ZWIgcmVjb25vY2UgdHUgY3VlbnRhPC90ZXh0PgoKICA8IS0tIEZsZWNoYXMgLS0+CiAgPGcgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIuNSIgZmlsbD0ibm9uZSIgbWFya2VyLWVuZD0idXJsKCNhcnIpIj4KICAgIDxsaW5lIHgxPSI0MDAiIHkxPSIxMTAiIHgyPSI0MDAiIHkyPSIxMTgiLz4KICAgIDxsaW5lIHgxPSIzMTAiIHkxPSIxNjgiIHgyPSIyMDAiIHkyPSIxODIiLz4KICAgIDxsaW5lIHgxPSI0OTAiIHkxPSIxNjgiIHgyPSI2MDAiIHkyPSIxODIiLz4KICAgIDxsaW5lIHgxPSIxODAiIHkxPSIyNDYiIHgyPSIxODAiIHkyPSIyNTYiLz4KICAgIDxsaW5lIHgxPSI2MjAiIHkxPSIyNDYiIHgyPSI2MjAiIHkyPSIyNTYiLz4KICAgIDxsaW5lIHgxPSIxODAiIHkxPSIzMjAiIHgyPSIxODAiIHkyPSIzMzAiLz4KICAgIDxsaW5lIHgxPSI2MjAiIHkxPSIzMjAiIHgyPSI2MjAiIHkyPSIzMzAiLz4KICAgIDxsaW5lIHgxPSIxODAiIHkxPSIzOTQiIHgyPSIzMjAiIHkyPSI0MDQiLz4KICAgIDxsaW5lIHgxPSI2MjAiIHkxPSIzOTQiIHgyPSI0ODAiIHkyPSI0MDQiLz4KICAgIDxsaW5lIHgxPSI0MDAiIHkxPSI0NTAiIHgyPSI0MDAiIHkyPSI0NTgiLz4KICA8L2c+CiAgPHRleHQgeD0iMjUwIiB5PSIxNzYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPlBDPC90ZXh0PgogIDx0ZXh0IHg9IjU1MCIgeT0iMTc2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5Nw7N2aWw8L3RleHQ+Cjwvc3ZnPgo=" alt="Flujo Instalacion"/><figcaption class="fig-caption">Figura · Flujo Instalacion</figcaption></figure>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. Crear una billetera nueva</h2>
+<h3 class="sub" id="sub8">5.1 La frase semilla: la llave de todo</h3>
+<ul><li>Al crear la billetera, MetaMask genera una <strong>frase semilla</strong> de 12 palabras (también acepta importar frases de 24 palabras).</li><li><strong>La frase ES tu billetera</strong>: quien la tenga puede usar tus cuentas. MetaMask te pedirá confirmarla escribiendo algunas palabras al azar.</li></ul>
+<p>Reglas para guardarla:</p>
+<ol><li>Anótala en papel, sin conexión (nunca en capturas de pantalla, notas del móvil ni correos).</li><li>No la compartas con nadie, ni siquiera con un "soporte técnico".</li><li>Guarda una copia en un segundo sitio seguro. <strong>Nadie puede recuperarla por ti.</strong></li></ol>
+<h3 class="sub" id="sub9">5.2 La contraseña o el PIN</h3>
+<ul><li>La contraseña (PC) o el PIN/biometría (móvil) solo protegen el acceso a la app en <strong>tu</strong> dispositivo.</li><li>No es la clave de la billetera y <strong>no sirve para recuperar la frase</strong>.</li><li>Si bloqueas MetaMask en el PC, la web guarda tu cuenta pero no podrás firmar hasta desbloquear la extensión.</li></ul>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICAgIDxtYXJrZXIgaWQ9ImFyclIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjZTYzOTQ2Ii8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5DcmVhciB0dSBiaWxsZXRlcmE6IGxhIGZyYXNlIHNlbWlsbGEgKDEyIHBhbGFicmFzKTwvdGV4dD4KCiAgPCEtLSBQYXNvcyAtLT4KICA8cmVjdCB4PSI0MCIgeT0iNjAiIHdpZHRoPSI0ODAiIGhlaWdodD0iNTAiIHJ4PSIxMiIgZmlsbD0iI2Y0YTI2MSIvPgogIDx0ZXh0IHg9IjI4MCIgeT0iOTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSJib2xkIj4xIMK3IEFicmlyIE1ldGFNYXNrIHkgcHVsc2FyIMKrRW1wZXphcsK7PC90ZXh0PgoKICA8cmVjdCB4PSI0MCIgeT0iMTIwIiB3aWR0aD0iNDgwIiBoZWlnaHQ9IjUwIiByeD0iMTIiIGZpbGw9IiM0OGNhZTQiLz4KICA8dGV4dCB4PSIyODAiIHk9IjE1MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9ImJvbGQiPjIgwrcgRWxlZ2lyOiDCq0NyZWFyIHVuYSB3YWxsZXTCuzwvdGV4dD4KCiAgPHJlY3QgeD0iNDAiIHk9IjE4MCIgd2lkdGg9IjQ4MCIgaGVpZ2h0PSI1MCIgcng9IjEyIiBmaWxsPSIjZTllNWYwIiBzdHJva2U9IiM4ZDg2YTkiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iMjgwIiB5PSIyMDUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPjMgwrcgQ3JlYXIgdW5hIGNvbnRyYXNlw7FhIGxvY2FsPC90ZXh0PgogIDx0ZXh0IHg9IjI4MCIgeT0iMjI0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwLjUiPihzb2xvIHByb3RlZ2UgZWwgYWNjZXNvIGEgdHUgZGlzcG9zaXRpdm8pPC90ZXh0PgoKICA8cmVjdCB4PSI0MCIgeT0iMjQwIiB3aWR0aD0iNDgwIiBoZWlnaHQ9IjUwIiByeD0iMTIiIGZpbGw9IiNkNGFmMzciLz4KICA8dGV4dCB4PSIyODAiIHk9IjI2NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+NCDCtyBNZXRhTWFzayBnZW5lcmEgbGEgZnJhc2Ugc2VtaWxsYTwvdGV4dD4KICA8dGV4dCB4PSIyODAiIHk9IjI4NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41Ij4oMTIgcGFsYWJyYXM6IGxhIGxsYXZlIGRlIHR1IGJpbGxldGVyYSk8L3RleHQ+CgogIDxyZWN0IHg9IjQwIiB5PSIzMDAiIHdpZHRoPSI0ODAiIGhlaWdodD0iNTAiIHJ4PSIxMiIgZmlsbD0iIzJhOWQ4ZiIvPgogIDx0ZXh0IHg9IjI4MCIgeT0iMzI1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj41IMK3IEd1w6FyZGFsYSBlbiBwYXBlbCwgZnVlcmEgZGUgbMOtbmVhPC90ZXh0PgogIDx0ZXh0IHg9IjI4MCIgeT0iMzQ0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwLjUiPihudW5jYSBlbiBjYXB0dXJhcywgbm90YXMgZGVsIG3Ds3ZpbCBuaSBjb3JyZW9zKTwvdGV4dD4KCiAgPHJlY3QgeD0iNDAiIHk9IjM2MCIgd2lkdGg9IjQ4MCIgaGVpZ2h0PSI1MCIgcng9IjEyIiBmaWxsPSIjNDhjYWU0Ii8+CiAgPHRleHQgeD0iMjgwIiB5PSIzOTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSJib2xkIj42IMK3IENvbmZpcm1hIGFsZ3VuYXMgcGFsYWJyYXMgYWwgYXphcjwvdGV4dD4KCiAgPHJlY3QgeD0iNDAiIHk9IjQyMCIgd2lkdGg9IjQ4MCIgaGVpZ2h0PSI1MCIgcng9IjEyIiBmaWxsPSIjMmE5ZDhmIi8+CiAgPHRleHQgeD0iMjgwIiB5PSI0NDUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPjcgwrcgwqFXYWxsZXQgY3JlYWRhISBUdSBkaXJlY2Npw7NuICgweOKApik8L3RleHQ+CiAgPHRleHQgeD0iMjgwIiB5PSI0NjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAuNSI+ZXMgdHUgaWRlbnRpZGFkIGVuIGxhIHJlZCBkZSBwcnVlYmFzPC90ZXh0PgoKICA8IS0tIEF2aXNvIC0tPgogIDxyZWN0IHg9IjU2MCIgeT0iMjUwIiB3aWR0aD0iMjMwIiBoZWlnaHQ9IjEyMCIgcng9IjE0IiBmaWxsPSIjZTYzOTQ2Ii8+CiAgPHRleHQgeD0iNjc1IiB5PSIyNzIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPsKhQXZpc28gZGUgc2VndXJpZGFkITwvdGV4dD4KICA8dGV4dCB4PSI2NzUiIHk9IjI5MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMC41Ij5MYSBmcmFzZSBzZW1pbGxhIGVzIGxhIGxsYXZlPC90ZXh0PgogIDx0ZXh0IHg9IjY3NSIgeT0iMzA2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwLjUiPmRlIHR1IGJpbGxldGVyYS48L3RleHQ+CiAgPHRleHQgeD0iNjc1IiB5PSIzMjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAuNSI+TnVuY2EgbGEgY29tcGFydGFzLCBuaTwvdGV4dD4KICA8dGV4dCB4PSI2NzUiIHk9IjM0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMC41Ij5jb24gdW4gwqtzb3BvcnRlIHTDqWNuaWNvwrsuPC90ZXh0PgogIDx0ZXh0IHg9IjY3NSIgeT0iMzYwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwLjUiPk5hZGllIHB1ZWRlIHJlY3VwZXJhcmxhIHBvciB0aS48L3RleHQ+CgogIDwhLS0gRmxlY2hhcyB2ZXJ0aWNhbGVzIC0tPgogIDxnIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyLjUiIGZpbGw9Im5vbmUiIG1hcmtlci1lbmQ9InVybCgjYXJyKSI+CiAgICA8bGluZSB4MT0iMjgwIiB5MT0iMTEwIiB4Mj0iMjgwIiB5Mj0iMTE2Ii8+CiAgICA8bGluZSB4MT0iMjgwIiB5MT0iMTcwIiB4Mj0iMjgwIiB5Mj0iMTc2Ii8+CiAgICA8bGluZSB4MT0iMjgwIiB5MT0iMjMwIiB4Mj0iMjgwIiB5Mj0iMjM2Ii8+CiAgICA8bGluZSB4MT0iMjgwIiB5MT0iMjkwIiB4Mj0iMjgwIiB5Mj0iMjk2Ii8+CiAgICA8bGluZSB4MT0iMjgwIiB5MT0iMzUwIiB4Mj0iMjgwIiB5Mj0iMzU2Ii8+CiAgICA8bGluZSB4MT0iMjgwIiB5MT0iNDEwIiB4Mj0iMjgwIiB5Mj0iNDE2Ii8+CiAgPC9nPgogIDwhLS0gRmxlY2hhIGRpc2NvbnRpbnVhIGhhY2lhIGVsIGF2aXNvIC0tPgogIDxnIHN0cm9rZT0iI2U2Mzk0NiIgc3Ryb2tlLXdpZHRoPSIyLjUiIGZpbGw9Im5vbmUiIHN0cm9rZS1kYXNoYXJyYXk9IjYgNCIgbWFya2VyLWVuZD0idXJsKCNhcnJSKSI+CiAgICA8bGluZSB4MT0iNTIwIiB5MT0iMzI1IiB4Mj0iNTU2IiB5Mj0iMzI1Ii8+CiAgPC9nPgo8L3N2Zz4K" alt="Crear Wallet"/><figcaption class="fig-caption">Figura · Crear Wallet</figcaption></figure>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. Red de pruebas: el ETH no vale dinero</h2>
+<ul><li>Todos los contratos de TrueKeate viven hoy en una <strong>red de pruebas</strong> (anvil, número de red 31337). No hay una red de producción definida → <strong>pendiente de confirmar</strong>.</li><li>En esa red, el dinero es <strong>ETH simbólico de pruebas</strong>, sin valor real.</li><li><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Aunque conectes una cuenta con activos reales de otras redes, no los pierdes… pero <strong>cualquier operación de prueba consume ETH de prueba</strong>, y las claves de las cuentas de desarrollo son públicas (ver manual <code>03-cuentas-anvil.md</code>). <strong>Nunca uses en esta red cuentas con valor real.</strong></li><li>Recomendación: crea cuentas de prueba dedicadas (las del anvil) y no las mezcles con tu billetera personal.</li></ul>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. ¿Y otras billeteras? (alternativas)</h2>
+<ul><li>La web acepta <strong>cualquier billetera que se conecte al navegador</strong> igual que MetaMask (por ejemplo Brave Wallet o Coinbase Wallet).</li><li><strong>WalletConnect no está integrado</strong> hoy en la plataforma: usarlo para conectar a TrueKeate no es posible → <strong>pendiente de confirmar</strong> como vía alternativa. Los requisitos del proyecto fijan MetaMask como billetera.</li><li>En el móvil, la vía equivalente y sí disponible es el navegador interno de la app de MetaMask (apartado 4.2).</li></ul>
+</section>
+<section class="seccion" id="s8"><h2 class="seccion">8. Ficha didáctica</h2>
+<div class="table-wrap"><table><thead><tr><th>Campo</th><th>Contenido</th></tr></thead><tbody><tr><td><strong>¿Qué es?</strong></td><td>Una billetera (wallet) es una aplicación que guarda tus claves y firma por ti sin mostrarlas. TrueKeate usa MetaMask: extensión en el PC y app en el móvil.</td></tr><tr><td><strong>¿Para qué sirve?</strong></td><td>Para conectarte a TrueKeate, iniciar sesión firmando un mensaje, autorizar los trueques y ver tus activos de prueba (ETH, BRLT, NFTs).</td></tr><tr><td><strong>Pasos clave</strong></td><td>1) Instalar MetaMask (PC o móvil). 2) Crear o importar la billetera. 3) Guardar la frase semilla en papel. 4) Abrir la web de TrueKeate y pulsar "Conectar MetaMask e iniciar sesión". 5) Aceptar el permiso para ver cuentas.</td></tr><tr><td><strong>Errores comunes</strong></td><td>Descargar extensiones falsas con nombres parecidos · Confundir "conectar" (ver cuentas) con "firmar" o "enviar dinero" · Tener seleccionada otra red y no ver los saldos de prueba · Compartir la frase semilla con un supuesto soporte.</td></tr><tr><td><strong>Consejo de seguridad</strong></td><td>La frase semilla se escribe en papel y no se comparte jamás. En esta red de pruebas solo usa cuentas sin valor real: las claves de las cuentas de prueba son públicas (ver manual <code>03-cuentas-anvil.md</code>).</td></tr></tbody></table></div>
+</section>
+<section class="seccion" id="s9"><h2 class="seccion">9. Lo que falta por confirmar (resumen)</h2>
+<ol><li>La firma delegada desde la PWA instalada a la app de MetaMask (enlace profundo) → <strong>pendiente de confirmar</strong>.</li><li>El modo sin conexión de la PWA (service worker) → <strong>pendiente de confirmar</strong>.</li><li>La integración de WalletConnect como vía alternativa → <strong>pendiente de confirmar</strong>.</li><li>La red de producción definitiva del proyecto (hoy todo funciona sobre la red de pruebas) → <strong>pendiente de confirmar</strong>.</li></ol>
+</section>
+<section class="seccion" id="s10"><h2 class="seccion">10. Glosario de este manual</h2>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Significado</th></tr></thead><tbody><tr><td><strong>Wallet / billetera</strong></td><td>Aplicación que guarda tus claves y firma por ti</td></tr><tr><td><strong>MetaMask</strong></td><td>La billetera que usa TrueKeate (extensión y app)</td></tr><tr><td><strong>Extensión</strong></td><td>Programa que se añade al navegador</td></tr><tr><td><strong>Frase semilla</strong></td><td>12 o 24 palabras que son la llave de tu billetera</td></tr><tr><td><strong>Conectar</strong></td><td>Dar permiso a la web para ver tus cuentas (no firma nada)</td></tr><tr><td><strong>Firmar</strong></td><td>Demostrar con tu clave que un mensaje es tuyo</td></tr><tr><td><strong>Red de pruebas</strong></td><td>Red donde el dinero es simbólico y no vale nada real</td></tr><tr><td><strong>ETH</strong></td><td>La moneda de esa red de pruebas</td></tr><tr><td><strong>PWA</strong></td><td>Web que se puede instalar como una app en el móvil</td></tr></tbody></table></div>
+</section>
+</main>
+
+</body>
+</html>

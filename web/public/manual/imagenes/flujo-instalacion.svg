@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+    <marker id="arrW" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#2a9d8f"/>
+    </marker>
+  </defs>
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  <rect width="800" height="54" fill="#1a2b4c"/>
+  <rect y="50" width="800" height="4" fill="#d4af37"/>
+  <text x="400" y="34" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="bold">Instalar MetaMask y conectar TrueKeate (PC y móvil)</text>
+
+  <!-- A: inicio -->
+  <rect x="250" y="64" width="300" height="46" rx="13" fill="#f4a261"/>
+  <text x="400" y="92" text-anchor="middle" fill="#1a2b4c" font-size="13" font-weight="bold">Quiero usar TrueKeate</text>
+
+  <!-- Decision -->
+  <rect x="250" y="122" width="300" height="46" rx="13" fill="#f3e5ab" stroke="#c5a065" stroke-width="2"/>
+  <text x="400" y="150" text-anchor="middle" fill="#1a2b4c" font-size="13" font-weight="bold">¿Desde dónde te conectas?</text>
+
+  <!-- Rama izquierda: Ordenador -->
+  <rect x="30" y="186" width="300" height="60" rx="12" fill="#48cae4"/>
+  <text x="180" y="212" text-anchor="middle" fill="#0a1128" font-size="12.5" font-weight="bold">Instalar extensión MetaMask</text>
+  <text x="180" y="232" text-anchor="middle" fill="#0a1128" font-size="10">Chrome Web Store · Firefox · metamask.io</text>
+
+  <rect x="30" y="260" width="300" height="60" rx="12" fill="#2a9d8f"/>
+  <text x="180" y="286" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">Crear o importar la billetera</text>
+  <text x="180" y="306" text-anchor="middle" fill="#ffffff" font-size="10">y guardar la frase semilla (12 palabras)</text>
+
+  <rect x="30" y="334" width="300" height="60" rx="12" fill="#e9e5f0" stroke="#8d86a9" stroke-width="1.5"/>
+  <text x="180" y="360" text-anchor="middle" fill="#1a2b4c" font-size="12.5" font-weight="bold">Abrir la web de TrueKeate</text>
+  <text x="180" y="380" text-anchor="middle" fill="#1a2b4c" font-size="10">en el navegador del ordenador</text>
+
+  <!-- Rama derecha: Móvil -->
+  <rect x="470" y="186" width="300" height="60" rx="12" fill="#48cae4"/>
+  <text x="620" y="212" text-anchor="middle" fill="#0a1128" font-size="12.5" font-weight="bold">Instalar la app MetaMask</text>
+  <text x="620" y="232" text-anchor="middle" fill="#0a1128" font-size="10">Google Play · App Store</text>
+
+  <rect x="470" y="260" width="300" height="60" rx="12" fill="#2a9d8f"/>
+  <text x="620" y="286" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">Crear o importar la billetera</text>
+  <text x="620" y="306" text-anchor="middle" fill="#ffffff" font-size="10">dentro de la app (misma frase que el PC)</text>
+
+  <rect x="470" y="334" width="300" height="60" rx="12" fill="#e9e5f0" stroke="#8d86a9" stroke-width="1.5"/>
+  <text x="620" y="360" text-anchor="middle" fill="#1a2b4c" font-size="12.5" font-weight="bold">Abrir la web de TrueKeate</text>
+  <text x="620" y="380" text-anchor="middle" fill="#1a2b4c" font-size="10">en el navegador interno de MetaMask</text>
+
+  <!-- Union -->
+  <rect x="160" y="406" width="480" height="44" rx="12" fill="#d4af37"/>
+  <text x="400" y="433" text-anchor="middle" fill="#0a1128" font-size="13" font-weight="bold">Pulsar: Conectar MetaMask e iniciar sesión</text>
+
+  <rect x="200" y="462" width="400" height="36" rx="12" fill="#2a9d8f"/>
+  <text x="400" y="477" text-anchor="middle" fill="#ffffff" font-size="10.5" font-weight="bold">MetaMask pide permiso para ver tus cuentas</text>
+  <text x="400" y="491" text-anchor="middle" fill="#ffffff" font-size="10">¡Listo! La web reconoce tu cuenta</text>
+
+  <!-- Flechas -->
+  <g stroke="#1a2b4c" stroke-width="2.5" fill="none" marker-end="url(#arr)">
+    <line x1="400" y1="110" x2="400" y2="118"/>
+    <line x1="310" y1="168" x2="200" y2="182"/>
+    <line x1="490" y1="168" x2="600" y2="182"/>
+    <line x1="180" y1="246" x2="180" y2="256"/>
+    <line x1="620" y1="246" x2="620" y2="256"/>
+    <line x1="180" y1="320" x2="180" y2="330"/>
+    <line x1="620" y1="320" x2="620" y2="330"/>
+    <line x1="180" y1="394" x2="320" y2="404"/>
+    <line x1="620" y1="394" x2="480" y2="404"/>
+    <line x1="400" y1="450" x2="400" y2="458"/>
+  </g>
+  <text x="250" y="176" text-anchor="middle" fill="#1a2b4c" font-size="10.5" font-weight="bold">PC</text>
+  <text x="550" y="176" text-anchor="middle" fill="#1a2b4c" font-size="10.5" font-weight="bold">Móvil</text>
+</svg>

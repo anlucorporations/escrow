@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · Ver los NFTs de tus trueques en la billetera</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">07 · Wallets y Cuentas</div>
+    <h1>Ver los NFTs de tus trueques en la billetera</h1>
+    <div class="intro">Versión en lenguaje sencillo del manual técnico "Verificación de los NFTs de los trueques en la wallet". Cuando haces un trueque en TrueKeate, el objeto ofrecido se representa como un <strong>NFT</strong> (un certificado digital único) en la red de pruebas. Aquí te contamos qué es ese NFT y cómo añadirlo a MetaMask para verlo.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>07-Wallets-y-Cuentas/05-nfts-trueques.md</b></span>
+      <span>Edición: <b>4 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/07-Wallets-y-Cuentas/05-nfts-trueques</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Wallets y Cuentas · Wallets Y Cuentas — Ver los NFTs de tus trueques en la billetera</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>¿Qué es el NFT de los trueques?</span></a><div class="subs"><a href="#sub1">2.1 Un certificado único (ERC-721)</a><br><a href="#sub2">2.2 Un NFT de pruebas (importante)</a></div></li><li><a href="#s3"><span class="tnum">3</span><span>Añadir un NFT en MetaMask (ordenador)</span></a><div class="subs"><a href="#sub3">3.1 Requisitos previos</a><br><a href="#sub4">3.2 Pasos</a></div></li><li><a href="#s4"><span class="tnum">4</span><span>Añadir un NFT en MetaMask (móvil)</span></a></li><li><a href="#s5"><span class="tnum">5</span><span>Comprobar que el NFT es tuyo (la parte fiable)</span></a><div class="subs"><a href="#sub5">5.1 Qué muestra MetaMask (limitación conocida)</a><br><a href="#sub6">5.2 La fuente de verdad: preguntar al contrato</a><br><a href="#sub7">5.3 Y dentro de la plataforma web</a></div></li><li><a href="#s6"><span class="tnum">6</span><span>Avisos importantes</span></a></li><li><a href="#s7"><span class="tnum">7</span><span>Ficha didáctica</span></a></li><li><a href="#s8"><span class="tnum">8</span><span>Lo que falta por confirmar (resumen)</span></a></li><li><a href="#s9"><span class="tnum">9</span><span>Glosario de este manual</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<blockquote class="info"><span class="tag">Nota</span><p>🔎 Datos auditados el 2026-09-04 en la red de pruebas (anvil, cadena 31337).</p></blockquote>
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos</h2>
+<p>Para ver un NFT necesitas <strong>dos datos</strong>: la dirección del contrato y el <strong>número del token</strong> (su ID). Sin el ID no se puede importar.</p>
+<ol><li>Abre MetaMask y comprueba que tienes la <strong>red de TrueKeate</strong> (cadena 31337) seleccionada.</li><li>Pestaña <strong>"NFTs"</strong> (junto a "Activos") → botón <strong>"Importar NFTs"</strong>.</li><li>Rellena:<ul><li><em>Dirección</em>: <code>0x99dbe4aea58e518c50a1c04ae9b48c9f6354612f</code></li><li><em>ID</em>: el número del token (por ejemplo, <code>1</code>)</li></ul></li><li>Pulsa <strong>"Añadir"</strong>.</li><li>MetaMask comprueba que el contrato es de NFTs y que la cuenta activa posee ese token. Si es tuya, el NFT se añade a tu colección.</li></ol>
+<blockquote class="warn"><span class="tag">Aviso</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Antes de importar necesitas saber <strong>qué ID tienes</strong>. Ese dato no está en la web: hay que comprobarlo en la blockchain (apartado 5).</p></blockquote>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. ¿Qué es el NFT de los trueques?</h2>
+<h3 class="sub" id="sub1">2.1 Un certificado único (ERC-721)</h3>
+<ul><li>Un <strong>NFT</strong> es un token <strong>no fungible</strong>: es único, no se puede partir ni cambiar por otro igual. Sirve para representar "esto es mío y es único".</li><li>El contrato de pruebas de TrueKeate se llama <strong>TrueKeateNFT</strong> y su símbolo es <strong>TKANFT</strong>.</li></ul>
+<div class="table-wrap"><table><thead><tr><th>Dato</th><th>Valor</th></tr></thead><tbody><tr><td>Dirección del contrato</td><td><code>0x99dbe4aea58e518c50a1c04ae9b48c9f6354612f</code></td></tr><tr><td>Nombre</td><td>TrueKeate NFT</td></tr><tr><td>Símbolo</td><td>TKANFT</td></tr><tr><td>Estándar</td><td>ERC-721 (<code>balanceOf</code>, <code>ownerOf</code>, <code>mint</code>, …)</td></tr></tbody></table></div>
+<h3 class="sub" id="sub2">2.2 Un NFT de pruebas (importante)</h3>
+<ul><li>TrueKeateNFT es un <strong>contrato de pruebas</strong> (un <em>mock</em>): en el entorno de desarrollo representa los objetos/certificados de los trueques.</li><li>El contrato definitivo que representará los objetos del trueque en producción es <strong>pendiente de confirmar</strong> (hoy solo existe este mock).</li><li>Los números de token (IDs) se asignan <strong>en orden desde el 1</strong>: el primer NFT minteado es el 1, el siguiente el 2, y así.</li><li>En el despliegue básico <strong>no se mintea ningún NFT</strong>: los que existan en cada entorno dependen de las pruebas y flujos hechos. Qué IDs existen ahora en la red remota es <strong>pendiente de confirmar</strong>.</li></ul>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. Añadir un NFT en MetaMask (ordenador)</h2>
+<h3 class="sub" id="sub3">3.1 Requisitos previos</h3>
+<ol><li>Tener seleccionada la <strong>red del proyecto</strong> (cadena 31337).</li><li>Conocer la <strong>dirección del contrato</strong>: <code>0x99dbe4aea58e518c50a1c04ae9b48c9f6354612f</code></li><li>Conocer el <strong>ID del token</strong> (un número entero, por ejemplo <code>1</code>).</li></ol>
+<h3 class="sub" id="sub4">3.2 Pasos</h3>
+<ol><li>Abre MetaMask → pestaña <strong>"NFTs"</strong>.</li><li>Pulsa <strong>"Importar NFTs"</strong> (o el icono de importar).</li><li>Rellena los dos campos:<ul><li><em>Dirección</em>: <code>0x99dbe4aea58e518c50a1c04ae9b48c9f6354612f</code></li><li><em>ID</em>: el número de tu token (p. ej. <code>1</code>).</li></ul></li><li>Pulsa <strong>"Añadir"</strong>. MetaMask valida que el contrato es ERC-721 y que la cuenta activa posee ese token.</li></ol>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. Añadir un NFT en MetaMask (móvil)</h2>
+<ol><li>En MetaMask móvil, selecciona la red del proyecto (cadena 31337).</li><li>Pestaña <strong>"NFTs"</strong> → <strong>"Importar NFTs"</strong>.</li><li>Pega la dirección del contrato + el token ID → <strong>"Añadir"</strong>.</li></ol>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. Comprobar que el NFT es tuyo (la parte fiable)</h2>
+<h3 class="sub" id="sub5">5.1 Qué muestra MetaMask (limitación conocida)</h3>
+<ul><li>El contrato de pruebas <strong>no incluye imagen ni descripción</strong> (no define metadatos). Por eso MetaMask puede mostrar el NFT <strong>sin imagen</strong>, o fallar la vista previa. El comportamiento exacto de la interfaz con metadatos vacíos es <strong>pendiente de confirmar</strong>.</li><li>No te preocupes: <strong>la propiedad no depende de la imagen</strong>. Se comprueba en la blockchain.</li></ul>
+<h3 class="sub" id="sub6">5.2 La fuente de verdad: preguntar al contrato</h3>
+<p>En la blockchain cada NFT guarda quién es su dueño. Dos preguntas útiles:</p>
+<ul><li><strong>¿Cuántos NFTs de este contrato tiene una cuenta?</strong> → se cuenta con <code>balanceOf</code>.</li><li><strong>¿De quién es el token número X?</strong> → se pregunta con <code>ownerOf</code>.</li></ul>
+<p>Ejemplo para personas técnicas (con la herramienta <code>cast</code>):</p>
+<pre><code><span class="pre-label">bash</span>RPC=https://mcc-foundry-anvil-slzlptbcla-ew.a.run.app
+NFT=0x99dbe4aea58e518c50a1c04ae9b48c9f6354612f
+
+# ¿Cuántos NFTs TKANFT tiene Ana (cuenta 2)?
+cast call $NFT "balanceOf(address)(uint256)" \
+  0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC --rpc-url $RPC
+
+# ¿Quién es el dueño del token 1?
+cast call $NFT "ownerOf(uint256)(address)" 1 --rpc-url $RPC</code></pre>
+<ul><li>Si <code>ownerOf</code> da error, ese token <strong>no existe</strong> en esta red en este momento.</li><li>Si <code>balanceOf</code> da 0, esa cuenta no tiene NFTs de este contrato.</li></ul>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p>No hay un explorador de bloques configurado para el anvil remoto → <strong>pendiente de confirmar</strong>; por ahora, la verificación fiable es preguntar al contrato (como arriba).</p></blockquote>
+<h3 class="sub" id="sub7">5.3 Y dentro de la plataforma web</h3>
+<ul><li>El módulo de Finanzas muestra "NFTs en stock" de la cuenta conectada, pero ese dato es el <strong>registrado en la base de datos</strong> (un espejo), no una lectura directa de la blockchain. Para confirmar la propiedad real de un token hay que consultar la cadena (apartado 5.2).</li></ul>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. Avisos importantes</h2>
+<ul><li><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> <strong>Es un contrato de pruebas</strong>: cualquiera puede mintear (crear) un NFT de este contrato para cualquier cuenta. Poseer uno <strong>no certifica nada</strong> sobre tu identidad ni tu estado en la plataforma.</li><li><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> <strong>Red de pruebas</strong>: estos NFTs no tienen valor real.</li><li><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Los token IDs y saldos dependen del estado de cada anvil (si se reinicia, pueden cambiar): si <code>ownerOf</code> falla o <code>balanceOf</code> da 0, el NFT no existe en ese momento en esa red.</li></ul>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICAgIDxtYXJrZXIgaWQ9ImFyclIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjZTYzOTQ2Ii8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5Bw7FhZGUgeSB2ZXJpZmljYSBsb3MgTkZUcyBkZSB0dXMgdHJ1ZXF1ZXM8L3RleHQ+CgogIDwhLS0gUGFzbyAxIC0tPgogIDxyZWN0IHg9IjYwIiB5PSI2MCIgd2lkdGg9IjUwMCIgaGVpZ2h0PSI0MCIgcng9IjEyIiBmaWxsPSIjZjRhMjYxIi8+CiAgPHRleHQgeD0iMzEwIiB5PSI4NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+MSDCtyBSZWQgZGUgVHJ1ZUtlYXRlIHNlbGVjY2lvbmFkYSAoMzEzMzcpPC90ZXh0PgoKICA8IS0tIFBhc28gMiAtLT4KICA8cmVjdCB4PSI2MCIgeT0iMTEyIiB3aWR0aD0iNTAwIiBoZWlnaHQ9IjQwIiByeD0iMTIiIGZpbGw9IiM0OGNhZTQiLz4KICA8dGV4dCB4PSIzMTAiIHk9IjEzOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+MiDCtyBQZXN0YcOxYSDCq05GVHPCuyDihpIgwqtJbXBvcnRhciBORlRzwrs8L3RleHQ+CgogIDwhLS0gUGFzbyAzIC0tPgogIDxyZWN0IHg9IjYwIiB5PSIxNjQiIHdpZHRoPSI1MDAiIGhlaWdodD0iNjQiIHJ4PSIxMiIgZmlsbD0iI2U5ZTVmMCIgc3Ryb2tlPSIjOGQ4NmE5IiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDx0ZXh0IHg9IjMxMCIgeT0iMTg2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iYm9sZCI+MyDCtyBSZWxsZW5hIGxhIGRpcmVjY2nDs24gZGVsIGNvbnRyYXRvIFRydWVLZWF0ZU5GVCAoVEtBTkZUKTo8L3RleHQ+CiAgPHRleHQgeD0iMzEwIiB5PSIyMDciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTEiIGZvbnQtd2VpZ2h0PSJib2xkIj4weDk5ZGJlNGFlYTU4ZTUxOGM1MGExYzA0YWU5YjQ4YzlmNjM1NDYxMmY8L3RleHQ+CiAgPHRleHQgeD0iMzEwIiB5PSIyMjEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiPnkgZWwgdG9rZW4gSUQ6IG7Dum1lcm8gZW50ZXJvIGVuIG9yZGVuIGRlc2RlIGVsIDEgKGVqLiBJRCAxKTwvdGV4dD4KCiAgPCEtLSBQYXNvIDQgLS0+CiAgPHJlY3QgeD0iNjAiIHk9IjI0MCIgd2lkdGg9IjUwMCIgaGVpZ2h0PSI0MCIgcng9IjEyIiBmaWxsPSIjNDhjYWU0Ii8+CiAgPHRleHQgeD0iMzEwIiB5PSIyNjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPjQgwrcgUHVsc2EgwqtBw7FhZGlywrs8L3RleHQ+CgogIDwhLS0gRGVjaXNpb24gLS0+CiAgPHJlY3QgeD0iNjAiIHk9IjI5MiIgd2lkdGg9IjUwMCIgaGVpZ2h0PSI1NiIgcng9IjEyIiBmaWxsPSIjZDRhZjM3Ii8+CiAgPHRleHQgeD0iMzEwIiB5PSIzMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPjUgwrcgwr9NZXRhTWFzayBjb25maXJtYSBxdWUgdHUgY3VlbnRhIHBvc2VlIGVsIHRva2VuPzwvdGV4dD4KICA8dGV4dCB4PSIzMTAiIHk9IjMzOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMCI+bGEgcHJvcGllZGFkIHNlIGNvbXBydWViYSBlbiBsYSBibG9ja2NoYWluIChvd25lck9mIC8gYmFsYW5jZU9mKTwvdGV4dD4KCiAgPCEtLSBObzogZXJyb3IgLS0+CiAgPHJlY3QgeD0iNTkwIiB5PSIyOTIiIHdpZHRoPSIyMDAiIGhlaWdodD0iNTYiIHJ4PSIxMiIgZmlsbD0iI2U2Mzk0NiIvPgogIDx0ZXh0IHg9IjY5MCIgeT0iMzE0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjExLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5ObyAvIGVycm9yPC90ZXh0PgogIDx0ZXh0IHg9IjY5MCIgeT0iMzMwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjkuNSI+Y29tcHJ1ZWJhIGVsIHRva2VuIElEIHkgbGE8L3RleHQ+CiAgPHRleHQgeD0iNjkwIiB5PSIzNDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iOS41Ij5yZWQ7IHByZWd1bnRhIGFsIGNvbnRyYXRvPC90ZXh0PgoKICA8IS0tIFNpOiBsaXN0byAtLT4KICA8cmVjdCB4PSI2MCIgeT0iMzYyIiB3aWR0aD0iNTAwIiBoZWlnaHQ9IjQ0IiByeD0iMTIiIGZpbGw9IiMyYTlkOGYiLz4KICA8dGV4dCB4PSIzMTAiIHk9IjM5MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9ImJvbGQiPlPDrSDihpIgwqFMaXN0byEgRWwgTkZUIGFwYXJlY2UgZW4gdHUgY29sZWNjacOzbjwvdGV4dD4KCiAgPCEtLSBOb3RhIC0tPgogIDxyZWN0IHg9IjYwIiB5PSI0MTgiIHdpZHRoPSI1MDAiIGhlaWdodD0iNzIiIHJ4PSIxMiIgZmlsbD0iIzhkODZhOSIvPgogIDx0ZXh0IHg9IjMxMCIgeT0iNDQwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+UmVjdWVyZGE6IGVsIGNvbnRyYXRvIGRlIHBydWViYXMgbm8gZGVmaW5lIGltYWdlbiBuaTwvdGV4dD4KICA8dGV4dCB4PSIzMTAiIHk9IjQ1NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMCI+ZGVzY3JpcGNpw7NuIChtZXRhZGF0b3MpLCBwb3IgZXNvIHB1ZWRlIHZlcnNlIHNpbiBpbWFnZW4uPC90ZXh0PgogIDx0ZXh0IHg9IjMxMCIgeT0iNDc0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwIj5MYSBwcm9waWVkYWQgc2UgY29tcHJ1ZWJhIGVuIGxhIGJsb2NrY2hhaW46IG93bmVyT2YoSUQpLjwvdGV4dD4KCiAgPCEtLSBGbGVjaGFzIC0tPgogIDxnIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyLjUiIGZpbGw9Im5vbmUiIG1hcmtlci1lbmQ9InVybCgjYXJyKSI+CiAgICA8bGluZSB4MT0iMzEwIiB5MT0iMTAwIiB4Mj0iMzEwIiB5Mj0iMTA4Ii8+CiAgICA8bGluZSB4MT0iMzEwIiB5MT0iMTUyIiB4Mj0iMzEwIiB5Mj0iMTYwIi8+CiAgICA8bGluZSB4MT0iMzEwIiB5MT0iMjI4IiB4Mj0iMzEwIiB5Mj0iMjM2Ii8+CiAgICA8bGluZSB4MT0iMzEwIiB5MT0iMjgwIiB4Mj0iMzEwIiB5Mj0iMjg4Ii8+CiAgICA8bGluZSB4MT0iMzEwIiB5MT0iMzQ4IiB4Mj0iMzEwIiB5Mj0iMzU4Ii8+CiAgICA8bGluZSB4MT0iMzEwIiB5MT0iNDA2IiB4Mj0iMzEwIiB5Mj0iNDE0Ii8+CiAgICA8bGluZSB4MT0iNTYwIiB5MT0iMzIwIiB4Mj0iNTg2IiB5Mj0iMzIwIi8+CiAgPC9nPgogIDx0ZXh0IHg9IjMxOCIgeT0iMzU4IiBmaWxsPSIjMmE5ZDhmIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+c8OtPC90ZXh0PgogIDx0ZXh0IHg9IjU3MyIgeT0iMzE0IiBmaWxsPSIjZTYzOTQ2IiBmb250LXNpemU9IjEwIiBmb250LXdlaWdodD0iYm9sZCI+bm88L3RleHQ+CgogIDwhLS0gQnVjbGU6IG5vIC0+IHZvbHZlciBhbCBwYXNvIDMgLS0+CiAgPGcgc3Ryb2tlPSIjZTYzOTQ2IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1kYXNoYXJyYXk9IjYgNCIgbWFya2VyLWVuZD0idXJsKCNhcnJSKSI+CiAgICA8cGF0aCBkPSJNIDcwMCAyOTIgTCA3MDAgMjEwIEwgNTYzIDIxMCIvPgogIDwvZz4KICA8dGV4dCB4PSI3MTIiIHk9IjI2MiIgZmlsbD0iI2U2Mzk0NiIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9ImJvbGQiPnZ1ZWx2ZSBhbCBwYXNvIDM8L3RleHQ+Cjwvc3ZnPgo=" alt="Nft Trueques"/><figcaption class="fig-caption">Figura · Nft Trueques</figcaption></figure>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. Ficha didáctica</h2>
+<div class="table-wrap"><table><thead><tr><th>Campo</th><th>Contenido</th></tr></thead><tbody><tr><td><strong>¿Qué es?</strong></td><td>El NFT de los trueques (contrato TrueKeateNFT, estándar ERC-721, símbolo TKANFT) es un certificado digital único que representa el objeto de un trueque en la red de pruebas. Dirección: <code>0x99db…612f</code>.</td></tr><tr><td><strong>¿Para qué sirve?</strong></td><td>Para ver en tu billetera los NFTs/certificados de tus trueques de prueba y comprobar quién es el dueño de cada token en la blockchain.</td></tr><tr><td><strong>Pasos clave</strong></td><td>1) Seleccionar la red 31337. 2) Pestaña NFTs → Importar NFTs. 3) Pegar la dirección <code>0x99dbe4aea58e518c50a1c04ae9b48c9f6354612f</code> + el ID del token. 4) Añadir. 5) Para confirmar propiedad, preguntar a la cadena (<code>ownerOf</code>/<code>balanceOf</code>).</td></tr><tr><td><strong>Errores comunes</strong></td><td>Importar sin saber el ID del token · Tener la red equivocada (no aparece) · Esperar imagen o descripción (este contrato de pruebas no tiene metadatos) · Fiarse de una captura en vez de comprobar <code>ownerOf</code>.</td></tr><tr><td><strong>Consejo de seguridad</strong></td><td>La fuente de verdad es la <strong>blockchain</strong> (<code>ownerOf</code>), no la interfaz: si el contrato no dice que eres el dueño, no lo eres, muestre lo que muestre la wallet. Y recuerda: es un NFT de pruebas, sin valor real.</td></tr></tbody></table></div>
+</section>
+<section class="seccion" id="s8"><h2 class="seccion">8. Lo que falta por confirmar (resumen)</h2>
+<ol><li>Qué token IDs existen ahora en la red remota (depende de los mints hechos por pruebas/flujos) → <strong>pendiente de confirmar</strong>.</li><li>Cómo muestra MetaMask un NFT sin metadatos (imagen/descripción) → <strong>pendiente de confirmar</strong>.</li><li>El contrato definitivo de representación de objetos del trueque → <strong>pendiente de confirmar</strong> (hoy solo existe el mock de pruebas).</li></ol>
+</section>
+<section class="seccion" id="s9"><h2 class="seccion">9. Glosario de este manual</h2>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Significado</th></tr></thead><tbody><tr><td><strong>NFT</strong></td><td>Token no fungible: único e irrepetible</td></tr><tr><td><strong>ERC-721</strong></td><td>Estándar de NFTs (cada token es distinto)</td></tr><tr><td><strong>Token ID</strong></td><td>El número de matrícula de un NFT (1, 2, 3…)</td></tr><tr><td><strong>Mock</strong></td><td>Programa de pruebas que imita al real para poder probar</td></tr><tr><td><strong>Mint</strong></td><td>Crear (acuñar) un token nuevo</td></tr><tr><td><strong>ownerOf / balanceOf</strong></td><td>Preguntas al contrato: "¿de quién es este token?" / "¿cuántos tiene esta cuenta?"</td></tr><tr><td><strong>Metadatos</strong></td><td>La imagen y la descripción que acompañan a un NFT</td></tr></tbody></table></div>
+</section>
+</main>
+
+</body>
+</html>

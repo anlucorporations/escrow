@@ -32,6 +32,7 @@ const THEMES = {
   '04-Despliegue': 'Despliegue',
   '05-Diccionario-de-Datos': 'Diccionario de Datos',
   '06-Diagrama-Relacional': 'Diagrama Relacional',
+  '07-Wallets-y-Cuentas': 'Wallets y Cuentas',
 };
 
 const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
@@ -610,8 +611,10 @@ ${body}
 
 /* ============================================================== ejecución === */
 function listManuals() {
+  const scope = process.env.PDF_SCOPE || '';
   return walk(MD_ROOT)
     .map((p) => ({ rel: p.slice(MD_ROOT.length + 1), abs: p }))
+    .filter((m) => !scope || m.rel.startsWith(scope))
     .sort((a, b) => a.rel.localeCompare(b.rel));
 }
 

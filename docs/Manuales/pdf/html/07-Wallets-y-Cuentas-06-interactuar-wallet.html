@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · Firmar y autorizar en la plataforma</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">07 · Wallets y Cuentas</div>
+    <h1>Firmar y autorizar en la plataforma</h1>
+    <div class="intro">Versión en lenguaje sencillo del manual técnico "Interacción con la wallet en la plataforma". Cuando usas TrueKeate, tu billetera (MetaMask) aparece en momentos concretos: para <strong>conectarte</strong>, para <strong>iniciar sesión firmando</strong> y, en el futuro, para <strong>autorizar los pasos de un trueque</strong>. Aquí te explicamos qué significa cada cosa y cuándo te pedirán algo.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>07-Wallets-y-Cuentas/06-interactuar-wallet.md</b></span>
+      <span>Edición: <b>4 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/07-Wallets-y-Cuentas/06-interactuar-wallet</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Wallets y Cuentas · Wallets Y Cuentas — Firmar y autorizar en la plataforma</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>Conectar la billetera: ¿qué ocurre al pulsar el botón?</span></a><div class="subs"><a href="#sub1">2.1 Los tres pasos del botón oficial</a><br><a href="#sub2">2.2 ¿Y si mi cuenta no está inscrita?</a><br><a href="#sub3">2.3 Al recargar la página</a></div></li><li><a href="#s3"><span class="tnum">3</span><span>Firmar la sesión: el mensaje "TrueKeate: iniciar sesión"</span></a><div class="subs"><a href="#sub4">3.1 Qué es exactamente</a><br><a href="#sub5">3.2 Qué verás en MetaMask</a><br><a href="#sub6">3.3 Una sola firma para todo (login único)</a></div></li><li><a href="#s4"><span class="tnum">4</span><span>Autorizar los pasos de un trueque</span></a><div class="subs"><a href="#sub7">4.1 Qué ocurre HOY en la web (verificado)</a><br><a href="#sub8">4.2 El diseño a futuro: firmar la intención y que la plataforma pague</a><br><a href="#sub9">4.3 Qué significa cada botón del trueque</a></div></li><li><a href="#s5"><span class="tnum">5</span><span>¿Firma o transacción? Lo que puede pedirte MetaMask</span></a></li><li><a href="#s6"><span class="tnum">6</span><span>Avisos importantes</span></a></li><li><a href="#s7"><span class="tnum">7</span><span>Ficha didáctica</span></a></li><li><a href="#s8"><span class="tnum">8</span><span>Lo que falta por confirmar (resumen)</span></a></li><li><a href="#s9"><span class="tnum">9</span><span>Glosario de este manual</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<blockquote class="info"><span class="tag">Nota</span><p>🔎 Datos auditados el 2026-09-04 en la red de pruebas (anvil, cadena 31337).</p></blockquote>
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos</h2>
+<p>Ejemplo: quieres entrar en la web de TrueKeate como <strong>Ana</strong>.</p>
+<ol><li>Importa la cuenta de Ana en MetaMask (manual [03 · Las cuentas de prueba](03-cuentas-anvil.md)) y selecciona la red de TrueKeate (cadena 31337).</li><li>Abre la web de TrueKeate: <code>https://truekeate-web-593453426217.europe-west1.run.app</code></li><li>Pulsa <strong>"🔗 Conectar MetaMask e iniciar sesión"</strong>.</li><li>En MetaMask aparece el diálogo <strong>"Conectar con TrueKeate"</strong>: es un permiso para <strong>ver tus cuentas</strong> (no firma nada). Pulsa aprobar.</li><li>Si la cuenta está inscrita, MetaMask te pide <strong>firmar el mensaje de sesión</strong>: <em>"TrueKeate: iniciar sesión"</em>. Firma.</li><li>¡Ya estás dentro! La sesión queda guardada. Al recargar la página, la web te reconoce sin volver a preguntar.</li></ol>
+<blockquote class="importante"><span class="tag">Importante</span><p>Importante: <strong>firmar la sesión no cuesta gas ni necesita ETH</strong>. Es solo una firma, no un pago.</p></blockquote>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. Conectar la billetera: ¿qué ocurre al pulsar el botón?</h2>
+<h3 class="sub" id="sub1">2.1 Los tres pasos del botón oficial</h3>
+<p>El botón <strong>"🔗 Conectar MetaMask e iniciar sesión"</strong> hace tres cosas, en orden:</p>
+<ol><li><strong>Conectar</strong>: MetaMask abre el diálogo <em>"Conectar con TrueKeate"</em>. Es un <strong>permiso para ver tus cuentas</strong>. No es una firma ni una transacción.</li><li><strong>Consultar</strong>: la web pregunta al servidor si esa wallet está <strong>inscrita</strong> en TrueKeate.</li><li><strong>Autenticar</strong>: si está inscrita, la web pide la <strong>firma de sesión</strong> (apartado 3).</li></ol>
+<h3 class="sub" id="sub2">2.2 ¿Y si mi cuenta no está inscrita?</h3>
+<ul><li>Si la wallet no está inscrita, la suite (tu área privada) queda bloqueada: solo podrás ver el catálogo y la pantalla de inscripción.</li><li>Para operar hay que completar la <strong>inscripción formal</strong>: correo, teléfono, dirección y consentimiento de protección de datos.</li><li>Los botones "Conectar MetaMask" que aparecen en otras pantallas (por ejemplo, en "Mi Trueke Central") solo <strong>conectan</strong> la cuenta: no firman la sesión. El botón completo para entrar es el de "Conectar <strong>e iniciar sesión</strong>".</li></ul>
+<h3 class="sub" id="sub3">2.3 Al recargar la página</h3>
+<ul><li>La web guarda tu cuenta y tu sesión en el navegador. Al recargar, restaura la cuenta y, si la sesión pertenece a esa misma cuenta, también la sesión: no tendrás que firmar otra vez.</li><li>Si MetaMask está <strong>bloqueada</strong>, la web conserva la cuenta pero no puede firmar: te pedirá desbloquear la billetera cuando haga falta.</li></ul>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. Firmar la sesión: el mensaje "TrueKeate: iniciar sesión"</h2>
+<h3 class="sub" id="sub4">3.1 Qué es exactamente</h3>
+<ul><li>Para iniciar sesión, TrueKeate pide firmar un <strong>mensaje concreto</strong>: <em>"TrueKeate: iniciar sesión"</em>.</li><li>Firma ese mensaje con tu billetera. El servidor comprueba quién lo firmó (sin que tú envíes nunca tu clave privada) y emite un <strong>pase de sesión</strong> que la web guarda en el navegador.</li><li>Ese pase se usa en todas las llamadas de tu área privada: es tu "carné" mientras estás dentro.</li></ul>
+<h3 class="sub" id="sub5">3.2 Qué verás en MetaMask</h3>
+<ul><li>MetaMask muestra un diálogo de <strong>firma de mensaje</strong> con el texto <em>"TrueKeate: iniciar sesión"</em>.</li><li>Es una <strong>firma, no una transacción</strong>: <strong>no consume gas</strong> ni requiere saldo de ETH.</li><li>Si la <strong>rechazas</strong>, simplemente no entras: la web registra el fallo y te deja sin sesión. Puedes volver a intentarlo.</li></ul>
+<h3 class="sub" id="sub6">3.3 Una sola firma para todo (login único)</h3>
+<ul><li>Con una sola firma de sesión accedes a todas las secciones de tu área privada según tu tipo y estado (particular, empresa, socio…).</li><li>Si <strong>cambias de cuenta</strong> o <strong>cierras sesión</strong>, el pase de la cuenta anterior se descarta: con la nueva cuenta hay que <strong>volver a firmar</strong> (manual [03 · cuentas](03-cuentas-anvil.md), apartado 6).</li></ul>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. Autorizar los pasos de un trueque</h2>
+<h3 class="sub" id="sub7">4.1 Qué ocurre HOY en la web (verificado)</h3>
+<ul><li>Las acciones de un trueque en la web — <strong>custodiar mi lado</strong>, <strong>firmar la recepción</strong> y <strong>valorar</strong> — se envían al servidor con tu <strong>sesión</strong> (el pase del apartado 3). No abren ninguna ventana de MetaMask ni piden firma.</li><li>El servidor registra el paso en su base de datos (el "espejo" del trueque).</li></ul>
+<h3 class="sub" id="sub8">4.2 El diseño a futuro: firmar la intención y que la plataforma pague</h3>
+<ul><li>El diseño previsto (meta-transacciones) es que tú <strong>firmes tu intención</strong> (un documento tipado llamado EIP-712) y un servicio de la plataforma (el <strong>relayer</strong>) ejecute el paso pagando el "combustible" (gas) por ti.</li><li>Esa parte on-chain <strong>existe y está probada en el código</strong> (contrato SmartAccount + relayer), pero <strong>la web todavía NO te pide esa firma</strong>: no hay botones en la interfaz que la soliciten hoy.</li><li>Por lo tanto, "firmar un intent EIP-712 desde la web" queda <strong>pendiente de confirmar</strong> hasta que se integre en la interfaz.</li></ul>
+<h3 class="sub" id="sub9">4.3 Qué significa cada botón del trueque</h3>
+<div class="table-wrap"><table><thead><tr><th>Botón en la web</th><th>Qué hace hoy</th><th>¿Abre MetaMask?</th></tr></thead><tbody><tr><td><strong>Custodiar mi lado</strong></td><td>Marca el trueque como custodiado en la base de datos</td><td>No</td></tr><tr><td><strong>Firmar recepción</strong></td><td>Registra que recibiste lo pactado</td><td>No</td></tr><tr><td><strong>Valorar (1–5)</strong></td><td>Guarda tu valoración del trueque</td><td>No</td></tr></tbody></table></div>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p>El avance <strong>on-chain</strong> del trueque (el contrato Escrow con sus estados) está desplegado y probado en el código, pero la gestión desde la wallet (firmar intents para custodiar/completar) es la parte pendiente de la integración → <strong>pendiente de confirmar</strong>.</p></blockquote>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. ¿Firma o transacción? Lo que puede pedirte MetaMask</h2>
+<p>Cuando uses TrueKeate (ahora o en el futuro) puedes encontrarte con cuatro tipos de ventana en MetaMask. Conviene saber distinguirlos:</p>
+<div class="table-wrap"><table><thead><tr><th>Ventana que ves</th><th>Qué es</th><th>¿Firma o transacción?</th><th>¿Gasta ETH?</th></tr></thead><tbody><tr><td><em>"Conectar con TrueKeate"</em> (ver cuentas)</td><td>Permiso para ver tus cuentas</td><td>Permiso (sin firma)</td><td>No</td></tr><tr><td><em>"TrueKeate: iniciar sesión"</em> (mensaje)</td><td>Firma de sesión</td><td>Firma de mensaje</td><td><strong>No</strong> (sin gas)</td></tr><tr><td>Firma de datos tipados <em>"TrueKeate SmartAccount"</em></td><td>Tu intención de un paso del trueque (diseño)</td><td>Firma de datos</td><td><strong>No para ti</strong>: la plataforma (relayer) paga el gas · hoy <strong>sin UI</strong> → pendiente de confirmar</td></tr><tr><td>Confirmar transacción (con gas en ETH)</td><td>Ejecutar algo directamente en la cadena</td><td>Transacción</td><td><strong>Sí</strong>, gas en ETH de pruebas · sin UI verificada → pendiente de confirmar</td></tr></tbody></table></div>
+<p>Regla mnemotécnica:</p>
+<ul><li><strong>Permiso</strong> = solo ver tus cuentas. Sin firma, sin gas.</li><li><strong>Firma de mensaje</strong> = demuestras que controlas la cuenta. Sin gas.</li><li><strong>Firma de datos tipados</strong> = autorizas una operación concreta; el relayer paga el gas (cuando exista la UI).</li><li><strong>Transacción</strong> = ejecutas y pagas el gas tú.</li></ul>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. Avisos importantes</h2>
+<ul><li><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> <strong>Conectar no es firmar</strong>: dar permiso para ver tus cuentas no revela tu clave ni firma nada. La única firma que pide la app al entrar es el mensaje de sesión.</li><li><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Una firma es <strong>vinculante</strong>: revisa siempre el texto exacto que firmas (aquí, siempre <em>"TrueKeate: iniciar sesión"</em>) y comprueba que estás en la web oficial de TrueKeate (evita sitios suplantadores).</li><li><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Verifica la <strong>red activa</strong> (cadena 31337) antes de confirmar cualquier cosa en MetaMask.</li><li><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Si un día ves una firma de datos tipados <em>"TrueKeate SmartAccount"</em>, revisa que el mensaje describe exactamente la operación que quieres autorizar antes de firmar.</li></ul>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5GaXJtYXIgeSBhdXRvcml6YXIgZW4gVHJ1ZUtlYXRlPC90ZXh0PgoKICA8IS0tIEE6IGJvdG9uIC0tPgogIDxyZWN0IHg9IjgwIiB5PSI2MiIgd2lkdGg9IjQwMCIgaGVpZ2h0PSI0MiIgcng9IjEyIiBmaWxsPSIjZjRhMjYxIi8+CiAgPHRleHQgeD0iMjgwIiB5PSI4OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+MSDCtyBQdWxzYXIgwqtDb25lY3RhciBNZXRhTWFzayBlIGluaWNpYXIgc2VzacOzbsK7PC90ZXh0PgoKICA8IS0tIEI6IHBlcm1pc28gY3VlbnRhcyAtLT4KICA8cmVjdCB4PSI4MCIgeT0iMTE2IiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjUwIiByeD0iMTIiIGZpbGw9IiM0OGNhZTQiLz4KICA8dGV4dCB4PSIyODAiIHk9IjEzNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiPjIgwrcgTWV0YU1hc2s6IMKrQ29uZWN0YXIgY29uIFRydWVLZWF0ZcK7PC90ZXh0PgogIDx0ZXh0IHg9IjI4MCIgeT0iMTU0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwLjUiPnBlcm1pc28gcGFyYSBWRVIgdHVzIGN1ZW50YXMgwrcgbm8gZmlybWEgbmFkYTwvdGV4dD4KCiAgPCEtLSBDOiBkZWNpc2lvbiBpbnNjcml0YSAtLT4KICA8cmVjdCB4PSI4MCIgeT0iMTc4IiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjUyIiByeD0iMTIiIGZpbGw9IiNmM2U1YWIiIHN0cm9rZT0iI2M1YTA2NSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iMjgwIiB5PSIyMDgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPjMgwrcgwr9Fc3RhIHdhbGxldCBlc3TDoSBpbnNjcml0YSBlbiBUcnVlS2VhdGU/PC90ZXh0PgoKICA8IS0tIEQ6IG5vIGluc2NyaXRhIC0tPgogIDxyZWN0IHg9IjU0MCIgeT0iMTc4IiB3aWR0aD0iMjMwIiBoZWlnaHQ9IjUyIiByeD0iMTIiIGZpbGw9IiM4ZDg2YTkiLz4KICA8dGV4dCB4PSI2NTUiIHk9IjE5NyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMS41IiBmb250LXdlaWdodD0iYm9sZCI+Tm8gaW5zY3JpdGE8L3RleHQ+CiAgPHRleHQgeD0iNjU1IiB5PSIyMTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iOS41Ij5zb2xvIHZlcsOhcyBjYXTDoWxvZ28geSBsYSBwYW50YWxsYTwvdGV4dD4KICA8dGV4dCB4PSI2NTUiIHk9IjIyNSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSI5LjUiPmRlIGluc2NyaXBjacOzbiAoY29ycmVvLCB0ZWzDqWZvbm/igKYpPC90ZXh0PgoKICA8IS0tIEU6IGZpcm1hciBzZXNpb24gLS0+CiAgPHJlY3QgeD0iODAiIHk9IjI0NCIgd2lkdGg9IjQwMCIgaGVpZ2h0PSI1MiIgcng9IjEyIiBmaWxsPSIjZDRhZjM3Ii8+CiAgPHRleHQgeD0iMjgwIiB5PSIyNjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSJib2xkIj40IMK3IE1ldGFNYXNrIHBpZGUgZmlybWFyIGVsIG1lbnNhamU6PC90ZXh0PgogIDx0ZXh0IHg9IjI4MCIgeT0iMjgyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjExLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj7Cq1RydWVLZWF0ZTogaW5pY2lhciBzZXNpw7Nuwrs8L3RleHQ+CgogIDwhLS0gRjogcmVjaGF6YXMgLS0+CiAgPHJlY3QgeD0iNTQwIiB5PSIyNDQiIHdpZHRoPSIyMzAiIGhlaWdodD0iNTIiIHJ4PSIxMiIgZmlsbD0iI2U2Mzk0NiIvPgogIDx0ZXh0IHg9IjY1NSIgeT0iMjYzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjExLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5SZWNoYXphczwvdGV4dD4KICA8dGV4dCB4PSI2NTUiIHk9IjI3OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSI5LjUiPm5vIGhheSBzZXNpw7NuOiBwdWVkZXM8L3RleHQ+CiAgPHRleHQgeD0iNjU1IiB5PSIyOTEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iOS41Ij52b2x2ZXIgYSBpbnRlbnRhcmxvPC90ZXh0PgoKICA8IS0tIEc6IHNlcnZpZG9yIHZhbGlkYSAtLT4KICA8cmVjdCB4PSI4MCIgeT0iMzEwIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjUwIiByeD0iMTIiIGZpbGw9IiMyYTlkOGYiLz4KICA8dGV4dCB4PSIyODAiIHk9IjMyOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiPjUgwrcgRWwgc2Vydmlkb3IgdmFsaWRhIHR1IGZpcm1hPC90ZXh0PgogIDx0ZXh0IHg9IjI4MCIgeT0iMzQ2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwLjUiPnkgZW1pdGUgdHUgcGFzZSBkZSBzZXNpw7NuIChzaW4gZ2FzKTwvdGV4dD4KCiAgPCEtLSBIOiBkZW50cm8gLS0+CiAgPHJlY3QgeD0iODAiIHk9IjM3NCIgd2lkdGg9IjQwMCIgaGVpZ2h0PSI0OCIgcng9IjEyIiBmaWxsPSIjMmE5ZDhmIi8+CiAgPHRleHQgeD0iMjgwIiB5PSIzOTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSJib2xkIj42IMK3IMKhRGVudHJvISBFbCBwYXNlIHNlIGd1YXJkYTwvdGV4dD4KICA8dGV4dCB4PSIyODAiIHk9IjQwOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMC41Ij5hbCByZWNhcmdhciBsYSB3ZWIgc2lndWVzIGRlbnRybzwvdGV4dD4KCiAgPCEtLSBJOiBhY2Npb25lcyBob3kgLS0+CiAgPHJlY3QgeD0iNjAiIHk9IjQzNiIgd2lkdGg9IjMwMCIgaGVpZ2h0PSI1OCIgcng9IjEyIiBmaWxsPSIjMmE5ZDhmIi8+CiAgPHRleHQgeD0iMjEwIiB5PSI0NTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTAuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkhveTogY3VzdG9kaWFyIG1pIGxhZG8sIGZpcm1hcjwvdGV4dD4KICA8dGV4dCB4PSIyMTAiIHk9IjQ2OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMC41Ij5sYSByZWNlcGNpw7NuIHkgdmFsb3JhciBzZSBndWFyZGFuPC90ZXh0PgogIDx0ZXh0IHg9IjIxMCIgeT0iNDgzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwLjUiPmNvbiB0dSBzZXNpw7NuLCBzaW4gYWJyaXIgTWV0YU1hc2s8L3RleHQ+CgogIDwhLS0gSjogZnV0dXJvIC0tPgogIDxyZWN0IHg9IjQyMCIgeT0iNDM2IiB3aWR0aD0iMzUwIiBoZWlnaHQ9IjU4IiByeD0iMTIiIGZpbGw9IiNkNGFmMzciLz4KICA8dGV4dCB4PSI1OTUiIHk9IjQ1NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41IiBmb250LXdlaWdodD0iYm9sZCI+QSBmdXR1cm86IGZpcm1hcsOhcyB0dSBpbnRlbmNpw7NuPC90ZXh0PgogIDx0ZXh0IHg9IjU5NSIgeT0iNDY5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwLjUiPihFSVAtNzEyIMKrVHJ1ZUtlYXRlIFNtYXJ0QWNjb3VudMK7KTwvdGV4dD4KICA8dGV4dCB4PSI1OTUiIHk9IjQ4MyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41Ij55IGVsIHJlbGF5ZXIgcGFnYXLDoSBlbCBnYXMgcG9yIHRpPC90ZXh0PgoKICA8IS0tIEZsZWNoYXMgLS0+CiAgPGcgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIuNSIgZmlsbD0ibm9uZSIgbWFya2VyLWVuZD0idXJsKCNhcnIpIj4KICAgIDxsaW5lIHgxPSIyODAiIHkxPSIxMDQiIHgyPSIyODAiIHkyPSIxMTIiLz4KICAgIDxsaW5lIHgxPSIyODAiIHkxPSIxNjYiIHgyPSIyODAiIHkyPSIxNzQiLz4KICAgIDxsaW5lIHgxPSIyODAiIHkxPSIyMzAiIHgyPSIyODAiIHkyPSIyNDAiLz4KICAgIDxsaW5lIHgxPSIyODAiIHkxPSIyOTYiIHgyPSIyODAiIHkyPSIzMDYiLz4KICAgIDxsaW5lIHgxPSIyODAiIHkxPSIzNjAiIHgyPSIyODAiIHkyPSIzNzAiLz4KICAgIDxsaW5lIHgxPSIyODAiIHkxPSI0MjIiIHgyPSIyODAiIHkyPSI0MzIiLz4KICAgIDxsaW5lIHgxPSIzNjQiIHkxPSI0NjUiIHgyPSI0MTYiIHkyPSI0NjUiLz4KICAgIDxsaW5lIHgxPSI0ODAiIHkxPSIyMDQiIHgyPSI1MzYiIHkyPSIyMDQiLz4KICAgIDxsaW5lIHgxPSI0ODAiIHkxPSIyNzAiIHgyPSI1MzYiIHkyPSIyNzAiLz4KICA8L2c+CiAgPHRleHQgeD0iMjkwIiB5PSIyMzkiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPnPDrSwgaW5zY3JpdGE8L3RleHQ+CiAgPHRleHQgeD0iNTA1IiB5PSIxOTciIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiIGZvbnQtd2VpZ2h0PSJib2xkIj5ubyBpbnNjcml0YTwvdGV4dD4KICA8dGV4dCB4PSIyOTAiIHk9IjMwNCIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMC41IiBmb250LXdlaWdodD0iYm9sZCI+ZmlybWFzPC90ZXh0PgogIDx0ZXh0IHg9IjUwNSIgeT0iMjYzIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwIiBmb250LXdlaWdodD0iYm9sZCI+cmVjaGF6YXM8L3RleHQ+Cgo8L3N2Zz4K" alt="Flujo Firma"/><figcaption class="fig-caption">Figura · Flujo Firma</figcaption></figure>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. Ficha didáctica</h2>
+<div class="table-wrap"><table><thead><tr><th>Campo</th><th>Contenido</th></tr></thead><tbody><tr><td><strong>¿Qué es?</strong></td><td>Es la forma en que tu billetera participa en TrueKeate: conectar (permiso para ver cuentas), firmar la sesión (<em>"TrueKeate: iniciar sesión"</em>) y, en el futuro, firmar intents de trueque.</td></tr><tr><td><strong>¿Para qué sirve?</strong></td><td>Para entrar en tu área privada demostrando que controlas tu cuenta (sin enviar tu clave) y para autorizar los pasos de tus trueques. Firmar la sesión <strong>no cuesta gas</strong>.</td></tr><tr><td><strong>Pasos clave</strong></td><td>1) Conectar MetaMask (permiso de cuentas, sin firma). 2) Si estás inscrito, firmar <em>"TrueKeate: iniciar sesión"</em>. 3) Operar: hoy las acciones del trueque van con tu sesión (sin MetaMask). 4) Al cambiar de cuenta, volver a firmar.</td></tr><tr><td><strong>Errores comunes</strong></td><td>Confundir conectar con firmar (o firmar con pagar) · Rechazar la firma y creer que algo falló (solo no entras) · Cambiar de cuenta y esperar seguir con la misma sesión (se descarta) · Esperar que la web pida hoy la firma de intents EIP-712 (todavía no existe esa UI).</td></tr><tr><td><strong>Consejo de seguridad</strong></td><td>Revisa siempre el texto que firmas y la URL de la web. Regla: <strong>permiso = ver · firma = autorizar (sin gas) · transacción = ejecutar y pagar gas</strong>. En esta red el gas es ETH simbólico de pruebas, pero el hábito de revisar cada ventana se lleva a las redes reales.</td></tr></tbody></table></div>
+</section>
+<section class="seccion" id="s8"><h2 class="seccion">8. Lo que falta por confirmar (resumen)</h2>
+<ol><li>La firma de intents EIP-712 desde la web (no existe UI hoy; la pieza on-chain SmartAccount + relayer sí está implementada y probada) → <strong>pendiente de confirmar</strong>.</li><li>El avance on-chain real de los trueques desde la wallet (escrow con sus estados) → <strong>pendiente de confirmar</strong> en esta integración.</li><li>Las transacciones directas con gas (casos de empresas o fallback) no tienen UI verificada → <strong>pendiente de confirmar</strong>.</li></ol>
+</section>
+<section class="seccion" id="s9"><h2 class="seccion">9. Glosario de este manual</h2>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Significado</th></tr></thead><tbody><tr><td><strong>Conectar</strong></td><td>Dar permiso a la web para ver tus cuentas (sin firma)</td></tr><tr><td><strong>Firma de mensaje</strong></td><td>Demostrar que controlas una cuenta firmando un texto</td></tr><tr><td><strong>Pase de sesión (token)</strong></td><td>El "carné" que la web guarda tras tu firma de entrada</td></tr><tr><td><strong>Gas</strong></td><td>El "combustible" que pagan las operaciones de la red</td></tr><tr><td><strong>Relayer</strong></td><td>Servicio de la plataforma que pagará el gas de tus trueques</td></tr><tr><td><strong>EIP-712</strong></td><td>Formato de firma de datos tipados (estructurados) usado en el diseño de trueques</td></tr><tr><td><strong>Escrow</strong></td><td>Depósito intermediario: nadie cobra hasta que ambas partes cumplen</td></tr></tbody></table></div>
+</section>
+</main>
+
+</body>
+</html>

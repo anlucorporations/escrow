@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · Las cuentas de prueba (importar en tu billetera)</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">07 · Wallets y Cuentas</div>
+    <h1>Las cuentas de prueba (importar en tu billetera)</h1>
+    <div class="intro">Versión en lenguaje sencillo del manual técnico "Cuentas del anvil (desarrollo/pruebas)". TrueKeate usa <strong>cuentas de prueba</strong> ya creadas para que puedas probar con usuarios de ejemplo (Ana, Bruno, Carla…). Aquí te contamos cuáles son y cómo importarlas en MetaMask.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>07-Wallets-y-Cuentas/03-cuentas-anvil.md</b></span>
+      <span>Edición: <b>4 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/07-Wallets-y-Cuentas/03-cuentas-anvil</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Wallets y Cuentas · Wallets Y Cuentas — Las cuentas de prueba (importar en tu billetera)</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>¿Qué son las cuentas de prueba (anvil)?</span></a><div class="subs"><a href="#sub1">2.1 De dónde salen</a><br><a href="#sub2">2.2 El mnemónico estándar (público)</a><br><a href="#sub3">2.3 El camino de derivación (solo para curiosos)</a><br><a href="#sub4">2.4 Los dos roles operativos</a></div></li><li><a href="#s3"><span class="tnum">3</span><span>La tabla de cuentas de prueba (0 a 12)</span></a></li><li><a href="#s4"><span class="tnum">4</span><span>Importar una cuenta en MetaMask (ordenador)</span></a><div class="subs"><a href="#sub5">4.1 Por qué importarlas</a><br><a href="#sub6">4.2 Pasos</a></div></li><li><a href="#s5"><span class="tnum">5</span><span>Importar una cuenta en MetaMask (móvil)</span></a></li><li><a href="#s6"><span class="tnum">6</span><span>Cambiar de cuenta y desconectar en la plataforma</span></a><div class="subs"><a href="#sub7">6.1 Cambiar de cuenta</a><br><a href="#sub8">6.2 Qué pasa al cambiar de cuenta</a><br><a href="#sub9">6.3 Desconectar</a></div></li><li><a href="#s7"><span class="tnum">7</span><span>Advertencias obligatorias</span></a></li><li><a href="#s8"><span class="tnum">8</span><span>Ficha didáctica</span></a></li><li><a href="#s9"><span class="tnum">9</span><span>Lo que falta por confirmar (resumen)</span></a></li><li><a href="#s10"><span class="tnum">10</span><span>Glosario de este manual</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<blockquote class="importante"><span class="tag">Importante</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> <strong>Aviso muy importante</strong>: estas claves son <strong>públicas</strong> (aparecen en la documentación del framework) y <strong>solo sirven para pruebas</strong>. Nunca las uses con dinero real ni en producción.</p></blockquote>
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos</h2>
+<p>Ejemplo: quieres entrar en la web como <strong>Ana</strong> (cuenta 2).</p>
+<ol><li>Copia la <strong>clave privada</strong> de Ana: <code>0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a</code></li><li>Abre MetaMask → icono de perfil (arriba a la derecha) → <strong>"+ Añadir cuenta o cuenta de hardware"</strong> → <strong>"Importar cuenta"</strong>.</li><li>Deja el <em>Tipo</em> en <strong>Clave privada</strong>, pega la clave y pulsa <strong>Importar</strong>.</li><li>Comprueba que la dirección nueva coincide con la de Ana: <code>0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC</code></li><li>Abre la web de TrueKeate y pulsa <strong>"🔗 Conectar MetaMask e iniciar sesión"</strong>: ahora la plataforma te reconoce como Ana.</li></ol>
+<blockquote class="info"><span class="tag">Nota</span><p>Si prefieres importar todas las cuentas de golpe, puedes importar en MetaMask la <strong>frase semilla completa</strong> del anvil (apartado 2.2): como el camino de derivación es el mismo que usa MetaMask, obtendrás las mismas direcciones.</p></blockquote>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. ¿Qué son las cuentas de prueba (anvil)?</h2>
+<h3 class="sub" id="sub1">2.1 De dónde salen</h3>
+<ul><li>El anvil (la blockchain de pruebas) genera por defecto <strong>20 cuentas</strong> a partir de un <strong>mnemónico estándar conocido</strong> y financia con ETH de prueba las <strong>primeras 10</strong> (índices 0 a 9).</li><li>Son las cuentas con las que se despliegan los contratos, opera el relayer y se prueban los flujos.</li></ul>
+<h3 class="sub" id="sub2">2.2 El mnemónico estándar (público)</h3>
+<pre><code>test test test test test test test test test test test junk</code></pre>
+<ul><li>Es el mnemónico por defecto del framework y <strong>aparece en su documentación pública</strong>: cualquiera puede derivar estas claves.</li><li>Por eso <strong>jamás</strong> deben usarse fuera de pruebas.</li></ul>
+<h3 class="sub" id="sub3">2.3 El camino de derivación (solo para curiosos)</h3>
+<pre><code>m/44'/60'/0'/0/N     (N = número de la cuenta: 0, 1, 2, …)</code></pre>
+<ul><li>Es el mismo camino que usa MetaMask para sus cuentas: por eso, si importas la frase semilla del anvil en MetaMask, obtienes las mismas direcciones.</li></ul>
+<h3 class="sub" id="sub4">2.4 Los dos roles operativos</h3>
+<div class="table-wrap"><table><thead><tr><th>Cuenta</th><th>Quién es</th><th>Para qué sirve</th></tr></thead><tbody><tr><td><strong>0</strong></td><td>Owner / Admin</td><td>Desplegó los contratos y es la autoridad del panel de administración.</td></tr><tr><td><strong>1</strong></td><td>Relayer / plataforma</td><td>Paga el gas de los trueques de los usuarios (meta-transacciones). Es la billetera del servidor.</td></tr></tbody></table></div>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. La tabla de cuentas de prueba (0 a 12)</h2>
+<div class="table-wrap"><table><thead><tr><th>N.º</th><th>Usuario de ejemplo</th><th>Dirección (0x…)</th><th>Clave privada (0x…)</th><th>Rol / notas</th></tr></thead><tbody><tr><td>0</td><td>Owner / Admin</td><td><code>0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266</code></td><td><code>0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80</code></td><td>Despliega contratos; panel Owner. <strong>Tiene fondos.</strong></td></tr><tr><td>1</td><td>Relayer / plataforma</td><td><code>0x70997970C51812dc3A010C7d01b50e0d17dc79C8</code></td><td><code>0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d</code></td><td>Paga el gas (meta-tx); billetera del backend. <strong>Tiene fondos.</strong></td></tr><tr><td><strong>2</strong></td><td><strong>Ana</strong></td><td><code>0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC</code></td><td><code>0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a</code></td><td>Usuario particular de prueba. <strong>Tiene fondos.</strong></td></tr><tr><td><strong>3</strong></td><td><strong>Bruno</strong></td><td><code>0x90F79bf6EB2c4f870365E785982E1f101E93b906</code></td><td><code>0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6</code></td><td>Usuario particular de prueba. <strong>Tiene fondos.</strong></td></tr><tr><td><strong>4</strong></td><td><strong>Carla</strong></td><td><code>0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65</code></td><td><code>0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a</code></td><td>Usuario particular de prueba. <strong>Tiene fondos.</strong></td></tr><tr><td><strong>5</strong></td><td><strong>Diego</strong></td><td><code>0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc</code></td><td><code>0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba</code></td><td>Usuario particular de prueba. <strong>Tiene fondos.</strong></td></tr><tr><td><strong>6</strong></td><td><strong>Elena</strong></td><td><code>0x976EA74026E726554dB657fA54763abd0C3a0aa9</code></td><td><code>0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e</code></td><td>Usuario particular de prueba. <strong>Tiene fondos.</strong></td></tr><tr><td><strong>7</strong></td><td><strong>Fabián</strong></td><td><code>0x14dC79964da2C08b23698B3D3cc7Ca32193d9955</code></td><td><code>0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356</code></td><td>Usuario particular de prueba. <strong>Tiene fondos.</strong></td></tr><tr><td><strong>8</strong></td><td><strong>Gisela</strong></td><td><code>0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f</code></td><td><code>0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97</code></td><td>Usuario particular de prueba. <strong>Tiene fondos.</strong></td></tr><tr><td><strong>9</strong></td><td><strong>Héctor</strong></td><td><code>0xa0Ee7A142d267C1f36714E4a8F75612F20a79720</code></td><td><code>0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6</code></td><td>Usuario particular de prueba. <strong>Tiene fondos.</strong></td></tr><tr><td>10</td><td>Irene</td><td><code>0xBcd4042DE499D14e55001CcbB24a551F3b954096</code></td><td><code>0xf214f2b2cd398c806f84e317254e0f0b801d0643303237d97a22a48e01628897</code></td><td><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> <strong>SIN FONDOS</strong> en este anvil (solo se financian 0–9 por defecto).</td></tr><tr><td>11</td><td>Javier</td><td><code>0x71bE63f3384f5fb98995898A86B02Fb2426c5788</code></td><td><code>0x701b615bbdfb9de65240bc28bd21bbc0d996645a3dd57e7b12bc2bdf6f192c82</code></td><td>Sin fondos por defecto (ver apartado 7).</td></tr><tr><td>12</td><td>Karen</td><td><code>0xFABB0ac9d68B0B445fB7357272Ff202C5651694a</code></td><td><code>0xa267530f49f8280200edf313ee7af6b827f2a8bce2897751d06a843f644967b1</code></td><td>Sin fondos por defecto (ver apartado 7).</td></tr></tbody></table></div>
+<p>Notas de la tabla:</p>
+<ul><li>"Tiene fondos" = el anvil financia por defecto los índices 0 a 9 con ETH de prueba.</li><li>Los nombres (Ana, Bruno…) son <strong>usuarios de ejemplo</strong> para pruebas y manuales. Su rol concreto (particular, empresa, socio) y su estado en la base de datos dependen de la inscripción hecha en cada entorno → <strong>pendiente de confirmar</strong> por entorno.</li></ul>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. Importar una cuenta en MetaMask (ordenador)</h2>
+<h3 class="sub" id="sub5">4.1 Por qué importarlas</h3>
+<ul><li>La web de TrueKeate solo muestra y firma con las cuentas que MetaMask tiene cargadas. Para que la plataforma "vea" a Ana (o a cualquier cuenta), hay que <strong>importar su clave privada</strong> en MetaMask.</li></ul>
+<h3 class="sub" id="sub6">4.2 Pasos</h3>
+<ol><li>Abre MetaMask → icono de perfil (arriba a la derecha) → <strong>"Cambiar cuenta"</strong> (o <em>"Cuentas"</em>).</li><li>Pulsa <strong>"+ Añadir cuenta o cuenta de hardware"</strong> → <strong>"Importar cuenta"</strong>.</li><li>En <em>Tipo</em>, deja <strong>Clave privada</strong> y pega la clave de la tabla (por ejemplo, la de Ana, índice 2).</li><li>Pulsa <strong>Importar</strong>.</li><li>La cuenta aparece en el selector con su dirección. Comprueba que coincide con la de la tabla (¡así detectas erratas al copiar!).</li></ol>
+<p>Ejemplo de comprobación para personas técnicas (con la herramienta <code>cast</code>):</p>
+<pre><code><span class="pre-label">bash</span># La clave de Ana debe derivar en su dirección
+cast wallet address --private-key \
+  0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+# → 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC</code></pre>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. Importar una cuenta en MetaMask (móvil)</h2>
+<ol><li>Abre MetaMask en el móvil → icono de perfil/cuentas.</li><li><strong>"Añadir cuenta"</strong> → <strong>"Importar cuenta"</strong>.</li><li>Pega la clave privada → <strong>Importar</strong>.</li></ol>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. Cambiar de cuenta y desconectar en la plataforma</h2>
+<h3 class="sub" id="sub7">6.1 Cambiar de cuenta</h3>
+<ul><li>Cambia la cuenta activa en MetaMask (selector de cuentas). La web se entera al momento y actualiza la cuenta mostrada.</li></ul>
+<h3 class="sub" id="sub8">6.2 Qué pasa al cambiar de cuenta</h3>
+<ul><li>La plataforma vuelve a comprobar el estado de inscripción de la <strong>nueva</strong> cuenta y <strong>descarta la sesión de la cuenta anterior</strong>: el permiso de sesión está asociado a la billetera que lo firmó.</li><li>Con la cuenta nueva tendrás que <strong>volver a firmar la sesión</strong> (te lo pedirá la web).</li><li>Si la lista de cuentas queda vacía (MetaMask bloqueada o cuenta eliminada), la web se desconecta y limpia lo guardado.</li></ul>
+<h3 class="sub" id="sub9">6.3 Desconectar</h3>
+<ul><li>En la barra superior de la plataforma hay un botón <strong>"⏻ Desconectar billetera"</strong>. Al pulsarlo se limpia la cuenta y la sesión.</li></ul>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. Advertencias obligatorias</h2>
+<ul><li><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> <strong>Irene (cuenta 10) no tiene fondos</strong>: si un flujo necesita que Irene pague gas o reciba ETH, primero hay que financiarla. No hay un grifo (faucet) automático verificado en este entorno → <strong>pendiente de confirmar</strong> el mecanismo de financiación.</li><li><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Las cuentas 11 (Javier) y 12 (Karen) tampoco tienen fondos por defecto.</li><li><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> <strong>Solo pruebas</strong>: el mnemónico es público y todas las claves derivadas son conocidas. <strong>Nunca</strong> uses estas cuentas (ni fondos reales) en producción.</li><li><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> En producción, las claves del Owner y del relayer viven en el cajón de secretos de Google (Secret Manager); las claves de este manual solo sirven para el anvil de pruebas.</li><li><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Cualquiera que conozca la clave privada puede firmar por esa cuenta: <strong>no compartas</strong> las claves de la tabla fuera del equipo de pruebas.</li></ul>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMWEyYjRjIi8+CiAgICA8L21hcmtlcj4KICAgIDxtYXJrZXIgaWQ9ImFyclIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjciIG1hcmtlckhlaWdodD0iNyIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjZTYzOTQ2Ii8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiNmOGY5ZmEiLz4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjU0IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTAiIHdpZHRoPSI4MDAiIGhlaWdodD0iNCIgZmlsbD0iI2Q0YWYzNyIvPgogIDx0ZXh0IHg9IjQwMCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5JbXBvcnRhciB1bmEgY3VlbnRhIGRlIHBydWViYSBlbiB0dSBiaWxsZXRlcmE8L3RleHQ+CgogIDwhLS0gUGFzb3MgLS0+CiAgPHJlY3QgeD0iODAiIHk9IjY0IiB3aWR0aD0iNDgwIiBoZWlnaHQ9IjQ2IiByeD0iMTIiIGZpbGw9IiNmNGEyNjEiLz4KICA8dGV4dCB4PSIzMjAiIHk9IjkxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEzIiBmb250LXdlaWdodD0iYm9sZCI+MSDCtyBFbGlnZSB1bmEgY3VlbnRhIGRlIHBydWViYSAoZWouIEFuYSwgbi7CuiAyKTwvdGV4dD4KCiAgPHJlY3QgeD0iODAiIHk9IjEyNiIgd2lkdGg9IjQ4MCIgaGVpZ2h0PSI0NiIgcng9IjEyIiBmaWxsPSIjZTllNWYwIiBzdHJva2U9IiM4ZDg2YTkiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iMzIwIiB5PSIxNDYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPjIgwrcgQ29waWEgc3UgY2xhdmUgcHJpdmFkYSBkZSBsYSB0YWJsYTwvdGV4dD4KICA8dGV4dCB4PSIzMjAiIHk9IjE2NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMCI+QW5hOiAweDVkZTQxMTFhZmExYTRiOTQ5MDhmODMxMDNlYjFmMTcw4oCmPC90ZXh0PgoKICA8cmVjdCB4PSI4MCIgeT0iMTg4IiB3aWR0aD0iNDgwIiBoZWlnaHQ9IjUyIiByeD0iMTIiIGZpbGw9IiM0OGNhZTQiLz4KICA8dGV4dCB4PSIzMjAiIHk9IjIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9ImJvbGQiPjMgwrcgTWV0YU1hc2s6IGljb25vIGRlIHBlcmZpbCDihpIgSW1wb3J0YXIgY3VlbnRhPC90ZXh0PgogIDx0ZXh0IHg9IjMyMCIgeT0iMjMxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEwIj4oQcOxYWRpciBjdWVudGEgbyBjdWVudGEgZGUgaGFyZHdhcmUpPC90ZXh0PgoKICA8cmVjdCB4PSI4MCIgeT0iMjU2IiB3aWR0aD0iNDgwIiBoZWlnaHQ9IjQ2IiByeD0iMTIiIGZpbGw9IiM0OGNhZTQiLz4KICA8dGV4dCB4PSIzMjAiIHk9IjI4MyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9ImJvbGQiPjQgwrcgVGlwbzogwqtDbGF2ZSBwcml2YWRhwrsgeSBwZWdhIGxhIGNsYXZlPC90ZXh0PgoKICA8cmVjdCB4PSI4MCIgeT0iMzE4IiB3aWR0aD0iNDgwIiBoZWlnaHQ9IjQ2IiByeD0iMTIiIGZpbGw9IiM0OGNhZTQiLz4KICA8dGV4dCB4PSIzMjAiIHk9IjM0NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9ImJvbGQiPjUgwrcgUHVsc2EgwqtJbXBvcnRhcsK7PC90ZXh0PgoKICA8IS0tIERlY2lzaW9uIC0tPgogIDxyZWN0IHg9IjgwIiB5PSIzODAiIHdpZHRoPSI0ODAiIGhlaWdodD0iNTYiIHJ4PSIxMiIgZmlsbD0iI2YzZTVhYiIgc3Ryb2tlPSIjYzVhMDY1IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSIzMjAiIHk9IjQwOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9ImJvbGQiPjYgwrcgQ29tcHJ1ZWJhIGxhIGRpcmVjY2nDs24gcmVzdWx0YW50ZTo8L3RleHQ+CiAgPHRleHQgeD0iMzIwIiB5PSI0MjciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTEuNSI+wr9jb2luY2lkZSBjb24gbGEgZGUgbGEgdGFibGEgZGVsIG1hbnVhbD88L3RleHQ+CgogIDwhLS0gRXJyb3IgKG5vKSAtLT4KICA8cmVjdCB4PSI2MTAiIHk9IjM4MCIgd2lkdGg9IjE3MCIgaGVpZ2h0PSI1NiIgcng9IjEyIiBmaWxsPSIjZTYzOTQ2Ii8+CiAgPHRleHQgeD0iNjk1IiB5PSI0MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTEuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPk5vIGNvaW5jaWRlPC90ZXh0PgogIDx0ZXh0IHg9IjY5NSIgeT0iNDE2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjkuNSI+cmV2aXNhIHF1ZSBwZWdhc3RlIGxhIGNsYXZlPC90ZXh0PgogIDx0ZXh0IHg9IjY5NSIgeT0iNDI5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjkuNSI+Y29tcGxldGEgeSBzaW4gZXNwYWNpb3M8L3RleHQ+CgogIDwhLS0gUmVzdWx0YWRvIE9LIC0tPgogIDxyZWN0IHg9IjgwIiB5PSI0NTIiIHdpZHRoPSI0ODAiIGhlaWdodD0iNDQiIHJ4PSIxMiIgZmlsbD0iIzJhOWQ4ZiIvPgogIDx0ZXh0IHg9IjMyMCIgeT0iNDcwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjExLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj43IMK3IEFicmUgbGEgd2ViIHkgcHVsc2EgwqtDb25lY3RhciBlIGluaWNpYXIgc2VzacOzbsK7PC90ZXh0PgogIDx0ZXh0IHg9IjMyMCIgeT0iNDg5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEwLjUiPsKhWWEgb3BlcmFzIGNvbW8gQW5hIGVuIGxhIHJlZCBkZSBwcnVlYmFzITwvdGV4dD4KCiAgPCEtLSBGbGVjaGFzIC0tPgogIDxnIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyLjUiIGZpbGw9Im5vbmUiIG1hcmtlci1lbmQ9InVybCgjYXJyKSI+CiAgICA8bGluZSB4MT0iMzIwIiB5MT0iMTEwIiB4Mj0iMzIwIiB5Mj0iMTIyIi8+CiAgICA8bGluZSB4MT0iMzIwIiB5MT0iMTcyIiB4Mj0iMzIwIiB5Mj0iMTg0Ii8+CiAgICA8bGluZSB4MT0iMzIwIiB5MT0iMjQwIiB4Mj0iMzIwIiB5Mj0iMjUyIi8+CiAgICA8bGluZSB4MT0iMzIwIiB5MT0iMzAyIiB4Mj0iMzIwIiB5Mj0iMzE0Ii8+CiAgICA8bGluZSB4MT0iMzIwIiB5MT0iMzY0IiB4Mj0iMzIwIiB5Mj0iMzc2Ii8+CiAgICA8bGluZSB4MT0iNTYwIiB5MT0iNDA4IiB4Mj0iNjA2IiB5Mj0iNDA4Ii8+CiAgICA8bGluZSB4MT0iMzIwIiB5MT0iNDM2IiB4Mj0iMzIwIiB5Mj0iNDQ4Ii8+CiAgPC9nPgogIDx0ZXh0IHg9IjU4MyIgeT0iNDAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZTYzOTQ2IiBmb250LXNpemU9IjEwLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5ubzwvdGV4dD4KICA8dGV4dCB4PSIzMzAiIHk9IjQ0NiIgZmlsbD0iIzJhOWQ4ZiIgZm9udC1zaXplPSIxMC41IiBmb250LXdlaWdodD0iYm9sZCI+c8OtPC90ZXh0PgoKICA8IS0tIEJ1Y2xlIGRlIHJlaW50ZW50bzogdnVlbHZlIGFsIHBhc28gMyAtLT4KICA8ZyBzdHJva2U9IiNlNjM5NDYiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWRhc2hhcnJheT0iNiA0IiBtYXJrZXItZW5kPSJ1cmwoI2FyclIpIj4KICAgIDxwYXRoIGQ9Ik0gNjk1IDM4MCBMIDY5NSAyMTQgTCA1NjMgMjE0Ii8+CiAgPC9nPgogIDx0ZXh0IHg9IjcwNiIgeT0iMzAwIiBmaWxsPSIjZTYzOTQ2IiBmb250LXNpemU9IjEwIiBmb250LXdlaWdodD0iYm9sZCI+dnVlbHZlIGFsIHBhc28gMzwvdGV4dD4KPC9zdmc+Cg==" alt="Importar Cuenta"/><figcaption class="fig-caption">Figura · Importar Cuenta</figcaption></figure>
+</section>
+<section class="seccion" id="s8"><h2 class="seccion">8. Ficha didáctica</h2>
+<div class="table-wrap"><table><thead><tr><th>Campo</th><th>Contenido</th></tr></thead><tbody><tr><td><strong>¿Qué es?</strong></td><td>Son las cuentas de prueba que crea el anvil (la blockchain de pruebas) a partir de un mnemónico estándar público. Cada una tiene dirección y clave privada conocidas.</td></tr><tr><td><strong>¿Para qué sirve?</strong></td><td>Para probar TrueKeate con usuarios de ejemplo (Ana, Bruno, Carla…): importas una cuenta en MetaMask y la web te reconoce. La cuenta 0 es el Owner y la 1 es el relayer (paga el gas).</td></tr><tr><td><strong>Pasos clave</strong></td><td>1) Copiar la clave privada de la cuenta elegida. 2) MetaMask → Añadir cuenta → Importar cuenta. 3) Pegar la clave (tipo "Clave privada") e importar. 4) Verificar que la dirección coincide con la tabla. 5) Conectar en la web e iniciar sesión.</td></tr><tr><td><strong>Errores comunes</strong></td><td>Pegar la clave con espacios o incompleta (la dirección no coincide) · Usar estas cuentas con dinero real · Esperar que Irene (cuenta 10), Javier (11) o Karen (12) tengan fondos: no los tienen por defecto · Importar la cuenta pero dejar otra seleccionada en MetaMask.</td></tr><tr><td><strong>Consejo de seguridad</strong></td><td>El mnemónico y todas las claves son <strong>públicos</strong>: solo úsalos en la red de pruebas y nunca con fondos reales. En producción las claves del Owner y del relayer viven en el Secret Manager, no en manuales.</td></tr></tbody></table></div>
+</section>
+<section class="seccion" id="s9"><h2 class="seccion">9. Lo que falta por confirmar (resumen)</h2>
+<ol><li>El rol concreto y el estado de cada usuario de ejemplo (Ana…Karen) en la base de datos depende del entorno → <strong>pendiente de confirmar</strong> por entorno.</li><li>El mecanismo para financiar a Irene (cuenta 10, sin fondos) → <strong>pendiente de confirmar</strong> (no hay faucet verificado).</li></ol>
+</section>
+<section class="seccion" id="s10"><h2 class="seccion">10. Glosario de este manual</h2>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Significado</th></tr></thead><tbody><tr><td><strong>Anvil</strong></td><td>Simulador de blockchain que usa el proyecto para probar</td></tr><tr><td><strong>Mnemónico</strong></td><td>La frase de 12/24 palabras que genera las cuentas</td></tr><tr><td><strong>Clave privada</strong></td><td>La llave secreta de una cuenta: quien la tiene, firma por ella</td></tr><tr><td><strong>Dirección</strong></td><td>La "matrícula" pública de una cuenta (empieza por 0x)</td></tr><tr><td><strong>Importar cuenta</strong></td><td>Cargar una clave privada en MetaMask para poder usarla</td></tr><tr><td><strong>Owner</strong></td><td>Cuenta 0: la autoridad que despliega y administra</td></tr><tr><td><strong>Relayer</strong></td><td>Cuenta 1: la plataforma, paga el gas de los trueques</td></tr><tr><td><strong>Faucet / grifo</strong></td><td>Mecanismo que regala monedas de prueba</td></tr></tbody></table></div>
+</section>
+</main>
+
+</body>
+</html>
