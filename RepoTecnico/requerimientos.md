@@ -91,6 +91,9 @@ de datos PostgreSQL (off-chain, impulsada por eventos) alberga la información d
 - RF-04.5 En la creación de un nuevo intercambio se debe incluir **toda la información que genere confianza** en el intercambio.
 
 ### RF-05 · Intercambios (trueques) y escrow
+
+> **Lógica maestra del Trueke (definida por el director, post-entrega):** ver `RepoTecnico/logica_trueke.md` — ciclo completo en 9 puntos (inventario→NFT, A publica oferta con "qué quiere recibir", Mercado con todos los tipos diferenciados visualmente, B acuerda, propuesta de encuentro por mayor nivel/reputación con favoritos + mapa, Activo en Intercambio, tarjeta Mis Truekes con ofertados/cerrados, cierre Recibido Conforme → valoración / No Conforme → disputa). Estatus: documentada, pendiente de validación e implementación.
+
 - RF-05.1 Un trueque se ejecuta cuando el **Usuario A ofrece un NFT/cripto** y el **Usuario B completa el intercambio** ofreciendo el NFT/cripto requerido.
 - RF-05.2 Al ofrecer o completar un trueque, los **NFTs pasan a custodia del contrato escrow** hasta que **ambos usuarios firmen la recepción correcta** de lo negociado.
 - RF-05.2b **Liberación de fondos custodiados** *(Decisiones D13 + D26)*: solo se libera por **quórum de Socios** (≥2/3) tras la solicitud de anulación, con plazo máximo de **5 días** desde la solicitud. **Si vencen los 5 días sin alcanzar quórum, el escrow se resuelve ANULADO por defecto** con **devolución de los NFTs a ambas partes** (cierre en tiempo finito garantizado) *(Decisión D26)*.
