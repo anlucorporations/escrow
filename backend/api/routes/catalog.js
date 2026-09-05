@@ -17,8 +17,12 @@ export function crearRouterCatalog({ almacen }) {
   // POST /catalog/articulos — publicar artículo AtoA (requiere Verificado; RF-14.4/D14)
   r.post('/articulos', requiereSesion(almacen), requiereEstado(almacen, 'VERIFICADO', 'CERTIFICADO'), async (req, res) => {
     const u = await almacen.getUsuario(req.wallet);
-    const { titulo, descripcion, rubro, nftTokenId } = req.body;
+    const { titulo, descripcion, rubro, categoria, nftTokenId } = req.body;
     if (!titulo || !rubro) return res.status(400).json({ error: 'titulo_y_rubro_requeridos' });
+    const CATEGORIAS = ['ARTICULO', 'SERVICIO', 'BIEN', 'CRIPTO'];
+    if (categoria && !CATEGORIAS.includes(categoria)) {
+      return res.status(400).json({ error: 'categoria_invalida', detalle: CATEGORIAS.join('/') });
+    }
 
     const limite = LIMITE_ARTICULOS_POR_NIVEL[u.nivel] ?? 5;
     const todos = await almacen.listarArticulos();
@@ -28,7 +32,7 @@ export function crearRouterCatalog({ almacen }) {
     }
 
     const articulo = await almacen.crearArticulo({
-      wallet: req.wallet, titulo, descripcion, rubro, nftTokenId: nftTokenId ?? null, disponible: true,
+      wallet: req.wallet, titulo, descripcion, rubro, categoria: categoria ?? 'ARTICULO', nftTokenId: nftTokenId ?? null, disponible: true,
     });
     res.status(201).json({ articulo });
   });

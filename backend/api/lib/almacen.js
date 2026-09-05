@@ -152,6 +152,48 @@ export function crearAlmacen() {
       });
       return id; // devuelve el id numérico
     },
+    /** Oferta abierta de A en el Mercado (estado PROPUESTO, sin contraparte — punto 3). */
+    crearOferta(o) {
+      const id = proxTrueke++;
+      estado.truekes.set(id, {
+        id,
+        escrowId: o.escrowId ?? -id,
+        usuarioA: o.usuarioA ?? null,
+        usuarioB: null,
+        articuloAId: o.articuloAId ?? null,
+        articuloBId: null,
+        estado: 'PROPUESTO',
+        descripcionRequerida: o.descripcionRequerida ?? null,
+        tipoRequerido: o.tipoRequerido ?? null,
+        horaPautada: null,
+        cierreA: null,
+        cierreB: null,
+        createdAt: new Date().toISOString(),
+      });
+      return id;
+    },
+    /** Lista las ofertas abiertas del Mercado (truekes PROPUESTO). */
+    listarOfertas() {
+      return [...estado.truekes.values()].filter((t) => t.estado === 'PROPUESTO');
+    },
+    /** B acuerda una oferta: pasa de PROPUESTO a CREADO con su artículo y contraparte. */
+    acordarOferta(id, { usuarioB, articuloBId }) {
+      const t = estado.truekes.get(Number(id));
+      if (!t) return null;
+      if (t.estado !== 'PROPUESTO') return null;
+      t.usuarioB = usuarioB.toLowerCase();
+      t.articuloBId = articuloBId;
+      t.estado = 'CREADO';
+      return t;
+    },
+    /** Registra el cierre Conforme/No Conforme de una parte (punto 9). */
+    registrarCierre(id, { lado, conforme }) {
+      const t = estado.truekes.get(Number(id));
+      if (!t) return null;
+      if (lado === 'A') t.cierreA = conforme ? 'CONFORME' : 'NO_CONFORME';
+      else if (lado === 'B') t.cierreB = conforme ? 'CONFORME' : 'NO_CONFORME';
+      return t;
+    },
     getTrueke(id) {
       return estado.truekes.get(Number(id)) ?? null;
     },

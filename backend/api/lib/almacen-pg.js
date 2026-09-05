@@ -160,18 +160,18 @@ export async function crearAlmacenPg(pool) {
     // ------------------------------------------------------------ catálogo (persistido)
     async crearArticulo(a) {
       const r = await pool.query(
-        `INSERT INTO articulos (usuario_id, titulo, descripcion, rubro, disponible)
-         VALUES ((SELECT id FROM usuarios WHERE wallet=$1), $2, $3, $4, $5)
-         RETURNING id, titulo, rubro, disponible, created_at`,
-        [NORMALIZA_WALLET(a.usuarioId ?? a.wallet ?? ''), a.titulo ?? '', a.descripcion ?? null, a.rubro ?? '', a.disponible ?? true]
+        `INSERT INTO articulos (usuario_id, titulo, descripcion, rubro, categoria, disponible)
+         VALUES ((SELECT id FROM usuarios WHERE wallet=$1), $2, $3, $4, $5, $6)
+         RETURNING id, titulo, rubro, categoria, disponible, created_at`,
+        [NORMALIZA_WALLET(a.usuarioId ?? a.wallet ?? ''), a.titulo ?? '', a.descripcion ?? null, a.rubro ?? '', a.categoria ?? 'ARTICULO', a.disponible ?? true]
       );
       const f = r.rows[0];
-      return { id: f.id, titulo: f.titulo, rubro: f.rubro, disponible: f.disponible, createdAt: f.created_at.toISOString() };
+      return { id: f.id, titulo: f.titulo, rubro: f.rubro, categoria: f.categoria, disponible: f.disponible, createdAt: f.created_at.toISOString() };
     },
 
     async listarArticulos() {
       const r = await pool.query(
-        `SELECT a.id, a.titulo, a.descripcion, a.rubro, a.disponible, a.created_at,
+        `SELECT a.id, a.titulo, a.descripcion, a.rubro, a.categoria, a.disponible, a.created_at,
                 u.wallet AS usuario_wallet, u.nivel AS usuario_nivel
            FROM articulos a JOIN usuarios u ON u.id = a.usuario_id
           WHERE a.disponible = TRUE
@@ -182,6 +182,7 @@ export async function crearAlmacenPg(pool) {
         titulo: f.titulo,
         descripcion: f.descripcion ?? '',
         rubro: f.rubro,
+        categoria: f.categoria ?? 'ARTICULO',
         disponible: f.disponible,
         createdAt: f.created_at.toISOString(),
         usuarioWallet: f.usuario_wallet.trim().toLowerCase(),
@@ -237,15 +238,74 @@ export async function crearAlmacenPg(pool) {
       return filaATrueke(r.rows[0] ?? null);
     },
 
+    async crearOferta(o) {
+      const walletA = NORMALIZA_WALLET(o.usuarioA ?? '');
+      const r = await pool.query(
+        `INSERT INTO truekes (escrow_id, articulo_a_id, usuario_a, estado,
+                              descripcion_requerida, tipo_requerido)
+         VALUES ((SELECT COALESCE(MIN(escrow_id), 0) - 1 FROM truekes WHERE escrow_id < 0),
+                 $1, $2, 'PROPUESTO', $3, $4)
+         RETURNING id`,
+        [o.articuloAId ?? null, walletA, o.descripcionRequerida ?? null, o.tipoRequerido ?? null]
+      );
+      return Number(r.rows[0].id);
+    },
+
+    async listarOfertas() {
+      const r = await pool.query(
+        `SELECT t.*, aa.titulo AS titulo_a, ab.titulo AS titulo_b
+           FROM truekes t
+           LEFT JOIN articulos aa ON aa.id = t.articulo_a_id
+           LEFT JOIN articulos ab ON ab.id = t.articulo_b_id
+          WHERE t.estado = 'PROPUESTO'
+          ORDER BY t.id DESC`
+      );
+      return r.rows.map(filaATrueke);
+    },
+
+    async acordarOferta(id, { usuarioB, articuloBId }) {
+      const r = await pool.query(
+        `UPDATE truekes
+            SET usuario_b = $2, articulo_b_id = $3, estado = 'CREADO', updated_at = now()
+          WHERE id = $1 AND estado = 'PROPUESTO'
+          RETURNING *`,
+        [Number(id), NORMALIZA_WALLET(usuarioB), articuloBId ?? null]
+      );
+      if (r.rowCount === 0) return null;
+      return filaATrueke(r.rows[0]);
+    },
+
+    async registrarCierre(id, { lado, conforme }) {
+      const col = lado === 'A' ? 'cierre_a' : 'cierre_b';
+      const valor = conforme ? 'CONFORME' : 'NO_CONFORME';
+      const r = await pool.query(
+        `UPDATE truekes SET ${col} = $2, updated_at = now() WHERE id = $1 RETURNING *`,
+        [Number(id), valor]
+      );
+      if (r.rowCount === 0) return null;
+      return filaATrueke(r.rows[0]);
+    },
+
     async actualizarTrueke(id, cambios) {
       const actual = await this.getTrueke(Number(id));
       if (!actual) return null;
-      const estadosValidos = ['CREADO','ACTIVO','CUSTODIADO','APERTURA','EN_DISPUTA',
+      const estadosValidos = ['PROPUESTO','CREADO','ACTIVO','CUSTODIADO','APERTURA','EN_DISPUTA',
         'RESOLUCION_SOCIOS','COMPLETADO','ANULADO','BLOQUEADO'];
       const estado = cambios.estado && estadosValidos.includes(cambios.estado) ? cambios.estado : actual.estado;
+      const hora = cambios.horaPautada ? new Date(cambios.horaPautada).toISOString() : (cambios.horaPautada === null ? null : actual.horaPautada);
+      const punto = cambios.puntoEncuentroId !== undefined ? cambios.puntoEncuentroId : actual.puntoEncuentroId;
       const r = await pool.query(
-        `UPDATE truekes SET estado=$2, updated_at=now() WHERE id=$1 RETURNING *`,
-        [Number(id), estado]
+        `UPDATE truekes
+            SET estado=$2,
+                hora_pautada = COALESCE($3, hora_pautada),
+                punto_encuentro_id = COALESCE($4, punto_encuentro_id),
+                cierre_a = COALESCE($5, cierre_a),
+                cierre_b = COALESCE($6, cierre_b),
+                descripcion_requerida = COALESCE($7, descripcion_requerida),
+                tipo_requerido = COALESCE($8, tipo_requerido),
+                updated_at = now()
+          WHERE id = $1 RETURNING *`,
+        [Number(id), estado, hora ?? null, punto, cambios.cierreA ?? null, cambios.cierreB ?? null, cambios.descripcionRequerida ?? null, cambios.tipoRequerido ?? null]
       );
       if (r.rowCount === 0) return null;
       // Campos adicionales (firmas/valoraciones) se guardan en el payload de la fila
@@ -376,8 +436,14 @@ function filaATrueke(f) {
     tituloA: f.titulo_a ?? null,
     tituloB: f.titulo_b ?? null,
     usuarioA: f.usuario_a.trim().toLowerCase(),
-    usuarioB: f.usuario_b.trim().toLowerCase(),
+    // Oferta abierta (PROPUESTO) no tiene contraparte todavía (lógica maestra punto 3)
+    usuarioB: f.usuario_b ? f.usuario_b.trim().toLowerCase() : null,
     estado: f.estado,
+    descripcionRequerida: f.descripcion_requerida ?? null,
+    tipoRequerido: f.tipo_requerido ?? null,
+    cierreA: f.cierre_a ?? null,
+    cierreB: f.cierre_b ?? null,
+    puntoEncuentroId: f.punto_encuentro_id !== null && f.punto_encuentro_id !== undefined ? Number(f.punto_encuentro_id) : null,
     horaPautada: f.hora_pautada ? f.hora_pautada.toISOString() : null,
     txHash: f.tx_hash ?? null,
     bloque: f.bloque !== null ? Number(f.bloque) : null,
