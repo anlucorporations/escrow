@@ -27,11 +27,19 @@ DO $$ BEGIN
     CREATE TYPE estado_verificacion AS ENUM ('INSCRITO','VERIFICADO','CERTIFICADO');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
--- Enum canónico de 9 estados del escrow (diccionario de datos)
+-- Enum canónico de estados del escrow (diccionario de datos). PROPUESTO es el estado
+-- de la oferta abierta en el Mercado (lógica maestra del director, punto 3): vive solo
+-- off-chain (BD) hasta que B acuerda y el trueque arranca el ciclo on-chain (CREADO).
 DO $$ BEGIN
     CREATE TYPE estado_escrow AS ENUM
-        ('CREADO','ACTIVO','CUSTODIADO','APERTURA','EN_DISPUTA',
+        ('PROPUESTO','CREADO','ACTIVO','CUSTODIADO','APERTURA','EN_DISPUTA',
          'RESOLUCION_SOCIOS','COMPLETADO','ANULADO','BLOQUEADO');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+-- Categoría de ítem del inventario (lógica maestra del director, punto 4):
+-- los tipos de trueque son las combinaciones de ARTICULO/SERVICIO/BIEN/CRIPTO.
+DO $$ BEGIN
+    CREATE TYPE categoria_item AS ENUM ('ARTICULO','SERVICIO','BIEN','CRIPTO');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
@@ -99,8 +107,9 @@ CREATE TABLE IF NOT EXISTS articulos (
     titulo                  TEXT NOT NULL,
     descripcion             TEXT,
     rubro                   TEXT NOT NULL,
+    categoria               categoria_item NOT NULL DEFAULT 'ARTICULO', -- punto 4 (tipo de trueke)
     imagen_certificacion_id BIGINT,         -- FK 1—1 imagenes_certificadas (D23)
-    nft_token_id            NUMERIC,
+    nft_token_id            NUMERIC,        -- tokenId del TrueKeateNFT oficial (punto 1)
     disponible              BOOLEAN NOT NULL DEFAULT TRUE,
     alta_disponibilidad     BOOLEAN NOT NULL DEFAULT FALSE, -- D19 (computado)
     created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -108,18 +117,24 @@ CREATE TABLE IF NOT EXISTS articulos (
 );
 
 -- Espejo del estado on-chain del escrow (solo indexador — RNF-01.1)
+-- El estado PROPUESTO (oferta abierta en el Mercado, punto 3) vive off-chain: no tiene
+-- contraparte (usuario_b/articulo_b NULL) hasta que B acuerda y el trueque pasa a CREADO.
 CREATE TABLE IF NOT EXISTS truekes (
     id              BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    escrow_id       NUMERIC UNIQUE NOT NULL,          -- id on-chain del escrow
-    articulo_a_id   BIGINT REFERENCES articulos(id),
-    articulo_b_id   BIGINT REFERENCES articulos(id),
+    escrow_id       NUMERIC UNIQUE NOT NULL,          -- id on-chain del escrow (sintético negativo para ofertas)
+    articulo_a_id   BIGINT REFERENCES articulos(id),  -- lo que A ofrece (NFT publicado)
+    articulo_b_id   BIGINT REFERENCES articulos(id),  -- lo que B ofrece al acordar (NULL en PROPUESTO)
     usuario_a       CHAR(42) NOT NULL,
-    usuario_b       CHAR(42) NOT NULL,
-    estado          estado_escrow NOT NULL DEFAULT 'CREADO',
+    usuario_b       CHAR(42),                         -- NULL en PROPUESTO (oferta sin contraparte)
+    estado          estado_escrow NOT NULL DEFAULT 'PROPUESTO',
+    descripcion_requerida TEXT,   -- qué quiere recibir A (oferta abierta, punto 2)
+    tipo_requerido  categoria_item, -- tipo de ítem que A desea recibir (punto 4)
     hora_pautada    TIMESTAMPTZ,
     apertura_a      TIMESTAMPTZ,
     apertura_b      TIMESTAMPTZ,
     punto_encuentro_id BIGINT,
+    cierre_a        TEXT,          -- 'CONFORME' | 'NO_CONFORME' (punto 9)
+    cierre_b        TEXT,          -- 'CONFORME' | 'NO_CONFORME' (punto 9)
     tx_hash         CHAR(66),
     bloque          BIGINT,
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -149,6 +164,18 @@ CREATE TABLE IF NOT EXISTS puntos_encuentro (
     radio_km        NUMERIC NOT NULL DEFAULT 10,
     aprobado_socios BOOLEAN NOT NULL DEFAULT FALSE, -- establecimientos de retiro (CU-22)
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Puntos de encuentro favoritos del usuario + último uso (lógica maestra punto 7:
+-- "últimos puntos de encuentro usados, reutilizables como favoritos"). Cada trueke
+-- completado con punto_encuentro_id refresca ultimo_uso del dueño del punto.
+CREATE TABLE IF NOT EXISTS puntos_favoritos (
+    id                 BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    usuario_id         BIGINT NOT NULL REFERENCES usuarios(id),
+    punto_encuentro_id BIGINT NOT NULL REFERENCES puntos_encuentro(id),
+    ultimo_uso         TIMESTAMPTZ NOT NULL DEFAULT now(),
+    created_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (usuario_id, punto_encuentro_id)
 );
 
 -- Disputas y apelaciones (CU-18/19)
@@ -277,8 +304,10 @@ CREATE INDEX IF NOT EXISTS idx_truekes_usuario_a ON truekes(usuario_a);
 CREATE INDEX IF NOT EXISTS idx_truekes_usuario_b ON truekes(usuario_b);
 CREATE INDEX IF NOT EXISTS idx_usuarios_estado ON usuarios(estado);
 CREATE INDEX IF NOT EXISTS idx_articulos_rubro ON articulos(rubro);
+CREATE INDEX IF NOT EXISTS idx_articulos_categoria ON articulos(categoria);
 CREATE INDEX IF NOT EXISTS idx_auditoria_tx ON auditoria(tx_hash, log_index);
 CREATE INDEX IF NOT EXISTS idx_puntos_geog ON puntos_encuentro USING GIST(geog);
+CREATE INDEX IF NOT EXISTS idx_puntos_favoritos_usuario ON puntos_favoritos(usuario_id, ultimo_uso DESC);
 CREATE INDEX IF NOT EXISTS idx_imagenes_ref ON imagenes_certificadas(tipo, ref_id);
 
 -- Distancia ≤ 10 km entre partes (RF-08.3/08.4, R3) — consulta PostGIS de ejemplo:
