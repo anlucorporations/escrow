@@ -15,6 +15,7 @@ import { useSesionAutenticada } from "@/lib/useSesionAutenticada";
 import {
   crearTrueke,
   custodiarTrueke,
+  cerrarTrueke,
   firmarRecepcion,
   misTruekes,
   obtenerCatalogo,
@@ -180,7 +181,7 @@ export default function PaginaIntercambio() {
   }
 
   function contraparteDe(t: Trueke, lado: "A" | "B"): string {
-    return lado === "A" ? t.usuarioB : t.usuarioA;
+    return lado === "A" ? (t.usuarioB ?? "") : t.usuarioA;
   }
 
   function yaFirme(t: Trueke, _lado: "A" | "B"): boolean {
@@ -209,6 +210,32 @@ export default function PaginaIntercambio() {
       setError(e instanceof Error ? e.message : `fallo al ${accion === "custodiar" ? "custodiar" : "firmar"}`);
     } finally {
       setOcupado(null);
+    }
+  }
+
+  // ---------------------------------------------------------------- cierre conforme/no conforme (punto 9)
+  const [cerrando, setCerrando] = useState<number | null>(null);
+  const [cerradoOk, setCerradoOk] = useState<ReadonlySet<number>>(new Set());
+
+  /** Mi cierre registrado en el espejo (CONFORME/NO_CONFORME) o null. */
+  function miCierre(t: Trueke, lado: "A" | "B" | null): string | null {
+    if (!lado) return null;
+    return lado === "A" ? (t.cierreA ?? null) : (t.cierreB ?? null);
+  }
+
+  async function firmarCierre(t: Trueke, lado: "A" | "B", conforme: boolean) {
+    if (!token) return;
+    setCerrando(t.id);
+    setError(null);
+    try {
+      const r = await cerrarTrueke(token, t.id, lado, conforme);
+      setCerradoOk((prev) => new Set(prev).add(t.id));
+      if (r.disputa) setError(null);
+      await cargar();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "no se pudo registrar el cierre");
+    } finally {
+      setCerrando(null);
     }
   }
 
@@ -566,6 +593,40 @@ export default function PaginaIntercambio() {
                       >
                         {ocupando && ocupado?.accion === "firmar" ? "Firmando…" : "✍️ Firmar recepción"}
                       </Button>
+                    )}
+
+                    {/* Cierre del acuerdo (punto 9): Recibido Conforme / No Conforme */}
+                    {(t.estado === "CUSTODIADO" || t.estado === "APERTURA") &&
+                      lado &&
+                      !miCierre(t, lado) &&
+                      !cerradoOk.has(t.id) && (
+                        <>
+                          <Button
+                            className="!px-3 !py-1.5 !text-xs !bg-[linear-gradient(135deg,#2a9d8f,#2a9d8f)]"
+                            disabled={cerrando === t.id || !token}
+                            onClick={() => void firmarCierre(t, lado, true)}
+                          >
+                            {cerrando === t.id ? "Registrando…" : "✓ Recibido Conforme"}
+                          </Button>
+                          <Button
+                            variante="outline-navy"
+                            className="!px-3 !py-1.5 !text-xs !border-crimson !text-crimson hover:!bg-crimson/5"
+                            disabled={cerrando === t.id || !token}
+                            onClick={() => void firmarCierre(t, lado, false)}
+                          >
+                            ✗ No Conforme
+                          </Button>
+                        </>
+                      )}
+                    {lado && miCierre(t, lado) && (
+                      <span className="self-center text-[11px] font-semibold text-navy-800/60">
+                        Cierre: {miCierre(t, lado) === "CONFORME" ? "✓ Recibido Conforme" : "✗ No Conforme"}
+                      </span>
+                    )}
+                    {(t.estado === "EN_DISPUTA" || t.estado === "RESOLUCION_SOCIOS") && (
+                      <span className="self-center text-[11px] font-semibold text-crimson">
+                        ⚖️ En disputa — resolución de Socios
+                      </span>
                     )}
 
                     {ESTADOS_VALORABLES.includes(t.estado) && !yaValore(t) && (

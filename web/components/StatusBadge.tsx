@@ -28,6 +28,7 @@ export function tonoDeEstado(estado: string): BadgeTono {
     case "APERTURA": case "PENDIENTE": return "coral";
     case "EN_DISPUTA": case "RESOLUCION_SOCIOS": return "coral";
     case "INSCRITO": case "CREADO": case "ACTIVO": case "CUSTODIADO": return "navy";
+    case "PROPUESTO": return "gold"; // oferta abierta en el Mercado (lógica maestra punto 3)
     default: return "smoke";
   }
 }

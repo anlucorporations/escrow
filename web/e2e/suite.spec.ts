@@ -79,6 +79,28 @@ async function simularWallet(
             { status: 200, headers: { "Content-Type": "application/json" } }
           );
         }
+        // Mercado de trueques ofertados (modelo abierto-publicado, lógica maestra punto 3)
+        if (url.includes("/truekes/ofertas") && !init?.method) {
+          return new Response(
+            JSON.stringify({
+              truekes: [
+                { id: 1, articuloAId: 1, tituloA: "Bicicleta de montaña", usuarioA: "0x9999", estado: "PROPUESTO", descripcionRequerida: "Busco un curso", tipoRequerido: "SERVICIO" },
+                { id: 2, articuloAId: 2, tituloA: "Curso de fotografía", usuarioA: "0x8888", estado: "PROPUESTO", descripcionRequerida: "Busco una bici", tipoRequerido: "ARTICULO" },
+              ],
+            }),
+            { status: 200, headers: { "Content-Type": "application/json" } }
+          );
+        }
+        if (url.includes("/truekes") && !init?.method) {
+          return new Response(
+            JSON.stringify({
+              truekes: [
+                { id: 1, articuloAId: 1, tituloA: "Bicicleta de montaña", usuarioA: cuenta, usuarioB: "0x9999", estado: "CUSTODIADO" },
+              ],
+            }),
+            { status: 200, headers: { "Content-Type": "application/json" } }
+          );
+        }
         return origFetch(input, init);
       };
     },
