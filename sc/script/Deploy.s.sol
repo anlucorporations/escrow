@@ -10,7 +10,7 @@ import {FondoDeValor} from "../src/FondoDeValor.sol";
 import {SociosRegistry} from "../src/SociosRegistry.sol";
 import {SuscripcionEmpresa} from "../src/SuscripcionEmpresa.sol";
 import {TrueKeateToken} from "../src/mocks/TrueKeateToken.sol";
-import {TrueKeateNFT} from "../src/mocks/TrueKeateNFT.sol";
+import {TrueKeateNFT} from "../src/TrueKeateNFT.sol";
 
 /**
  * @title Deploy — Ciclos 1-2 (Fase 3)
@@ -40,8 +40,9 @@ contract Deploy is Script {
         TrueKeateToken tka = new TrueKeateToken("TrueKeate Token A", "TKA");
         TrueKeateToken tkb = new TrueKeateToken("TrueKeate Token B", "TKB");
 
-        // 4) NFT de prueba
-        TrueKeateNFT nft = new TrueKeateNFT("TrueKeate NFT", "TKANFT");
+        // 4) NFT oficial de la plataforma (lógica maestra punto 1: cada ítem del inventario
+        //    se mintea como TrueKeateNFT; minter inicial = owner, la operación lo ajusta).
+        TrueKeateNFT nft = new TrueKeateNFT("TrueKeate NFT", "TKANFT", owner);
 
         // 5) Ciclo 3: BRLT + FondoDeValor + SociosRegistry + SuscripcionEmpresa (gobernanza)
         BRLT brlt = new BRLT();
@@ -50,6 +51,7 @@ contract Deploy is Script {
         SuscripcionEmpresa suscripcion = new SuscripcionEmpresa();
 
         // vinculaciones
+        escrow.vincularTrueKeateNft(address(nft)); // solo NFT oficial en trueques (decisión del director)
         brlt.vincularRegistry(address(registry));
         brlt.vincularFondo(address(fondo));
         fondo.vincularBrlt(address(brlt));

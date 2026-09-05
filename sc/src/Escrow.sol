@@ -107,6 +107,7 @@ contract Escrow is Ownable, ReentrancyGuard {
     event ResolucionEjecutada(uint256 indexed id, bool anulada);
     event ResolucionPorDefecto(uint256 indexed id);
     event SancionProgramada(uint256 indexed id, uint256 ejecutaEn);
+    event TrueKeateNftVinculado(address nft);
 
     // ------------------------------------------------------------------ errores
     error NoAutorizado(uint256 id);
@@ -132,9 +133,20 @@ contract Escrow is Ownable, ReentrancyGuard {
     uint256 public plazoAnulacionMax = 5 days;   // D13
     uint256 public timelockSanciones = 6 hours;  // D21 (solo sanciones)
 
+    /// @dev NFT oficial de la plataforma (TrueKeateNFT). Si se vincula, el escrow solo
+    ///      acepta NFTs de ese contrato (decisión del director, lógica maestra punto 1).
+    address public trueKeateNft;
+
     /// @notice Vincula el SociosRegistry (solo owner).
     function vincularSociosRegistry(address registry_) external onlyOwner {
         sociosRegistry = registry_;
+    }
+
+    /// @notice Vincula el NFT oficial de la plataforma (solo owner). Con esto, los NFTs
+    ///         ofrecidos en trueques deben pertenecer al contrato TrueKeateNFT oficial.
+    function vincularTrueKeateNft(address nft_) external onlyOwner {
+        trueKeateNft = nft_;
+        emit TrueKeateNftVinculado(nft_);
     }
 
     function _esSocio(address quien) private view returns (bool) {
@@ -493,10 +505,13 @@ contract Escrow is Ownable, ReentrancyGuard {
     }
 
     // ------------------------------------------------------------------ utilidades
-    function _validarActivo(Activo calldata a) private pure {
+    function _validarActivo(Activo memory a) private view {
         if (a.token == address(0)) revert ActivoNoPermitido();
         if (a.esNft) {
             if (a.tokenId == 0 || a.cantidad != 1) revert ActivoNoPermitido();
+            // Decisión del director (lógica maestra punto 1): con el NFT oficial vinculado,
+            // el escrow solo acepta NFTs de TrueKeateNFT.
+            if (trueKeateNft != address(0) && a.token != trueKeateNft) revert ActivoNoPermitido();
         } else {
             if (a.cantidad == 0) revert ActivoNoPermitido();
         }
