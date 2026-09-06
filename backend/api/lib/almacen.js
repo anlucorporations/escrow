@@ -14,10 +14,13 @@ export function crearAlmacen() {
     finanzas: new Map(),     // id(usuario) -> finanzas
     disputas: new Map(),     // id -> disputa
     sesiones: new Map(),     // token -> {wallet}
+    puntos: new Map(),       // id -> punto de encuentro
+    puntosFavoritos: new Map(), // "wallet:id" -> {ultimoUso}
   };
   let proxArticulo = 1;
   let proxEncargo = 1;
   let proxTrueke = 1;
+  let proxPunto = 1;
 
   return {
     // ------------------------------------------------------------ usuarios
@@ -140,6 +143,51 @@ export function crearAlmacen() {
     },
     listarDisputas() {
       return [...(estado.disputas?.values() ?? [])];
+    },
+
+    // ------------------------------------------------------------ puntos de encuentro (CU-16, punto 5.1)
+    /** Crea un punto de encuentro del usuario (PostGIS en pg; lat/lng en memoria). */
+    crearPunto({ wallet, lat, lng, direccion, radioKm = 10 }) {
+      const id = proxPunto++;
+      const u = estado.usuarios.get(wallet);
+      estado.puntos.set(id, {
+        id,
+        usuarioId: u?.id ?? wallet,
+        wallet,
+        lat: Number(lat),
+        lng: Number(lng),
+        direccion: direccion ?? '',
+        radioKm: Number(radioKm),
+        aprobadoSocios: false,
+        createdAt: new Date().toISOString(),
+      });
+      return estado.puntos.get(id);
+    },
+    listarPuntos() {
+      return [...estado.puntos.values()];
+    },
+    getPunto(id) {
+      return estado.puntos.get(Number(id)) ?? null;
+    },
+    listarPuntosDe(wallet) {
+      return [...estado.puntos.values()].filter((p) => p.wallet === wallet);
+    },
+    /** Marca un punto como usado (upsert en favoritos — punto 7: últimos usados). */
+    registrarUsoPunto(wallet, puntoId) {
+      const p = estado.puntos.get(Number(puntoId));
+      if (!p) return null;
+      const clave = `${wallet}:${p.id}`;
+      estado.puntosFavoritos.set(clave, { wallet, puntoId: p.id, ultimoUso: new Date().toISOString() });
+      return { puntoId: p.id, ultimoUso: estado.puntosFavoritos.get(clave).ultimoUso };
+    },
+    /** Puntos favoritos/últimos usados del usuario, más recientes primero. */
+    listarPuntosFavoritosDe(wallet) {
+      const filas = [...(estado.puntosFavoritos?.values() ?? [])]
+        .filter((f) => f.wallet === wallet)
+        .sort((a, b) => (a.ultimoUso < b.ultimoUso ? 1 : -1));
+      return filas
+        .map((f) => ({ ...f, punto: estado.puntos.get(f.puntoId) ?? null }))
+        .filter((f) => f.punto);
     },
 
     // ------------------------------------------------------------ truekes (espejo de escrow)

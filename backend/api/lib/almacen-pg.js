@@ -415,6 +415,109 @@ export async function crearAlmacenPg(pool) {
       }));
     },
 
+    // ------------------------------------------------------------ puntos de encuentro (CU-16, punto 5.1)
+    async crearPunto({ wallet, lat, lng, direccion, radioKm = 10 }) {
+      const r = await pool.query(
+        `INSERT INTO puntos_encuentro (usuario_id, direccion, geog, radio_km)
+         VALUES ((SELECT id FROM usuarios WHERE wallet=$1), $2,
+                 ST_SetSRID(ST_MakePoint($4, $3), 4326)::geography, $5)
+         RETURNING id, direccion, radio_km, ST_Y(geog::geometry) AS lat, ST_X(geog::geometry) AS lng, created_at`,
+        [NORMALIZA_WALLET(wallet), direccion ?? '', Number(lat), Number(lng), Number(radioKm)]
+      );
+      const f = r.rows[0];
+      return {
+        id: Number(f.id),
+        lat: Number(f.lat),
+        lng: Number(f.lng),
+        direccion: f.direccion ?? '',
+        radioKm: Number(f.radio_km),
+        aprobadoSocios: false,
+        createdAt: f.created_at.toISOString(),
+      };
+    },
+
+    async getPunto(id) {
+      const r = await pool.query(
+        `SELECT id, usuario_id, direccion, radio_km, aprobado_socios,
+                ST_Y(geog::geometry) AS lat, ST_X(geog::geometry) AS lng, created_at
+           FROM puntos_encuentro WHERE id = $1`,
+        [Number(id)]
+      );
+      const f = r.rows[0];
+      if (!f) return null;
+      return {
+        id: Number(f.id),
+        lat: Number(f.lat),
+        lng: Number(f.lng),
+        direccion: f.direccion ?? '',
+        radioKm: Number(f.radio_km),
+        aprobadoSocios: f.aprobado_socios,
+        createdAt: f.created_at.toISOString(),
+      };
+    },
+
+    async listarPuntosDe(wallet) {
+      const r = await pool.query(
+        `SELECT id, usuario_id, direccion, radio_km, aprobado_socios,
+                ST_Y(geog::geometry) AS lat, ST_X(geog::geometry) AS lng, created_at
+           FROM puntos_encuentro WHERE usuario_id = (SELECT id FROM usuarios WHERE wallet = $1)
+          ORDER BY id DESC`,
+        [NORMALIZA_WALLET(wallet)]
+      );
+      return r.rows.map((f) => ({
+        id: Number(f.id),
+        lat: Number(f.lat),
+        lng: Number(f.lng),
+        direccion: f.direccion ?? '',
+        radioKm: Number(f.radio_km),
+        aprobadoSocios: f.aprobado_socios,
+        createdAt: f.created_at.toISOString(),
+      }));
+    },
+
+    /** Marca un punto como usado (upsert en puntos_favoritos — punto 7). */
+    async registrarUsoPunto(wallet, puntoId) {
+      await pool.query(
+        `INSERT INTO puntos_favoritos (usuario_id, punto_encuentro_id, ultimo_uso)
+         VALUES ((SELECT id FROM usuarios WHERE wallet=$1), $2, now())
+         ON CONFLICT (usuario_id, punto_encuentro_id)
+         DO UPDATE SET ultimo_uso = now()`,
+        [NORMALIZA_WALLET(wallet), Number(puntoId)]
+      );
+      const r = await pool.query(
+        `SELECT punto_encuentro_id, ultimo_uso FROM puntos_favoritos
+          WHERE usuario_id = (SELECT id FROM usuarios WHERE wallet = $1)
+            AND punto_encuentro_id = $2`,
+        [NORMALIZA_WALLET(wallet), Number(puntoId)]
+      );
+      const f = r.rows[0];
+      return f ? { puntoId: Number(f.punto_encuentro_id), ultimoUso: f.ultimo_uso.toISOString() } : null;
+    },
+
+    /** Puntos favoritos/últimos usados del usuario, más recientes primero. */
+    async listarPuntosFavoritosDe(wallet) {
+      const r = await pool.query(
+        `SELECT pf.punto_encuentro_id, pf.ultimo_uso, pe.direccion, pe.radio_km,
+                ST_Y(pe.geog::geometry) AS lat, ST_X(pe.geog::geometry) AS lng
+           FROM puntos_favoritos pf
+           JOIN puntos_encuentro pe ON pe.id = pf.punto_encuentro_id
+          WHERE pf.usuario_id = (SELECT id FROM usuarios WHERE wallet = $1)
+          ORDER BY pf.ultimo_uso DESC`,
+        [NORMALIZA_WALLET(wallet)]
+      );
+      return r.rows.map((f) => ({
+        puntoId: Number(f.punto_encuentro_id),
+        ultimoUso: f.ultimo_uso.toISOString(),
+        punto: {
+          id: Number(f.punto_encuentro_id),
+          lat: Number(f.lat),
+          lng: Number(f.lng),
+          direccion: f.direccion ?? '',
+          radioKm: Number(f.radio_km),
+        },
+      }));
+    },
+
     // ------------------------------------------------------------ sesiones (persistidas)
     async guardarSesion(token, wallet) {
       await pool.query(

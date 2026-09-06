@@ -19,9 +19,14 @@ import {
   firmarRecepcion,
   misTruekes,
   obtenerCatalogo,
+  proponerEncuentro,
+  puntosFavoritos,
+  crearPuntoEncuentro,
   valorarTrueke,
   type ArticuloCatalogo,
   type Trueke,
+  type PuntoFavorito,
+  type PuntoEncuentro,
 } from "@/lib/api";
 import { Card } from "@/components/Card";
 import { Button } from "@/components/Button";
@@ -78,6 +83,211 @@ function horaBonita(s: string | null | undefined): string | null {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+/** Mapa OSM embebido (sin API key) para el punto seleccionado — punto 5.1. */
+function MapaOsm({ lat, lng }: { lat: number; lng: number }) {
+  const margen = 0.01;
+  const bbox = `${lng - margen},${lat - margen},${lng + margen},${lat + margen}`;
+  const src = `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(
+    bbox
+  )}&layer=mapnik&marker=${lat},${lng}`;
+  return (
+    <div className="overflow-hidden rounded-xl border border-navy-800/10">
+      <iframe
+        title="Mapa del punto de encuentro"
+        src={src}
+        className="h-44 w-full"
+        loading="lazy"
+      />
+    </div>
+  );
+}
+
+/**
+ * Propuesta de encuentro (punto 5.1): el de mayor nivel/reputación propone el
+ * punto (últimos usados como favoritos), la fecha y la hora con mapa OSM.
+ */
+function PanelPropuestaEncuentro({ trueke, token }: { trueke: Trueke; token: string }) {
+  const [favoritos, setFavoritos] = useState<PuntoFavorito[]>([]);
+  const [seleccion, setSeleccion] = useState("");
+  const [hora, setHora] = useState("");
+  const [latNuevo, setLatNuevo] = useState("");
+  const [lngNuevo, setLngNuevo] = useState("");
+  const [dirNuevo, setDirNuevo] = useState("");
+  const [enviando, setEnviando] = useState(false);
+  const [mensaje, setMensaje] = useState<{ tipo: "ok" | "err"; texto: string } | null>(null);
+
+  const cargar = useCallback(async () => {
+    try {
+      const r = await puntosFavoritos(token);
+      setFavoritos(r.favoritos ?? []);
+    } catch {
+      setFavoritos([]);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    void cargar();
+  }, [cargar]);
+
+  const puntoSel: PuntoEncuentro | null =
+    favoritos.find((f) => String(f.puntoId) === seleccion)?.punto ?? null;
+
+  /** Usa la geolocalización del navegador para prellenar un punto nuevo. */
+  function usarMiUbicacion() {
+    if (!("geolocation" in navigator)) {
+      setMensaje({ tipo: "err", texto: "Tu navegador no ofrece geolocalización; ingresa lat/lng." });
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLatNuevo(String(pos.coords.latitude));
+        setLngNuevo(String(pos.coords.longitude));
+        setMensaje({ tipo: "ok", texto: "Ubicación capturada. Ajusta la dirección y propón." });
+      },
+      () => setMensaje({ tipo: "err", texto: "No se pudo obtener tu ubicación; ingresa lat/lng." })
+    );
+  }
+
+  async function enviar() {
+    if (!token) return;
+    setEnviando(true);
+    setMensaje(null);
+    try {
+      let puntoId: number | null = null;
+      if (seleccion) {
+        puntoId = Number(seleccion);
+      } else if (latNuevo && lngNuevo) {
+        const creado = await crearPuntoEncuentro(token, {
+          lat: Number(latNuevo),
+          lng: Number(lngNuevo),
+          direccion: dirNuevo || undefined,
+        });
+        puntoId = creado.punto.id;
+      }
+      if (!puntoId) {
+        setMensaje({ tipo: "err", texto: "Elige un punto de encuentro o crea uno nuevo." });
+        return;
+      }
+      if (!hora) {
+        setMensaje({ tipo: "err", texto: "Indica la fecha y hora del encuentro." });
+        return;
+      }
+      const r = await proponerEncuentro(token, trueke.id, {
+        puntoEncuentroId: puntoId,
+        horaPautada: new Date(hora).toISOString(),
+      });
+      setMensaje({
+        tipo: "ok",
+        texto: `Encuentro propuesto${r.propone ? ` por ${corta(r.propone)}` : ""}. La otra parte lo confirmará.`,
+      });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "no se pudo proponer";
+      // 403 → no es tu turno (la regla nivel→reputación→A la decide el backend)
+      setMensaje({ tipo: "err", texto: msg });
+    } finally {
+      setEnviando(false);
+    }
+  }
+
+  return (
+    <div className="mt-3 rounded-xl border border-navy-800/10 bg-smoke/60 p-3">
+      <p className="text-xs font-bold uppercase tracking-wide text-navy-800/60">
+        📍 Propuesta de encuentro (punto 5.1)
+      </p>
+      <p className="mt-1 text-[11px] text-navy-800/60">
+        Propone el punto + fecha + hora quien tenga mayor nivel/reputación (desempate: quien publicó el trueke).
+      </p>
+
+      {puntoSel ? (
+        <div className="mt-2">
+          <MapaOsm lat={puntoSel.lat} lng={puntoSel.lng} />
+          <p className="mt-1 text-[11px] text-navy-800/60">
+            📌 {puntoSel.direccion || `(${puntoSel.lat.toFixed(4)}, ${puntoSel.lng.toFixed(4)})`}
+          </p>
+        </div>
+      ) : (latNuevo && lngNuevo) ? (
+        <div className="mt-2">
+          <MapaOsm lat={Number(latNuevo)} lng={Number(lngNuevo)} />
+        </div>
+      ) : null}
+
+      <label className="mt-3 block text-[11px] font-semibold uppercase tracking-wide text-navy-800/60">
+        Punto (últimos usados — favoritos)
+        <select
+          className="mt-0.5 w-full rounded-lg border border-navy-800/10 bg-white px-2 py-1.5 text-xs outline-none focus:border-teal-500"
+          value={seleccion}
+          onChange={(e) => setSeleccion(e.target.value)}
+        >
+          <option value="">— Elegir punto favorito o crear uno nuevo —</option>
+          {favoritos.map((f) => (
+            <option key={f.puntoId} value={f.puntoId}>
+              {f.punto?.direccion || `Punto #${f.puntoId} (${f.punto?.lat.toFixed(3) ?? ""}, ${f.punto?.lng.toFixed(3) ?? ""})`}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <div className="mt-2 grid gap-2 sm:grid-cols-3">
+        <label className="block text-[11px] font-semibold uppercase tracking-wide text-navy-800/60">
+          Lat (nuevo)
+          <input
+            className="mt-0.5 w-full rounded-lg border border-navy-800/10 bg-white px-2 py-1.5 text-xs outline-none focus:border-teal-500"
+            value={latNuevo}
+            onChange={(e) => setLatNuevo(e.target.value)}
+            placeholder="-34.60"
+          />
+        </label>
+        <label className="block text-[11px] font-semibold uppercase tracking-wide text-navy-800/60">
+          Lng (nuevo)
+          <input
+            className="mt-0.5 w-full rounded-lg border border-navy-800/10 bg-white px-2 py-1.5 text-xs outline-none focus:border-teal-500"
+            value={lngNuevo}
+            onChange={(e) => setLngNuevo(e.target.value)}
+            placeholder="-58.38"
+          />
+        </label>
+        <label className="block text-[11px] font-semibold uppercase tracking-wide text-navy-800/60">
+          Dirección
+          <input
+            className="mt-0.5 w-full rounded-lg border border-navy-800/10 bg-white px-2 py-1.5 text-xs outline-none focus:border-teal-500"
+            value={dirNuevo}
+            onChange={(e) => setDirNuevo(e.target.value)}
+            placeholder="Plaza, café…"
+          />
+        </label>
+      </div>
+
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <Button variante="outline-navy" className="!px-3 !py-1 !text-xs" onClick={usarMiUbicacion}>
+          📡 Usar mi ubicación
+        </Button>
+        <label className="text-[11px] font-semibold uppercase tracking-wide text-navy-800/60">
+          Fecha y hora
+          <input
+            type="datetime-local"
+            className="ml-2 rounded-lg border border-navy-800/10 bg-white px-2 py-1.5 text-xs outline-none focus:border-teal-500"
+            value={hora}
+            onChange={(e) => setHora(e.target.value)}
+          />
+        </label>
+        <Button
+          className="!px-3 !py-1 !text-xs"
+          disabled={enviando}
+          onClick={() => void enviar()}
+        >
+          {enviando ? "Proponiendo…" : "🗓️ Proponer encuentro"}
+        </Button>
+      </div>
+
+      {mensaje && (
+        <p className={`mt-2 rounded-lg px-2 py-1.5 text-[11px] ${mensaje.tipo === "ok" ? "bg-teal-500/10 text-teal-700" : "bg-crimson/10 text-crimson"}`}>
+          {mensaje.texto}
+        </p>
+      )}
+    </div>
+  );
 }
 
 export default function PaginaIntercambio() {
@@ -646,6 +856,14 @@ export default function PaginaIntercambio() {
                       </span>
                     )}
                   </div>
+
+                  {/* Propuesta de encuentro (punto 5.1): solo en trueques acordados sin custodiar */}
+                  {(t.estado === "CREADO" || t.estado === "ACTIVO") &&
+                    t.usuarioB &&
+                    lado &&
+                    token && (
+                      <PanelPropuestaEncuentro trueke={t} token={token} />
+                    )}
                 </Card>
               );
             })}

@@ -26,6 +26,7 @@ import { crearRouterSubastas } from './routes/subastas.js';
 import { crearRouterFinanzas } from './routes/finanzas.js';
 import { crearRouterDisputas } from './routes/disputas.js';
 import { crearRouterGobernanza } from './routes/gobernanza.js';
+import { crearRouterPuntosEncuentro } from './routes/puntos-encuentro.js';
 
 /**
  * Crea la aplicación Express.
@@ -82,6 +83,7 @@ export function crearApp(deps = {}) {
   app.use('/finanzas', crearRouterFinanzas(deps));
   app.use('/disputas', crearRouterDisputas(deps));
   app.use('/gobernanza', crearRouterGobernanza(deps));
+  app.use('/puntos-encuentro', crearRouterPuntosEncuentro(deps));
 
   // 404 y manejo de errores
   app.use((_req, res) => res.status(404).json({ error: 'not_found' }));

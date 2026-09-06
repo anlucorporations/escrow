@@ -233,6 +233,10 @@ export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow
         puntoEncuentroId: Number(puntoEncuentroId),
         horaPautada: new Date(horaPautada).toISOString(),
       });
+      // El punto usado queda en los favoritos del que propone (punto 7: últimos usados)
+      try {
+        if (almacen.registrarUsoPunto) await almacen.registrarUsoPunto(req.wallet, Number(puntoEncuentroId));
+      } catch { /* el registro de uso es secundario */ }
       res.json({ trueke: actualizado, propone });
     } catch (e) { next(e); }
   });

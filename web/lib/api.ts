@@ -271,6 +271,45 @@ export function cerrarTrueke(token: string, id: number, lado: "A" | "B", conform
   return pedirAuth<{ trueke: Trueke; disputa?: Disputa }>(`/truekes/${id}/cierre`, token, { metodo: "POST", body: { lado, conforme } });
 }
 
+// ---------------------------------------------------------------------------
+// Puntos de encuentro (lógica maestra puntos 5.1 y 7)
+// ---------------------------------------------------------------------------
+export interface PuntoEncuentro {
+  id: number;
+  lat: number;
+  lng: number;
+  direccion?: string;
+  radioKm?: number;
+  aprobadoSocios?: boolean;
+  createdAt?: string;
+}
+
+export interface PuntoFavorito {
+  puntoId: number;
+  ultimoUso: string;
+  punto: PuntoEncuentro | null;
+}
+
+/** GET /puntos-encuentro/mios — mis puntos guardados. */
+export function misPuntosEncuentro(token: string): Promise<{ puntos: PuntoEncuentro[] }> {
+  return pedirAuth<{ puntos: PuntoEncuentro[] }>("/puntos-encuentro/mios", token);
+}
+
+/** POST /puntos-encuentro — crear un punto { lat, lng, direccion?, radioKm? }. */
+export function crearPuntoEncuentro(token: string, datos: { lat: number; lng: number; direccion?: string; radioKm?: number }): Promise<{ punto: PuntoEncuentro }> {
+  return pedirAuth<{ punto: PuntoEncuentro }>("/puntos-encuentro", token, { metodo: "POST", body: datos });
+}
+
+/** GET /puntos-encuentro/favoritos — últimos puntos usados (favoritos). */
+export function puntosFavoritos(token: string): Promise<{ favoritos: PuntoFavorito[] }> {
+  return pedirAuth<{ favoritos: PuntoFavorito[] }>("/puntos-encuentro/favoritos", token);
+}
+
+/** POST /puntos-encuentro/:id/usar — marca un punto como usado. */
+export function usarPuntoEncuentro(token: string, id: number): Promise<{ ok: boolean; uso?: { puntoId: number; ultimoUso: string } }> {
+  return pedirAuth<{ ok: boolean }>(`/puntos-encuentro/${id}/usar`, token, { metodo: "POST", body: {} });
+}
+
 /** POST /truekes — crear trueque. */
 export function crearTrueke(token: string, datos: { articuloAId: number; articuloBId: number; parteB: string; horaPautada?: string }): Promise<{ trueke: Trueke }> {
   return pedirAuth<{ trueke: Trueke }>("/truekes", token, { metodo: "POST", body: datos });
