@@ -171,7 +171,7 @@ export async function crearAlmacenPg(pool) {
 
     async listarArticulos() {
       const r = await pool.query(
-        `SELECT a.id, a.titulo, a.descripcion, a.rubro, a.categoria, a.disponible, a.created_at,
+        `SELECT a.id, a.titulo, a.descripcion, a.rubro, a.categoria, a.nft_token_id, a.disponible, a.created_at,
                 u.wallet AS usuario_wallet, u.nivel AS usuario_nivel
            FROM articulos a JOIN usuarios u ON u.id = a.usuario_id
           WHERE a.disponible = TRUE
@@ -183,6 +183,7 @@ export async function crearAlmacenPg(pool) {
         descripcion: f.descripcion ?? '',
         rubro: f.rubro,
         categoria: f.categoria ?? 'ARTICULO',
+        nftTokenId: f.nft_token_id !== null ? Number(f.nft_token_id) : null,
         disponible: f.disponible,
         createdAt: f.created_at.toISOString(),
         usuarioWallet: f.usuario_wallet.trim().toLowerCase(),
@@ -197,6 +198,17 @@ export async function crearAlmacenPg(pool) {
         [Number(id)]
       );
       return r.rowCount > 0;
+    },
+
+    /** Persiste el tokenId del NFT on-chain del artículo (lógica maestra punto 1). */
+    async fijarNftToken(id, tokenId) {
+      const r = await pool.query(
+        `UPDATE articulos SET nft_token_id = $2, updated_at = now() WHERE id = $1 RETURNING id, nft_token_id`,
+        [Number(id), tokenId === null ? null : Number(tokenId)]
+      );
+      if (r.rowCount === 0) return null;
+      const f = r.rows[0];
+      return { id: Number(f.id), nftTokenId: f.nft_token_id !== null ? Number(f.nft_token_id) : null };
     },
 
     // ------------------------------------------------------------ truekes (persistido)

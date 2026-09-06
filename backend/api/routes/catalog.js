@@ -11,7 +11,7 @@ import { requiereSesion, requiereEstado } from '../lib/auth.js';
 
 const LIMITE_ARTICULOS_POR_NIVEL = { INICIADO: 5, COMUN: 50, FRECUENTE: 100, SOCIO: 100 };
 
-export function crearRouterCatalog({ almacen }) {
+export function crearRouterCatalog({ almacen, minteadorNft }) {
   const r = Router();
 
   // POST /catalog/articulos — publicar artículo AtoA (requiere Verificado; RF-14.4/D14)
@@ -34,7 +34,35 @@ export function crearRouterCatalog({ almacen }) {
     const articulo = await almacen.crearArticulo({
       wallet: req.wallet, titulo, descripcion, rubro, categoria: categoria ?? 'ARTICULO', nftTokenId: nftTokenId ?? null, disponible: true,
     });
-    res.status(201).json({ articulo });
+
+    // Lógica maestra punto 1: cada ítem se convierte en un NFT (lo mintea la plataforma).
+    // Con red on-chain configurada → mint real; sin red → token simulado (aviso).
+    let minteo = null;
+    if (minteadorNft) {
+      try {
+        const uri = `data:application/json,${encodeURIComponent(JSON.stringify({
+          name: titulo,
+          description: descripcion ?? '',
+          rubro,
+          categoria: categoria ?? 'ARTICULO',
+        }))}`;
+        minteo = await minteadorNft.mintear(req.wallet, categoria ?? 'ARTICULO', uri);
+        if (minteo.nftTokenId !== null) {
+          await almacen.fijarNftToken(articulo.id, minteo.nftTokenId);
+          articulo.nftTokenId = minteo.nftTokenId;
+        }
+      } catch (e) {
+        minteo = { error: e instanceof Error ? e.message : 'minteo fallido' };
+        console.error('[catalog] minteo del artículo falló:', minteo.error);
+      }
+    }
+
+    res.status(201).json({
+      articulo,
+      nft: minteo
+        ? { tokenId: minteo.nftTokenId, simulado: Boolean(minteo.simulado), txHash: minteo.txHash ?? null, aviso: minteo.simulado ? 'sin red on-chain: token simulado (se minteará en producción)' : null }
+        : null,
+    });
   });
 
   // GET /catalog — catálogo público (wallet conectada puede ver ofertas — RF-14.3)

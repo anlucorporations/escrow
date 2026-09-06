@@ -18,6 +18,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { crearAlmacen } from './lib/almacen.js';
 import { crearAlmacenPg } from './lib/almacen-pg.js';
+import { crearMinteador } from './lib/nft-minter.js';
 import { iniciarServidor } from './app.js';
 import { crearIndexador } from '../indexador.js';
 import { RelayerEIP712 } from '../relayer.js';
@@ -60,6 +61,22 @@ async function main() {
     process.env.REGISTRY_ADDRESS ||
     contratos.SociosRegistry?.direccion ||
     null;
+
+  // ---- Minteo de NFT al publicar (lógica maestra punto 1) --------------------
+  // La plataforma (cuenta minter) convierte cada ítem del inventario en NFT.
+  // Config: NFT_ADDRESS (contrato TrueKeateNFT), MINTER_PRIVATE_KEY (cuenta
+  // operativa/relayer). Sin config → el minteo se simula en la API.
+  const nftAddress =
+    process.env.NFT_ADDRESS ||
+    (contratos.TrueKeateNFT && contratos.TrueKeateNFT.direccion) ||
+    null;
+  const minterPk = process.env.MINTER_PRIVATE_KEY || process.env.RELAYER_PRIVATE_KEY || null;
+  deps.minteadorNft = crearMinteador({ rpcUrl: rpc, nftAddress, minterPk, cadena: 'anvil/gcp' });
+  if (deps.minteadorNft.activo) {
+    console.log(`[index-gcp] Minteador NFT activo (contrato ${deps.minteadorNft.direccion} · minter ${deps.minteadorNft.minter})`);
+  } else {
+    console.warn('[index-gcp] Minteador NFT en MODO SIMULADO (falta NFT_ADDRESS/MINTER_PRIVATE_KEY o red).');
+  }
 
   // ---- Relayer EIP-712 (RF-09.2, RF-15.2) -----------------------------------
   const pkRelayer = process.env.RELAYER_PRIVATE_KEY;

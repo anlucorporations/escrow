@@ -78,6 +78,14 @@ export function crearAlmacen() {
       a.disponible = false;
       return a;
     },
+    /** Persiste el tokenId del NFT on-chain del artículo (lógica maestra punto 1). */
+    fijarNftToken(id, tokenId) {
+      const a = estado.articulos.get(Number(id));
+      if (!a) return null;
+      a.nftTokenId = tokenId;
+      a.updatedAt = new Date().toISOString();
+      return a;
+    },
     crearEncargo(e) {
       const id = proxEncargo++;
       estado.encargos.set(id, { id, estado: 'ACTIVO', createdAt: new Date().toISOString(), ...e });
