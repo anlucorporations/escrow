@@ -56,12 +56,12 @@
 
 | Punto de la lógica | Estado real hoy | Brecha |
 |---|---|---|
-| 1. NFT por ítem | `sc/src/TrueKeateNFT.sol` real (producción): mint solo por la plataforma (rol minter), categorías ARTICULO/SERVICIO/BIEN/CRIPTO, metadatos por token; Escrow solo acepta el NFT oficial vinculado; 9 tests Foundry nuevos | 🟢 hecho — el minteo automático al publicar (backend→relayer) y la UI de "se mintea al publicar" quedan para F3/F4 siguientes |
+| 1. NFT por ítem | `sc/src/TrueKeateNFT.sol` real (producción): mint solo por la plataforma (rol minter), categorías ARTICULO/SERVICIO/BIEN/CRIPTO, metadatos por token; Escrow solo acepta el NFT oficial vinculado; 9 tests Foundry nuevos | 🟢 hecho — **minteo automático operativo**: el backend mintea al publicar (nft-minter.js, relayer/minter); **desplegado en GCP** (contrato 0x638A…B44, minter=relayer) con mint real verificado on-chain |
 | 2. Alta desde Mi Trueke Central con "qué quiero recibir" | `/suite/dashboard` con alta de trueke ofertado (artículo propio + descripción + tipo requerido) → `POST /truekes/ofertas` | 🟢 hecho |
 | 3. Mercado = truekes de todos los tipos diferenciados | `/suite/mercado` lista ofertas PROPUESTO con icono/color por categoría + ficha modal | 🟢 hecho |
 | 4. Tipos (Artículo/Servicio/Bien/Cripto) | Enum `categoria_item` en BD + `articulos.categoria` + selector en Inventario + badge de tipo en Mercado | 🟢 hecho |
 | 5. B acuerda en el Mercado | Botón "Acordar intercambio" en la ficha (Verificado/Certificado) → `POST /truekes/:id/acordar` → CREADO | 🟢 hecho |
-| 5.1 Propuesta punto/fecha/hora por mayor rango + favoritos + mapa | Regla nivel D12 → reputación → A implementada en `POST /:id/propuesta-encuentro` (persiste punto+fecha/hora); **UI de mapa, lista de puntos favoritos y widgets fecha/hora en la web quedan pendientes** (módulo de geolocalización sin endpoints propios) | 🟡 parcial |
+| 5.1 Propuesta punto/fecha/hora por mayor rango + favoritos + mapa | Regla nivel D12 → reputación → A implementada en `POST /:id/propuesta-encuentro` (persiste punto+fecha/hora); **módulo de geolocalización completo** (router /puntos-encuentro con PostGIS, favoritos/últimos usados, panel web con mapa OSM embebido + geolocalización + fecha/hora) | 🟢 hecho — desplegado en GCP |
 | 6. Activo en Intercambio | El trueke acordado pasa a CREADO y aparece en `/suite/intercambio` con sus acciones | 🟢 hecho |
 | 7. Mis Truekes (ofertados/cerrados) + favoritos en el dashboard | Tarjeta real con Ofertados/Activos/Cerrados en `/suite/dashboard` (tabla `puntos_favoritos` creada; UI de favoritos pendiente) | 🟢 hecho (favoritos: 🟡) |
 | 8. Activos + en disputa en Intercambio | Intercambio marca los truekes EN_DISPUTA/RESOLUCION_SOCIOS con aviso; la gestión sigue en `/suite/disputas` | 🟢 hecho |
@@ -71,14 +71,16 @@
 
 - Alcance de "valoración del NFT recibido": ¿dimensiones D18 (aceptación/honestidad/seguridad/confiabilidad/compromiso) sobre el NFT, o solo 1–5 global?
 - Si la **firma Recibido Conforme/No Conforme** convive con el estado CUSTODIADO/APERTURA actual del escrow o sustituye la firma de recepción genérica (mapeo de estados al migrar).
-- Impacto en RF-05/RF-14 existentes y en los 61 tests Foundry / 32 backend / E2E al migrar.
-- **Minteo automático on-chain al publicar un ítem** (backend/relayer → `TrueKeateNFT.mint`) y la **UI del widget de mapa + favoritos de puntos de encuentro** (requiere módulo de geolocalización con endpoints propios; hoy la propuesta persiste punto+fecha/hora por id).
+- El **Escrow desplegado en GCP** aún no tiene `vincularTrueKeateNft` (se desplegó antes de F1): la restricción "solo NFT oficial" del escrow se activará al redesplegar el Escrow nuevo (requiere coordinar direcciones/trueques existentes).
 
 > ✅ **Resuelto por el director**: tipos = 4 categorías + combinaciones con icono/color; desempate = nivel → reputación → A; estado ofertado = PROPUESTO off-chain hasta el acuerdo.
 
-### Implementado (F1–F4)
+### Implementado (F1–F5 + pendientes P1–P3)
 
 - **F1 (sc)**: `TrueKeateNFT.sol` real con mint por la plataforma + categorías; Escrow con `vincularTrueKeateNft` (solo NFT oficial); Deploy actualizado; 9 tests Foundry nuevos → suite 71/71.
 - **F2 (bd)**: enum `estado_escrow` + `PROPUESTO`; enum `categoria_item`; `articulos.categoria`; `truekes.usuario_b` nullable + `descripcion_requerida`/`tipo_requerido`/`cierre_a`/`cierre_b`; tabla `puntos_favoritos`; migración idempotente validada en PG.
-- **F3 (api)**: `POST /truekes/ofertas`, `GET /truekes/ofertas`, `POST /:id/acordar`, `POST /:id/propuesta-encuentro`, `POST /:id/cierre`; catálogo con categoría; almacenes memoria+pg; tests 2 nuevos → suite backend 34/34 + smoke pg OK.
-- **F4 (web)**: Mercado con ofertas + ficha modal + Acordar; dashboard Mis Truekes (Ofertados/Activos/Cerrados) + alta de oferta; Intercambio con cierre Conforme/No Conforme; Inventario con categorías → E2E 43 passed / 3 skipped.
+- **F3 (api)**: `POST /truekes/ofertas`, `GET /truekes/ofertas`, `POST /:id/acordar`, `POST /:id/propuesta-encuentro`, `POST /:id/cierre`; catálogo con categoría; almacenes memoria+pg; tests → suite backend 34/34 + smoke pg OK.
+- **F4 (web)**: Mercado con ofertas + ficha modal + Acordar; dashboard Mis Truekes (Ofertados/Activos/Cerrados) + alta de oferta; Intercambio con cierre Conforme/No Conforme; Inventario con categorías → E2E 43/3.
+- **P1 (minteo automático)**: `api/lib/nft-minter.js` — la plataforma mintea cada ítem al publicar (mint on-chain real con red, simulado sin red); `POST /catalog/articulos` persiste `nft_token_id`; `fijarNftToken` en ambos almacenes. **Desplegado en GCP** (TrueKeateNFT real 0x638A…B44, minter = relayer; mint verificado on-chain tokenId 1 y 2).
+- **P2 (geolocalización)**: router `/puntos-encuentro` (crear con PostGIS, `/mios`, `/favoritos` = últimos usados punto 7, `/:id/usar`); la propuesta de encuentro registra el punto usado; web con panel de propuesta (mapa OSM embebido, selector de favoritos, lat/lng o geolocalización, fecha/hora). Tests backend 39/39; E2E 43/3.
+- **P3 (GCP)**: migración F2 aplicada en Cloud SQL de producción; NFT real desplegado en el anvil remoto; secretos `NFT_ADDRESS` creados; api y web redesplegadas (revisiones 00010); verificación E2E en producción OK.
