@@ -3148,7 +3148,7 @@
   ]
  },
  "TrueKeateNFT": {
-  "direccion": "",
+  "direccion": "0x638A246F0Ec8883eF68280293FFE8Cfbabe61B44",
   "abi": [
    {
     "type": "constructor",
