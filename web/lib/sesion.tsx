@@ -23,10 +23,12 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
 import { useEthereum } from "./ethereum";
+import { BrowserProvider } from "ethers";
 import { firmarAccion as firmarConSigner, mensajeAccion, type FirmaAccion } from "./firma";
 import {
   consultarEstado,
@@ -50,8 +52,10 @@ export interface Sesion {
   /** Cierra la sesión (borra el token). */
   cerrarSesion: () => void;
   /** Fuerza una re-consulta del estado de inscripción de la wallet actual.
-   *  Devuelve el estado consultado para poder encadenar acciones (login único). */
-  refrescar: () => Promise<EstadoAcceso>;
+   *  Devuelve el estado consultado para poder encadenar acciones (login único).
+   *  `wallet` (opcional): wallet explícita recién conectada; evita depender de
+   *  que el estado de React ya se haya propagado (reconexión con OTRA wallet). */
+  refrescar: (wallet?: string) => Promise<EstadoAcceso>;
   /** Ejecuta la inscripción formal y refresca el acceso. */
   inscribir: (datos: {
     correo: string;
@@ -79,27 +83,45 @@ export function SesionProvider({ children }: { children: ReactNode }) {
     return localStorage.getItem(CLAVE_TOKEN);
   });
   const [autenticando, setAutenticando] = useState(false);
-
-  const refrescar = useCallback(async (): Promise<EstadoAcceso> => {
-    if (!account) {
-      setAcceso({ fase: "sinWallet" });
-      return { fase: "sinWallet" };
-    }
-    // Refresco "en caliente": si ya tenemos una sesión inscrita (p. ej. tras
-    // completar la verificación/KYC), actualizamos el usuario SIN pasar por la
-    // fase "verificando" (que desmontaría el contenido del guard — remount).
-    // La fase "verificando" solo aplica al inicio/cambio de cuenta.
-    setAcceso((prev) =>
-      prev.fase === "inscrito" ? prev : { fase: "verificando" }
-    );
-    const estado = await consultarEstado(account);
-    const nuevo: EstadoAcceso =
-      estado.inscrito && estado.usuario
-        ? { fase: "inscrito", usuario: estado.usuario }
-        : { fase: "conectadoNoInscrito" };
-    setAcceso(nuevo);
-    return nuevo;
+  // Cuenta vigente en cada render: sirve para descartar respuestas ASYNC de una
+  // wallet que ya no está conectada (desconexión o cambio a OTRA wallet).
+  const cuentaRef = useRef<string | null>(null);
+  useEffect(() => {
+    cuentaRef.current = account;
   }, [account]);
+
+  const refrescar = useCallback(
+    async (wallet?: string): Promise<EstadoAcceso> => {
+      // Wallet a consultar: la explícita (recién conectada) o la del estado.
+      const cuentaConsultada = (wallet ?? account ?? "").toLowerCase();
+      if (!cuentaConsultada) {
+        setAcceso({ fase: "sinWallet" });
+        return { fase: "sinWallet" };
+      }
+      // Refresco "en caliente": si ya tenemos una sesión inscrita (p. ej. tras
+      // completar la verificación/KYC), actualizamos el usuario SIN pasar por la
+      // fase "verificando" (que desmontaría el contenido del guard — remount).
+      // La fase "verificando" solo aplica al inicio/cambio de cuenta.
+      setAcceso((prev) =>
+        prev.fase === "inscrito" ? prev : { fase: "verificando" }
+      );
+      const estado = await consultarEstado(cuentaConsultada);
+      // Guardia anti-carrera SOLO en refrescos implícitos (sin wallet explícita):
+      // si mientras consultábamos la cuenta cambió o se desconectó, descartar el
+      // resultado de la wallet anterior. Con wallet explícita (la acaba de
+      // conectar el botón en este mismo gesto) no aplica la carrera.
+      if (!wallet && cuentaRef.current !== cuentaConsultada) {
+        return { fase: "sinWallet" };
+      }
+      const nuevo: EstadoAcceso =
+        estado.inscrito && estado.usuario
+          ? { fase: "inscrito", usuario: estado.usuario }
+          : { fase: "conectadoNoInscrito" };
+      setAcceso(nuevo);
+      return nuevo;
+    },
+    [account]
+  );
 
   // Al conectar/desconectar o cambiar de cuenta, consulta el estado de inscripción
   // y reconcilia el token guardado con la cuenta activa (login persistente).
@@ -124,14 +146,21 @@ export function SesionProvider({ children }: { children: ReactNode }) {
 
   // Firma EIP-191 única → POST /auth/session → token global (login con wallet).
   const autenticar = useCallback(async (): Promise<boolean> => {
-    if (!signer || !account) return false;
     setAutenticando(true);
     try {
-      const firma = await signer.signMessage("TrueKeate: iniciar sesión");
+      // Provider/signer FRESCOS en el momento de firmar: se firma con la wallet
+      // ACTIVA ahora mismo en MetaMask (la que el usuario acaba de elegir), sin
+      // depender del estado de React (que puede no haberse propagado aún tras
+      // reconectar con OTRA wallet).
+      if (typeof window === "undefined" || !window.ethereum) return false;
+      const bp = new BrowserProvider(window.ethereum);
+      const signerFresco = await bp.getSigner();
+      const walletFirmante = (await signerFresco.getAddress()).toLowerCase();
+      const firma = await signerFresco.signMessage("TrueKeate: iniciar sesión");
       const sesion = await iniciarSesion(firma);
       setToken(sesion.token);
       localStorage.setItem(CLAVE_TOKEN, sesion.token);
-      localStorage.setItem(CLAVE_TOKEN_WALLET, account);
+      localStorage.setItem(CLAVE_TOKEN_WALLET, walletFirmante);
       return true;
     } catch (e) {
       console.error("[sesion] fallo de autenticación:", e);
@@ -139,7 +168,7 @@ export function SesionProvider({ children }: { children: ReactNode }) {
     } finally {
       setAutenticando(false);
     }
-  }, [signer, account]);
+  }, []);
 
   // Firma por acción: usa el signer de la wallet conectada (EIP-191).
   const firmarAccion = useCallback(

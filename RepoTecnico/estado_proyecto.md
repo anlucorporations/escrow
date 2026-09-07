@@ -352,6 +352,23 @@ criterios Gherkin/EARS alineados), `arquitectura_tecnica.md` (secciones 1–10, 
 4. Mejoras futuras opcionales (fuera de alcance): APK nativa (D40), integración con `mcc-postgres` real en GCP (D25), auditoría externa de seguridad previa a producción (D24), integración del 1 % de trueques al FondoDeValor (D7, marcado "pendiente de confirmar" en manuales), root merkle real del KYC para la escalera on-chain del Owner (D28).
 5. Los commits se crean localmente en `escrow-dsh-GCP`; el push a GitHub/GitLab se hace solo por orden del director (`/push`).
 
+## Bug fix — Desconectar billetera y reconectar con OTRA wallet (reporte del director)
+
+**Reporte**: "al usar el botón Desconectar del menú de usuario no desconecta y al tratar de conectarme con otra wallet el proyecto queda con la wallet anterior".
+
+**Causa raíz (3 fallas)**:
+1. `desconectar()` limpiaba el estado local pero NO revocaba el permiso `eth_accounts` en MetaMask (`wallet_revokePermissions`): el siguiente `eth_requestAccounts` devolvía la cuenta ANTERIOR sin mostrar el selector → imposible elegir otra wallet.
+2. `conectar()` no garantizaba provider/signer frescos para la cuenta recién elegida.
+3. El login único (`BotonConectarLogin` → `refrescar()`/`autenticar()`) dependía del estado de React, que aún no reflejaba la cuenta recién conectada → la firma se saltaba (en MetaMask real el popup daba tiempo a vaciar el estado; en reconexión inmediata no).
+
+**Fix** (`web/lib/ethereum.tsx`, `web/lib/sesion.tsx`, `web/components/BotonConectarLogin.tsx`):
+- `desconectar()` ahora llama `wallet_revokePermissions({eth_accounts:{}})` (con fallback silencioso si la wallet no lo soporta), limpia provider y persiste la desconexión.
+- `fijarCuenta(cuentas, bp?)` fija SIEMPRE provider+signer frescos; `conectar()` crea un `BrowserProvider` nuevo por conexión.
+- `autenticar()` firma con un provider/signer FRESCO creado en el momento (firma con la wallet activa en MetaMask, sin depender del estado).
+- `refrescar(wallet?)` acepta la wallet explícita recién conectada; la guardia anti-carrera solo aplica a refrescos implícitos (evita restaurar la sesión de una wallet que ya no está conectada).
+
+**Pruebas**: nuevo E2E `web/e2e/desconectar-reconectar.spec.ts` (desconectar limpia estado+permiso, la recarga no revive la wallet anterior, reconectar elige la wallet nueva y el token queda ligado a ella). Suite E2E completa de regresión ejecutada.
+
 ## Ciclo 10 — Siete ajustes aprobados por el director (implementados, pendiente push/despliegue)
 
 Decisión del director (bloques de 3 preguntas) e implementación, ver `RepoTecnico/logica_trueke.md` §7:
