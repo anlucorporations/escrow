@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useEthereum } from "@/lib/ethereum";
 import { useSesion } from "@/lib/sesion";
 import {
+  API_URL,
   ofertasMercado,
   acordarOferta,
   obtenerCatalogo,
@@ -75,9 +76,14 @@ function categoriaDeArticulo(articulos: ArticuloCatalogo[], id: number | null): 
   return articulos.find((a) => a.id === id)?.categoria ?? null;
 }
 
+function imagenesDeArticulo(articulos: ArticuloCatalogo[], id: number | null): { id: number; url: string }[] {
+  if (!id) return [];
+  return articulos.find((a) => a.id === id)?.imagenes ?? [];
+}
+
 export default function PaginaMercado() {
   const { account } = useEthereum();
-  const { acceso, token } = useSesion();
+  const { acceso, token, firmarAccion } = useSesion();
   const [ofertas, setOfertas] = useState<Trueke[]>([]);
   const [articulos, setArticulos] = useState<ArticuloCatalogo[]>([]);
   const [cargando, setCargando] = useState(true);
@@ -128,7 +134,9 @@ export default function PaginaMercado() {
     setAcordando(true);
     setMensaje(null);
     try {
-      const r = await acordarOferta(token, t.id, Number(miArticulo));
+      const firma = await firmarAccion("acordar trueque");
+      if (!firma) throw new Error("Firma requerida: desbloquea tu billetera.");
+      const r = await acordarOferta(token, t.id, Number(miArticulo), firma);
       setMensaje({ tipo: "ok", texto: "Intercambio acordado. Pasa a tu sección Intercambio como Activo." });
       setSeleccion(null);
       setMiArticulo("");
@@ -217,6 +225,12 @@ export default function PaginaMercado() {
                 onClick={() => { setSeleccion(t); setMensaje(null); setMiArticulo(""); }}
               >
                 <Card className="flex h-full flex-col p-4 transition hover:shadow-md">
+                {(() => {
+                  const imgs = imagenesDeArticulo(articulos, t.articuloAId);
+                  return imgs.length > 0 ? (
+                    <img src={`${API_URL}${imgs[0].url}`} alt={t.tituloA ?? ""} className="mb-3 h-36 w-full rounded-xl border border-navy-800/10 object-cover" />
+                  ) : null;
+                })()}
                 <div className="flex items-start gap-3">
                   <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-xl ${tipo.color}`}>
                     {tipo.icono}
@@ -252,8 +266,16 @@ export default function PaginaMercado() {
             {(() => {
               const catA = categoriaDeArticulo(articulos, seleccion.articuloAId) ?? "ARTICULO";
               const tipo = CATEGORIAS[catA] ?? CATEGORIAS.ARTICULO;
+              const imgsModal = imagenesDeArticulo(articulos, seleccion.articuloAId);
               return (
             <>
+            {imgsModal.length > 0 && (
+              <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
+                {imgsModal.map((im) => (
+                  <img key={im.id} src={`${API_URL}${im.url}`} alt={seleccion.tituloA ?? ""} className="h-32 w-32 shrink-0 rounded-xl border border-navy-800/10 object-cover" />
+                ))}
+              </div>
+            )}
             <div className="flex items-start justify-between gap-2">
               <div className="flex items-center gap-3">
                 <span className={`flex h-12 w-12 items-center justify-center rounded-xl text-2xl ${tipo.color}`}>

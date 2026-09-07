@@ -14,9 +14,18 @@ import { ethers } from 'ethers';
 
 let app, server, almacen;
 
-const wA = ethers.Wallet.createRandom().address.toLowerCase();
-const wB = ethers.Wallet.createRandom().address.toLowerCase();
+const walletA = ethers.Wallet.createRandom();
+const walletB = ethers.Wallet.createRandom();
+const wA = walletA.address.toLowerCase();
+const wB = walletB.address.toLowerCase();
 const wOwner = ethers.Wallet.createRandom().address.toLowerCase();
+
+/** Firma EIP-191 por acción (decisión del director: firma con la billetera). */
+async function firmaAccionDe(wallet, accion) {
+  const mensaje = `TrueKeate: ${accion} (ts=${Date.now()})`;
+  const firma = await wallet.signMessage(mensaje);
+  return { mensaje, firma };
+}
 
 function sesion(w) {
   const token = 'tok-' + w.slice(2, 10);
@@ -43,13 +52,14 @@ async function certificar(w) {
 async function escenarioTrueque() {
   const tokA = await certificar(wA);
   const tokB = await certificar(wB);
-  const artA = await request(app).post('/catalog/articulos').set('Authorization', `Bearer ${tokA}`).send({ titulo: 'Objeto A', rubro: 'Hogar' });
-  const artB = await request(app).post('/catalog/articulos').set('Authorization', `Bearer ${tokB}`).send({ titulo: 'Objeto B', rubro: 'Hogar' });
+  const artA = await request(app).post('/catalog/articulos').set('Authorization', `Bearer ${tokA}`).send({ titulo: 'Objeto A', rubro: 'Hogar', ...(await firmaAccionDe(walletA, 'publicar artículo')) });
+  const artB = await request(app).post('/catalog/articulos').set('Authorization', `Bearer ${tokB}`).send({ titulo: 'Objeto B', rubro: 'Hogar', ...(await firmaAccionDe(walletB, 'publicar artículo')) });
   const c = await request(app).post('/truekes').set('Authorization', `Bearer ${tokA}`).send({
     parteB: wB, articuloAId: artA.body.articulo.id, articuloBId: artB.body.articulo.id,
+    ...(await firmaAccionDe(walletA, 'crear trueque')),
   });
-  await request(app).post(`/truekes/${c.body.trueke.id}/custodiar`).set('Authorization', `Bearer ${tokA}`).send({ lado: 'A' });
-  await request(app).post(`/truekes/${c.body.trueke.id}/custodiar`).set('Authorization', `Bearer ${tokB}`).send({ lado: 'B' });
+  await request(app).post(`/truekes/${c.body.trueke.id}/custodiar`).set('Authorization', `Bearer ${tokA}`).send({ lado: 'A', ...(await firmaAccionDe(walletA, 'custodiar trueque')) });
+  await request(app).post(`/truekes/${c.body.trueke.id}/custodiar`).set('Authorization', `Bearer ${tokB}`).send({ lado: 'B', ...(await firmaAccionDe(walletB, 'custodiar trueque')) });
   return { tokA, tokB, truekeId: c.body.trueke.id };
 }
 

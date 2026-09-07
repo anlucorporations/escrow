@@ -9,6 +9,7 @@
 // Solo usa lib/api.ts + lib/useSesionAutenticada.ts; el backend ya lo soporta.
 // =============================================================================
 import { useCallback, useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import { useEthereum } from "@/lib/ethereum";
 import { useSesion } from "@/lib/sesion";
 import { useSesionAutenticada } from "@/lib/useSesionAutenticada";
@@ -18,11 +19,13 @@ import {
   cerrarTrueke,
   firmarRecepcion,
   misTruekes,
-  obtenerCatalogo,
   proponerEncuentro,
   puntosFavoritos,
   crearPuntoEncuentro,
   valorarTrueke,
+  contactoTrueke,
+  aceptarEncuentro,
+  rechazarEncuentro,
   type ArticuloCatalogo,
   type Trueke,
   type PuntoFavorito,
@@ -31,6 +34,12 @@ import {
 import { Card } from "@/components/Card";
 import { Button } from "@/components/Button";
 import { StatusBadge } from "@/components/StatusBadge";
+
+// Leaflet usa `window` al cargarse → solo cliente (evita romper el SSR).
+const MapaWidget = dynamic(
+  () => import("@/components/MapaWidget").then((m) => m.MapaWidget),
+  { ssr: false, loading: () => null }
+);
 
 /** Estados que cuentan como trueque "activo" (RF-14.4, mismo criterio del backend). */
 const ESTADOS_ACTIVOS = ["CREADO", "ACTIVO", "CUSTODIADO", "APERTURA"];
@@ -45,19 +54,6 @@ const DIMENSIONES = [
   { clave: "confiabilidad", label: "Confiabilidad" },
   { clave: "compromiso", label: "Compromiso" },
 ] as const;
-
-/** El catálogo puede llegar con `usuarioWallet` (pg) o `wallet` (memoria). */
-interface ArticuloUi extends ArticuloCatalogo {
-  wallet?: string;
-}
-
-const CLASE_CAMPO =
-  "mt-1 w-full rounded-xl border border-navy-800/10 bg-smoke px-3 py-2 text-sm text-navy-800 " +
-  "outline-none focus:border-teal-500 disabled:opacity-50";
-
-function propietarioDe(a: ArticuloUi): string {
-  return (a.usuarioWallet ?? a.wallet ?? "").toLowerCase();
-}
 
 function corta(wallet: string | null | undefined): string {
   if (!wallet) return "—";
@@ -85,43 +81,21 @@ function horaBonita(s: string | null | undefined): string | null {
   });
 }
 
-/** Mapa OSM embebido (sin API key) para el punto seleccionado — punto 5.1. */
-function MapaOsm({ lat, lng }: { lat: number; lng: number }) {
-  const margen = 0.01;
-  const bbox = `${lng - margen},${lat - margen},${lng + margen},${lat + margen}`;
-  const src = `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(
-    bbox
-  )}&layer=mapnik&marker=${lat},${lng}`;
-  return (
-    <div className="overflow-hidden rounded-xl border border-navy-800/10">
-      <iframe
-        title="Mapa del punto de encuentro"
-        src={src}
-        className="h-44 w-full"
-        loading="lazy"
-      />
-    </div>
-  );
-}
-
-/**
- * Propuesta de encuentro (punto 5.1): el de mayor nivel/reputación propone el
- * punto (últimos usados como favoritos), la fecha y la hora con mapa OSM.
- */
+/** Widget flotante de mapa para la propuesta de encuentro (punto 4 del director). */
 function PanelPropuestaEncuentro({ trueke, token }: { trueke: Trueke; token: string }) {
-  const [favoritos, setFavoritos] = useState<PuntoFavorito[]>([]);
-  const [seleccion, setSeleccion] = useState("");
+  const { firmarAccion } = useSesion();
+  const [favoritos, setFavoritos] = useState<PuntoEncuentro[]>([]);
   const [hora, setHora] = useState("");
-  const [latNuevo, setLatNuevo] = useState("");
-  const [lngNuevo, setLngNuevo] = useState("");
-  const [dirNuevo, setDirNuevo] = useState("");
+  const [mapaAbierto, setMapaAbierto] = useState(false);
+  const [puntoNuevo, setPuntoNuevo] = useState<{ lat: number; lng: number; direccion: string } | null>(null);
+  const [puntoIdElegido, setPuntoIdElegido] = useState<number | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [mensaje, setMensaje] = useState<{ tipo: "ok" | "err"; texto: string } | null>(null);
 
   const cargar = useCallback(async () => {
     try {
       const r = await puntosFavoritos(token);
-      setFavoritos(r.favoritos ?? []);
+      setFavoritos((r.favoritos ?? []).map((x) => x.punto).filter(Boolean) as PuntoEncuentro[]);
     } catch {
       setFavoritos([]);
     }
@@ -131,23 +105,19 @@ function PanelPropuestaEncuentro({ trueke, token }: { trueke: Trueke; token: str
     void cargar();
   }, [cargar]);
 
-  const puntoSel: PuntoEncuentro | null =
-    favoritos.find((f) => String(f.puntoId) === seleccion)?.punto ?? null;
-
-  /** Usa la geolocalización del navegador para prellenar un punto nuevo. */
-  function usarMiUbicacion() {
-    if (!("geolocation" in navigator)) {
-      setMensaje({ tipo: "err", texto: "Tu navegador no ofrece geolocalización; ingresa lat/lng." });
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLatNuevo(String(pos.coords.latitude));
-        setLngNuevo(String(pos.coords.longitude));
-        setMensaje({ tipo: "ok", texto: "Ubicación capturada. Ajusta la dirección y propón." });
-      },
-      () => setMensaje({ tipo: "err", texto: "No se pudo obtener tu ubicación; ingresa lat/lng." })
+  /** Al confirmar en el widget se incrustan los datos en el formulario (punto 4). */
+  function alConfirmarMapa(r: { lat: number; lng: number; direccion: string }) {
+    // Si coincide con un favorito ya guardado, se reutiliza su id (sin duplicar).
+    const fav = favoritos.find(
+      (x) => Math.abs(x.lat - r.lat) < 1e-5 && Math.abs(x.lng - r.lng) < 1e-5
     );
+    setPuntoIdElegido(fav?.id ?? null);
+    setPuntoNuevo(r);
+    setMapaAbierto(false);
+    setMensaje({
+      tipo: "ok",
+      texto: `Punto incrustado: ${r.direccion || `${r.lat.toFixed(4)}, ${r.lng.toFixed(4)}`}${fav ? " (favorito)" : ""}. Fija la fecha/hora y propón.`,
+    });
   }
 
   async function enviar() {
@@ -155,36 +125,35 @@ function PanelPropuestaEncuentro({ trueke, token }: { trueke: Trueke; token: str
     setEnviando(true);
     setMensaje(null);
     try {
-      let puntoId: number | null = null;
-      if (seleccion) {
-        puntoId = Number(seleccion);
-      } else if (latNuevo && lngNuevo) {
-        const creado = await crearPuntoEncuentro(token, {
-          lat: Number(latNuevo),
-          lng: Number(lngNuevo),
-          direccion: dirNuevo || undefined,
-        });
-        puntoId = creado.punto.id;
-      }
-      if (!puntoId) {
-        setMensaje({ tipo: "err", texto: "Elige un punto de encuentro o crea uno nuevo." });
+      if (!puntoNuevo) {
+        setMensaje({ tipo: "err", texto: "Abre el mapa e incrusta un punto de encuentro." });
         return;
       }
       if (!hora) {
         setMensaje({ tipo: "err", texto: "Indica la fecha y hora del encuentro." });
         return;
       }
+      let puntoId = puntoIdElegido;
+      if (!puntoId) {
+        const creado = await crearPuntoEncuentro(token, {
+          lat: puntoNuevo.lat,
+          lng: puntoNuevo.lng,
+          direccion: puntoNuevo.direccion || undefined,
+        });
+        puntoId = creado.punto.id;
+      }
+      const firmaProp = await firmarAccion("proponer encuentro");
+      if (!firmaProp) throw new Error("Firma requerida: desbloquea tu billetera.");
       const r = await proponerEncuentro(token, trueke.id, {
         puntoEncuentroId: puntoId,
         horaPautada: new Date(hora).toISOString(),
-      });
+      }, firmaProp);
       setMensaje({
         tipo: "ok",
         texto: `Encuentro propuesto${r.propone ? ` por ${corta(r.propone)}` : ""}. La otra parte lo confirmará.`,
       });
     } catch (e) {
       const msg = e instanceof Error ? e.message : "no se pudo proponer";
-      // 403 → no es tu turno (la regla nivel→reputación→A la decide el backend)
       setMensaje({ tipo: "err", texto: msg });
     } finally {
       setEnviando(false);
@@ -197,71 +166,13 @@ function PanelPropuestaEncuentro({ trueke, token }: { trueke: Trueke; token: str
         📍 Propuesta de encuentro (punto 5.1)
       </p>
       <p className="mt-1 text-[11px] text-navy-800/60">
-        Propone el punto + fecha + hora quien tenga mayor nivel/reputación (desempate: quien publicó el trueke).
+        Propone quien tenga mayor nivel/reputación (desempate: quien publicó). La contraparte solo acepta o rechaza.
       </p>
 
-      {puntoSel ? (
-        <div className="mt-2">
-          <MapaOsm lat={puntoSel.lat} lng={puntoSel.lng} />
-          <p className="mt-1 text-[11px] text-navy-800/60">
-            📌 {puntoSel.direccion || `(${puntoSel.lat.toFixed(4)}, ${puntoSel.lng.toFixed(4)})`}
-          </p>
-        </div>
-      ) : (latNuevo && lngNuevo) ? (
-        <div className="mt-2">
-          <MapaOsm lat={Number(latNuevo)} lng={Number(lngNuevo)} />
-        </div>
-      ) : null}
-
-      <label className="mt-3 block text-[11px] font-semibold uppercase tracking-wide text-navy-800/60">
-        Punto (últimos usados — favoritos)
-        <select
-          className="mt-0.5 w-full rounded-lg border border-navy-800/10 bg-white px-2 py-1.5 text-xs outline-none focus:border-teal-500"
-          value={seleccion}
-          onChange={(e) => setSeleccion(e.target.value)}
-        >
-          <option value="">— Elegir punto favorito o crear uno nuevo —</option>
-          {favoritos.map((f) => (
-            <option key={f.puntoId} value={f.puntoId}>
-              {f.punto?.direccion || `Punto #${f.puntoId} (${f.punto?.lat.toFixed(3) ?? ""}, ${f.punto?.lng.toFixed(3) ?? ""})`}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <div className="mt-2 grid gap-2 sm:grid-cols-3">
-        <label className="block text-[11px] font-semibold uppercase tracking-wide text-navy-800/60">
-          Lat (nuevo)
-          <input
-            className="mt-0.5 w-full rounded-lg border border-navy-800/10 bg-white px-2 py-1.5 text-xs outline-none focus:border-teal-500"
-            value={latNuevo}
-            onChange={(e) => setLatNuevo(e.target.value)}
-            placeholder="-34.60"
-          />
-        </label>
-        <label className="block text-[11px] font-semibold uppercase tracking-wide text-navy-800/60">
-          Lng (nuevo)
-          <input
-            className="mt-0.5 w-full rounded-lg border border-navy-800/10 bg-white px-2 py-1.5 text-xs outline-none focus:border-teal-500"
-            value={lngNuevo}
-            onChange={(e) => setLngNuevo(e.target.value)}
-            placeholder="-58.38"
-          />
-        </label>
-        <label className="block text-[11px] font-semibold uppercase tracking-wide text-navy-800/60">
-          Dirección
-          <input
-            className="mt-0.5 w-full rounded-lg border border-navy-800/10 bg-white px-2 py-1.5 text-xs outline-none focus:border-teal-500"
-            value={dirNuevo}
-            onChange={(e) => setDirNuevo(e.target.value)}
-            placeholder="Plaza, café…"
-          />
-        </label>
-      </div>
-
+      {/* Botón que abre el widget flotante del mapa */}
       <div className="mt-2 flex flex-wrap items-center gap-2">
-        <Button variante="outline-navy" className="!px-3 !py-1 !text-xs" onClick={usarMiUbicacion}>
-          📡 Usar mi ubicación
+        <Button className="!px-3 !py-1.5 !text-xs" onClick={() => setMapaAbierto(true)}>
+          🗺️ Señalar en el mapa
         </Button>
         <label className="text-[11px] font-semibold uppercase tracking-wide text-navy-800/60">
           Fecha y hora
@@ -272,35 +183,85 @@ function PanelPropuestaEncuentro({ trueke, token }: { trueke: Trueke; token: str
             onChange={(e) => setHora(e.target.value)}
           />
         </label>
-        <Button
-          className="!px-3 !py-1 !text-xs"
-          disabled={enviando}
-          onClick={() => void enviar()}
-        >
+        <Button className="!px-3 !py-1.5 !text-xs" disabled={enviando} onClick={() => void enviar()}>
           {enviando ? "Proponiendo…" : "🗓️ Proponer encuentro"}
         </Button>
       </div>
+
+      {/* Punto incrustado por el widget */}
+      {puntoNuevo && (
+        <div className="mt-2 rounded-lg border border-teal-500/30 bg-teal-500/5 px-2 py-1.5 text-[11px] text-navy-800/80">
+          📌 Punto: {puntoNuevo.direccion || `(${puntoNuevo.lat.toFixed(4)}, ${puntoNuevo.lng.toFixed(4)})`}
+          <span className="ml-2 font-mono text-[10px] text-navy-800/50">
+            {puntoNuevo.lat.toFixed(5)}, {puntoNuevo.lng.toFixed(5)}
+          </span>
+        </div>
+      )}
 
       {mensaje && (
         <p className={`mt-2 rounded-lg px-2 py-1.5 text-[11px] ${mensaje.tipo === "ok" ? "bg-teal-500/10 text-teal-700" : "bg-crimson/10 text-crimson"}`}>
           {mensaje.texto}
         </p>
       )}
+
+      {/* Widget flotante del mapa */}
+      <MapaWidget
+        abierto={mapaAbierto}
+        favoritos={favoritos}
+        inicial={puntoNuevo}
+        onCerrar={() => setMapaAbierto(false)}
+        onConfirmar={alConfirmarMapa}
+      />
+    </div>
+  );
+}
+
+function ContactoContraparte({ trueke, lado, token }: { trueke: Trueke; lado: "A" | "B" | null; token: string }) {
+  const [info, setInfo] = useState<{ telefono: string | null; correo: string | null; wallet: string } | null>(null);
+  const [oculto, setOculto] = useState(false);
+  const [errorC, setErrorC] = useState(false);
+  const activo = ["CREADO", "ACTIVO", "CUSTODIADO", "APERTURA", "EN_DISPUTA", "RESOLUCION_SOCIOS"].includes(trueke.estado);
+
+  useEffect(() => {
+    let vivo = true;
+    setInfo(null);
+    setOculto(false);
+    setErrorC(false);
+    if (!token || !lado || !activo) return;
+    contactoTrueke(token, trueke.id)
+      .then((r) => {
+        if (!vivo) return;
+        if (r.oculto) setOculto(true);
+        else setInfo(r.contacto);
+      })
+      .catch(() => vivo && setErrorC(true));
+    return () => { vivo = false; };
+  }, [token, trueke.id, trueke.estado, lado, activo]);
+
+  if (!activo || !lado || !token) return null;
+  if (oculto) return null;
+  if (errorC) return null;
+  if (!info) return null;
+  return (
+    <div className="mt-2 rounded-xl border border-teal-500/20 bg-teal-500/5 px-3 py-2 text-xs text-navy-800/80">
+      <p className="font-semibold text-navy-800">📞 Contacto de la contraparte</p>
+      {info.telefono && <p>📱 {info.telefono}</p>}
+      {info.correo && <p>✉️ {info.correo}</p>}
+      {!info.telefono && !info.correo && <p className="text-navy-800/50">Sin teléfono/correo registrado.</p>}
+      <p className="mt-0.5 text-[10px] text-navy-800/40">Visible mientras el trueque esté activo (se oculta al cerrar).</p>
     </div>
   );
 }
 
 export default function PaginaIntercambio() {
   const { account } = useEthereum();
-  const { acceso } = useSesion();
+  const { acceso, firmarAccion } = useSesion();
   const { token, error: errorSesion } = useSesionAutenticada();
 
   const usuario = acceso.fase === "inscrito" ? acceso.usuario : null;
   const estadoD28 = usuario?.estado ?? "INSCRITO";
-  const puedeCrear = estadoD28 === "VERIFICADO" || estadoD28 === "CERTIFICADO";
 
   // ---------------------------------------------------------------- datos
-  const [catalogo, setCatalogo] = useState<ArticuloUi[]>([]);
   const [truekes, setTruekes] = useState<Trueke[]>([]);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -310,9 +271,8 @@ export default function PaginaIntercambio() {
     setCargando(true);
     setError(null);
     try {
-      const [mis, catalogoResp] = await Promise.all([misTruekes(token), obtenerCatalogo()]);
+      const mis = await misTruekes(token);
       setTruekes(mis.truekes ?? []);
-      setCatalogo(catalogoResp as ArticuloUi[]);
     } catch (e) {
       setError(e instanceof Error ? e.message : "no se pudieron cargar tus trueques");
     } finally {
@@ -324,58 +284,7 @@ export default function PaginaIntercambio() {
     if (token) void cargar();
   }, [token, cargar]);
 
-  const misArticulos = useMemo(
-    () =>
-      catalogo.filter(
-        (a) => account && propietarioDe(a) === account.toLowerCase()
-      ),
-    [catalogo, account]
-  );
-  const otrosArticulos = useMemo(
-    () =>
-      catalogo.filter(
-        (a) => !account || (propietarioDe(a) !== account.toLowerCase() && propietarioDe(a) !== "")
-      ),
-    [catalogo, account]
-  );
-
   const activos = truekes.filter((t) => ESTADOS_ACTIVOS.includes(t.estado)).length;
-  const limiteAlcanzado = estadoD28 === "VERIFICADO" && activos >= MAX_ACTIVOS_VERIFICADO;
-
-  // ---------------------------------------------------------------- formulario
-  const [articuloAId, setArticuloAId] = useState("");
-  const [articuloBId, setArticuloBId] = useState("");
-  const [horaPautada, setHoraPautada] = useState("");
-  const [creando, setCreando] = useState(false);
-  const [errorForm, setErrorForm] = useState<string | null>(null);
-
-  const artB = useMemo(
-    () => otrosArticulos.find((a) => String(a.id) === articuloBId) ?? null,
-    [otrosArticulos, articuloBId]
-  );
-  const parteB = artB ? propietarioDe(artB) : "";
-
-  async function crear() {
-    if (!token || !articuloAId || !artB || !parteB) return;
-    setCreando(true);
-    setErrorForm(null);
-    try {
-      await crearTrueke(token, {
-        articuloAId: Number(articuloAId),
-        articuloBId: artB.id,
-        parteB,
-        horaPautada: horaPautada ? new Date(horaPautada).toISOString() : undefined,
-      });
-      setArticuloAId("");
-      setArticuloBId("");
-      setHoraPautada("");
-      await cargar();
-    } catch (e) {
-      setErrorForm(e instanceof Error ? e.message : "no se pudo crear el trueque");
-    } finally {
-      setCreando(false);
-    }
-  }
 
   // ---------------------------------------------------------------- acciones por trueke
   const [ocupado, setOcupado] = useState<{ id: number; accion: string } | null>(null);
@@ -410,9 +319,13 @@ export default function PaginaIntercambio() {
     setError(null);
     try {
       if (accion === "custodiar") {
-        await custodiarTrueke(token, id, lado);
+        const firmaCust = await firmarAccion("custodiar trueque");
+        if (!firmaCust) throw new Error("Firma requerida: desbloquea tu billetera.");
+        await custodiarTrueke(token, id, lado, firmaCust);
       } else {
-        await firmarRecepcion(token, id, lado);
+        const firmaRec = await firmarAccion("firmar recepción");
+        if (!firmaRec) throw new Error("Firma requerida: desbloquea tu billetera.");
+        await firmarRecepcion(token, id, lado, firmaRec);
         setFirmados((prev) => new Set(prev).add(id));
       }
       await cargar();
@@ -438,7 +351,9 @@ export default function PaginaIntercambio() {
     setCerrando(t.id);
     setError(null);
     try {
-      const r = await cerrarTrueke(token, t.id, lado, conforme);
+      const firmaCierre = await firmarAccion("cerrar trueque");
+      if (!firmaCierre) throw new Error("Firma requerida: desbloquea tu billetera.");
+      const r = await cerrarTrueke(token, t.id, lado, conforme, firmaCierre);
       setCerradoOk((prev) => new Set(prev).add(t.id));
       if (r.disputa) setError(null);
       await cargar();
@@ -446,6 +361,24 @@ export default function PaginaIntercambio() {
       setError(e instanceof Error ? e.message : "no se pudo registrar el cierre");
     } finally {
       setCerrando(null);
+    }
+  }
+
+  /** Punto 6: la contraparte acepta o rechaza la propuesta de encuentro. */
+  async function responderEncuentro(t: Trueke, accion: "aceptar" | "rechazar") {
+    if (!token) return;
+    setOcupado({ id: t.id, accion });
+    setError(null);
+    try {
+      const firmaResp = await firmarAccion(accion === "aceptar" ? "aceptar encuentro" : "rechazar encuentro");
+      if (!firmaResp) throw new Error("Firma requerida: desbloquea tu billetera.");
+      if (accion === "aceptar") await aceptarEncuentro(token, t.id, firmaResp);
+      else await rechazarEncuentro(token, t.id, firmaResp);
+      await cargar();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : `no se pudo ${accion === "aceptar" ? "aceptar" : "rechazar"} el encuentro`);
+    } finally {
+      setOcupado(null);
     }
   }
 
@@ -473,6 +406,8 @@ export default function PaginaIntercambio() {
     setEnviando(true);
     setErrorVal(null);
     try {
+      const firmaVal = await firmarAccion("valorar trueque");
+      if (!firmaVal) throw new Error("Firma requerida: desbloquea tu billetera.");
       await valorarTrueke(token, t.id, {
         valorado: contraparteDe(t, lado),
         aceptacion: Number(valores.aceptacion),
@@ -480,7 +415,7 @@ export default function PaginaIntercambio() {
         seguridad: Number(valores.seguridad),
         confiabilidad: Number(valores.confiabilidad),
         compromiso: Number(valores.compromiso),
-      });
+      }, firmaVal);
       setValorados((prev) => new Set(prev).add(t.id));
       setValorandoId(null);
       setValores({});
@@ -493,18 +428,7 @@ export default function PaginaIntercambio() {
   }
 
   // ---------------------------------------------------------------- render
-  const bloqueante = !puedeCrear && (
-    <div className="rounded-xl border border-crimson/30 bg-crimson/5 px-4 py-3">
-      <p className="text-sm font-semibold text-crimson">
-        🔒 Crear trueques bloqueado: tu estado es {estadoD28} (RF-14.4, D28).
-      </p>
-      <p className="mt-0.5 text-xs text-navy-800/60">
-        Para crear trueques necesitas el estado <strong>Verificado</strong> (correo y
-        teléfono confirmados) o <strong>Certificado</strong> (identidad verificada).
-        Completa la verificación desde el dashboard / Mi Perfil.
-      </p>
-    </div>
-  );
+  const bloqueante = null; // el alta de trueques vive en Mi Trueke Central (decisión del director)
 
   return (
     <div className="space-y-5">
@@ -534,116 +458,6 @@ export default function PaginaIntercambio() {
         <p className="rounded-xl bg-crimson/10 px-4 py-2 text-xs text-crimson">
           ⚠️ {error ?? errorSesion}
         </p>
-      )}
-
-      {/* Formulario: nuevo trueque */}
-      {puedeCrear && (
-        <Card className="p-5">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <h2 className="font-display text-lg font-semibold text-navy-800">Nuevo trueque</h2>
-              <p className="text-xs text-navy-800/60">
-                Ofreces uno de tus artículos (A) a cambio de un artículo de otro usuario (B).
-              </p>
-            </div>
-            <span
-              className={`rounded-pill px-3 py-1 text-[11px] font-bold ${
-                limiteAlcanzado ? "bg-crimson/15 text-crimson" : "bg-navy-800/5 text-navy-800/70"
-              }`}
-            >
-              {activos} de {MAX_ACTIVOS_VERIFICADO} trueques activos
-            </span>
-          </div>
-
-          {misArticulos.length === 0 ? (
-            <p className="mt-4 rounded-xl bg-gold-500/10 px-4 py-3 text-sm text-navy-800/80">
-              📦 <strong>Publica primero un artículo desde Mi Inventario</strong> (requiere
-              estado Verificado) para poder ofrecerlo en un trueque.
-            </p>
-          ) : otrosArticulos.length === 0 ? (
-            <p className="mt-4 rounded-xl bg-smoke px-4 py-3 text-sm text-navy-800/80">
-              Aún no hay artículos de <strong>otros usuarios</strong> disponibles en el catálogo
-              para elegir como contraparte. Vuelve más tarde o comparte tu oferta en el mercado.
-            </p>
-          ) : (
-            <form
-              className="mt-4 grid gap-3 sm:grid-cols-2"
-              onSubmit={(e) => {
-                e.preventDefault();
-                void crear();
-              }}
-            >
-              <label className="block text-xs font-semibold uppercase tracking-wide text-navy-800/60">
-                Mi artículo (A) — ofrezco
-                <select
-                  className={CLASE_CAMPO}
-                  value={articuloAId}
-                  onChange={(e) => setArticuloAId(e.target.value)}
-                >
-                  <option value="">Elige tu artículo…</option>
-                  {misArticulos.map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.titulo}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <label className="block text-xs font-semibold uppercase tracking-wide text-navy-800/60">
-                Artículo de contraparte (B) — recibo
-                <select
-                  className={CLASE_CAMPO}
-                  value={articuloBId}
-                  onChange={(e) => setArticuloBId(e.target.value)}
-                >
-                  <option value="">Elige un artículo de otro usuario…</option>
-                  {otrosArticulos.map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.titulo} · {corta(propietarioDe(a))}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <label className="block text-xs font-semibold uppercase tracking-wide text-navy-800/60">
-                Wallet de la otra parte (B)
-                <input
-                  className={CLASE_CAMPO}
-                  value={parteB}
-                  readOnly
-                  placeholder="Se autocompleta al elegir la contraparte"
-                />
-              </label>
-
-              <label className="block text-xs font-semibold uppercase tracking-wide text-navy-800/60">
-                Hora pautada (opcional)
-                <input
-                  type="datetime-local"
-                  className={CLASE_CAMPO}
-                  value={horaPautada}
-                  onChange={(e) => setHoraPautada(e.target.value)}
-                />
-              </label>
-
-              {errorForm && (
-                <p className="rounded-xl bg-crimson/10 px-3 py-2 text-xs text-crimson sm:col-span-2">
-                  ⚠️ {errorForm}
-                </p>
-              )}
-
-              <div className="flex flex-wrap items-center gap-2 sm:col-span-2">
-                <Button type="submit" disabled={!articuloAId || !artB || !parteB || limiteAlcanzado || creando}>
-                  {creando ? "Creando…" : "Crear trueque"}
-                </Button>
-                {limiteAlcanzado && (
-                  <span className="text-xs font-semibold text-crimson">
-                    Máximo de {MAX_ACTIVOS_VERIFICADO} trueques activos alcanzado (RF-14.4).
-                  </span>
-                )}
-              </div>
-            </form>
-          )}
-        </Card>
       )}
 
       {/* Lista: mis trueques */}
@@ -710,6 +524,8 @@ export default function PaginaIntercambio() {
                     )}
                   </p>
 
+                  <ContactoContraparte trueke={t} lado={lado} token={token} />
+
                   {(hora || t.updatedAt) && (
                     <p className="mt-1 text-[11px] text-navy-800/40">
                       {hora ? `📅 Pautado: ${hora}` : ""}
@@ -767,7 +583,30 @@ export default function PaginaIntercambio() {
 
                   {/* Acciones */}
                   <div className="mt-4 flex flex-wrap gap-2 border-t border-navy-800/5 pt-3">
-                    {lado && (t.estado === "CREADO" || t.estado === "ACTIVO") && (
+                    {/* Punto 6: propuesta de encuentro pendiente → la contraparte solo acepta/rechaza */}
+                    {t.encuentroEstado === "PROPUESTO" &&
+                      t.encuentroPropuestoPor &&
+                      lado &&
+                      (t.encuentroPropuestoPor.toLowerCase() !== (account ?? "").toLowerCase()) && (
+                      <>
+                        <Button
+                          className="!px-3 !py-1.5 !text-xs !bg-[linear-gradient(135deg,#2a9d8f,#2a9d8f)]"
+                          disabled={ocupado?.id === t.id || !token}
+                          onClick={() => void responderEncuentro(t, "aceptar")}
+                        >
+                          {ocupado?.id === t.id && ocupado?.accion === "aceptar" ? "Custodiando…" : "🤝 Aceptar encuentro (custodia ambos NFTs)"}
+                        </Button>
+                        <Button
+                          variante="outline-navy"
+                          className="!px-3 !py-1.5 !text-xs !border-crimson !text-crimson hover:!bg-crimson/5"
+                          disabled={ocupado?.id === t.id || !token}
+                          onClick={() => void responderEncuentro(t, "rechazar")}
+                        >
+                          ✗ Rechazar
+                        </Button>
+                      </>
+                    )}
+                    {lado && (t.estado === "CREADO" || t.estado === "ACTIVO") && t.encuentroEstado !== "ACEPTADO" && (
                       <Button
                         className="!px-3 !py-1.5 !text-xs"
                         disabled={ocupando || !token}
@@ -775,6 +614,11 @@ export default function PaginaIntercambio() {
                       >
                         {ocupando && ocupado?.accion === "custodiar" ? "Custodiando…" : "🛡️ Custodiar mi lado"}
                       </Button>
+                    )}
+                    {t.encuentroEstado === "ACEPTADO" && (
+                      <span className="self-center text-[11px] font-semibold text-teal-600">
+                        🛡️ NFTs custodiados en el escrow (acuerdo del encuentro)
+                      </span>
                     )}
 
                     {lado && t.estado === "CUSTODIADO" && !yaFirme(t, lado) && (

@@ -11,7 +11,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useEthereum } from "@/lib/ethereum";
 import { useSesion } from "@/lib/sesion";
 import { useSesionAutenticada } from "@/lib/useSesionAutenticada";
-import { obtenerCatalogo, publicarArticulo, despublicarArticulo, usarNft as usarNftApi, type ArticuloCatalogo } from "@/lib/api";
+import { API_URL, obtenerCatalogo, publicarArticulo, despublicarArticulo, usarNft as usarNftApi, type ArticuloCatalogo } from "@/lib/api";
 import { Card } from "@/components/Card";
 import { Button } from "@/components/Button";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -33,7 +33,7 @@ const inputCls =
 
 export default function PaginaInventario() {
   const { account } = useEthereum();
-  const { acceso } = useSesion();
+  const { acceso, firmarAccion } = useSesion();
   const { token, error: errorSesion } = useSesionAutenticada();
 
   const [mios, setMios] = useState<ArticuloCatalogo[]>([]);
@@ -45,6 +45,7 @@ export default function PaginaInventario() {
   const [rubro, setRubro] = useState(RUBROS[0]);
   const [categoria, setCategoria] = useState("ARTICULO");
   const [descripcion, setDescripcion] = useState("");
+  const [imagenesSel, setImagenesSel] = useState<{ data: string; mime: string; preview: string }[]>([]);
   const [publicando, setPublicando] = useState(false);
 
   const inscrito = acceso.fase === "inscrito" ? acceso.usuario : null;
@@ -67,15 +68,38 @@ export default function PaginaInventario() {
     if (account) void cargar();
   }, [account, cargar]);
 
+  /** Convierte archivos seleccionados a base64 (punto 1: 1..N imágenes). */
+  function alSeleccionarImagenes(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []).slice(0, 5);
+    if (files.length === 0) return;
+    const lecturas = files.map(
+      (file) =>
+        new Promise<{ data: string; mime: string; preview: string }>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const data = String(reader.result ?? "").split(",")[1] ?? "";
+            resolve({ data, mime: file.type || "image/jpeg", preview: String(reader.result ?? "") });
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        })
+    );
+    Promise.all(lecturas).then((lista) => setImagenesSel((prev) => [...prev, ...lista].slice(0, 5)));
+    e.target.value = "";
+  }
+
   async function publicar(e: React.FormEvent) {
     e.preventDefault();
     if (!token) return;
     setPublicando(true);
     setError(null);
     try {
-      await publicarArticulo(token, { titulo, rubro, categoria, descripcion: descripcion || undefined });
+      const firma = await firmarAccion("publicar artículo");
+      if (!firma) throw new Error("Firma requerida: desbloquea tu billetera para publicar.");
+      await publicarArticulo(token, { titulo, rubro, categoria, descripcion: descripcion || undefined, imagenes: imagenesSel.map(({ data, mime }) => ({ data, mime })) }, firma);
       setTitulo("");
       setDescripcion("");
+      setImagenesSel([]);
       await cargar();
     } catch (e) {
       setError(e instanceof Error ? e.message : "error al publicar");
@@ -88,7 +112,9 @@ export default function PaginaInventario() {
     if (!token) return;
     setError(null);
     try {
-      await despublicarArticulo(token, id);
+      const firma = await firmarAccion("retirar del mercado");
+      if (!firma) throw new Error("Firma requerida: desbloquea tu billetera.");
+      await despublicarArticulo(token, id, firma);
       await cargar();
     } catch (e) {
       setError(e instanceof Error ? e.message : "error al despublicar");
@@ -105,7 +131,9 @@ export default function PaginaInventario() {
     setError(null);
     setMensajeUso(null);
     try {
-      const r = await usarNftApi(token, Number(a.nftTokenId), Number(a.id));
+      const firma = await firmarAccion("usar NFT");
+      if (!firma) throw new Error("Firma requerida: desbloquea tu billetera.");
+      const r = await usarNftApi(token, Number(a.nftTokenId), Number(a.id), firma);
       setMensajeUso(
         r.quemado.simulado
           ? `"${a.titulo}" consumido (marcado en tu inventario; el quemado on-chain se ejecutará en producción).`
@@ -211,6 +239,36 @@ export default function PaginaInventario() {
                 className={inputCls}
               />
             </div>
+            <div>
+              <label htmlFor="imagenes" className="mb-1 block text-xs font-semibold text-navy-800/60">
+                Imágenes (1–5) — se muestran en el Mercado
+              </label>
+              <input
+                id="imagenes"
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={alSeleccionarImagenes}
+                className="block w-full text-xs text-navy-800/60 file:mr-3 file:rounded-pill file:border-0 file:bg-teal-500/10 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-teal-700"
+              />
+              {imagenesSel.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {imagenesSel.map((im, idx) => (
+                    <div key={idx} className="relative">
+                      <img src={im.preview} alt={`imagen ${idx + 1}`} className="h-16 w-16 rounded-lg border border-navy-800/10 object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setImagenesSel((prev) => prev.filter((_, i) => i !== idx))}
+                        className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-pill bg-crimson text-[10px] font-bold text-white"
+                        aria-label="Quitar imagen"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             <Button type="submit" disabled={publicando}>
               {publicando ? "Publicando…" : "📦 Publicar artículo"}
             </Button>
@@ -248,6 +306,13 @@ export default function PaginaInventario() {
                 <StatusBadge estado={a.disponible === false ? "Retirado" : "Activo"} tono={a.disponible === false ? "crimson" : "teal"} />
               </div>
               {a.descripcion && <p className="mt-2 line-clamp-2 text-xs text-navy-800/60">{a.descripcion}</p>}
+              {a.imagenes && a.imagenes.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {a.imagenes.map((im) => (
+                    <img key={im.id} src={`${API_URL}${im.url}`} alt={a.titulo} className="h-12 w-12 rounded-lg border border-navy-800/10 object-cover" />
+                  ))}
+                </div>
+              )}
               {token && a.disponible !== false && (
                 <div className="mt-3 flex flex-wrap justify-end gap-2">
                   {a.nftTokenId != null && !a.usadoEl && (

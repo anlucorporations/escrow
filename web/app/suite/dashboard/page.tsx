@@ -31,6 +31,7 @@ const CATEGORIAS = [
 function PublicarOferta() {
   const { token } = useSesionAutenticada();
   const { account } = useEthereum();
+  const { firmarAccion } = useSesion();
   const [misArticulos, setMisArticulos] = useState<ArticuloCatalogo[]>([]);
   const [articuloAId, setArticuloAId] = useState("");
   const [descripcionRequerida, setDescripcionRequerida] = useState("");
@@ -56,11 +57,13 @@ function PublicarOferta() {
     setEnviando(true);
     setMensaje(null);
     try {
+      const firma = await firmarAccion("publicar oferta de trueque");
+      if (!firma) throw new Error("Firma requerida: desbloquea tu billetera.");
       await crearOfertaTrueke(token, {
         articuloAId: Number(articuloAId),
         descripcionRequerida: descripcionRequerida.trim(),
         tipoRequerido,
-      });
+      }, firma);
       setMensaje({ tipo: "ok", texto: "Trueke publicado en el Mercado. Espera a que alguien lo acuerde." });
       setArticuloAId("");
       setDescripcionRequerida("");
@@ -143,6 +146,7 @@ function PublicarOferta() {
 function MisTruekesResumen() {
   const { token } = useSesionAutenticada();
   const { account } = useEthereum();
+  const { firmarAccion } = useSesion();
   const [misTruekesLista, setMisTruekesLista] = useState<Trueke[]>([]);
   const [ofertas, setOfertas] = useState<Trueke[]>([]);
   const [cargado, setCargado] = useState(false);

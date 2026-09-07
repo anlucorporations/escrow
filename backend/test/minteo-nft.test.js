@@ -47,8 +47,10 @@ test('POST /catalog/articulos con minteador simulado → 201 + aviso', async () 
   const server = app.listen(0);
   await new Promise((res) => server.on('listening', res));
 
+  const mensaje = `TrueKeate: publicar artículo (ts=${Date.now()})`;
+  const firma = await wallet.signMessage(mensaje);
   const r = await request(app).post('/catalog/articulos').set('Authorization', 'Bearer tok-mint')
-    .send({ titulo: 'Bici NFT', rubro: 'Deportes', categoria: 'ARTICULO' });
+    .send({ titulo: 'Bici NFT', rubro: 'Deportes', categoria: 'ARTICULO', mensaje, firma });
   assert.equal(r.status, 201, JSON.stringify(r.body));
   assert.ok(r.body.articulo.id);
   assert.equal(r.body.articulo.nftTokenId, null, 'sin red no se persiste token');

@@ -234,6 +234,34 @@ export async function crearAlmacenPg(pool) {
       return { id: Number(f.id), usadoEl: f.usado_el ? f.usado_el.toISOString() : null };
     },
 
+    async guardarImagenArticulo({ articuloId, wallet, contenido, mime }) {
+      const r = await pool.query(
+        `INSERT INTO imagenes_certificadas (tipo, ref_id, wallet, contenido, mime)
+         VALUES ('PUBLICACION', $1, $2, $3, $4)
+         RETURNING id`,
+        [Number(articuloId), NORMALIZA_WALLET(wallet), Buffer.from(contenido ?? ''), mime ?? 'image/jpeg']
+      );
+      return Number(r.rows[0].id);
+    },
+
+    async listarImagenesArticulo(articuloId) {
+      const r = await pool.query(
+        `SELECT id, mime FROM imagenes_certificadas WHERE tipo='PUBLICACION' AND ref_id = $1 ORDER BY id`,
+        [Number(articuloId)]
+      );
+      return r.rows.map((f) => ({ id: Number(f.id), mime: f.mime ?? 'image/jpeg' }));
+    },
+
+    async getImagen(id) {
+      const r = await pool.query(
+        `SELECT id, contenido, mime, wallet FROM imagenes_certificadas WHERE id = $1`,
+        [Number(id)]
+      );
+      const f = r.rows[0];
+      if (!f) return null;
+      return { id: Number(f.id), contenido: f.contenido, mime: f.mime ?? 'image/jpeg', wallet: f.wallet.trim().toLowerCase() };
+    },
+
     async getArticulo(id) {
       const r = await pool.query(
         `SELECT a.id, a.titulo, a.descripcion, a.rubro, a.categoria, a.nft_token_id, a.disponible, a.usado_el,
@@ -352,6 +380,7 @@ export async function crearAlmacenPg(pool) {
       const estado = cambios.estado && estadosValidos.includes(cambios.estado) ? cambios.estado : actual.estado;
       const hora = cambios.horaPautada ? new Date(cambios.horaPautada).toISOString() : (cambios.horaPautada === null ? null : actual.horaPautada);
       const punto = cambios.puntoEncuentroId !== undefined ? cambios.puntoEncuentroId : actual.puntoEncuentroId;
+      const propone = cambios.encuentroPropuestoPor ? NORMALIZA_WALLET(cambios.encuentroPropuestoPor) : null;
       const r = await pool.query(
         `UPDATE truekes
             SET estado=$2,
@@ -361,9 +390,11 @@ export async function crearAlmacenPg(pool) {
                 cierre_b = COALESCE($6, cierre_b),
                 descripcion_requerida = COALESCE($7, descripcion_requerida),
                 tipo_requerido = COALESCE($8, tipo_requerido),
+                encuentro_propuesto_por = COALESCE($9, encuentro_propuesto_por),
+                encuentro_estado = COALESCE($10, encuentro_estado),
                 updated_at = now()
           WHERE id = $1 RETURNING *`,
-        [Number(id), estado, hora ?? null, punto, cambios.cierreA ?? null, cambios.cierreB ?? null, cambios.descripcionRequerida ?? null, cambios.tipoRequerido ?? null]
+        [Number(id), estado, hora ?? null, punto, cambios.cierreA ?? null, cambios.cierreB ?? null, cambios.descripcionRequerida ?? null, cambios.tipoRequerido ?? null, propone, cambios.encuentroEstado ?? null]
       );
       if (r.rowCount === 0) return null;
       // Campos adicionales (firmas/valoraciones) se guardan en el payload de la fila
@@ -604,6 +635,8 @@ function filaATrueke(f) {
     tipoRequerido: f.tipo_requerido ?? null,
     cierreA: f.cierre_a ?? null,
     cierreB: f.cierre_b ?? null,
+    encuentroPropuestoPor: f.encuentro_propuesto_por ? f.encuentro_propuesto_por.trim().toLowerCase() : null,
+    encuentroEstado: f.encuentro_estado ?? null,
     puntoEncuentroId: f.punto_encuentro_id !== null && f.punto_encuentro_id !== undefined ? Number(f.punto_encuentro_id) : null,
     horaPautada: f.hora_pautada ? f.hora_pautada.toISOString() : null,
     txHash: f.tx_hash ?? null,

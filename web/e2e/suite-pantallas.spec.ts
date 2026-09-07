@@ -151,15 +151,17 @@ test.describe("Pantallas de la suite (integración)", () => {
     await expect(page.getByText("Mi bicicleta")).toBeVisible();
   });
 
-  test("Intercambio: lista mis trueques y permite crear", async ({ page }) => {
+  test("Intercambio: lista mis trueques activos (el alta vive en Mi Trueke Central)", async ({ page }) => {
     await simularSuite(page, { tipo: "PARTICULAR", nivel: "INICIADO", estado: "VERIFICADO" });
     await page.goto("/suite/intercambio");
     await expect(page.getByRole("heading", { name: /Intercambio/ })).toBeVisible();
     // Si la página pide iniciar sesión / autenticar (firma), se confirma
     const btnAuth = page.getByRole("button", { name: /Iniciar sesión|Autenticar/ });
     if (await btnAuth.isVisible().catch(() => false)) await btnAuth.click();
-    // El trueque creado (A ⇄ B) aparece en "Mis trueques" (aparece 2× por el <select>)
+    // El trueque activo (A ⇄ B) aparece en "Mis trueques"
     await expect(page.getByText(/Mi bicicleta ⇄ Curso de/)).toBeVisible();
+    // El alta de trueques ya NO está en Intercambio (decisión del director: solo en Mi Trueke Central)
+    await expect(page.getByRole("heading", { name: /Nuevo trueque/ })).toHaveCount(0);
   });
 
   test("Perfil: muestra identidad y reputación tras autenticar", async ({ page }) => {

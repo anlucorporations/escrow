@@ -134,6 +134,8 @@ CREATE TABLE IF NOT EXISTS truekes (
     apertura_a      TIMESTAMPTZ,
     apertura_b      TIMESTAMPTZ,
     punto_encuentro_id BIGINT,
+    encuentro_propuesto_por CHAR(42), -- quien propuso el encuentro (puntos 6/7 del director)
+    encuentro_estado TEXT,            -- 'PROPUESTO'|'ACEPTADO'|'RECHAZADO'
     cierre_a        TEXT,          -- 'CONFORME' | 'NO_CONFORME' (punto 9)
     cierre_b        TEXT,          -- 'CONFORME' | 'NO_CONFORME' (punto 9)
     tx_hash         CHAR(66),
@@ -205,6 +207,8 @@ CREATE TABLE IF NOT EXISTS imagenes_certificadas (
     firma_ecdsa         BYTEA NOT NULL,
     metadata            JSONB,
     root_merkle_anclada BYTEA,              -- raíz merkle anclada on-chain (D23)
+    contenido           BYTEA,              -- binario de la imagen (punto 1: imágenes en mercado)
+    mime                TEXT,               -- tipo MIME (image/jpeg, image/png…)
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 

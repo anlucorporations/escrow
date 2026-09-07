@@ -75,8 +75,10 @@ test('propuesta de encuentro registra el punto como usado (punto 7)', async () =
   const puntoId = p.body.punto.id;
 
   // propone A (parte que gana por desempate → A en empate de nivel/reputación)
+  const mensaje = `TrueKeate: proponer encuentro (ts=${Date.now()})`;
+  const firma = await wallet.signMessage(mensaje);
   const prop = await request(app).post('/truekes/1/propuesta-encuentro').set('Authorization', 'Bearer tok-p1')
-    .send({ puntoEncuentroId: puntoId, horaPautada: '2030-08-01T15:00:00Z' });
+    .send({ puntoEncuentroId: puntoId, horaPautada: '2030-08-01T15:00:00Z', mensaje, firma });
   assert.equal(prop.status, 200, JSON.stringify(prop.body));
 
   const fav = await request(app).get('/puntos-encuentro/favoritos').set('Authorization', 'Bearer tok-p1');

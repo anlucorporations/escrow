@@ -27,6 +27,7 @@ import {
   type ReactNode,
 } from "react";
 import { useEthereum } from "./ethereum";
+import { firmarAccion as firmarConSigner, mensajeAccion, type FirmaAccion } from "./firma";
 import {
   consultarEstado,
   inscribirse,
@@ -59,6 +60,8 @@ export interface Sesion {
     consentimientoGdpr: boolean;
   }) => Promise<{ ok: boolean; error?: string }>;
   autenticando: boolean;
+  /** Firma una acción con la billetera (EIP-191 por operación — decisión del director). */
+  firmarAccion: (accion: string) => Promise<FirmaAccion | null>;
 }
 
 const SesionContext = createContext<Sesion | null>(null);
@@ -138,6 +141,14 @@ export function SesionProvider({ children }: { children: ReactNode }) {
     }
   }, [signer, account]);
 
+  // Firma por acción: usa el signer de la wallet conectada (EIP-191).
+  const firmarAccion = useCallback(
+    async (accion: string): Promise<FirmaAccion | null> => {
+      return firmarConSigner(signer, accion);
+    },
+    [signer]
+  );
+
   const cerrarSesion = useCallback(() => {
     setToken(null);
     localStorage.removeItem(CLAVE_TOKEN);
@@ -159,8 +170,8 @@ export function SesionProvider({ children }: { children: ReactNode }) {
   );
 
   const valor = useMemo<Sesion>(
-    () => ({ acceso, token, autenticar, cerrarSesion, refrescar, inscribir, autenticando }),
-    [acceso, token, autenticar, cerrarSesion, refrescar, inscribir, autenticando]
+    () => ({ acceso, token, autenticar, cerrarSesion, refrescar, inscribir, autenticando, firmarAccion }),
+    [acceso, token, autenticar, cerrarSesion, refrescar, inscribir, autenticando, firmarAccion]
   );
 
   return <SesionContext.Provider value={valor}>{children}</SesionContext.Provider>;

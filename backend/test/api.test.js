@@ -28,6 +28,13 @@ const wA = walletA.address.toLowerCase();
 const wB = walletB.address.toLowerCase();
 const wOwner = walletOwner.address.toLowerCase();
 
+
+async function firmaAccionDe(wallet, accion) {
+  const mensaje = `TrueKeate: ${accion} (ts=${Date.now()})`;
+  const firma = await wallet.signMessage(mensaje);
+  return { mensaje, firma };
+}
+
 function sesionDe(wallet) {
   // token directo al almacén (flujo de sesión por firma se prueba aparte)
   const token = 'tok-' + wallet.address.slice(2, 10);
@@ -117,11 +124,11 @@ test('catalog: solo Verificado/Certificado publica; límite por nivel (D14/RF-04
   const token = sesionDe(walletA);
 
   for (let i = 0; i < 5; i++) {
-    const r = await request(app).post('/catalog/articulos').set('Authorization', `Bearer ${token}`).send({ titulo: `Art ${i}`, rubro: 'electronica' });
+    const r = await request(app).post('/catalog/articulos').set('Authorization', `Bearer ${token}`).send({ titulo: `Art ${i}`, rubro: 'electronica', ...(await firmaAccionDe(walletA, 'publicar artículo')) });
     assert.equal(r.status, 201, `art ${i}: ${JSON.stringify(r.body)}`);
   }
   // 6º artículo: nivel INICIADO → límite 5 (RF-04.2)
-  const sexto = await request(app).post('/catalog/articulos').set('Authorization', `Bearer ${token}`).send({ titulo: 'Art 6', rubro: 'electronica' });
+  const sexto = await request(app).post('/catalog/articulos').set('Authorization', `Bearer ${token}`).send({ titulo: 'Art 6', rubro: 'electronica', ...(await firmaAccionDe(walletA, 'publicar artículo')) });
   assert.equal(sexto.status, 403);
   assert.match(sexto.body.error, /limite_articulos/);
 });
@@ -137,7 +144,7 @@ test('truekes: Verificado crea (máx 3 activos RF-14.4) y valida valoración 1�
   await request(app).post('/kyc/verify-codes').set('Authorization', `Bearer ${tokB}`).send({ codigoCorreo: codigoDemo });
 
   // B publica su artículo; el artículo de A se toma de su catálogo existente.
-  const artB = await request(app).post('/catalog/articulos').set('Authorization', `Bearer ${tokB}`).send({ titulo: 'Curso B', rubro: 'Educacion' });
+  const artB = await request(app).post('/catalog/articulos').set('Authorization', `Bearer ${tokB}`).send({ titulo: 'Curso B', rubro: 'Educacion', ...(await firmaAccionDe(walletB, 'publicar artículo')) });
   assert.equal(artB.status, 201, JSON.stringify(artB.body));
   const catalogo = await request(app).get('/catalog');
   const artDeA = catalogo.body.articulos.find((a) => a.wallet === wA);
@@ -145,6 +152,7 @@ test('truekes: Verificado crea (máx 3 activos RF-14.4) y valida valoración 1�
 
   // B (Verificado) crea el trueque ofreciendo su artículo por uno de A
   const c = await request(app).post('/truekes').set('Authorization', `Bearer ${tokB}`).send({
+    ...(await firmaAccionDe(walletB, 'crear trueque')),
     parteB: wA,
     articuloAId: artB.body.articulo.id,
     articuloBId: artDeA.id,
@@ -158,15 +166,15 @@ test('truekes: Verificado crea (máx 3 activos RF-14.4) y valida valoración 1�
   assert.ok(mios.body.truekes.some((t) => t.id === c.body.trueke.id));
 
   // custodiar lado A (el creador B custodia su lado A)
-  const cu = await request(app).post(`/truekes/${c.body.trueke.id}/custodiar`).set('Authorization', `Bearer ${tokB}`).send({ lado: 'A' });
+  const cu = await request(app).post(`/truekes/${c.body.trueke.id}/custodiar`).set('Authorization', `Bearer ${tokB}`).send({ lado: 'A', ...(await firmaAccionDe(walletB, 'custodiar trueque')) });
   assert.equal(cu.status, 200);
   assert.equal(cu.body.trueke.estado, 'CUSTODIADO');
 
   // valoración fuera de rango
-  const bad = await request(app).post(`/truekes/${c.body.trueke.id}/valoracion`).set('Authorization', `Bearer ${tokB}`).send({ valorado: wA, aceptacion: 6, honestidad: 5, seguridad: 5, confiabilidad: 5, compromiso: 5 });
+  const bad = await request(app).post(`/truekes/${c.body.trueke.id}/valoracion`).set('Authorization', `Bearer ${tokB}`).send({ valorado: wA, aceptacion: 6, honestidad: 5, seguridad: 5, confiabilidad: 5, compromiso: 5, ...(await firmaAccionDe(walletB, 'valorar trueque')) });
   assert.equal(bad.status, 400);
 
-  const val = await request(app).post(`/truekes/${c.body.trueke.id}/valoracion`).set('Authorization', `Bearer ${tokB}`).send({ valorado: wA, aceptacion: 5, honestidad: 4, seguridad: 5, confiabilidad: 5, compromiso: 5 });
+  const val = await request(app).post(`/truekes/${c.body.trueke.id}/valoracion`).set('Authorization', `Bearer ${tokB}`).send({ valorado: wA, aceptacion: 5, honestidad: 4, seguridad: 5, confiabilidad: 5, compromiso: 5, ...(await firmaAccionDe(walletB, 'valorar trueque')) });
   assert.equal(val.status, 200);
 });
 

@@ -16,11 +16,13 @@ export function crearAlmacen() {
     sesiones: new Map(),     // token -> {wallet}
     puntos: new Map(),       // id -> punto de encuentro
     puntosFavoritos: new Map(), // "wallet:id" -> {ultimoUso}
+    imagenes: new Map(),    // id -> imagen certificada
   };
   let proxArticulo = 1;
   let proxEncargo = 1;
   let proxTrueke = 1;
   let proxPunto = 1;
+  let proxImagen = 1;
 
   return {
     // ------------------------------------------------------------ usuarios
@@ -109,6 +111,24 @@ export function crearAlmacen() {
     },
     getArticulo(id) {
       return estado.articulos.get(Number(id)) ?? null;
+    },
+    /** Guarda una imagen del artículo (punto 1). Devuelve el id. */
+    guardarImagenArticulo({ articuloId, wallet, contenido, mime }) {
+      const id = proxImagen++;
+      estado.imagenes.set(id, {
+        id, articuloId: Number(articuloId), wallet,
+        contenido: Buffer.isBuffer(contenido) ? contenido : Buffer.from(contenido ?? ''),
+        mime: mime ?? 'image/jpeg',
+        tipo: 'PUBLICACION',
+        createdAt: new Date().toISOString(),
+      });
+      return id;
+    },
+    listarImagenesArticulo(articuloId) {
+      return [...estado.imagenes.values()].filter((i) => i.articuloId === Number(articuloId));
+    },
+    getImagen(id) {
+      return estado.imagenes.get(Number(id)) ?? null;
     },
     crearEncargo(e) {
       const id = proxEncargo++;

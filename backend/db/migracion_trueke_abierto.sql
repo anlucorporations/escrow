@@ -43,6 +43,8 @@ ALTER TABLE truekes ADD COLUMN IF NOT EXISTS descripcion_requerida TEXT;
 ALTER TABLE truekes ADD COLUMN IF NOT EXISTS tipo_requerido categoria_item;
 ALTER TABLE truekes ADD COLUMN IF NOT EXISTS cierre_a TEXT;
 ALTER TABLE truekes ADD COLUMN IF NOT EXISTS cierre_b TEXT;
+ALTER TABLE truekes ADD COLUMN IF NOT EXISTS encuentro_propuesto_por CHAR(42);
+ALTER TABLE truekes ADD COLUMN IF NOT EXISTS encuentro_estado TEXT;
 
 -- 5) tabla puntos_favoritos
 CREATE TABLE IF NOT EXISTS puntos_favoritos (
@@ -57,3 +59,7 @@ CREATE TABLE IF NOT EXISTS puntos_favoritos (
 -- índices útiles para el Mercado (PROPUESTO) y Mis Truekes
 CREATE INDEX IF NOT EXISTS idx_truekes_propuestos ON truekes(estado) WHERE estado = 'PROPUESTO';
 CREATE INDEX IF NOT EXISTS idx_puntos_favoritos_usuario ON puntos_favoritos(usuario_id, ultimo_uso DESC);
+
+-- Punto 1 (imágenes en inventario/mercado): binario y MIME por imagen
+ALTER TABLE imagenes_certificadas ADD COLUMN IF NOT EXISTS contenido BYTEA;
+ALTER TABLE imagenes_certificadas ADD COLUMN IF NOT EXISTS mime TEXT;

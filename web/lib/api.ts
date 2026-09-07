@@ -22,6 +22,11 @@ export interface EstadoInscripcion {
   usuario: UsuarioPublico | null;
 }
 
+export interface FirmaAccion {
+  mensaje: string;
+  firma: string;
+}
+
 export interface ArticuloCatalogo {
   id: number;
   titulo: string;
@@ -33,6 +38,7 @@ export interface ArticuloCatalogo {
   usadoEl?: string | null;
   usuarioWallet?: string;
   usuarioNivel?: string;
+  imagenes?: { id: number; url: string }[];
 }
 
 async function pedir<T>(ruta: string, opciones?: RequestInit): Promise<T> {
@@ -172,6 +178,8 @@ export interface Trueke {
   tipoRequerido?: string | null;
   cierreA?: string | null;
   cierreB?: string | null;
+  encuentroPropuestoPor?: string | null;
+  encuentroEstado?: string | null;
   puntoEncuentroId?: number | null;
   horaPautada?: string | null;
   updatedAt?: string | null;
@@ -249,8 +257,8 @@ export function misTruekes(token: string): Promise<{ truekes: Trueke[] }> {
 }
 
 /** POST /truekes/ofertas — A publica una oferta abierta en el Mercado (PROPUESTO). */
-export function crearOfertaTrueke(token: string, datos: { articuloAId: number; descripcionRequerida: string; tipoRequerido?: string }): Promise<{ trueke: Trueke }> {
-  return pedirAuth<{ trueke: Trueke }>("/truekes/ofertas", token, { metodo: "POST", body: datos });
+export function crearOfertaTrueke(token: string, datos: { articuloAId: number; descripcionRequerida: string; tipoRequerido?: string }, firma?: FirmaAccion): Promise<{ trueke: Trueke }> {
+  return pedirAuth<{ trueke: Trueke }>("/truekes/ofertas", token, { metodo: "POST", body: { ...datos, ...(firma ?? {}) } });
 }
 
 /** GET /truekes/ofertas — ofertas abiertas del Mercado (observable con wallet). */
@@ -259,18 +267,33 @@ export function ofertasMercado(): Promise<{ truekes: Trueke[] }> {
 }
 
 /** POST /truekes/:id/acordar — B acuerda la oferta con su artículo. */
-export function acordarOferta(token: string, id: number, articuloBId: number): Promise<{ trueke: Trueke }> {
-  return pedirAuth<{ trueke: Trueke }>(`/truekes/${id}/acordar`, token, { metodo: "POST", body: { articuloBId } });
+export function acordarOferta(token: string, id: number, articuloBId: number, firma?: FirmaAccion): Promise<{ trueke: Trueke }> {
+  return pedirAuth<{ trueke: Trueke }>(`/truekes/${id}/acordar`, token, { metodo: "POST", body: { articuloBId, ...(firma ?? {}) } });
 }
 
 /** POST /truekes/:id/propuesta-encuentro — quien gana la regla propone punto + fecha/hora. */
-export function proponerEncuentro(token: string, id: number, datos: { puntoEncuentroId: number; horaPautada: string }): Promise<{ trueke: Trueke; propone: string }> {
-  return pedirAuth<{ trueke: Trueke; propone: string }>(`/truekes/${id}/propuesta-encuentro`, token, { metodo: "POST", body: datos });
+export function proponerEncuentro(token: string, id: number, datos: { puntoEncuentroId: number; horaPautada: string }, firma?: FirmaAccion): Promise<{ trueke: Trueke; propone: string }> {
+  return pedirAuth<{ trueke: Trueke; propone: string }>(`/truekes/${id}/propuesta-encuentro`, token, { metodo: "POST", body: { ...datos, ...(firma ?? {}) } });
+}
+
+/** GET /truekes/:id/contacto — teléfono/correo de la contraparte (solo truekes activos). */
+export function contactoTrueke(token: string, id: number): Promise<{ contacto: { telefono: string | null; correo: string | null; wallet: string } | null; oculto: boolean }> {
+  return pedirAuth<{ contacto: { telefono: string | null; correo: string | null; wallet: string } | null; oculto: boolean }>(`/truekes/${id}/contacto`, token);
+}
+
+/** POST /truekes/:id/encuentro/aceptar — la contraparte acepta (custodia automática ambos NFTs). */
+export function aceptarEncuentro(token: string, id: number, firma?: FirmaAccion): Promise<{ trueke: Trueke; custodia: string; encuentroEstado: string }> {
+  return pedirAuth<{ trueke: Trueke; custodia: string; encuentroEstado: string }>(`/truekes/${id}/encuentro/aceptar`, token, { metodo: "POST", body: { ...(firma ?? {}) } });
+}
+
+/** POST /truekes/:id/encuentro/rechazar — la contraparte rechaza la propuesta. */
+export function rechazarEncuentro(token: string, id: number, firma?: FirmaAccion): Promise<{ trueke: Trueke; encuentroEstado: string }> {
+  return pedirAuth<{ trueke: Trueke; encuentroEstado: string }>(`/truekes/${id}/encuentro/rechazar`, token, { metodo: "POST", body: { ...(firma ?? {}) } });
 }
 
 /** POST /truekes/:id/cierre — firma Recibido Conforme (true) / No Conforme (false). */
-export function cerrarTrueke(token: string, id: number, lado: "A" | "B", conforme: boolean): Promise<{ trueke: Trueke; disputa?: Disputa }> {
-  return pedirAuth<{ trueke: Trueke; disputa?: Disputa }>(`/truekes/${id}/cierre`, token, { metodo: "POST", body: { lado, conforme } });
+export function cerrarTrueke(token: string, id: number, lado: "A" | "B", conforme: boolean, firma?: FirmaAccion): Promise<{ trueke: Trueke; disputa?: Disputa }> {
+  return pedirAuth<{ trueke: Trueke; disputa?: Disputa }>(`/truekes/${id}/cierre`, token, { metodo: "POST", body: { lado, conforme, ...(firma ?? {}) } });
 }
 
 // ---------------------------------------------------------------------------
@@ -313,32 +336,32 @@ export function usarPuntoEncuentro(token: string, id: number): Promise<{ ok: boo
 }
 
 /** POST /truekes/nft/:tokenId/usar — consume el NFT recibido (se quema — punto 2). */
-export function usarNft(token: string, tokenId: number, articuloId?: number): Promise<{ ok: boolean; quemado: { tokenId: number; simulado: boolean; txHash?: string | null }; articulo: ArticuloCatalogo }> {
+export function usarNft(token: string, tokenId: number, articuloId?: number, firma?: FirmaAccion): Promise<{ ok: boolean; quemado: { tokenId: number; simulado: boolean; txHash?: string | null }; articulo: ArticuloCatalogo }> {
   return pedirAuth<{ ok: boolean; quemado: { tokenId: number; simulado: boolean; txHash?: string | null }; articulo: ArticuloCatalogo }>(
     `/truekes/nft/${tokenId}/usar`,
     token,
-    { metodo: "POST", body: articuloId ? { articuloId } : {} }
+    { metodo: "POST", body: { ...(articuloId ? { articuloId } : {}), ...(firma ?? {}) } }
   );
 }
 
 /** POST /truekes — crear trueque. */
-export function crearTrueke(token: string, datos: { articuloAId: number; articuloBId: number; parteB: string; horaPautada?: string }): Promise<{ trueke: Trueke }> {
-  return pedirAuth<{ trueke: Trueke }>("/truekes", token, { metodo: "POST", body: datos });
+export function crearTrueke(token: string, datos: { articuloAId: number; articuloBId: number; parteB: string; horaPautada?: string }, firma?: FirmaAccion): Promise<{ trueke: Trueke }> {
+  return pedirAuth<{ trueke: Trueke }>("/truekes", token, { metodo: "POST", body: { ...datos, ...(firma ?? {}) } });
 }
 
 /** POST /truekes/:id/custodiar — custodiar lado A/B. */
-export function custodiarTrueke(token: string, id: number, lado: "A" | "B"): Promise<{ trueke: Trueke }> {
-  return pedirAuth<{ trueke: Trueke }>(`/truekes/${id}/custodiar`, token, { metodo: "POST", body: { lado } });
+export function custodiarTrueke(token: string, id: number, lado: "A" | "B", firma?: FirmaAccion): Promise<{ trueke: Trueke }> {
+  return pedirAuth<{ trueke: Trueke }>(`/truekes/${id}/custodiar`, token, { metodo: "POST", body: { lado, ...(firma ?? {}) } });
 }
 
 /** POST /truekes/:id/firma-recepcion — firmar recepción lado A/B. */
-export function firmarRecepcion(token: string, id: number, lado: "A" | "B"): Promise<{ trueke: Trueke }> {
-  return pedirAuth<{ trueke: Trueke }>(`/truekes/${id}/firma-recepcion`, token, { metodo: "POST", body: { lado } });
+export function firmarRecepcion(token: string, id: number, lado: "A" | "B", firma?: FirmaAccion): Promise<{ trueke: Trueke }> {
+  return pedirAuth<{ trueke: Trueke }>(`/truekes/${id}/firma-recepcion`, token, { metodo: "POST", body: { lado, ...(firma ?? {}) } });
 }
 
 /** POST /truekes/:id/valoracion — valoración 1–5. */
-export function valorarTrueke(token: string, id: number, datos: { valorado: string; aceptacion: number; honestidad: number; seguridad: number; confiabilidad: number; compromiso: number }): Promise<{ ok: boolean; trueke: Trueke }> {
-  return pedirAuth<{ ok: boolean; trueke: Trueke }>(`/truekes/${id}/valoracion`, token, { metodo: "POST", body: datos });
+export function valorarTrueke(token: string, id: number, datos: { valorado: string; aceptacion: number; honestidad: number; seguridad: number; confiabilidad: number; compromiso: number }, firma?: FirmaAccion): Promise<{ ok: boolean; trueke: Trueke }> {
+  return pedirAuth<{ ok: boolean; trueke: Trueke }>(`/truekes/${id}/valoracion`, token, { metodo: "POST", body: { ...datos, ...(firma ?? {}) } });
 }
 
 /** GET /finanzas/mi — saldos propios. */
@@ -378,17 +401,18 @@ export function votarPropuesta(token: string, propuestaId: number, aFavor: boole
 /** POST /catalog/articulos — publicar artículo (Verificado/Certificado, RF-14.4). */
 export function publicarArticulo(
   token: string,
-  datos: { titulo: string; rubro: string; categoria?: string; descripcion?: string }
-): Promise<{ articulo: ArticuloCatalogo }> {
-  return pedirAuth<{ articulo: ArticuloCatalogo }>("/catalog/articulos", token, {
+  datos: { titulo: string; rubro: string; categoria?: string; descripcion?: string; imagenes?: { data: string; mime: string }[] },
+  firma?: FirmaAccion
+): Promise<{ articulo: ArticuloCatalogo; imagenes?: { id: number; url: string }[] }> {
+  return pedirAuth<{ articulo: ArticuloCatalogo; imagenes?: { id: number; url: string }[] }>("/catalog/articulos", token, {
     metodo: "POST",
-    body: datos,
+    body: { ...datos, ...(firma ?? {}) },
   });
 }
 
 /** POST /catalog/:id/despublicar — marca un artículo propio como no disponible. */
-export function despublicarArticulo(token: string, id: number): Promise<{ ok: boolean; articulo?: ArticuloCatalogo }> {
-  return pedirAuth<{ ok: boolean }>(`/catalog/${id}/despublicar`, token, { metodo: "POST", body: {} });
+export function despublicarArticulo(token: string, id: number, firma?: FirmaAccion): Promise<{ ok: boolean; articulo?: ArticuloCatalogo }> {
+  return pedirAuth<{ ok: boolean }>(`/catalog/${id}/despublicar`, token, { metodo: "POST", body: { ...(firma ?? {}) } });
 }
 
 // =============================================================================

@@ -14,7 +14,7 @@
 //   POST /truekes/:id/valoracion → valoración 1–5 (D18/D36)
 // =============================================================================
 import { Router } from 'express';
-import { requiereSesion, requiereEstado } from '../lib/auth.js';
+import { requiereSesion, requiereEstado, requiereFirmaAccion } from '../lib/auth.js';
 
 export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow, walletEmpresas, minteadorNft }) {
   const r = Router();
@@ -39,7 +39,7 @@ export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow
 
   // POST /truekes/ofertas — A publica una oferta abierta (requiere Verificado/Certificado)
   // Body: { articuloAId, descripcionRequerida, tipoRequerido? }  (puntos 2-3)
-  r.post('/ofertas', requiereSesion(almacen), requiereEstado(almacen, 'VERIFICADO', 'CERTIFICADO'), async (req, res, next) => {
+  r.post('/ofertas', requiereSesion(almacen), requiereEstado(almacen, 'VERIFICADO', 'CERTIFICADO'), requiereFirmaAccion('publicar oferta de trueque'), async (req, res, next) => {
     try {
       const { articuloAId, descripcionRequerida, tipoRequerido } = req.body;
       if (!articuloAId || !descripcionRequerida) {
@@ -77,7 +77,7 @@ export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow
 
   // POST /truekes/:id/acordar — B acuerda la oferta (requiere Verificado/Certificado)
   // Body: { articuloBId }  (B ofrece su NFT; puntos 5-5.2)
-  r.post('/:id/acordar', requiereSesion(almacen), requiereEstado(almacen, 'VERIFICADO', 'CERTIFICADO'), async (req, res, next) => {
+  r.post('/:id/acordar', requiereSesion(almacen), requiereEstado(almacen, 'VERIFICADO', 'CERTIFICADO'), requiereFirmaAccion('acordar trueque'), async (req, res, next) => {
     try {
       const t = await almacen.getTrueke(req.params.id);
       if (!t) return res.status(404).json({ error: 'trueke_inexistente' });
@@ -103,6 +103,29 @@ export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow
     } catch (e) { next(e); }
   });
 
+  // GET /truekes/:id/contacto — contacto de la contraparte (punto 5 del director)
+  // Solo visible mientras el trueke esté ACTIVO (CREADO..APERTURA); al cerrar se oculta.
+  // Devuelve teléfono/correo de la OTRA parte, únicamente a las partes del trueke.
+  r.get('/:id/contacto', requiereSesion(almacen), async (req, res, next) => {
+    try {
+      const t = await almacen.getTrueke(req.params.id);
+      if (!t) return res.status(404).json({ error: 'trueke_inexistente' });
+      const soyParte = t.usuarioA === req.wallet || (t.usuarioB && t.usuarioB === req.wallet);
+      if (!soyParte) return res.status(403).json({ error: 'no_autorizado', detalle: 'solo las partes del trueke' });
+      const cerrado = ['COMPLETADO', 'ANULADO', 'BLOQUEADO'].includes(t.estado);
+      if (cerrado) {
+        return res.json({ contacto: null, oculto: true, detalle: 'el trueke está cerrado: contacto oculto' });
+      }
+      const contraparteWallet = t.usuarioA === req.wallet ? t.usuarioB : t.usuarioA;
+      const u = contraparteWallet ? await almacen.getUsuario(contraparteWallet) : null;
+      if (!u) return res.status(404).json({ error: 'contraparte_inexistente' });
+      res.json({
+        contacto: { telefono: u.telefono ?? null, correo: u.correo ?? null, wallet: contraparteWallet },
+        oculto: false,
+      });
+    } catch (e) { next(e); }
+  });
+
   // GET /truekes/:id — detalle del trueque (CU-05.1: info de confianza)
   r.get('/:id', requiereSesion(almacen), async (req, res) => {
     const t = await almacen.getTrueke(req.params.id);
@@ -112,7 +135,7 @@ export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow
 
   // POST /truekes — crear trueque (requiere Verificado/Certificado; D14)
   // Body: { articuloAId, articuloBId, parteB, horaPautada? }
-  r.post('/', requiereSesion(almacen), requiereEstado(almacen, 'VERIFICADO', 'CERTIFICADO'), async (req, res, next) => {
+  r.post('/', requiereSesion(almacen), requiereEstado(almacen, 'VERIFICADO', 'CERTIFICADO'), requiereFirmaAccion('crear trueque'), async (req, res, next) => {
     try {
       const u = await almacen.getUsuario(req.wallet);
       const { articuloAId, articuloBId, parteB, horaPautada } = req.body;
@@ -138,15 +161,8 @@ export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow
     } catch (e) { next(e); }
   });
 
-  // GET /truekes/:id — detalle del trueque (CU-05.1: info de confianza)
-  r.get('/:id', requiereSesion(almacen), async (req, res) => {
-    const t = await almacen.getTrueke(req.params.id);
-    if (!t) return res.status(404).json({ error: 'trueke_inexistente' });
-    res.json({ trueke: t });
-  });
-
   // POST /truekes/:id/custodiar — custodiarA/B (CU-12)
-  r.post('/:id/custodiar', requiereSesion(almacen), async (req, res, next) => {
+  r.post('/:id/custodiar', requiereSesion(almacen), requiereFirmaAccion('custodiar trueque'), async (req, res, next) => {
     try {
       const t = await almacen.getTrueke(req.params.id);
       if (!t) return res.status(404).json({ error: 'trueke_inexistente' });
@@ -159,7 +175,7 @@ export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow
   });
 
   // POST /truekes/:id/firma-recepcion — firmar recepción (CU-14)
-  r.post('/:id/firma-recepcion', requiereSesion(almacen), async (req, res, next) => {
+  r.post('/:id/firma-recepcion', requiereSesion(almacen), requiereFirmaAccion('firmar recepción'), async (req, res, next) => {
     try {
       const t = await almacen.getTrueke(req.params.id);
       if (!t) return res.status(404).json({ error: 'trueke_inexistente' });
@@ -172,7 +188,7 @@ export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow
   });
 
   // POST /truekes/:id/valoracion — marcar valoración (D36: marcador; detalle off-chain)
-  r.post('/:id/valoracion', requiereSesion(almacen), async (req, res, next) => {
+  r.post('/:id/valoracion', requiereSesion(almacen), requiereFirmaAccion('valorar trueque'), async (req, res, next) => {
     try {
       const t = await almacen.getTrueke(req.params.id);
       if (!t) return res.status(404).json({ error: 'trueke_inexistente' });
@@ -193,7 +209,7 @@ export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow
   // POST /truekes/:id/propuesta-encuentro — propone punto/fecha/hora del encuentro (punto 5.1)
   // Decide quién propone: mayor nivel D12 → mayor reputación → quien publicó (A).
   // Body: { puntoEncuentroId, horaPautada }  — el que gana la regla puede proponer.
-  r.post('/:id/propuesta-encuentro', requiereSesion(almacen), async (req, res, next) => {
+  r.post('/:id/propuesta-encuentro', requiereSesion(almacen), requiereFirmaAccion('proponer encuentro'), async (req, res, next) => {
     try {
       const t = await almacen.getTrueke(req.params.id);
       if (!t) return res.status(404).json({ error: 'trueke_inexistente' });
@@ -232,12 +248,56 @@ export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow
       const actualizado = await almacen.actualizarTrueke(t.id, {
         puntoEncuentroId: Number(puntoEncuentroId),
         horaPautada: new Date(horaPautada).toISOString(),
+        encuentroPropuestoPor: req.wallet,
+        encuentroEstado: 'PROPUESTO',
       });
       // El punto usado queda en los favoritos del que propone (punto 7: últimos usados)
       try {
         if (almacen.registrarUsoPunto) await almacen.registrarUsoPunto(req.wallet, Number(puntoEncuentroId));
       } catch { /* el registro de uso es secundario */ }
-      res.json({ trueke: actualizado, propone });
+      res.json({ trueke: actualizado, propone, encuentroEstado: 'PROPUESTO' });
+    } catch (e) { next(e); }
+  });
+
+  // POST /truekes/:id/encuentro/aceptar — la contraparte acepta la propuesta (punto 6)
+  // Al aceptar (punto 7): AMBOS NFTs pasan automáticamente a custodia del escrow
+  // (estado CUSTODIADO) y se liberan/transfieren solo al cierre Conforme.
+  r.post('/:id/encuentro/aceptar', requiereSesion(almacen), requiereFirmaAccion('aceptar encuentro'), async (req, res, next) => {
+    try {
+      const t = await almacen.getTrueke(req.params.id);
+      if (!t) return res.status(404).json({ error: 'trueke_inexistente' });
+      if (t.encuentroEstado !== 'PROPUESTO' || !t.encuentroPropuestoPor) {
+        return res.status(409).json({ error: 'sin_propuesta', detalle: 'no hay una propuesta de encuentro pendiente' });
+      }
+      // Solo la parte que NO propuso puede aceptar (la otra solo acepta, no propone otra)
+      if (req.wallet === t.encuentroPropuestoPor) {
+        return res.status(403).json({ error: 'no_autorizado', detalle: 'no puedes aceptar tu propia propuesta' });
+      }
+      const soyParte = t.usuarioA === req.wallet || (t.usuarioB && t.usuarioB === req.wallet);
+      if (!soyParte) return res.status(403).json({ error: 'no_autorizado' });
+
+      // Punto 7: custodia automática de ambos lados en el escrow
+      await almacen.actualizarTrueke(t.id, { encuentroEstado: 'ACEPTADO', estado: 'CUSTODIADO' });
+      const actualizado = await almacen.getTrueke(t.id);
+      res.json({ trueke: actualizado, custodia: 'AUTOMATICA_AMBOS', encuentroEstado: 'ACEPTADO' });
+    } catch (e) { next(e); }
+  });
+
+  // POST /truekes/:id/encuentro/rechazar — la contraparte rechaza la propuesta (punto 6)
+  r.post('/:id/encuentro/rechazar', requiereSesion(almacen), requiereFirmaAccion('rechazar encuentro'), async (req, res, next) => {
+    try {
+      const t = await almacen.getTrueke(req.params.id);
+      if (!t) return res.status(404).json({ error: 'trueke_inexistente' });
+      if (t.encuentroEstado !== 'PROPUESTO' || !t.encuentroPropuestoPor) {
+        return res.status(409).json({ error: 'sin_propuesta' });
+      }
+      if (req.wallet === t.encuentroPropuestoPor) {
+        return res.status(403).json({ error: 'no_autorizado', detalle: 'no puedes rechazar tu propia propuesta' });
+      }
+      const soyParte = t.usuarioA === req.wallet || (t.usuarioB && t.usuarioB === req.wallet);
+      if (!soyParte) return res.status(403).json({ error: 'no_autorizado' });
+      await almacen.actualizarTrueke(t.id, { encuentroEstado: 'RECHAZADO' });
+      res.json({ trueke: await almacen.getTrueke(t.id), encuentroEstado: 'RECHAZADO' });
     } catch (e) { next(e); }
   });
 
@@ -245,7 +305,7 @@ export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow
   // Body: { lado: 'A'|'B', conforme: true|false }
   //   Conforme ✓  → cierre_a/b = CONFORME; con ambos conformes + valoraciones → COMPLETADO.
   //   No Conforme ✗ → cierre = NO_CONFORME y se abre disputa (estado EN_DISPUTA).
-  r.post('/:id/cierre', requiereSesion(almacen), async (req, res, next) => {
+  r.post('/:id/cierre', requiereSesion(almacen), requiereFirmaAccion('cerrar trueque'), async (req, res, next) => {
     try {
       const t = await almacen.getTrueke(req.params.id);
       if (!t) return res.status(404).json({ error: 'trueke_inexistente' });
@@ -298,7 +358,7 @@ export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow
   // Requiere sesión; el NFT debe estar en el inventario del usuario (reasignado en el
   // punto 0) o ser el propietario on-chain. Body: { articuloId? } — opcional para
   // enlazar la fila BD; si se omite se busca por nft_token_id.
-  r.post('/nft/:tokenId/usar', requiereSesion(almacen), async (req, res, next) => {
+  r.post('/nft/:tokenId/usar', requiereSesion(almacen), requiereFirmaAccion('usar NFT'), async (req, res, next) => {
     try {
       const tokenId = Number(req.params.tokenId);
       const { articuloId } = req.body ?? {};

@@ -7,7 +7,7 @@
 // ofertas — decisión del director; RF-14.3).
 // =============================================================================
 import { Router } from 'express';
-import { requiereSesion, requiereEstado } from '../lib/auth.js';
+import { requiereSesion, requiereEstado, requiereFirmaAccion } from '../lib/auth.js';
 
 const LIMITE_ARTICULOS_POR_NIVEL = { INICIADO: 5, COMUN: 50, FRECUENTE: 100, SOCIO: 100 };
 
@@ -15,10 +15,16 @@ export function crearRouterCatalog({ almacen, minteadorNft }) {
   const r = Router();
 
   // POST /catalog/articulos — publicar artículo AtoA (requiere Verificado; RF-14.4/D14)
-  r.post('/articulos', requiereSesion(almacen), requiereEstado(almacen, 'VERIFICADO', 'CERTIFICADO'), async (req, res) => {
+  r.post('/articulos', requiereSesion(almacen), requiereEstado(almacen, 'VERIFICADO', 'CERTIFICADO'), requiereFirmaAccion('publicar artículo'), async (req, res) => {
     const u = await almacen.getUsuario(req.wallet);
-    const { titulo, descripcion, rubro, categoria, nftTokenId } = req.body;
+    const { titulo, descripcion, rubro, categoria, nftTokenId, imagenes } = req.body;
     if (!titulo || !rubro) return res.status(400).json({ error: 'titulo_y_rubro_requeridos' });
+    const imgs = Array.isArray(imagenes) ? imagenes.slice(0, 5) : [];
+    for (const im of imgs) {
+      if (!im || typeof im.data !== 'string' || typeof im.mime !== 'string') {
+        return res.status(400).json({ error: 'imagen_invalida', detalle: 'cada imagen: { data: base64, mime }' });
+      }
+    }
     const CATEGORIAS = ['ARTICULO', 'SERVICIO', 'BIEN', 'CRIPTO'];
     if (categoria && !CATEGORIAS.includes(categoria)) {
       return res.status(400).json({ error: 'categoria_invalida', detalle: CATEGORIAS.join('/') });
@@ -34,6 +40,20 @@ export function crearRouterCatalog({ almacen, minteadorNft }) {
     const articulo = await almacen.crearArticulo({
       wallet: req.wallet, titulo, descripcion, rubro, categoria: categoria ?? 'ARTICULO', nftTokenId: nftTokenId ?? null, disponible: true,
     });
+
+    // Punto 1 del director: guardar las imágenes del artículo (1..N)
+    const imagenesGuardadas = [];
+    for (const im of imgs) {
+      try {
+        const buf = Buffer.from(im.data, 'base64');
+        const idImg = await almacen.guardarImagenArticulo({
+          articuloId: articulo.id, wallet: req.wallet, contenido: buf, mime: im.mime,
+        });
+        imagenesGuardadas.push({ id: idImg, url: `/catalog/${articulo.id}/imagen/${idImg}` });
+      } catch (e) {
+        console.error('[catalog] imagen no guardada:', e.message);
+      }
+    }
 
     // Lógica maestra punto 1: cada ítem se convierte en un NFT (lo mintea la plataforma).
     // Con red on-chain configurada → mint real; sin red → token simulado (aviso).
@@ -58,7 +78,8 @@ export function crearRouterCatalog({ almacen, minteadorNft }) {
     }
 
     res.status(201).json({
-      articulo,
+      articulo: { ...articulo, imagenes: imagenesGuardadas },
+      imagenes: imagenesGuardadas,
       nft: minteo
         ? { tokenId: minteo.nftTokenId, simulado: Boolean(minteo.simulado), txHash: minteo.txHash ?? null, aviso: minteo.simulado ? 'sin red on-chain: token simulado (se minteará en producción)' : null }
         : null,
@@ -68,7 +89,29 @@ export function crearRouterCatalog({ almacen, minteadorNft }) {
   // GET /catalog — catálogo público (wallet conectada puede ver ofertas — RF-14.3)
   r.get('/', async (_req, res) => {
     const todos = await almacen.listarArticulos();
-    res.json({ articulos: todos.filter((a) => a.disponible !== false) });
+    const visibles = todos.filter((a) => a.disponible !== false);
+    const conImagenes = await Promise.all(visibles.map(async (a) => {
+      let imagenes = [];
+      try {
+        const lista = (await almacen.listarImagenesArticulo(a.id)) ?? [];
+        imagenes = lista.map((i) => ({ id: i.id, url: `/catalog/${a.id}/imagen/${i.id}` }));
+      } catch { /* sin imágenes */ }
+      return { ...a, imagenes };
+    }));
+    res.json({ articulos: conImagenes });
+  });
+
+  // GET /catalog/:articuloId/imagen/:imagenId — sirve una imagen del artículo (punto 1)
+  r.get('/:articuloId/imagen/:imagenId', async (req, res) => {
+    try {
+      const img = await almacen.getImagen(Number(req.params.imagenId));
+      if (!img) return res.status(404).json({ error: 'imagen_inexistente' });
+      res.setHeader('Content-Type', img.mime || 'image/jpeg');
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+      res.send(img.contenido);
+    } catch (e) {
+      res.status(500).json({ error: 'imagen_error' });
+    }
   });
 
   // POST /catalog/:id/despublicar — el dueño retira su artículo del catálogo
