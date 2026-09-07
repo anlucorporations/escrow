@@ -82,7 +82,13 @@ export function SesionProvider({ children }: { children: ReactNode }) {
       setAcceso({ fase: "sinWallet" });
       return { fase: "sinWallet" };
     }
-    setAcceso({ fase: "verificando" });
+    // Refresco "en caliente": si ya tenemos una sesión inscrita (p. ej. tras
+    // completar la verificación/KYC), actualizamos el usuario SIN pasar por la
+    // fase "verificando" (que desmontaría el contenido del guard — remount).
+    // La fase "verificando" solo aplica al inicio/cambio de cuenta.
+    setAcceso((prev) =>
+      prev.fase === "inscrito" ? prev : { fase: "verificando" }
+    );
     const estado = await consultarEstado(account);
     const nuevo: EstadoAcceso =
       estado.inscrito && estado.usuario

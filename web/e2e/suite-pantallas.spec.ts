@@ -36,6 +36,9 @@ async function simularSuite(
         removeListener: () => {},
       };
       localStorage.setItem("truekeate.account", cuenta as string);
+      // Login único: la wallet inscrita ya firmó al conectar → token global.
+      localStorage.setItem("truekeate.token", "tok-e2e-pantallas");
+      localStorage.setItem("truekeate.token.wallet", cuenta as string);
 
       const orig = window.fetch.bind(window);
       window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {

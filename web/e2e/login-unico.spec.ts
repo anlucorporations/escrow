@@ -50,8 +50,9 @@ async function simularLoginUnico(page: Page, usuario: UsuarioSim) {
         }
         if (url.includes("/catalog")) return json({ articulos: [] });
         if (url.includes("/reputacion/mi")) {
-          return json({ puntaje: 70, nivel: "COMUN", medalla: "ORO", oroHistorico: false, metricas: {}, formula: "f" });
+          return json({ puntaje: 70, nivel: "COMUN", medalla: "ORO", oroHistorico: false, metricas: { reputacionMedia: 4.5, efectivos: 3, apelaciones: 0 }, formula: "f" });
         }
+        if (url.includes("/disputas")) return json({ disputas: [] });
         if (url.includes("/puntos-encuentro/favoritos")) return json({ favoritos: [] });
         if (url.includes("/puntos-encuentro/mios")) return json({ puntos: [] });
         return orig(input, init);
@@ -62,21 +63,21 @@ async function simularLoginUnico(page: Page, usuario: UsuarioSim) {
 }
 
 test.describe("Login único — sin reautenticación por sección", () => {
-  test("al autenticarse en una sección, el token persiste al navegar a otra", async ({ page }) => {
+  test("el guard pide la firma UNA vez y luego no la repite al navegar", async ({ page }) => {
     await simularLoginUnico(page, { tipo: "PARTICULAR", nivel: "INICIADO", estado: "CERTIFICADO" });
 
-    // 1) Entrar a una sección que pide autenticar (sin token aún)
+    // 1) Entrar a una sección sin token: el guard muestra la ÚNICA pantalla de login
     await page.goto("/suite/perfil");
+    await expect(page.getByRole("heading", { name: /Inicia sesión con tu billetera/ })).toBeVisible();
+
+    // 2) Firmar UNA vez (firma EIP-191 → token global) → se muestra la sección
+    const btnLogin = page.getByRole("button", { name: /Iniciar sesión \(una firma\)/ });
+    await btnLogin.click();
     await expect(page.getByRole("heading", { name: /Mi Perfil/ })).toBeVisible();
 
-    // 2) Autenticarse UNA vez (firma EIP-191 → token global)
-    const btnLogin = page.getByRole("button", { name: /Iniciar sesión|Autenticar|Iniciar sesión para operar/ });
-    if (await btnLogin.isVisible().catch(() => false)) await btnLogin.click();
-    await expect(page).toHaveURL(/\/suite\/perfil/);
-
     // 3) Navegar a OTRA sección: NO debe volver a pedir la firma
-    await page.goto("/suite/disputas");
-    await expect(page.getByRole("heading", { name: /Disputas/ })).toBeVisible();
+    await page.goto("/suite/dashboard");
+    await expect(page.getByRole("heading", { name: "Mi Trueke Central" })).toBeVisible();
 
     // El botón de autenticación NO debe aparecer (token global ya emitido)
     const btnRepetido = page.getByRole("button", { name: /Iniciar sesión|Autenticar/ });
@@ -111,6 +112,8 @@ test.describe("Login único — sin reautenticación por sección", () => {
           if (url.includes("/truekes/ofertas")) return json({ truekes: [] });
           if (url.includes("/truekes")) return json({ truekes: [] });
           if (url.includes("/catalog")) return json({ articulos: [] });
+          if (url.includes("/disputas")) return json({ disputas: [] });
+          if (url.includes("/reputacion/mi")) return json({ puntaje: 70, nivel: "COMUN", medalla: "ORO", oroHistorico: false, metricas: { reputacionMedia: 4.5, efectivos: 3, apelaciones: 0 }, formula: "f" });
           return orig(input, init);
         };
       },

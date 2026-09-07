@@ -157,7 +157,7 @@ function TarjetaPropuesta({
 export default function PaginaGobernanza() {
   const { account } = useEthereum();
   const { acceso } = useSesion();
-  const { token, autenticar, cargando: autenticando, error: errorAuth } = useSesionAutenticada();
+  const { token } = useSesionAutenticada();
 
   const [padron, setPadron] = useState<{ totalSocios: number; esSocio: boolean } | null>(null);
   const [propuestas, setPropuestas] = useState<PropuestaGobernanza[]>([]);
@@ -236,24 +236,18 @@ export default function PaginaGobernanza() {
         )}
       </div>
 
-      {/* 1) Sin token → autenticar (firma EIP-191) */}
+      {/* 1) Sin token → el guard ya pidió la firma única (respaldo) */}
       {!token ? (
         <Card className="p-8 text-center">
           <p className="text-3xl">🗳️</p>
           <h2 className="mt-2 font-display text-lg font-semibold text-navy-800">
-            Autentícate para ver la gobernanza de Socios
+            Inicia sesión para ver la gobernanza de Socios
           </h2>
           <p className="mx-auto mt-1 max-w-md text-sm text-navy-800/60">
             El padrón y las propuestas viven on-chain en el SociosRegistry y se consultan a través
-            del backend con tu sesión firmada (EIP-191). Cualquier usuario inscrito puede
-            consultarlos; solo un Socio puede votar (D21).
+            del backend con tu sesión. Inicia sesión desde el menú superior (una sola firma);
+            cualquier inscrito puede consultar, solo un Socio puede votar (D21).
           </p>
-          <div className="mt-5 flex justify-center">
-            <Button onClick={() => void autenticar()} disabled={autenticando}>
-              {autenticando ? "Firmando…" : "🔏 Autenticar con mi wallet"}
-            </Button>
-          </div>
-          {errorAuth && <p className="mt-3 text-xs text-crimson">⚠️ {errorAuth}</p>}
         </Card>
       ) : (
         <>

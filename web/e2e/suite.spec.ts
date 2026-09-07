@@ -40,6 +40,12 @@ async function simularWallet(
         removeListener: () => {},
       };
       localStorage.setItem("truekeate.account", cuenta as string);
+      // Login único (decisión del director): la wallet inscrita firmó UNA vez al
+      // conectar → token global guardado (el guard deja pasar sin re-firma).
+      if (estaInscrito) {
+        localStorage.setItem("truekeate.token", "tok-e2e-suite");
+        localStorage.setItem("truekeate.token.wallet", cuenta as string);
+      }
 
       // Intercepta la verificación de inscripción contra el backend.
       const origFetch = window.fetch.bind(window);
@@ -63,6 +69,16 @@ async function simularWallet(
           return new Response(
             JSON.stringify({
               inscrito: true,
+              usuario: { wallet: cuenta, ...usuarioSim },
+            }),
+            { status: 200, headers: { "Content-Type": "application/json" } }
+          );
+        }
+        // Login único: la firma EIP-191 emite el token global (POST /auth/session).
+        if (url.includes("/auth/session") && init?.method === "POST") {
+          return new Response(
+            JSON.stringify({
+              token: "tok-e2e-suite",
               usuario: { wallet: cuenta, ...usuarioSim },
             }),
             { status: 200, headers: { "Content-Type": "application/json" } }
@@ -162,8 +178,10 @@ test.describe("Suite de usuario — control de acceso", () => {
     await page.getByLabel("Teléfono *").fill("+58 412 000 0000");
     await page.getByLabel(/Autorizo a TrueKeate/).check();
     await page.getByRole("button", { name: "Completar inscripción" }).click();
-    // Tras inscribirse, la wallet queda inscrita y accede al dashboard.
-    await expect(page).toHaveURL(/\/suite\/dashboard/, { timeout: 10_000 });
+    // Tras inscribirse, la wallet queda inscrita y el guard pide la ÚNICA firma
+    // de login (decisión del director: autenticación solo al conectar/acceder).
+    await expect(page.getByRole("heading", { name: /Inicia sesión con tu billetera/ })).toBeVisible({ timeout: 10_000 });
+    await page.getByRole("button", { name: /Iniciar sesión \(una firma\)/ }).click();
     await expect(page.getByRole("heading", { name: "Mi Trueke Central" })).toBeVisible();
   });
 
@@ -207,12 +225,12 @@ test.describe("Suite de usuario — control de acceso", () => {
     await expect(page.locator("nav[aria-label='Navegación principal']")).toBeHidden();
   });
 
-  test("panel Admin (RF-13.1): el Owner ve el dashboard y pide autenticar por firma", async ({ page }) => {
+  test("panel Admin (RF-13.1): el Owner ve el dashboard (login único ya hecho)", async ({ page }) => {
     await simularWallet(page, true, { tipo: "SOCIO", nivel: "SOCIO", estado: "CERTIFICADO" });
     await page.goto("/suite/admin");
     await expect(page.getByRole("heading", { name: /Panel del Owner/ })).toBeVisible();
-    // Sin token todavía: pide autenticarse (firma EIP-191 de la wallet).
-    await expect(page.getByRole("button", { name: /Autenticar como Owner/ })).toBeVisible();
+    // El login único se hizo al conectar: NO se vuelve a pedir firma por página.
+    await expect(page.getByRole("button", { name: /Autenticar/ })).toHaveCount(0);
   });
 
   test("protección por URL: un Particular Certificado NO entra a /suite/admin", async ({ page }) => {

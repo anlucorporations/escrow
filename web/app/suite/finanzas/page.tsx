@@ -22,7 +22,7 @@ function formatearMoneda(n: number | undefined): string {
 export default function PaginaFinanzas() {
   const { account } = useEthereum();
   const { acceso } = useSesion();
-  const { token, autenticar, cargando, error: errorSesion } = useSesionAutenticada();
+  const { token, error: errorSesion } = useSesionAutenticada();
 
   const [fin, setFin] = useState<FinanzasMi | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -73,13 +73,8 @@ export default function PaginaFinanzas() {
         <Card className="p-6 text-center">
           <p className="text-2xl">🔏</p>
           <p className="mt-2 text-sm text-navy-800/70">
-            Autentícate con tu billetera para ver tus finanzas.
+            Inicia sesión desde el menú superior con tu billetera (una sola firma) para ver tus finanzas.
           </p>
-          <div className="mt-4 flex justify-center">
-            <Button onClick={() => void autenticar()} disabled={cargando}>
-              {cargando ? "Firmando…" : "🔏 Autenticar"}
-            </Button>
-          </div>
         </Card>
       )}
 

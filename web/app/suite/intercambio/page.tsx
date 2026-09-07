@@ -293,7 +293,7 @@ function PanelPropuestaEncuentro({ trueke, token }: { trueke: Trueke; token: str
 export default function PaginaIntercambio() {
   const { account } = useEthereum();
   const { acceso } = useSesion();
-  const { token, autenticar, cargando: autenticando, error: errorSesion } = useSesionAutenticada();
+  const { token, error: errorSesion } = useSesionAutenticada();
 
   const usuario = acceso.fase === "inscrito" ? acceso.usuario : null;
   const estadoD28 = usuario?.estado ?? "INSCRITO";
@@ -522,15 +522,9 @@ export default function PaginaIntercambio() {
               {corta(account)}
             </span>
           )}
-          {!token ? (
-            <Button onClick={() => void autenticar()} disabled={autenticando || !account}>
-              {autenticando ? "Firmando…" : "🔏 Iniciar sesión para operar"}
-            </Button>
-          ) : (
-            <Button variante="outline-navy" onClick={() => void cargar()} disabled={cargando}>
-              {cargando ? "Cargando…" : "↻ Refrescar"}
-            </Button>
-          )}
+          <Button variante="outline-navy" onClick={() => void cargar()} disabled={cargando}>
+            {cargando ? "Cargando…" : "↻ Refrescar"}
+          </Button>
         </div>
       </div>
 
@@ -561,11 +555,7 @@ export default function PaginaIntercambio() {
             </span>
           </div>
 
-          {!token ? (
-            <p className="mt-4 rounded-xl bg-smoke px-4 py-3 text-sm text-navy-800/70">
-              Autentícate con el botón superior para crear trueques (firma EIP-191 de tu wallet).
-            </p>
-          ) : misArticulos.length === 0 ? (
+          {misArticulos.length === 0 ? (
             <p className="mt-4 rounded-xl bg-gold-500/10 px-4 py-3 text-sm text-navy-800/80">
               📦 <strong>Publica primero un artículo desde Mi Inventario</strong> (requiere
               estado Verificado) para poder ofrecerlo en un trueque.
@@ -670,15 +660,7 @@ export default function PaginaIntercambio() {
           )}
         </div>
 
-        {!token && (
-          <Card className="p-6 text-center">
-            <p className="text-sm text-navy-800/70">
-              Inicia sesión con tu wallet para ver y avanzar tus trueques.
-            </p>
-          </Card>
-        )}
-
-        {token && cargando && (
+        {cargando && (
           <p className="py-8 text-center text-sm text-navy-800/50">Cargando tus trueques…</p>
         )}
 

@@ -78,7 +78,7 @@ function Metrica({ etiqueta, valor }: { etiqueta: string; valor: string }) {
 export default function PaginaPerfil() {
   const { account } = useEthereum();
   const { acceso } = useSesion();
-  const { token, autenticar, cargando: autenticando, error: errorAuth } = useSesionAutenticada();
+  const { token } = useSesionAutenticada();
 
   // Reputación D12/D30 (solo se pide una vez autenticado).
   const [reputacion, setReputacion] = useState<ReputacionMi | null>(null);
@@ -266,20 +266,9 @@ export default function PaginaPerfil() {
         </p>
 
         {!token && (
-          <>
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <Button onClick={() => void autenticar()} disabled={autenticando}>
-                {autenticando ? "✍️ Firmando…" : "🔏 Autenticar para ver mi reputación"}
-              </Button>
-              <p className="max-w-sm text-xs text-navy-800/50">
-                Se firmará el mensaje <em>“TrueKeate: iniciar sesión”</em> (EIP-191)
-                para emitir un token de acceso.
-              </p>
-            </div>
-            {errorAuth && (
-              <p className="mt-3 text-xs text-crimson">⚠️ {errorAuth}</p>
-            )}
-          </>
+          <p className="mt-3 text-sm text-navy-800/60">
+            Inicia sesión desde el menú superior con tu billetera (una sola firma) para ver tu reputación.
+          </p>
         )}
 
         {token && cargandoRep && (

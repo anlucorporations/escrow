@@ -34,7 +34,7 @@ const inputCls =
 export default function PaginaInventario() {
   const { account } = useEthereum();
   const { acceso } = useSesion();
-  const { token, autenticar, cargando, error: errorSesion } = useSesionAutenticada();
+  const { token, error: errorSesion } = useSesionAutenticada();
 
   const [mios, setMios] = useState<ArticuloCatalogo[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -111,13 +111,8 @@ export default function PaginaInventario() {
         <Card className="p-6 text-center">
           <p className="text-2xl">🔏</p>
           <p className="mt-2 text-sm text-navy-800/70">
-            Autentícate con tu billetera (firma EIP-191) para gestionar tu inventario.
+            Inicia sesión desde el menú superior con tu billetera (una sola firma) para gestionar tu inventario.
           </p>
-          <div className="mt-4 flex justify-center">
-            <Button onClick={() => void autenticar()} disabled={cargando}>
-              {cargando ? "Firmando…" : "🔏 Autenticar"}
-            </Button>
-          </div>
         </Card>
       )}
 

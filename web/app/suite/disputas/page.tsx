@@ -195,38 +195,16 @@ export default function PaginaDisputas() {
         )}
       </div>
 
-      {/* Sin token de sesión → autenticar (firma EIP-191). */}
+      {/* Sin token: el guard de la suite ya pidió la firma única (respaldo). */}
       {!token && (
         <Card className="p-8 text-center">
           <p className="text-3xl">🔏</p>
           <h2 className="mt-2 font-display text-lg font-semibold text-navy-800">
-            Autentícate para ver tus disputas
+            Inicia sesión para ver tus disputas
           </h2>
           <p className="mx-auto mt-1 max-w-md text-sm text-navy-800/60">
-            Para consultar tus disputas y solicitar anulaciones debes firmar el mensaje
-            <em> “TrueKeate: iniciar sesión”</em> (EIP-191) con la wallet conectada.
+            Inicia sesión desde el menú superior con tu billetera (una sola firma).
           </p>
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
-            {!conectado ? (
-              <Button onClick={() => void conectar()} disabled={conectando}>
-                {conectando ? "Conectando…" : "Conectar MetaMask"}
-              </Button>
-            ) : (
-              <Button
-                onClick={() => void autenticar()}
-                disabled={autenticando || !signer}
-              >
-                {autenticando
-                  ? "Firmando…"
-                  : !signer
-                    ? "Desbloquea tu wallet para firmar"
-                    : "🔏 Autenticar sesión"}
-              </Button>
-            )}
-          </div>
-          {errorAutenticacion && (
-            <p className="mt-3 text-xs text-crimson">⚠️ {errorAutenticacion}</p>
-          )}
         </Card>
       )}
 

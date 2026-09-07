@@ -7,7 +7,9 @@
 //      conexión (solo la landing es pública).
 //   2) Wallet conectada pero NO inscrita → SOLO puede ver el catálogo
 //      (/suite/mercado); el resto de la suite muestra el aviso de inscripción.
-//   3) Inscrita → contenido normal según escalera D28.
+//   3) Inscrita → LOGIN ÚNICO: se pide UNA firma (token de sesión global) y
+//      después se muestran las secciones según su perfil (RF-14) — las páginas
+//      ya NO piden autenticación por separado.
 // =============================================================================
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -50,6 +52,33 @@ function PantallaConectar() {
   );
 }
 
+/** Login ÚNICO: la billetera ya está conectada e inscrita; falta la firma única
+ *  que emite el token de sesión global. Una sola vez; luego todas las secciones. */
+function PantallaIniciarSesion() {
+  const { token, autenticar, autenticando } = useSesion();
+  if (token) return null; // ya autenticado (el guard re-renderiza al cambiar token)
+  return (
+    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-4 py-16 text-center">
+      <div className="rounded-card border border-navy-800/10 bg-white p-8 shadow-md">
+        <p className="text-4xl">🔏</p>
+        <h1 className="mt-3 font-display text-2xl font-bold text-navy-800">
+          Inicia sesión con tu billetera
+        </h1>
+        <p className="mx-auto mt-2 max-w-md text-sm text-navy-800/60">
+          Tu billetera está conectada e inscrita. Confirma con <strong>una sola
+          firma</strong> para acceder a tus secciones. No te la volveremos a pedir
+          al navegar.
+        </p>
+        <div className="mt-6 flex justify-center">
+          <Button onClick={() => void autenticar()} disabled={autenticando}>
+            {autenticando ? "Firmando…" : "🔏 Iniciar sesión (una firma)"}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PantallaRequiereInscripcion() {
   const { inscribir, refrescar } = useSesion();
   return (
@@ -87,7 +116,7 @@ function PantallaRequiereInscripcion() {
 
 export function SuiteGuard({ children }: { children: ReactNode }) {
   const { conectado } = useEthereum();
-  const { acceso } = useSesion();
+  const { acceso, token } = useSesion();
   const pathname = usePathname() ?? "";
 
   // 1) Sin wallet conectada → no se accede al contenido de la suite.
@@ -108,8 +137,11 @@ export function SuiteGuard({ children }: { children: ReactNode }) {
     return <PantallaRequiereInscripcion />;
   }
 
-  // 4) Inscrita (INSCRITO/VERIFICADO/CERTIFICADO) → acceso según rol/estado.
+  // 4) Inscrita (INSCRITO/VERIFICADO/CERTIFICADO):
+  //    LOGIN ÚNICO — sin token de sesión se pide UNA firma (nunca por página).
   if (acceso.fase === "inscrito") {
+    if (!token) return <PantallaIniciarSesion />;
+
     // Protección por URL: si la sección no está permitida para este usuario
     // (RF-14/D14), se muestra un aviso en vez del contenido.
     const permitidas = seccionesPara({

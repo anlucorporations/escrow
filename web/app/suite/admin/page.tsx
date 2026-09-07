@@ -10,7 +10,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useEthereum } from "@/lib/ethereum";
 import { useSesion } from "@/lib/sesion";
 import {
-  iniciarSesion,
   adminContratos,
   adminDb,
   adminKpis,
@@ -34,11 +33,9 @@ function TarjetaKpi({ icono, label, valor, tono }: { icono: string; label: strin
 }
 
 export default function PaginaAdmin() {
-  const { account, signer, conectado, conectar, conectando } = useEthereum();
-  const { acceso } = useSesion();
+  const { account, conectado, conectar, conectando } = useEthereum();
+  const { acceso, token } = useSesion();
 
-  const [token, setToken] = useState<string | null>(null);
-  const [firmando, setFirmando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
 
@@ -71,25 +68,6 @@ export default function PaginaAdmin() {
       setCargando(false);
     }
   }, [token]);
-
-  // Autentica al Owner (firma EIP-191) y carga el panel.
-  const autenticar = useCallback(async () => {
-    if (!signer) {
-      setError("Desbloquea tu billetera para firmar (RF-16).");
-      return;
-    }
-    setFirmando(true);
-    setError(null);
-    try {
-      const firma = await signer.signMessage("TrueKeate: iniciar sesión");
-      const sesion = await iniciarSesion(firma);
-      setToken(sesion.token);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "fallo de autenticación");
-    } finally {
-      setFirmando(false);
-    }
-  }, [signer]);
 
   useEffect(() => {
     if (token) void cargar();
@@ -124,15 +102,9 @@ export default function PaginaAdmin() {
             </span>
           </p>
         </div>
-        {!token ? (
-          <Button onClick={() => void autenticar()} disabled={firmando || !signer}>
-            {firmando ? "Firmando…" : !signer ? "Desbloquea tu wallet para firmar" : "🔏 Autenticar como Owner"}
-          </Button>
-        ) : (
-          <Button variante="outline-navy" onClick={() => void cargar()} disabled={cargando}>
-            {cargando ? "Cargando…" : "↻ Refrescar"}
-          </Button>
-        )}
+        <Button variante="outline-navy" onClick={() => void cargar()} disabled={cargando}>
+          {cargando ? "Cargando…" : "↻ Refrescar"}
+        </Button>
       </div>
 
       {token && !esOwner && (
@@ -141,16 +113,6 @@ export default function PaginaAdmin() {
         </p>
       )}
       {error && <p className="rounded-xl bg-crimson/10 px-4 py-2 text-xs text-crimson">⚠️ {error}</p>}
-
-      {!token && (
-        <Card className="p-6 text-center">
-          <p className="text-sm text-navy-800/70">
-            Para ver los datos operativos debes <strong>autenticarte con la wallet del Owner</strong>:
-            se firmará el mensaje <em>“TrueKeate: iniciar sesión”</em> (EIP-191) y se emitirá un token de
-            sesión.
-          </p>
-        </Card>
-      )}
 
       {activo && (
         <>

@@ -18,7 +18,7 @@ const inputCls =
   "w-full rounded-xl border border-navy-800/15 bg-white px-3 py-2 text-sm text-navy-800 outline-none transition-colors focus:border-teal-500";
 
 export default function PaginaCertificacion() {
-  const { acceso, token, autenticar, autenticando } = useSesion();
+  const { acceso, token } = useSesion();
   const [estado, setEstado] = useState<string | null>(null);
   const [documentoRef, setDocumentoRef] = useState("");
   const [selfieRef, setSelfieRef] = useState("");
@@ -41,18 +41,14 @@ export default function PaginaCertificacion() {
   }, [cargarEstado]);
 
   if (!token) {
+    // El guard de la suite ya pide la firma única; protección de respaldo.
     return (
       <Card className="mx-auto max-w-xl p-8 text-center">
         <p className="text-3xl">🛡️</p>
         <h1 className="mt-2 font-display text-2xl font-bold text-navy-800">Certificación (KYC)</h1>
         <p className="mt-1 text-sm text-navy-800/60">
-          Inicia sesión con tu billetera (una sola firma) para enviar tu KYC.
+          Inicia sesión desde el menú superior con tu billetera (una sola firma).
         </p>
-        <div className="mt-5 flex justify-center">
-          <Button onClick={() => void autenticar()} disabled={autenticando}>
-            {autenticando ? "Firmando…" : "🔗 Iniciar sesión"}
-          </Button>
-        </div>
       </Card>
     );
   }

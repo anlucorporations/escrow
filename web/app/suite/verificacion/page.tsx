@@ -17,7 +17,7 @@ const inputCls =
   "w-full rounded-xl border border-navy-800/15 bg-white px-3 py-2 text-center font-mono text-2xl tracking-[0.4em] text-navy-800 outline-none transition-colors focus:border-teal-500";
 
 export default function PaginaVerificacion() {
-  const { acceso, token, autenticar, autenticando } = useSesion();
+  const { acceso, token, refrescar } = useSesion();
   const [estado, setEstado] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
   const [codigoDemo, setCodigoDemo] = useState<string | null>(null);
@@ -42,20 +42,15 @@ export default function PaginaVerificacion() {
     void cargarEstado();
   }, [cargarEstado]);
 
-  // No autenticado → pedir login único
+  // Sin token: el guard de la suite ya pidió la firma única; protección de respaldo.
   if (!token) {
     return (
       <Card className="mx-auto max-w-xl p-8 text-center">
         <p className="text-3xl">🛡️</p>
         <h1 className="mt-2 font-display text-2xl font-bold text-navy-800">Verificación de identidad</h1>
         <p className="mt-1 text-sm text-navy-800/60">
-          Inicia sesión con tu billetera (una sola firma) para verificar tu correo.
+          Inicia sesión desde el menú superior con tu billetera (una sola firma).
         </p>
-        <div className="mt-5 flex justify-center">
-          <Button onClick={() => void autenticar()} disabled={autenticando}>
-            {autenticando ? "Firmando…" : "🔗 Iniciar sesión"}
-          </Button>
-        </div>
       </Card>
     );
   }
@@ -110,6 +105,10 @@ export default function PaginaVerificacion() {
       const r = await verificarCodigo(token!, codigo);
       setEstado(r.usuario.estado);
       setAviso(null);
+      // Actualiza el contexto global (INSCRITO → VERIFICADO) para que el guard,
+      // el escudo D28 y las secciones nuevas (Intercambio/Inventario) se habiliten
+      // al instante, sin recargar la página.
+      await refrescar();
       await cargarEstado();
     } catch (e) {
       setError(e instanceof Error ? e.message : "código inválido");
