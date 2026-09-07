@@ -27,6 +27,10 @@ export default function PaginaVerificacion() {
   const [error, setError] = useState<string | null>(null);
 
   const inscrito = acceso.fase === "inscrito" ? acceso.usuario : null;
+  // Fuente de verdad del estado: la wallet CONECTADA (acceso.usuario.estado
+  // viene de /auth/estado?wallet=…). Nunca depende del token de sesión, que
+  // podría pertenecer a otra cuenta guardada en el navegador.
+  const estadoWallet = inscrito?.estado ?? null;
 
   const cargarEstado = useCallback(async () => {
     if (!token) return;
@@ -55,20 +59,21 @@ export default function PaginaVerificacion() {
     );
   }
 
-  // Ya verificado o certificado → no hace falta
-  if (estado === "VERIFICADO" || estado === "CERTIFICADO") {
+  // Ya verificado o certificado (estado de la WALLET conectada) → no hace falta.
+  const estadoEfectivo = estado ?? estadoWallet;
+  if (estadoEfectivo === "VERIFICADO" || estadoEfectivo === "CERTIFICADO") {
     return (
       <Card className="mx-auto max-w-xl p-8 text-center">
         <p className="text-4xl">✅</p>
         <h1 className="mt-2 font-display text-2xl font-bold text-navy-800">¡Correo verificado!</h1>
         <p className="mt-1 text-sm text-navy-800/60">
-          Tu estado actual es <strong>{estado}</strong>.{" "}
-          {estado === "VERIFICADO"
+          Tu estado actual es <strong>{estadoEfectivo}</strong>.{" "}
+          {estadoEfectivo === "VERIFICADO"
             ? "Siguiente paso: completar la certificación (KYC)."
             : "Ya tienes todas las operaciones habilitadas."}
         </p>
         <p className="mt-4">
-          {estado === "VERIFICADO" ? (
+          {estadoEfectivo === "VERIFICADO" ? (
             <a href="/suite/certificacion" className="text-sm font-semibold text-teal-500 underline">
               Ir a Certificación (KYC) →
             </a>

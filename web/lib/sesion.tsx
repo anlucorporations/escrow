@@ -100,6 +100,9 @@ export function SesionProvider({ children }: { children: ReactNode }) {
 
   // Al conectar/desconectar o cambiar de cuenta, consulta el estado de inscripción
   // y reconcilia el token guardado con la cuenta activa (login persistente).
+  // Regla: solo se conserva un token cuya wallet asociada COINCIDE con la cuenta
+  // conectada. Los tokens huérfanos (guardados antes de existir la clave wallet)
+  // o de otra cuenta se descartan → se pide la firma única de la cuenta actual.
   useEffect(() => {
     void refrescar();
     if (!account) return; // sin cuenta no aplica token (el guard bloquea la suite)
@@ -107,8 +110,9 @@ export function SesionProvider({ children }: { children: ReactNode }) {
     const previo = localStorage.getItem(CLAVE_TOKEN);
     if (previo && walletDelToken === account) {
       setToken(previo); // restaura el token de ESTA cuenta (sin re-firma)
-    } else if (walletDelToken && walletDelToken !== account) {
-      // cuenta distinta → token ajeno: se borra para no heredar sesión ajena
+    } else if (previo) {
+      // Token sin wallet asociada (versión anterior) o de OTRA cuenta → se
+      // descarta para no operar con la identidad de un tercero.
       setToken(null);
       localStorage.removeItem(CLAVE_TOKEN);
       localStorage.removeItem(CLAVE_TOKEN_WALLET);
