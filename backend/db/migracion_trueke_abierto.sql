@@ -34,6 +34,8 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- 3) articulos.categoria
 ALTER TABLE articulos ADD COLUMN IF NOT EXISTS categoria categoria_item NOT NULL DEFAULT 'ARTICULO';
+-- 3b) articulos.usado_el — ítem consumido (NFT quemado, lógica post-trueke punto 2)
+ALTER TABLE articulos ADD COLUMN IF NOT EXISTS usado_el TIMESTAMPTZ;
 
 -- 4) truekes: usuario_b nullable (oferta sin contraparte) y nuevas columnas
 ALTER TABLE truekes ALTER COLUMN usuario_b DROP NOT NULL;

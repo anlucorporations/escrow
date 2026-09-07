@@ -16,7 +16,7 @@
 import { Router } from 'express';
 import { requiereSesion, requiereEstado } from '../lib/auth.js';
 
-export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow, walletEmpresas }) {
+export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow, walletEmpresas, minteadorNft }) {
   const r = Router();
 
   // GET /truekes — mis trueques (solo los de la wallet conectada)
@@ -273,8 +273,68 @@ export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow
       const otra = lado === 'A' ? trasCierre.cierreB : trasCierre.cierreA;
       if (otra === 'CONFORME') {
         await almacen.actualizarTrueke(t.id, { estado: 'COMPLETADO' });
+        // Lógica post-trueke punto 0: liberación EN CRUZ del inventario — el artículo A
+        // pasa a ser del usuario B y el artículo B del usuario A (igual que el Escrow
+        // transfiere los NFTs on-chain al completar). Así el receptor ve el NFT recibido
+        // en su inventario y puede re-truequearlo (punto 1).
+        try {
+          if (trasCierre.articuloAId && trasCierre.usuarioB && almacen.reasignarArticulo) {
+            await almacen.reasignarArticulo(trasCierre.articuloAId, trasCierre.usuarioB);
+          }
+          if (trasCierre.articuloBId && trasCierre.usuarioA && almacen.reasignarArticulo) {
+            await almacen.reasignarArticulo(trasCierre.articuloBId, trasCierre.usuarioA);
+          }
+        } catch (e) {
+          console.error('[truekes] reasignación de artículos al completar:', e.message);
+        }
       }
       res.json({ trueke: await almacen.getTrueke(t.id) });
+    } catch (e) { next(e); }
+  });
+
+  // POST /truekes/nft/:tokenId/usar — consumir el NFT recibido (punto 2)
+  // El dueño actual del NFT (tras un trueke COMPLETADO, ya está en su inventario)
+  // lo USA: se quema on-chain (TrueKeateNFT.usar) y el artículo se marca usado_el.
+  // Requiere sesión; el NFT debe estar en el inventario del usuario (reasignado en el
+  // punto 0) o ser el propietario on-chain. Body: { articuloId? } — opcional para
+  // enlazar la fila BD; si se omite se busca por nft_token_id.
+  r.post('/nft/:tokenId/usar', requiereSesion(almacen), async (req, res, next) => {
+    try {
+      const tokenId = Number(req.params.tokenId);
+      const { articuloId } = req.body ?? {};
+
+      // 1) localizar el artículo del usuario que posee este NFT
+      const todos = await almacen.listarArticulos();
+      const mio = todos.find((a) =>
+        Number(a.nftTokenId) === tokenId &&
+        (a.usuarioWallet ?? a.wallet) === req.wallet &&
+        a.disponible !== false && !a.usadoEl
+      );
+      const articulo = articuloId
+        ? todos.find((a) => Number(a.id) === Number(articuloId) && (a.usuarioWallet ?? a.wallet) === req.wallet)
+        : mio;
+      if (!articulo) {
+        return res.status(403).json({ error: 'no_autorizado', detalle: 'el NFT debe estar en tu inventario (recibido por trueke)' });
+      }
+
+      // 2) quemar on-chain si hay red configurada (TrueKeateNFT.usar)
+      let quemado = null;
+      if (minteadorNft && minteadorNft.activo && minteadorNft.usar) {
+        quemado = await minteadorNft.usar(tokenId);
+      } else {
+        // Sin red: el quemado on-chain se simula (la BD marca usado; en producción
+        // con red se ejecuta TrueKeateNFT.usar real).
+        quemado = { simulado: true, txHash: null };
+      }
+
+      // 3) marcar la fila BD como consumida
+      await almacen.marcarArticuloUsado(articulo.id);
+
+      res.json({
+        ok: true,
+        quemado: { tokenId, simulado: Boolean(quemado.simulado), txHash: quemado.txHash ?? null },
+        articulo: await almacen.getArticulo?.(articulo.id) ?? { id: articulo.id, usadoEl: new Date().toISOString() },
+      });
     } catch (e) { next(e); }
   });
 

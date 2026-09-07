@@ -89,6 +89,27 @@ export function crearAlmacen() {
       a.updatedAt = new Date().toISOString();
       return a;
     },
+    /** Reasigna el dueño de un artículo (liberación en cruz al COMPLETADO — punto 0). */
+    reasignarArticulo(id, nuevaWallet) {
+      const a = estado.articulos.get(Number(id));
+      if (!a) return null;
+      a.wallet = nuevaWallet.toLowerCase();
+      a.usuarioId = nuevaWallet.toLowerCase();
+      a.updatedAt = new Date().toISOString();
+      return a;
+    },
+    /** Marca un artículo como consumido (NFT quemado — punto 2). */
+    marcarArticuloUsado(id) {
+      const a = estado.articulos.get(Number(id));
+      if (!a) return null;
+      a.disponible = false;
+      a.usadoEl = new Date().toISOString();
+      a.updatedAt = new Date().toISOString();
+      return a;
+    },
+    getArticulo(id) {
+      return estado.articulos.get(Number(id)) ?? null;
+    },
     crearEncargo(e) {
       const id = proxEncargo++;
       estado.encargos.set(id, { id, estado: 'ACTIVO', createdAt: new Date().toISOString(), ...e });

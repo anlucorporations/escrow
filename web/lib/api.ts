@@ -29,6 +29,8 @@ export interface ArticuloCatalogo {
   rubro?: string;
   categoria?: string;
   disponible?: boolean;
+  nftTokenId?: number | null;
+  usadoEl?: string | null;
   usuarioWallet?: string;
   usuarioNivel?: string;
 }
@@ -308,6 +310,15 @@ export function puntosFavoritos(token: string): Promise<{ favoritos: PuntoFavori
 /** POST /puntos-encuentro/:id/usar — marca un punto como usado. */
 export function usarPuntoEncuentro(token: string, id: number): Promise<{ ok: boolean; uso?: { puntoId: number; ultimoUso: string } }> {
   return pedirAuth<{ ok: boolean }>(`/puntos-encuentro/${id}/usar`, token, { metodo: "POST", body: {} });
+}
+
+/** POST /truekes/nft/:tokenId/usar — consume el NFT recibido (se quema — punto 2). */
+export function usarNft(token: string, tokenId: number, articuloId?: number): Promise<{ ok: boolean; quemado: { tokenId: number; simulado: boolean; txHash?: string | null }; articulo: ArticuloCatalogo }> {
+  return pedirAuth<{ ok: boolean; quemado: { tokenId: number; simulado: boolean; txHash?: string | null }; articulo: ArticuloCatalogo }>(
+    `/truekes/nft/${tokenId}/usar`,
+    token,
+    { metodo: "POST", body: articuloId ? { articuloId } : {} }
+  );
 }
 
 /** POST /truekes — crear trueque. */

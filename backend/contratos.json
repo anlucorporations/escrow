@@ -3547,6 +3547,19 @@
     "stateMutability": "nonpayable"
    },
    {
+    "type": "function",
+    "name": "usar",
+    "inputs": [
+     {
+      "name": "tokenId",
+      "type": "uint256",
+      "internalType": "uint256"
+     }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+   },
+   {
     "type": "event",
     "name": "Approval",
     "inputs": [
@@ -3623,6 +3636,25 @@
       "type": "string",
       "indexed": false,
       "internalType": "string"
+     }
+    ],
+    "anonymous": false
+   },
+   {
+    "type": "event",
+    "name": "ArticuloUsado",
+    "inputs": [
+     {
+      "name": "tokenId",
+      "type": "uint256",
+      "indexed": true,
+      "internalType": "uint256"
+     },
+     {
+      "name": "cuenta",
+      "type": "address",
+      "indexed": false,
+      "internalType": "address"
      }
     ],
     "anonymous": false
@@ -3836,6 +3868,11 @@
    {
     "type": "error",
     "name": "SoloMinter",
+    "inputs": []
+   },
+   {
+    "type": "error",
+    "name": "SoloPropietario",
     "inputs": []
    }
   ]

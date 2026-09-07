@@ -171,10 +171,9 @@ export async function crearAlmacenPg(pool) {
 
     async listarArticulos() {
       const r = await pool.query(
-        `SELECT a.id, a.titulo, a.descripcion, a.rubro, a.categoria, a.nft_token_id, a.disponible, a.created_at,
+        `SELECT a.id, a.titulo, a.descripcion, a.rubro, a.categoria, a.nft_token_id, a.disponible, a.usado_el, a.created_at,
                 u.wallet AS usuario_wallet, u.nivel AS usuario_nivel
            FROM articulos a JOIN usuarios u ON u.id = a.usuario_id
-          WHERE a.disponible = TRUE
           ORDER BY a.created_at DESC`
       );
       return r.rows.map((f) => ({
@@ -185,6 +184,7 @@ export async function crearAlmacenPg(pool) {
         categoria: f.categoria ?? 'ARTICULO',
         nftTokenId: f.nft_token_id !== null ? Number(f.nft_token_id) : null,
         disponible: f.disponible,
+        usadoEl: f.usado_el ? f.usado_el.toISOString() : null,
         createdAt: f.created_at.toISOString(),
         usuarioWallet: f.usuario_wallet.trim().toLowerCase(),
         usuarioNivel: f.usuario_nivel,
@@ -209,6 +209,52 @@ export async function crearAlmacenPg(pool) {
       if (r.rowCount === 0) return null;
       const f = r.rows[0];
       return { id: Number(f.id), nftTokenId: f.nft_token_id !== null ? Number(f.nft_token_id) : null };
+    },
+
+    /** Reasigna el dueño de un artículo (liberación en cruz al COMPLETADO — punto 0). */
+    async reasignarArticulo(id, nuevaWallet) {
+      const r = await pool.query(
+        `UPDATE articulos SET usuario_id = (SELECT id FROM usuarios WHERE wallet = $2),
+                updated_at = now()
+          WHERE id = $1 RETURNING id`,
+        [Number(id), NORMALIZA_WALLET(nuevaWallet)]
+      );
+      return r.rowCount > 0;
+    },
+
+    /** Marca un artículo como consumido (NFT quemado — punto 2). */
+    async marcarArticuloUsado(id) {
+      const r = await pool.query(
+        `UPDATE articulos SET disponible = FALSE, usado_el = now(), updated_at = now()
+          WHERE id = $1 RETURNING id, usado_el`,
+        [Number(id)]
+      );
+      if (r.rowCount === 0) return null;
+      const f = r.rows[0];
+      return { id: Number(f.id), usadoEl: f.usado_el ? f.usado_el.toISOString() : null };
+    },
+
+    async getArticulo(id) {
+      const r = await pool.query(
+        `SELECT a.id, a.titulo, a.descripcion, a.rubro, a.categoria, a.nft_token_id, a.disponible, a.usado_el,
+                u.wallet AS usuario_wallet
+           FROM articulos a JOIN usuarios u ON u.id = a.usuario_id
+          WHERE a.id = $1`,
+        [Number(id)]
+      );
+      const f = r.rows[0];
+      if (!f) return null;
+      return {
+        id: Number(f.id),
+        titulo: f.titulo,
+        descripcion: f.descripcion ?? '',
+        rubro: f.rubro,
+        categoria: f.categoria ?? 'ARTICULO',
+        nftTokenId: f.nft_token_id !== null ? Number(f.nft_token_id) : null,
+        disponible: f.disponible,
+        usadoEl: f.usado_el ? f.usado_el.toISOString() : null,
+        usuarioWallet: f.usuario_wallet.trim().toLowerCase(),
+      };
     },
 
     // ------------------------------------------------------------ truekes (persistido)

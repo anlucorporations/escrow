@@ -164,4 +164,41 @@ contract TrueKeateNftTest is Test {
         );
         assertEq(uint256(escrow.estado(id)), uint256(Escrow.Estado.CREADO));
     }
+
+    // ============================================================ usar (quemar — punto 2)
+    /// El dueño puede usar/quemar su NFT: deja de existir on-chain.
+    function test_UsarQuemaElNft() public {
+        vm.prank(plataforma);
+        uint256 tokenId = nft.mint(parteA, "SERVICIO", "ipfs://servicio-1");
+
+        vm.prank(parteA);
+        nft.usar(tokenId);
+
+        vm.expectRevert(); // el token ya no existe
+        nft.ownerOf(tokenId);
+    }
+
+    /// Solo el propietario actual puede quemar (un tercero no).
+    function test_UsarSoloPropietario() public {
+        vm.prank(plataforma);
+        uint256 tokenId = nft.mint(parteA, "ARTICULO", "ipfs://bici-1");
+
+        vm.prank(parteB);
+        vm.expectRevert(TrueKeateNFT.SoloPropietario.selector);
+        nft.usar(tokenId);
+        assertEq(nft.ownerOf(tokenId), parteA, "sigue del dueno");
+    }
+
+    /// Tras transferir el NFT (trueke completado), el NUEVO dueño puede quemarlo.
+    function test_UsarElNuevoDuenoTrasTrueke() public {
+        vm.prank(plataforma);
+        uint256 tokenId = nft.mint(parteA, "BIEN", "ipfs://bien-1");
+        vm.prank(parteA);
+        nft.transferFrom(parteA, parteB, tokenId); // liberación en cruz del escrow
+
+        vm.prank(parteB);
+        nft.usar(tokenId);
+        vm.expectRevert();
+        nft.ownerOf(tokenId);
+    }
 }

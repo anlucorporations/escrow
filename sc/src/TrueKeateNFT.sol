@@ -29,10 +29,12 @@ contract TrueKeateNFT is ERC721, ERC721URIStorage, Ownable {
 
     // ------------------------------------------------------------------ eventos
     event ArticuloMinteado(uint256 indexed tokenId, address cuenta, string categoria, string uri);
+    event ArticuloUsado(uint256 indexed tokenId, address cuenta);
 
     // ------------------------------------------------------------------ errores
     error SoloMinter();
     error CategoriaInvalida();
+    error SoloPropietario();
 
     // ------------------------------------------------------------------ constructor
     constructor(
@@ -80,6 +82,20 @@ contract TrueKeateNFT is ERC721, ERC721URIStorage, Ownable {
             || h == keccak256("SERVICIO")
             || h == keccak256("BIEN")
             || h == keccak256("CRIPTO");
+    }
+
+    // ------------------------------------------------------------------ usar (quemar — punto 2 de la lógica post-trueke)
+    /**
+     * @notice El DUEÑO actual del NFT lo consume: se quema on-chain (_burn) porque el
+     *         ítem fue usado y ya no existe (p. ej. un servicio ya prestado o un bien
+     *         consumible). Solo el propietario del token puede ejecutarlo.
+     * @param tokenId token a quemar.
+     */
+    function usar(uint256 tokenId) external {
+        if (ownerOf(tokenId) != msg.sender) revert SoloPropietario();
+        _burn(tokenId);
+        delete categoriaDe[tokenId];
+        emit ArticuloUsado(tokenId, msg.sender);
     }
 
     // ------------------------------------------------------------------ overrides (doble herencia ERC721 + URIStorage)

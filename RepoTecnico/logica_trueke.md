@@ -84,3 +84,23 @@
 - **P1 (minteo automático)**: `api/lib/nft-minter.js` — la plataforma mintea cada ítem al publicar (mint on-chain real con red, simulado sin red); `POST /catalog/articulos` persiste `nft_token_id`; `fijarNftToken` en ambos almacenes. **Desplegado en GCP** (TrueKeateNFT real 0x638A…B44, minter = relayer; mint verificado on-chain tokenId 1 y 2).
 - **P2 (geolocalización)**: router `/puntos-encuentro` (crear con PostGIS, `/mios`, `/favoritos` = últimos usados punto 7, `/:id/usar`); la propuesta de encuentro registra el punto usado; web con panel de propuesta (mapa OSM embebido, selector de favoritos, lat/lng o geolocalización, fecha/hora). Tests backend 39/39; E2E 43/3.
 - **P3 (GCP)**: migración F2 aplicada en Cloud SQL de producción; NFT real desplegado en el anvil remoto; secretos `NFT_ADDRESS` creados; api y web redesplegadas (revisiones 00010); verificación E2E en producción OK.
+
+---
+
+## 6. Ciclo de vida del NFT tras el trueke (director — post-entrega)
+
+- **Punto 0 — Liberación en cruz del inventario**: al pasar a COMPLETADO (ambos Recibido
+  Conforme), el backend reasigna en BD el dueño de ambos artículos (A→usuarioB, B→usuarioA),
+  igual que el Escrow transfiere los NFTs on-chain. El receptor ve el NFT recibido en su
+  inventario. *(implementado)*
+- **Punto 1 — Conservar para otro trueke**: el NFT recibido queda en el inventario del
+  receptor, disponible para ofrecerlo en un nuevo trueke (requisito: el NFT entregado debe
+  pertenecer al inventario de quien lo ofrece). *(implementado)*
+- **Punto 2 — Usar el NFT recibido (quemar)**: el dueño puede **USAR** el ítem; al elegir
+  USAR el NFT se quema on-chain (`TrueKeateNFT.usar(tokenId)` con `_burn`) porque fue
+  consumido y ya no existe. La fila BD se marca `articulos.usado_el` (disponible=false);
+  el tokenId se conserva como registro histórico. Endpoint
+  `POST /truekes/nft/:tokenId/usar` (solo el dueño); botón "🔥 Usar/Consumir" en el
+  inventario con confirmación. Sin red configurada el quemado se simula (aviso). *(implementado)*
+
+Verificación: Foundry 74/74 · Backend 40/40 · E2E 47/3.

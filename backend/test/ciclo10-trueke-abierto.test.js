@@ -143,3 +143,54 @@ test('trueke abierto: cierre No Conforme abre disputa (EN_DISPUTA)', async () =>
   assert.ok(nc.body.disputa, 'se abre la disputa');
   assert.equal(nc.body.disputa.solicitante, wB);
 });
+
+// =============================================================================
+// Lógica post-trueke (director):
+//   0. Al COMPLETADO los NFTs pasan al inventario de la contraparte (reasignación).
+//   1. El receptor puede re-ofrecer el NFT recibido.
+//   2. USAR: el dueño consume el NFT → se quema (simulado sin red) y marca usado_el.
+// =============================================================================
+test('post-trueke: al COMPLETADO se reasigna el dueño y el receptor puede usar el NFT', async () => {
+  const tokA = await registrarYVerificar(walletA, 'FRECUENTE');
+  const tokB = await registrarYVerificar(walletB, 'COMUN');
+  const artA = await publicarArticulo(tokA, 'Bici urbana', 'ARTICULO');
+  const artB = await publicarArticulo(tokB, 'Masaje relajante', 'SERVICIO');
+
+  // A oferta su bici; B la acuerda ofreciendo su servicio
+  const of = await request(app).post('/truekes/ofertas').set('Authorization', `Bearer ${tokA}`).send({
+    articuloAId: artA.id, descripcionRequerida: 'Busco un masaje', tipoRequerido: 'SERVICIO',
+  });
+  const ofertaId = of.body.trueke.id;
+  await request(app).post(`/truekes/${ofertaId}/acordar`).set('Authorization', `Bearer ${tokB}`).send({ articuloBId: artB.id });
+  await request(app).post(`/truekes/${ofertaId}/custodiar`).set('Authorization', `Bearer ${tokA}`).send({ lado: 'A' });
+  await request(app).post(`/truekes/${ofertaId}/custodiar`).set('Authorization', `Bearer ${tokB}`).send({ lado: 'B' });
+  await request(app).post(`/truekes/${ofertaId}/cierre`).set('Authorization', `Bearer ${tokA}`).send({ lado: 'A', conforme: true });
+  const cierreB = await request(app).post(`/truekes/${ofertaId}/cierre`).set('Authorization', `Bearer ${tokB}`).send({ lado: 'B', conforme: true });
+  assert.equal(cierreB.body.trueke.estado, 'COMPLETADO');
+
+  // Punto 0: el artículo A (bici de A) ahora es del usuario B
+  const catalogo = await request(app).get('/catalog');
+  const dueno = (a) => (a.usuarioWallet ?? a.wallet ?? '').toLowerCase();
+  const bici = catalogo.body.articulos.find((a) => a.id === artA.id);
+  assert.equal(dueno(bici), wB, 'la bici pasó al inventario de B');
+  const masaje = catalogo.body.articulos.find((a) => a.id === artB.id);
+  assert.equal(dueno(masaje), wA, 'el servicio pasó al inventario de A');
+
+  // Punto 1: B ya puede ofrecer la bici recibida en un nuevo trueke
+  const misDeB = catalogo.body.articulos.filter((a) => dueno(a) === wB && a.disponible !== false);
+  assert.ok(misDeB.some((a) => a.id === artA.id), 'B puede re-ofrecer la bici recibida');
+
+  // Punto 2: B USA la bici (la consume) → se marca usado_el (sin red: simulado)
+  const usar = await request(app).post(`/truekes/nft/${bici.nftTokenId ?? 1}/usar`)
+    .set('Authorization', `Bearer ${tokB}`).send({ articuloId: artA.id });
+  assert.equal(usar.status, 200, JSON.stringify(usar.body));
+  assert.equal(usar.body.quemado.simulado, true, 'sin red el quemado se simula');
+  assert.ok(usar.body.articulo.usadoEl || usar.body.articulo.usado_el, 'la fila BD marca usado_el');
+
+  // Un tercero NO puede usar un NFT ajeno
+  const walletC = ethers.Wallet.createRandom();
+  const tokC = await registrarYVerificar(walletC, 'COMUN');
+  const usarAjeno = await request(app).post(`/truekes/nft/${bici.nftTokenId ?? 1}/usar`)
+    .set('Authorization', `Bearer ${tokC}`).send({ articuloId: artA.id });
+  assert.equal(usarAjeno.status, 403, 'un tercero no consume el NFT ajeno');
+});

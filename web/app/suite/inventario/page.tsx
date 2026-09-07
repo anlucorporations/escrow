@@ -11,7 +11,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useEthereum } from "@/lib/ethereum";
 import { useSesion } from "@/lib/sesion";
 import { useSesionAutenticada } from "@/lib/useSesionAutenticada";
-import { obtenerCatalogo, publicarArticulo, despublicarArticulo, type ArticuloCatalogo } from "@/lib/api";
+import { obtenerCatalogo, publicarArticulo, despublicarArticulo, usarNft as usarNftApi, type ArticuloCatalogo } from "@/lib/api";
 import { Card } from "@/components/Card";
 import { Button } from "@/components/Button";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -38,6 +38,7 @@ export default function PaginaInventario() {
 
   const [mios, setMios] = useState<ArticuloCatalogo[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [mensajeUso, setMensajeUso] = useState<string | null>(null);
   const [cargandoLista, setCargandoLista] = useState(false);
 
   const [titulo, setTitulo] = useState("");
@@ -94,6 +95,28 @@ export default function PaginaInventario() {
     }
   }
 
+  /** Punto 2 (lógica post-trueke): el dueño USA/consume el NFT recibido → se quema. */
+  async function usarNftDe(a: ArticuloCatalogo) {
+    if (!token || a.nftTokenId == null) return;
+    const ok = window.confirm(
+      `¿Consumir "${a.titulo}"?\n\nEl NFT se QUEMARÁ (dejará de existir on-chain) porque el ítem fue usado. Esta acción no se puede deshacer.`
+    );
+    if (!ok) return;
+    setError(null);
+    setMensajeUso(null);
+    try {
+      const r = await usarNftApi(token, Number(a.nftTokenId), Number(a.id));
+      setMensajeUso(
+        r.quemado.simulado
+          ? `"${a.titulo}" consumido (marcado en tu inventario; el quemado on-chain se ejecutará en producción).`
+          : `"${a.titulo}" consumido y su NFT quemado on-chain.`
+      );
+      await cargar();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "no se pudo consumir el ítem");
+    }
+  }
+
   return (
     <div className="space-y-5">
       <div>
@@ -106,6 +129,9 @@ export default function PaginaInventario() {
 
       {errorSesion && <p className="rounded-xl bg-crimson/10 px-4 py-2 text-xs text-crimson">⚠️ {errorSesion}</p>}
       {error && <p className="rounded-xl bg-crimson/10 px-4 py-2 text-xs text-crimson">⚠️ {error}</p>}
+      {mensajeUso && (
+        <p className="rounded-xl bg-teal-500/10 px-4 py-2 text-xs text-teal-700">✅ {mensajeUso}</p>
+      )}
 
       {!token && (
         <Card className="p-6 text-center">
@@ -223,7 +249,16 @@ export default function PaginaInventario() {
               </div>
               {a.descripcion && <p className="mt-2 line-clamp-2 text-xs text-navy-800/60">{a.descripcion}</p>}
               {token && a.disponible !== false && (
-                <div className="mt-3 flex justify-end">
+                <div className="mt-3 flex flex-wrap justify-end gap-2">
+                  {a.nftTokenId != null && !a.usadoEl && (
+                    <button
+                      onClick={() => void usarNftDe(a)}
+                      className="rounded-pill border border-gold-500/50 bg-gold-500/10 px-3 py-1 text-xs font-semibold text-navy-800 hover:bg-gold-500/20"
+                      title="Consume el ítem: el NFT se quema on-chain (deja de existir)"
+                    >
+                      🔥 Usar/Consumir
+                    </button>
+                  )}
                   <button
                     onClick={() => void despublicar(Number(a.id))}
                     className="rounded-pill border border-crimson/40 px-3 py-1 text-xs font-semibold text-crimson hover:bg-crimson/5"

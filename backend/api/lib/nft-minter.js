@@ -15,12 +15,14 @@ import { ethers } from 'ethers';
 
 export const ABI_TRUEEKEATENFT = [
   'function mint(address cuenta, string calldata categoria, string calldata uri) external returns (uint256 tokenId)',
+  'function usar(uint256 tokenId) external',
   'function minter() view returns (address)',
   'function setMinter(address) external',
   'function siguienteTokenId() view returns (uint256)',
   'function categoriaDe(uint256) view returns (string)',
   'function tokenURI(uint256) view returns (string)',
   'event ArticuloMinteado(uint256 indexed tokenId, address cuenta, string categoria, string uri)',
+  'event ArticuloUsado(uint256 indexed tokenId, address cuenta)',
 ];
 
 /**
@@ -88,6 +90,20 @@ export function crearMinteador({ rpcUrl, nftAddress, minterPk, cadena = 'anvil' 
         tokenId = Number(sig) - 1;
       }
       return { nftTokenId: tokenId, simulado: false, txHash: recibo?.hash ?? tx.hash ?? null };
+    },
+
+    /**
+     * Quema un NFT que su dueño USÓ (lógica post-trueke punto 2). Ejecuta
+     * TrueKeateNFT.usar(tokenId) on-chain; sin red se simula (la BD marca usado_el).
+     * @param {number} tokenId
+     */
+    async usar(tokenId) {
+      if (!real) {
+        return { simulado: true, txHash: null };
+      }
+      const tx = await contrato.usar(Number(tokenId));
+      const recibo = await tx.wait();
+      return { simulado: false, txHash: recibo?.hash ?? tx.hash ?? null };
     },
   };
 }

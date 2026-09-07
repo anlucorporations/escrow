@@ -111,6 +111,7 @@ CREATE TABLE IF NOT EXISTS articulos (
     imagen_certificacion_id BIGINT,         -- FK 1—1 imagenes_certificadas (D23)
     nft_token_id            NUMERIC,        -- tokenId del TrueKeateNFT oficial (punto 1)
     disponible              BOOLEAN NOT NULL DEFAULT TRUE,
+    usado_el                TIMESTAMPTZ,    -- ítem consumido (NFT quemado — lógica post-trueke punto 2)
     alta_disponibilidad     BOOLEAN NOT NULL DEFAULT FALSE, -- D19 (computado)
     created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at              TIMESTAMPTZ NOT NULL DEFAULT now()
