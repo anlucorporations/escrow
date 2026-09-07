@@ -48,8 +48,9 @@ export interface Sesion {
   autenticar: () => Promise<boolean>;
   /** Cierra la sesión (borra el token). */
   cerrarSesion: () => void;
-  /** Fuerza una re-consulta del estado de inscripción de la wallet actual. */
-  refrescar: () => Promise<void>;
+  /** Fuerza una re-consulta del estado de inscripción de la wallet actual.
+   *  Devuelve el estado consultado para poder encadenar acciones (login único). */
+  refrescar: () => Promise<EstadoAcceso>;
   /** Ejecuta la inscripción formal y refresca el acceso. */
   inscribir: (datos: {
     correo: string;
@@ -62,38 +63,49 @@ export interface Sesion {
 
 const SesionContext = createContext<Sesion | null>(null);
 const CLAVE_TOKEN = "truekeate.token";
+/** Wallet asociada al token guardado (se descarta si cambió la cuenta). */
+const CLAVE_TOKEN_WALLET = "truekeate.token.wallet";
 
 export function SesionProvider({ children }: { children: ReactNode }) {
   const { account, conectado, signer } = useEthereum();
   const [acceso, setAcceso] = useState<EstadoAcceso>({ fase: "sinWallet" });
-  const [token, setToken] = useState<string | null>(null);
+  // Token restaurado de forma síncrona desde localStorage (login persistente:
+  // evita el parpadeo de "Iniciar sesión" y la re-firma en cada recarga/sección).
+  const [token, setToken] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(CLAVE_TOKEN);
+  });
   const [autenticando, setAutenticando] = useState(false);
 
-  const refrescar = useCallback(async () => {
+  const refrescar = useCallback(async (): Promise<EstadoAcceso> => {
     if (!account) {
       setAcceso({ fase: "sinWallet" });
-      return;
+      return { fase: "sinWallet" };
     }
     setAcceso({ fase: "verificando" });
     const estado = await consultarEstado(account);
-    setAcceso(
+    const nuevo: EstadoAcceso =
       estado.inscrito && estado.usuario
         ? { fase: "inscrito", usuario: estado.usuario }
-        : { fase: "conectadoNoInscrito" }
-    );
+        : { fase: "conectadoNoInscrito" };
+    setAcceso(nuevo);
+    return nuevo;
   }, [account]);
 
-  // Al conectar/desconectar o cambiar de cuenta, consulta el estado y restaura
-  // el token guardado si pertenece a la cuenta actual (login persistente).
+  // Al conectar/desconectar o cambiar de cuenta, consulta el estado de inscripción
+  // y reconcilia el token guardado con la cuenta activa (login persistente).
   useEffect(() => {
     void refrescar();
+    if (!account) return; // sin cuenta no aplica token (el guard bloquea la suite)
+    const walletDelToken = localStorage.getItem(CLAVE_TOKEN_WALLET);
     const previo = localStorage.getItem(CLAVE_TOKEN);
-    if (account && previo) {
-      // El token se asocia a la cuenta: se valida su pertenencia en cada uso por
-      // el backend; si cambió la cuenta, se descarta el token anterior.
-      setToken(previo);
-    } else {
+    if (previo && walletDelToken === account) {
+      setToken(previo); // restaura el token de ESTA cuenta (sin re-firma)
+    } else if (walletDelToken && walletDelToken !== account) {
+      // cuenta distinta → token ajeno: se borra para no heredar sesión ajena
       setToken(null);
+      localStorage.removeItem(CLAVE_TOKEN);
+      localStorage.removeItem(CLAVE_TOKEN_WALLET);
     }
   }, [account, conectado, refrescar]);
 
@@ -106,6 +118,7 @@ export function SesionProvider({ children }: { children: ReactNode }) {
       const sesion = await iniciarSesion(firma);
       setToken(sesion.token);
       localStorage.setItem(CLAVE_TOKEN, sesion.token);
+      localStorage.setItem(CLAVE_TOKEN_WALLET, account);
       return true;
     } catch (e) {
       console.error("[sesion] fallo de autenticación:", e);
@@ -118,6 +131,7 @@ export function SesionProvider({ children }: { children: ReactNode }) {
   const cerrarSesion = useCallback(() => {
     setToken(null);
     localStorage.removeItem(CLAVE_TOKEN);
+    localStorage.removeItem(CLAVE_TOKEN_WALLET);
   }, []);
 
   const inscribir = useCallback<Sesion["inscribir"]>(

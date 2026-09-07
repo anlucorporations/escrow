@@ -14,7 +14,7 @@ import { Button } from "@/components/Button";
 
 export function BotonConectarLogin({ className }: { className?: string }) {
   const { conectar, conectando } = useEthereum();
-  const { acceso, autenticar, autenticando, refrescar } = useSesion();
+  const { autenticar, autenticando, refrescar } = useSesion();
   const [ocupado, setOcupado] = useState(false);
 
   const cargando = conectando || autenticando || ocupado;
@@ -24,9 +24,11 @@ export function BotonConectarLogin({ className }: { className?: string }) {
     try {
       const cuenta = await conectar();
       if (!cuenta) return;
-      await refrescar();
+      // refrescar() DEVUELVE el estado consultado (no usar el closure `acceso`,
+      // que aún vale del render anterior y rompía el login único).
+      const estado = await refrescar();
       // Si la wallet ya está inscrita, se firma una vez (login único).
-      if (acceso.fase === "inscrito") await autenticar();
+      if (estado.fase === "inscrito") await autenticar();
     } finally {
       setOcupado(false);
     }
