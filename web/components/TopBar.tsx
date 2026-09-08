@@ -107,10 +107,12 @@ export function TopBar() {
           />
         </Link>
 
-        {/* ---- Secciones de la suite: SOLO PC (≥lg) — unidas a la barra ---- */}
+        {/* ---- Secciones de la suite: SOLO PC (≥lg) — unidas a la barra ----
+            Ajuste del director (2026-09): SOLO iconos; al pasar el mouse se
+            muestra el título de la sección (tooltip/aria). */}
         <nav
           aria-label="Secciones de la suite"
-          className="hidden min-w-0 flex-1 items-center justify-center gap-1 lg:flex"
+          className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 lg:flex"
         >
           {!conectado ? (
             <p className="truncate text-xs text-white/50">
@@ -120,13 +122,15 @@ export function TopBar() {
             <>
               <Link
                 href="/suite/mercado"
-                className={`whitespace-nowrap rounded-pill px-3 py-1.5 text-sm font-semibold ${
+                title="Mercado"
+                aria-label="Mercado"
+                className={`inline-flex h-9 w-9 items-center justify-center rounded-pill text-base transition-colors ${
                   seccionActiva("/suite/mercado")
                     ? "bg-gold-500 text-navy-900"
                     : "text-white/75 hover:bg-white/10 hover:text-white"
                 }`}
               >
-                🛒 Mercado
+                🛒
               </Link>
               <span className="ml-2 truncate text-xs text-white/45">
                 Wallet conectada sin inscribir — solo catálogo.
@@ -137,17 +141,15 @@ export function TopBar() {
               <Link
                 key={s.href}
                 href={s.href}
-                title={s.descripcion}
-                className={`whitespace-nowrap rounded-pill px-3 py-1.5 text-sm font-semibold transition-colors ${
+                title={s.label}
+                aria-label={s.label}
+                className={`inline-flex h-9 w-9 items-center justify-center rounded-pill text-lg leading-none transition-colors ${
                   seccionActiva(s.href)
                     ? "bg-gold-500 text-navy-900"
                     : "text-white/75 hover:bg-white/10 hover:text-white"
                 }`}
               >
-                <span aria-hidden className="mr-1">
-                  {s.icono}
-                </span>
-                {s.label}
+                <span aria-hidden>{s.icono}</span>
               </Link>
             ))
           )}
