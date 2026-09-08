@@ -78,7 +78,7 @@ Navegador: **Chromium headless interno** (`chromium_headless_shell`, build 1234 
 | 10 | **Intercambio (Bruno)** — sección con historial/activos | ✅ | `09-intercambio-bruno.png` |
 | 11 | Intersticial **“Iniciar sesión (una firma)”** al recargar secciones — confirmado y superado con un clic (comportamiento por diseño, H3) | ✅ | — |
 
-> Los scripts de prueba quedan en `web/prueba-1-navegador.mjs`, `web/flujo-usuario.mjs`, `web/cerrar.mjs` y `web/final-verif.mjs` (evidencia JSON en `RepoTecnico/pruebas/1ra-prueba/*.json`).
+> Evidencia de la prueba en `RepoTecnico/pruebas/1ra-prueba/` (capturas PNG + JSON por paso). Los harness de navegador fueron temporales (se limpiaron del repositorio).
 
 ---
 
@@ -107,7 +107,7 @@ bash backend/scripts/reiniciar-plataforma.sh --confirmar --respaldo
 # Inyección (BD + on-chain con claves reales del anvil GCP)
 DATABASE_URL="postgresql://app:***@127.0.0.1:5433/truekeate" \
   node scripts/inyectar_datos_operativos.mjs --yes
-# Pruebas de navegador (Chromium headless interno)
-cd web && LD_LIBRARY_PATH=/tmp/playwright-libs/extracted/usr/lib/x86_64-linux-gnu \
-  FONTCONFIG_FILE=/tmp/fonts-config/fonts.conf node prueba-1-navegador.mjs
+# Pruebas de navegador (Chromium headless interno) — usa el harness de la suite
+# E2E (web/e2e) o reproduce con Playwright contra la URL desplegada; evidencia en
+# RepoTecnico/pruebas/1ra-prueba/
 ```
