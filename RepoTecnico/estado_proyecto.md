@@ -438,3 +438,11 @@ Despliegue GCP: commit `8e7d13d` pusheado a GitHub/GitLab.com/gitlab.codecrypto.
 **truekeate-web rev 00016** (europe-west1). Verificado en vivo: `/auth/estado` devuelve
 `username`, catálogo 24 artículos, y en el navegador la barra única muestra `🥇 👤 @ana.lopez`,
 las secciones por rol y la marca con logo. Captura: `RepoTecnico/pruebas/1ra-prueba/ui-gcp-produccion.png`.
+
+### Ajuste menú de usuario (2026-09-08, desplegado)
+
+- Botón del menú: SOLO 👤 + emoji de estado (INSCRITO 🟡 · VERIFICADO 🟢 · CERTIFICADO 🥇).
+- Desplegable: título `@username · nivel (D12)` y subtítulo `tipo · medalla de reputación`.
+- Se eliminó el componente EscudoEstado; la API pública expone `medalla`.
+- Despliegue GCP: API rev 00016 · web rev 00018 (imágenes release-169d345). Verificado en
+  navegador: `👤🥇 @ana.lopez·SOCIO SOCIO🥇ORO` y `👤🟢 @carlos.mendoza·COMUN PARTICULAR🥉BRONCE`.
