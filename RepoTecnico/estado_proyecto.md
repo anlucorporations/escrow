@@ -422,3 +422,19 @@ Documento completo con hallazgos: `RepoTecnico/INFORME_PRUEBA_1.md` (evidencia e
 `RepoTecnico/pruebas/1ra-prueba/`). Hallazgos: H1 (reputación cuenta solo parte A + nivel calculado
 no perfil), H2 (listado de Mercado lento en headless), H3 (firma única al recargar), H4 (permite
 ofertar dos veces el mismo artículo), H5 (mensaje de éxito transitorio).
+
+## Ajustes de UI del director (2026-09-08) — desplegados y publicados
+
+Ajustes implementados, probados en navegador (local y GCP) y desplegados en producción:
+1. **PC**: barra superior ÚNICA (secciones + menú de usuario en `TopBar`); se eliminó `TopNavPc`.
+2. **Menú de usuario**: muestra `@username` (columna `usuarios.username` + migración
+   `backend/db/migracion_username.sql`; API `/auth/*` lo expone sin PII; registro lo deriva del correo).
+3. **Símbolo de estado minimalista** junto al username: INSCRITO 🟡 · VERIFICADO 🟢 · CERTIFICADO 🥇
+   (sustituye al escudo; misma navegación por estado).
+4. **Marca**: icono de logo (`TrueKeate_logo.svg`) + logotipo `TrueKeat☑` (sin glifo ⇄).
+
+Despliegue GCP: commit `8e7d13d` pusheado a GitHub/GitLab.com/gitlab.codecrypto.academy; imágenes
+`backend:release-8e7d13d` y `web:release-8e7d13d` → Cloud Run **truekeate-api rev 00015** y
+**truekeate-web rev 00016** (europe-west1). Verificado en vivo: `/auth/estado` devuelve
+`username`, catálogo 24 artículos, y en el navegador la barra única muestra `🥇 👤 @ana.lopez`,
+las secciones por rol y la marca con logo. Captura: `RepoTecnico/pruebas/1ra-prueba/ui-gcp-produccion.png`.
