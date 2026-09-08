@@ -27,6 +27,8 @@ const RUTA_INSCRIPCION = "/suite/inscripcion";
 const RUTAS_SIN_INSCRIPCION = [RUTA_CATALOGO, RUTA_INSCRIPCION];
 
 function PantallaConectar() {
+  const { errorConexion, abrirEnAppWallet } = useEthereum();
+  const host = typeof window !== "undefined" ? window.location.host : "";
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-4 py-16 text-center">
       <div className="rounded-card border border-navy-800/10 bg-white p-8 shadow-md">
@@ -42,6 +44,38 @@ function PantallaConectar() {
         <div className="mt-6 flex justify-center">
           <BotonConectarLogin />
         </div>
+
+        {/* Ayuda contextual si no hay wallet inyectada (RF-16.1 / móvil) */}
+        {errorConexion === "app_movil" && (
+          <div className="mx-auto mt-5 max-w-md rounded-xl border border-gold-500/40 bg-gold-500/5 p-4 text-left">
+            <p className="text-sm font-bold text-navy-800">📱 Tu wallet está en la app del móvil</p>
+            <p className="mt-1 text-xs text-navy-800/70">
+              Los navegadores del móvil no tienen extensiones. Conecta de una de estas dos formas:
+            </p>
+            <ol className="mt-2 list-decimal space-y-1 pl-4 text-xs text-navy-800/80">
+              <li>
+                Pulsa el botón y TrueKeate se abrirá dentro de <strong>MetaMask</strong> (app).{" "}
+                <em>(Otras wallets: busca su navegador interno y entra a esta misma dirección.)</em>
+              </li>
+              <li>
+                En MetaMask: menú ⋮ → <strong>Navegador</strong> → entra a <code className="break-all">{host}</code>
+              </li>
+            </ol>
+            <Button onClick={() => abrirEnAppWallet()} className="mt-3 w-full !text-xs">
+              📲 Abrir en la app de MetaMask
+            </Button>
+          </div>
+        )}
+        {errorConexion === "sin_wallet" && (
+          <div className="mx-auto mt-5 max-w-md rounded-xl border border-navy-800/10 bg-smoke p-4 text-left">
+            <p className="text-sm font-bold text-navy-800">🦊 No se detectó una wallet en este navegador</p>
+            <p className="mt-1 text-xs text-navy-800/70">
+              Instala la <strong>extensión de MetaMask</strong> (u otra wallet compatible, RF-16.1),
+              recarga la página y vuelve a pulsar “Conectar”. Si estás en el móvil, usa la app.
+            </p>
+          </div>
+        )}
+
         <p className="mt-4 text-xs text-navy-800/40">
           <Link href="/" className="underline hover:text-teal-500">
             ← Volver a la página de inicio

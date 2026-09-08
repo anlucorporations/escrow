@@ -486,3 +486,15 @@ Capturas: `RepoTecnico/pruebas/1ra-prueba/sbt-*.png`. Commit `c440204` en los 3 
   con vistas de imagen y **aprueba** → CERTIFICADO + mint del SBT nativo (Diana quedó CERTIFICADO
   con sbtDe=2; Carlos CERTIFICADO vía auto-SBT con sbtDe=1). API: submit 200 + review 200.
 - Capturas: `RepoTecnico/pruebas/1ra-prueba/owner-01..04*.png` + JSON de resultados.
+
+## Conexión de wallet en móvil (fix director, 2026-09-08)
+
+Diagnóstico: en navegadores móviles NO hay extensiones (`window.ethereum` ausente) y la app
+mostraba "MetaMask no está instalado…". Fix (decisión: deep link + navegador interno; WalletConnect
+documentado como mejora futura — requiere projectId de cloud.walletconnect.com):
+- `lib/ethereum.tsx`: sin provider se espera un provider **EIP-6963** (1,2 s) y se adopta; si no hay,
+  se marca `errorConexion` (`app_movil` en móvil / `sin_wallet` en escritorio) en vez de alert().
+  Nuevo `abrirEnAppWallet()` → deep link `https://metamask.app.link/dapp/<host>`.
+- `components/SuiteGuard.tsx`: tarjetas de ayuda contextuales: móvil → "Abrir en la app de
+  MetaMask" + pasos del Navegador interno; escritorio → instalar extensión.
+- Pendiente futuro: integración WalletConnect universal (projectId).
