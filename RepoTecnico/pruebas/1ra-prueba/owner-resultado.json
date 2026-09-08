@@ -1,0 +1,40 @@
+{
+  "fecha": "2026-09-08T16:13:48.950Z",
+  "pasos": [
+    {
+      "p": "Diana (sin SBT) ve formulario",
+      "ok": true,
+      "d": "panel visible"
+    },
+    {
+      "p": "Enviar habilitado (2 imágenes)",
+      "ok": true,
+      "d": ""
+    },
+    {
+      "p": "Diana envía KYC → PENDIENTE",
+      "ok": false,
+      "d": "esperando Owner"
+    },
+    {
+      "p": "Owner entra al Panel",
+      "ok": true,
+      "d": "sesión Owner"
+    },
+    {
+      "p": "Sección KYC pendientes",
+      "ok": false,
+      "d": "RF-18.4"
+    },
+    {
+      "p": "Diana listada en pendientes",
+      "ok": false,
+      "d": "fila Diana visible"
+    },
+    {
+      "p": "Owner aprueba → CERTIFICADO+SBT",
+      "ok": true,
+      "d": "review OK"
+    }
+  ]
+}

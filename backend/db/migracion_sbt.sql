@@ -20,3 +20,7 @@ ALTER TABLE kyc ADD COLUMN IF NOT EXISTS selfie_img_id BIGINT;
 -- 3) La firma ECDSA de imagenes_certificadas pasa a ser opcional (las imágenes
 --    KYC las almacena la plataforma sin firma del usuario)
 ALTER TABLE imagenes_certificadas ALTER COLUMN firma_ecdsa DROP NOT NULL;
+
+-- 4) Columnas de imagen (contenido binario + MIME) ausentes en esquemas antiguos
+ALTER TABLE imagenes_certificadas ADD COLUMN IF NOT EXISTS contenido BYTEA;
+ALTER TABLE imagenes_certificadas ADD COLUMN IF NOT EXISTS mime TEXT;

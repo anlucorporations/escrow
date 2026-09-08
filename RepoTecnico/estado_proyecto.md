@@ -473,3 +473,16 @@ firma opcional) · TrueKeateSBT desplegado en anvil GCP `0x870526b7973b56163a699
 **web rev 00019** (imágenes release-c440204). E2E en producción (Carlos): sin SBT → pide
 DNI+selfie; mint SBT nativo #1; detección y **auto-certificación → CERTIFICADO** (kyc via_sbt).
 Capturas: `RepoTecnico/pruebas/1ra-prueba/sbt-*.png`. Commit `c440204` en los 3 repos.
+
+### Prueba del flujo Owner (KYC con imágenes) — 2026-09-08 ✅
+
+- **Hallazgo corregido**: la BD de producción tenía `imagenes_certificadas` sin las columnas
+  `contenido` y `mime` (esquema antiguo) → la subida de imágenes KYC fallaba (500). Se añadieron
+  vía `migracion_sbt.sql` (idempotente) y se aplicó en Cloud SQL (afecta también a las imágenes
+  de artículos A5).
+- **Pruebas en producción**: (a) usuaria sin SBT (Gisela temporal) sube DNI+selfie por la UI →
+  “KYC enviado” (PENDIENTE) con imágenes persistidas (tipo KYC_DNI/KYC_SELFIE, mime, binario);
+  (b) **Owner** desde `/suite/admin` (cuenta 0, bootstrap previo) ve la sección “KYC pendientes”
+  con vistas de imagen y **aprueba** → CERTIFICADO + mint del SBT nativo (Diana quedó CERTIFICADO
+  con sbtDe=2; Carlos CERTIFICADO vía auto-SBT con sbtDe=1). API: submit 200 + review 200.
+- Capturas: `RepoTecnico/pruebas/1ra-prueba/owner-01..04*.png` + JSON de resultados.
