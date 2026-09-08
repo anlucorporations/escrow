@@ -1,6 +1,6 @@
 # Manual Técnico 06 — Diagrama Relacional (modelo PostgreSQL off-chain)
 
-> **Alcance**: descripción textual de las 14 tablas del esquema real, sus relaciones (1:N, 1:1, N:M resueltas), qué tabla es espejo de qué contrato/evento on-chain y el rol de PostGIS (radio ≤10 km, RNF-08.3/08.4) en la búsqueda de trueques.
+> **Alcance**: descripción textual de las **16 tablas** del esquema real, sus relaciones (1:N, 1:1, N:M resueltas), qué tabla es espejo de qué contrato/evento on-chain y el rol de PostGIS (radio ≤10 km, RNF-08.3/08.4) en la búsqueda de trueques. **Revisión 2026-09**: esquema ampliado (`username`, certificación SBT/imágenes en `kyc`, `KYC_DNI`/`KYC_SELFIE` y `contenido`/`mime` en `imagenes_certificadas`, tablas `puntos_favoritos` y `sesiones`).
 > **Fuentes leídas**: `backend/db/schema.sql`, `backend/indexador.js`, eventos declarados en `sc/src/*.sol`, `RepoTecnico/arquitectura_tecnica.md` (§4 modelo, §5 indexador).
 > **Convención**: toda referencia `ruta:línea` apunta al código real. Las FKs **sin constraint SQL** se marcan como "FK lógica" y su enforcement se delega al backend o queda **pendiente de confirmar**.
 
@@ -11,7 +11,7 @@
 ### 1.1 Diagrama textual de tablas y relaciones
 
 ```
-                         usuarios (62-79)
+                         usuarios (70-88)
                         ┌───────────────┐
    FK usuario_id        │ id PK         │        FK usuario_id
      1:N (kyc)          │ wallet UNIQUE │        1:N (articulos,
@@ -22,30 +22,35 @@
               ┌────────────────┼───────────────────────┐
               │                │ 1:N                   │ 1:1 (finanzas)
               ▼                ▼                       ▼
-            kyc (82)      articulos (96)          finanzas (228)
+            kyc (92)      articulos (111)        finanzas (267)
               │                │  ▲                    ▲
               │ FK usuario_id  │  │ imagen_certificacion_id   ▲ espejo
               │                │  │ (FK lógica 1—1, D23)      │ BRLT.EmisionRegistrada
-              │                ▼  │ imagenes_certificadas(170)│
+              │                ▼  │ imagenes_certificadas(207)│
               │              ┌───────────────┐                │
-              │ FK          │ truekes (111)  │◄── espejo Escrow│
+              │ FK          │ truekes (130)  │◄── espejo Escrow│
               │ 1:N         │ escrow_id UNIQ │   (indexador)   │
               ▼              │ art_a FK art.  │                │
-           disputas (155)    │ art_b FK art.  │  usuario_a/b    │
+           disputas (192)    │ art_b FK art.  │  usuario_a/b    │
                              │ punto_enc(id)  │  CHAR(42)      │
                              │ estado 9 enums │                │
                              └───────┬────────┘                │
                     FK trueke_id     │ 1:N                     │
                      1:N             ▼                         │
-                  valoraciones(129)  │            suscripciones(184) ── espejo
-                                     │            campanas(197)      SuscripcionEmpresa
-                                     │            subastas(210)      .Suscrita
+                  valoraciones(154)  │            suscripciones(223) ── espejo
+                                     │            campanas(236)      SuscripcionEmpresa
+                                     │            subastas(249)      .Suscrita
                                      ▼
                         (eventos procesados)
-                     auditoria (240) ── indexador_checkpoint (255)
+                     auditoria (279) ── indexador_checkpoint (294)
 ```
 
 Leyenda: `(n)` = línea de apertura de la tabla en `backend/db/schema.sql`; líneas continuas = FK con `REFERENCES` real; líneas punteadas = FK lógica sin constraint.
+
+> **Revisión 2026-09**: el esquema creció (276 → 327 líneas; `username`, certificación SBT/imágenes en
+> `kyc`, tablas `puntos_favoritos` y `sesiones`). Las líneas del diagrama y de las secciones revisadas
+> están actualizadas; las restantes referencias de línea de este documento pueden quedar desfasadas
+> respecto a `backend/db/schema.sql` actual (re-marcado fino pendiente de confirmar).
 
 ### 1.2 Tipos de clave presentes en el esquema
 
@@ -62,7 +67,12 @@ Leyenda: `(n)` = línea de apertura de la tabla en `backend/db/schema.sql`; lín
 - **1:N**: la relación dominante (usuario → sus tablas; trueque → valoraciones/disputas). Ver §2.
 - **1:1**: `usuarios`–`finanzas` (PK compartida, `schema.sql:229`); `usuarios`–`kyc` (lógica: 1 fila KYC por usuario, sin `UNIQUE` en `usuario_id` → el esquema permite N); `articulos`–`imagenes_certificadas` (FK lógica `imagen_certificacion_id`, `schema.sql:102`).
 - **N:M**: no hay tablas puente explícitas; el trueque es la **relación N:M usuario↔artículo resuelta con 2+2 columnas** en `truekes` (ver §4).
-- **Polimorfismo**: `imagenes_certificadas(tipo, ref_id)` apunta a `articulos` (PUBLICACION) o `truekes` (RECEPCION) según `tipo` (`schema.sql:172-173`).
+- **Polimorfismo**: `imagenes_certificadas(tipo, ref_id)` apunta a `articulos` (PUBLICACION),
+  `truekes` (RECEPCION) o **`kyc`** (`KYC_DNI`/`KYC_SELFIE`, 2026-09) según `tipo`
+  (`schema.sql:209-210`; índice `idx_imagenes_ref (tipo, ref_id)` en 323).
+- **KYC 2026-09**: `kyc` gana FKs lógicas a `imagenes_certificadas` (`documento_img_id`, `selfie_img_id`,
+  `schema.sql:104-105`) y referencias on-chain propias (`sbt_contrato`/`sbt_token_id`/`via_sbt`,
+  `schema.sql:101-103`) — ver Manual 03 · 09-certificacion-sbt.
 
 ---
 
@@ -104,7 +114,8 @@ Leyenda: `(n)` = línea de apertura de la tabla en `backend/db/schema.sql`; lín
 |---|---|---|---|---|
 | `imagen_certificacion_id` | `articulos` | `imagenes_certificadas(id)` (1—1) | 102 | Comentario del esquema: "FK 1—1 imagenes_certificadas (D23)" — **sin `REFERENCES`** |
 | `punto_encuentro_id` | `truekes` | `puntos_encuentro(id)` | 122 | **Sin `REFERENCES`**; punto acordado del encuentro (CU-16) |
-| `ref_id` | `imagenes_certificadas` | `articulos.id` o `truekes.id` según `tipo` | 173 | Polimórfica; índice `(tipo, ref_id)` en 272 |
+| `ref_id` | `imagenes_certificadas` | `articulos.id`, `truekes.id` o **`kyc.id`** según `tipo` (KYC_DNI/KYC_SELFIE) | 210 | Polimórfica; índice `(tipo, ref_id)` en 323 |
+| `documento_img_id` / `selfie_img_id` | `kyc` | `imagenes_certificadas(id)` (1—1 lógica, 2026-09) | 104-105 | **Sin `REFERENCES`**; imágenes DNI/selfie del KYC (Manual 03 · 09) |
 | `usuario_a`, `usuario_b` | `truekes` | `usuarios.wallet` (dirección) | 116-117 | Denormalizada a propósito (§1.2); índices en 266-267 |
 | `valorador`, `valorado` | `valoraciones` | `usuarios.wallet` | 132-133 | Denormalizada |
 | `solicitante` | `disputas` | `usuarios.wallet` | 158 | Denormalizada |
@@ -151,6 +162,11 @@ El intercambio AtoA es una relación **N:M entre usuarios y artículos** que el 
 
 **Contratos con eventos pero SIN mapeo en este ciclo** (pendiente de confirmar en C8): `FondoDeValor` (`ContribucionRegistrada`, `PorcentajeActualizado`, `RetiroParaOperacion`, `sc/src/FondoDeValor.sol:35-38`) — afecta a `finanzas.fondo_valor`; y los eventos de disputa/resolución del escrow (`AnulacionSolicitada`, `VotoSocio`, `ResolucionEjecutada`, `ResolucionPorDefecto`, `SancionProgramada`, `sc/src/Escrow.sol:105-109`) — afectarían a `disputas`/`truekes`. El mapa del indexador solo cubre 5 entidades (`backend/indexador.js:51-66`).
 
+**TrueKeateSBT (2026-09) sin espejo en el indexador**: el evento `SbtMinteado`
+(`sc/src/TrueKeateSBT.sol:32`) **no está mapeado** en `backend/indexador.js`; los campos
+`kyc.via_sbt`/`sbt_contrato`/`sbt_token_id` los escribe **la API directamente** al certificar
+(`routes/kyc.js` + `lib/almacen-pg.js:154-185`) — la cadena no necesita espejo para este flujo.
+
 ---
 
 ## 6. Tablas off-chain escritas por el backend
@@ -161,7 +177,8 @@ El intercambio AtoA es una relación **N:M entre usuarios y artículos** que el 
 | `valoraciones` | Valoración 1-5 (D18/D36) | FK `truekes` | Contenido off-chain; las marcas on-chain (`ValoracionMarcadaA/B`, `sc/src/Escrow.sol:100-101`) no se sincronizan en este ciclo (pendiente) |
 | `puntos_encuentro` | Zonas (CU-16) | FK `usuarios` | Escritura por el usuario/backend; geografía PostGIS |
 | `disputas` | Solicitudes de anulación (CU-18/19) | FK `truekes` | `registro_votos` JSONB es espejo de votos on-chain (D21); su llenado automatizado es **pendiente de confirmar** |
-| `imagenes_certificadas` | Evidencia de imágenes (D23) | FK lógica polimórfica `(tipo, ref_id)` | Hash SHA-256 + firma ECDSA obligatorios (`schema.sql:174,177`); backend/IPFS; el anclaje on-chain de la raíz (D23) no está en los contratos de este ciclo (Manual 05 §4.3) |
+| `kyc` | Metadata KYC + certificación (D28) | FK `usuarios` | **2026-09**: `initKyc`/`getKyc`/`actualizarKyc` (`backend/api/lib/almacen-pg.js:117-185`); `via_sbt`/`sbt_*`/`documento_img_id`/`selfie_img_id` los escriben `/kyc/auto-certificar` y `/kyc/review`; `merkle_root` es espejo del Smart Account (§5); `imagenes_certificadas` recibe las imágenes `KYC_DNI`/`KYC_SELFIE` |
+| `imagenes_certificadas` | Evidencia de imágenes (D23) | FK lógica polimórfica `(tipo, ref_id)` | Hash SHA-256 + `contenido`/`mime` (2026-09); `firma_ecdsa` opcional para KYC (`schema.sql:214`); escritura real por `guardarImagen`/`guardarImagenArticulo` (`almacen-pg.js:188-197,299-304`); el anclaje on-chain de la raíz (D23) no está en los contratos de este ciclo (Manual 05 §4.3) |
 | `campanas` | VENTA/RECOLECTA (CU-09/10) | FK `usuarios` | Backend; `estado` en texto libre |
 | `subastas` | Subastas (RF-17, CU-25/26) | FK `usuarios` ×2, `articulos` | Backend; `pujas` JSONB; desempate por `nivel_ganador` (D27) |
 | `finanzas` | Saldos por usuario | PK/FK `usuarios` | Parcialmente espejo (BRLT) — §5 |
@@ -223,6 +240,7 @@ Las columnas usan el tipo `GEOGRAPHY`, por lo que las distancias de `ST_DWithin`
 |---|---|
 | Estado actual de un trueque | `truekes` por `escrow_id` o `id` → `estado` (enum 9 estados); KPIs de disputas leen el espejo: `backend/api/routes/admin.js:27-30` |
 | Escalera D28 de un usuario | `usuarios.estado` (INSCRITO→VERIFICADO→CERTIFICADO) + `kyc.estado`/`merkle_root` (espejo de `SmartAccount.kycMerkleRoot`, `sc/src/SmartAccount.sol:51`) |
+| Certificación KYC/SBT (2026-09) | `kyc` (`via_sbt`, `sbt_contrato`, `sbt_token_id`, `documento_img_id`, `selfie_img_id`) + `imagenes_certificadas` (`KYC_DNI`/`KYC_SELFIE`) + on-chain `TrueKeateSBT.sbtDe(wallet)` (`backend/api/routes/kyc.js:136-145`) |
 | ¿Quién participó y con qué? | `truekes.usuario_a/b` (direcciones) + `articulos` vía `articulo_a_id/b_id` |
 | Valoraciones de un trueque | `valoraciones` por `trueke_id` (5 renglones 1-5); reputación media derivada (`backend/api/routes/reputacion.js:22-27`) |
 | Búsqueda de trueques por cercanía | `ST_DWithin(puntos_encuentro.geog, usuarios.geog, 10000)` (≤10 km, RNF-08) + índice GIST `idx_puntos_geog` |
@@ -235,17 +253,19 @@ Las columnas usan el tipo `GEOGRAPHY`, por lo que las distancias de `ST_DWithin`
 
 | Tabla | PK | FKs reales (REFERENCES) | FKs lógicas / denormalizadas |
 |---|---|---|---|
-| `usuarios` | `id` | — | `wallet` (clave natural on-chain) |
-| `kyc` | `id` | `usuario_id → usuarios` | `revisado_por` (wallet Owner), `merkle_root` (espejo) |
+| `usuarios` | `id` | — | `wallet` (clave natural on-chain), `username` (handle público, 2026-09) |
+| `kyc` | `id` | `usuario_id → usuarios` | `revisado_por` (wallet Owner/minter), `merkle_root` (espejo), `sbt_contrato` (dirección on-chain), `documento_img_id`/`selfie_img_id` → `imagenes_certificadas` (FK lógica) |
 | `articulos` | `id` | `usuario_id → usuarios` | `imagen_certificacion_id → imagenes_certificadas` (1—1, D23) |
 | `truekes` | `id` | `articulo_a_id`, `articulo_b_id → articulos` | `escrow_id` (on-chain), `usuario_a/b` (wallets), `punto_encuentro_id → puntos_encuentro` |
 | `valoraciones` | `id` | `trueke_id → truekes` | `valorador`/`valorado` (wallets) |
 | `puntos_encuentro` | `id` | `usuario_id → usuarios` | `geog` espacial |
+| `puntos_favoritos` | `id` | `usuario_id → usuarios`, `punto_encuentro_id → puntos_encuentro` | `UNIQUE (usuario_id, punto_encuentro_id)` |
 | `disputas` | `id` | `trueke_id → truekes` | `solicitante` (wallet), `registro_votos` (espejo JSONB) |
-| `imagenes_certificadas` | `id` | — | `ref_id` polimórfico `(tipo)`; `wallet` |
+| `imagenes_certificadas` | `id` | — | `ref_id` polimórfico `(tipo)` → articulos/truekes/**kyc**; `wallet` |
 | `suscripciones` | `id` | `empresa_id → usuarios` | `tx_hash` (evento) |
 | `campanas` | `id` | `usuario_id → usuarios` | `articulos` JSONB |
 | `subastas` | `id` | `empresa_id → usuarios`, `articulo_id → articulos`, `ganador_id → usuarios` | `escrow_id` (on-chain), `nivel_ganador` (desempate D27) |
 | `finanzas` | `usuario_id` (= FK) | `usuario_id → usuarios` | `nfts_stock`/`criptos`/`porcentajes_config` JSONB |
 | `auditoria` | `id` | — | `actor` (log.address); UNIQUE idempotencia |
 | `indexador_checkpoint` | `contrato` | — | — |
+| `sesiones` | `token` | `wallet → usuarios(wallet)` | Tokens del login con wallet (RF-16); expiración 24 h |

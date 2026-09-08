@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · El Panel del Owner: el cuadro de mandos de TrueKeate</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">08 · Suite de Sistemas</div>
+    <h1>El Panel del Owner: el cuadro de mandos de TrueKeate</h1>
+    <div class="intro">Versión en lenguaje sencillo del manual técnico "Panel del Owner / Sistemas" (<code>RepoTecnico/Manuales/08-Suite-Sistemas/01-panel-sistemas.md</code>). Aquí contamos qué ve y qué puede hacer la <strong>persona responsable de TrueKeate</strong> (el Owner) en su panel de control: cifras del momento, revisión de identidades con fotos, contratos desplegados y salud de los servidores. Pensado para público general y para el propio Owner.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>08-Suite-Sistemas/01-panel-sistemas.md</b></span>
+      <span>Edición: <b>8 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/08-Suite-Sistemas/01-panel-sistemas</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Suite de Sistemas · Suite Sistemas — El Panel del Owner: el cuadro de mandos de TrueKeate</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>Qué es el Panel del Owner</span></a><div class="subs"><a href="#sub1">2.1 Propósito y alcance</a><br><a href="#sub2">2.2 Quién puede usarlo (varias comprobaciones)</a></div></li><li><a href="#s3"><span class="tnum">3</span><span>La página del panel, pieza a pieza</span></a><div class="subs"><a href="#sub3">3.1 La estructura</a><br><a href="#sub4">3.2 Las tarjetas de cifras (KPIs)</a><br><a href="#sub5">3.3 La revisión de certificaciones (con fotos)</a><br><a href="#sub6">3.4 La base de datos off-chain</a><br><a href="#sub7">3.5 Los contratos desplegados</a><br><a href="#sub8">3.6 La infraestructura (relayer e indexador)</a></div></li><li><a href="#s4"><span class="tnum">4</span><span>Revisar certificaciones: el bloque de KYC pendientes</span></a><div class="subs"><a href="#sub9">4.1 Qué ves y cómo se cargan las fotos</a><br><a href="#sub10">4.2 Aprobar o rechazar</a></div></li><li><a href="#s5"><span class="tnum">5</span><span>Los servicios que alimentan el panel (para curiosos)</span></a><div class="subs"><a href="#sub11">5.1 Los servicios `/admin`</a><br><a href="#sub12">5.2 Los servicios de certificación del Owner</a><br><a href="#sub13">5.3 El cliente de la web</a></div></li><li><a href="#s6"><span class="tnum">6</span><span>Operación guiada para el Owner</span></a><div class="subs"><a href="#sub14">6.1 Preparar el terreno (una sola vez)</a><br><a href="#sub15">6.2 Revisar certificaciones pendientes</a><br><a href="#sub16">6.3 Leer cifras, base de datos, contratos e infraestructura</a><br><a href="#sub17">6.4 Verificación registrada en producción</a></div></li><li><a href="#s7"><span class="tnum">7</span><span>Lo que falta por confirmar (resumen)</span></a></li><li><a href="#s8"><span class="tnum">8</span><span>Glosario de este manual</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos</h2>
+<p>El <strong>Panel del Owner</strong> es la "sala de máquinas" de TrueKeate. Con él puedes:</p>
+<ol><li><strong>Ver las cifras del momento</strong> (KPIs): cuántos usuarios hay, cuántos artículos se ofrecen, cuántos trueques se han hecho y cuántas disputas hay abiertas.</li><li><strong>Revisar solicitudes de certificación</strong>: ver las <strong>fotos (documento + selfie)</strong> de quien quiere certificarse y <strong>aprobar o rechazar</strong>.</li><li><strong>Mirar la base de datos</strong>: cuántas filas hay en las "carpetas" principales (usuarios, artículos, truekes).</li><li><strong>Mirar los contratos desplegados</strong>: las direcciones de la "caja fuerte" y demás piezas en la cadena.</li><li><strong>Comprobar la salud de los servidores</strong>: si el relayer (el que firma por ti) y el indexador (el que copia la cadena a la base) están OK.</li></ol>
+<blockquote class="info"><span class="tag">Nota</span><p>Para entrar necesitas ser el <strong>Owner</strong> (cuenta 0 del anvil, registrada como SOCIO CERTIFICADO) y tener la <strong>billetera conectada</strong> con sesión iniciada. Cómo prepararlo: manual <code>04-Despliegue/02-reinicio-y-bootstrap.md</code>.</p></blockquote>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. Qué es el Panel del Owner</h2>
+<h3 class="sub" id="sub1">2.1 Propósito y alcance</h3>
+<ul><li>Es una pantalla <strong>real</strong> de TrueKeate (no un dibujo): la encuentras en <strong><code>/suite/admin</code></strong> con el título "🛠 Panel del Owner".</li><li>Reúne en una sola página: cifras (KPIs), estado de la base de datos, contratos desplegados, salud de los servidores y la <strong>revisión de certificaciones</strong> con fotos.</li></ul>
+<h3 class="sub" id="sub2">2.2 Quién puede usarlo (varias comprobaciones)</h3>
+<p>El acceso está vigilado en varias capas, todas a la vez:</p>
+<div class="table-wrap"><table><thead><tr><th>Capa</th><th>Qué comprueba</th></tr></thead><tbody><tr><td><strong>Menú y dirección (web)</strong></td><td>La sección Admin solo aparece si tu tipo de usuario es <strong>SOCIO</strong></td></tr><tr><td><strong>Aviso en la página</strong></td><td>Si entras sin ser SOCIO, la web te avisa en rojo</td></tr><tr><td><strong>Servicios <code>/admin</code></strong></td><td>Exigen sesión iniciada <strong>y</strong> ser SOCIO (o rol OWNER)</td></tr><tr><td><strong>Servicios de certificación</strong></td><td>Exigen ser el <strong>Owner on-chain</strong>: la cuenta dueña del registro de Socios</td></tr><tr><td><strong>Registro en la base</strong></td><td>El Owner debe estar dado de alta como CERTIFICADO + SOCIO (script de bootstrap)</td></tr></tbody></table></div>
+<blockquote class="info"><span class="tag">Nota</span><p>Detalle fino: la web se fija en el tipo "SOCIO" del usuario, y los servicios de certificación verifican además la identidad del Owner en la cadena. Son dos comprobaciones que se complementan.</p></blockquote>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. La página del panel, pieza a pieza</h2>
+<h3 class="sub" id="sub3">3.1 La estructura</h3>
+<ul><li><strong>Cabecera</strong>: el título, tu billetera corta (por ejemplo <code>0xf39F…2266</code>) y el botón <strong>"↻ Refrescar"</strong> para volver a pedir todos los datos.</li><li><strong>Sin billetera conectada</strong>: ves una tarjeta "Conecta la billetera del Owner".</li><li>Los datos solo se pintan cuando <strong>los cuatro servicios responden</strong>: mientras tanto ves un indicador de carga.</li></ul>
+<h3 class="sub" id="sub4">3.2 Las tarjetas de cifras (KPIs)</h3>
+<p>Cuatro números con su icono:</p>
+<ul><li>👥 <strong>Usuarios inscritos</strong></li><li>📦 <strong>Artículos publicados</strong></li><li>⇄ <strong>Trueques (espejo)</strong> — los acuerdos registrados</li><li>⚖ <strong>Disputas abiertas</strong></li></ul>
+<h3 class="sub" id="sub5">3.3 La revisión de certificaciones (con fotos)</h3>
+<ul><li>En el panel vive el bloque de <strong>KYC pendientes</strong>: solicitudes de personas que subieron documento + selfie y esperan tu decisión. Se explica en la sección 4.</li></ul>
+<h3 class="sub" id="sub6">3.4 La base de datos off-chain</h3>
+<ul><li>Una tarjeta resume la base de datos (PostgreSQL en la nube): cuántos <strong>usuarios</strong>, <strong>artículos</strong> y <strong>trueques</strong> hay guardados. Recuerda que esa base es un <strong>espejo</strong> de lo que ocurre en la cadena: la llenan los eventos que emiten los contratos.</li></ul>
+<h3 class="sub" id="sub7">3.5 Los contratos desplegados</h3>
+<ul><li>La tarjeta "Contratos desplegados" lista las piezas de la cadena <strong>con dirección real</strong> (ignora las vacías): el Escrow (la caja fuerte), la fábrica de cuentas, el registro de Socios, la moneda BRLT, las suscripciones de empresas, los NFTs de trueques y el <strong>TrueKeateSBT</strong> de certificación (desde 2026-09).</li></ul>
+<h3 class="sub" id="sub8">3.6 La infraestructura (relayer e indexador)</h3>
+<ul><li>🤖 <strong>Relayer EIP-712</strong> (el que firma las operaciones sin gas): muestra si está <strong>OK</strong> o <strong>caído</strong>, su billetera y un aviso de <strong>"Saldo bajo: SÍ (recargar)"</strong> si se está quedando sin fondos.</li><li>👁 <strong>Indexador</strong> (el que copia la cadena a la base): muestra hasta qué bloque ha leído (<strong>cabeza</strong>), cuántos eventos ha procesado y cuántos han fallado.</li><li>Si el servicio no está activado en ese despliegue, la tarjeta lo dice: "No configurado en este despliegue".</li></ul>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAwIDQ0NSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiPgogIDxkZWZzPgogICAgPG1hcmtlciBpZD0iYXJyIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjguNSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjYuNSIgbWFya2VySGVpZ2h0PSI2LjUiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj4KICAgICAgPHBhdGggZD0iTTAsMSBMOSw1IEwwLDkgeiIgZmlsbD0iIzFhMmI0YyIvPgogICAgPC9tYXJrZXI+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjQ0NSIgZmlsbD0iI2Y4ZjlmYSIvPgogIDxyZWN0IHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjU4IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTQiIHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjQiIGZpbGw9IiNkNGFmMzciLz4KICA8dGV4dCB4PSI2MDAiIHk9IjM3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjIxIiBmb250LXdlaWdodD0iYm9sZCI+RWwgUGFuZWwgZGVsIE93bmVyOiBsYSBiaWJsaW90ZWNhIGRlIHNpc3RlbWFzPC90ZXh0PgoKICA8IS0tIE93bmVyIC0tPgogIDxyZWN0IHg9IjI1IiB5PSIxNzAiIHdpZHRoPSIyMDAiIGhlaWdodD0iMTA1IiByeD0iMTQiIGZpbGw9IiNmNGEyNjEiIHN0cm9rZT0iI2IwNmEyYSIgc3Ryb2tlLXdpZHRoPSIxLjIiLz4KICA8dGV4dCB4PSIxMjUiIHk9IjIwMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9ImJvbGQiPk93bmVyPC90ZXh0PgogIDx0ZXh0IHg9IjEyNSIgeT0iMjI4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjExIj5jdWVudGEgMCDCtyBkZXBsb3llcjwvdGV4dD4KICA8dGV4dCB4PSIxMjUiIHk9IjI0OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMSI+Q0VSVElGSUNBRE8gwrcgU09DSU88L3RleHQ+CiAgPHRleHQgeD0iMTI1IiB5PSIyNjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iOS41Ij5tZWRhbGxhIE9STzwvdGV4dD4KCiAgPCEtLSBQYW5lbCAtLT4KICA8cmVjdCB4PSIyODUiIHk9IjE2NSIgd2lkdGg9IjIzNSIgaGVpZ2h0PSIxMjAiIHJ4PSIxNCIgZmlsbD0iIzQ4Y2FlNCIvPgogIDx0ZXh0IHg9IjQwMiIgeT0iMjAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjE1IiBmb250LXdlaWdodD0iYm9sZCI+UGFuZWwgZGVsIE93bmVyPC90ZXh0PgogIDx0ZXh0IHg9IjQwMiIgeT0iMjI1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjExLjUiPi9zdWl0ZS9hZG1pbjwvdGV4dD4KICA8dGV4dCB4PSI0MDIiIHk9IjI0NyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMCI+cmV2aXNpb25lcyB5IGNvbnRyb2w8L3RleHQ+CiAgPHRleHQgeD0iNDAyIiB5PSIyNjUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAiPnNvbG8gcGFyYSBTT0NJT1M8L3RleHQ+CgogIDxsaW5lIHgxPSIyMjciIHkxPSIyMjIiIHgyPSIyODEiIHkyPSIyMjIiIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KCiAgPCEtLSBjb250ZW5lZG9yIHRpbGVzIC0tPgogIDxyZWN0IHg9IjU4MCIgeT0iODgiIHdpZHRoPSI1OTUiIGhlaWdodD0iMzQyIiByeD0iMTYiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iI2Q0YWYzNyIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iNjAwIiB5PSIxMTAiIGZpbGw9IiM4YTZkMWYiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkxvIHF1ZSBlbCBQYW5lbCBsZSBtdWVzdHJhIGFsIE93bmVyPC90ZXh0PgogIDxsaW5lIHgxPSI1MjIiIHkxPSIyMjIiIHgyPSI1NzYiIHkyPSIyMjIiIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyLjUiIG1hcmtlci1lbmQ9InVybCgjYXJyKSIvPgoKICA8IS0tIFQxIGNpZnJhcyAtLT4KICA8cmVjdCB4PSI2MDAiIHk9IjEyOCIgd2lkdGg9IjI3MCIgaGVpZ2h0PSI4OCIgcng9IjEyIiBmaWxsPSIjZTllNWYwIiBzdHJva2U9IiM4ZDg2YTkiIHN0cm9rZS13aWR0aD0iMS4yIi8+CiAgPHRleHQgeD0iNzM1IiB5PSIxNTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTMuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkNpZnJhcyAoS1BJcyk8L3RleHQ+CiAgPHRleHQgeD0iNzM1IiB5PSIxNzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiPnVzdWFyaW9zIMK3IGFydGljdWxvczwvdGV4dD4KICA8dGV4dCB4PSI3MzUiIHk9IjE5MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMCI+dHJ1ZWtlcyDCtyBkaXNwdXRhczwvdGV4dD4KICA8dGV4dCB4PSI3MzUiIHk9IjIwOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzhkODZhOSIgZm9udC1zaXplPSI5Ij5jdWFudG9zIGhheSBndWFyZGFkb3M8L3RleHQ+CgogIDwhLS0gVDIgYmFzZSBkZSBkYXRvcyAtLT4KICA8cmVjdCB4PSI2MDAiIHk9IjIzMiIgd2lkdGg9IjI3MCIgaGVpZ2h0PSI4OCIgcng9IjEyIiBmaWxsPSIjZTllNWYwIiBzdHJva2U9IiM4ZDg2YTkiIHN0cm9rZS13aWR0aD0iMS4yIi8+CiAgPHRleHQgeD0iNzM1IiB5PSIyNTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTMuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkJhc2UgZGUgZGF0b3M8L3RleHQ+CiAgPHRleHQgeD0iNzM1IiB5PSIyNzgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiPlBvc3RncmVTUUwgZW4gbGEgbnViZTwvdGV4dD4KICA8dGV4dCB4PSI3MzUiIHk9IjI5NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMCI+ZXMgZWwgZXNwZWpvPC90ZXh0PgogIDx0ZXh0IHg9IjczNSIgeT0iMzEwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOGQ4NmE5IiBmb250LXNpemU9IjkiPmRlIGxvIHF1ZSBwYXNhIGVuIGxhIGNhZGVuYTwvdGV4dD4KCiAgPCEtLSBUMyBjb250cmF0b3MgLS0+CiAgPHJlY3QgeD0iNjAwIiB5PSIzMzYiIHdpZHRoPSIyNzAiIGhlaWdodD0iODAiIHJ4PSIxMiIgZmlsbD0iI2U5ZTVmMCIgc3Ryb2tlPSIjOGQ4NmE5IiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDx0ZXh0IHg9IjczNSIgeT0iMzYwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEzLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5Db250cmF0b3MgZGVzcGxlZ2Fkb3M8L3RleHQ+CiAgPHRleHQgeD0iNzM1IiB5PSIzODIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiPkVzY3JvdyDCtyBCUkxUIMK3IFNCVCDCtzwvdGV4dD4KICA8dGV4dCB4PSI3MzUiIHk9IjM5OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMCI+TkZUcyDCtyBTb2Npb3MgKGNvbiBkaXJlY2Npb24pPC90ZXh0PgoKICA8IS0tIFQ0IGluZnJhZXN0cnVjdHVyYSAtLT4KICA8cmVjdCB4PSI4OTAiIHk9IjEyOCIgd2lkdGg9IjI2NSIgaGVpZ2h0PSI4OCIgcng9IjEyIiBmaWxsPSIjZTllNWYwIiBzdHJva2U9IiM4ZDg2YTkiIHN0cm9rZS13aWR0aD0iMS4yIi8+CiAgPHRleHQgeD0iMTAyMiIgeT0iMTUyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEzLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5JbmZyYWVzdHJ1Y3R1cmE8L3RleHQ+CiAgPHRleHQgeD0iMTAyMiIgeT0iMTc0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwIj5yZWxheWVyIEVJUC03MTI6IE9LIG8gY2FpZG88L3RleHQ+CiAgPHRleHQgeD0iMTAyMiIgeT0iMTkyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwIj5hdmlzbzogc2FsZG8gYmFqbzwvdGV4dD4KICA8dGV4dCB4PSIxMDIyIiB5PSIyMDgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM4ZDg2YTkiIGZvbnQtc2l6ZT0iOSI+aW5kZXhhZG9yOiBjYWJlemEgeSBldmVudG9zPC90ZXh0PgoKICA8IS0tIFQ1IEtZQyAtLT4KICA8cmVjdCB4PSI4OTAiIHk9IjIzMiIgd2lkdGg9IjI2NSIgaGVpZ2h0PSIxODQiIHJ4PSIxMiIgZmlsbD0iI2YzZTVhYiIgc3Ryb2tlPSIjYzVhMDY1IiBzdHJva2Utd2lkdGg9IjEuNCIvPgogIDx0ZXh0IHg9IjEwMjIiIHk9IjI1NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMy41IiBmb250LXdlaWdodD0iYm9sZCI+UmV2aXNpb24gS1lDIChmb3Rvcyk8L3RleHQ+CiAgPHRleHQgeD0iMTAyMiIgeT0iMjc0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjkuNSI+c29saWNpdHVkZXMgY29uIGRvY3VtZW50byArIHNlbGZpZTwvdGV4dD4KCiAgPCEtLSBwaWxsIGFwcm9iYXIgLS0+CiAgPHJlY3QgeD0iOTAwIiB5PSIyOTIiIHdpZHRoPSIyNDUiIGhlaWdodD0iNTgiIHJ4PSIxMSIgZmlsbD0iIzJhOWQ4ZiIvPgogIDx0ZXh0IHg9IjEwMjIiIHk9IjMxNSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+QXByb2JhciDinJM8L3RleHQ+CiAgPHRleHQgeD0iMTAyMiIgeT0iMzM1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZTdmN2Y0IiBmb250LXNpemU9IjkuNSI+Q0VSVElGSUNBRE8gKyBzZSBlbWl0ZSBzdSBTQlQ8L3RleHQ+CgogIDwhLS0gcGlsbCByZWNoYXphciAtLT4KICA8cmVjdCB4PSI5MDAiIHk9IjM2MiIgd2lkdGg9IjI0NSIgaGVpZ2h0PSI0OCIgcng9IjExIiBmaWxsPSIjZTYzOTQ2Ii8+CiAgPHRleHQgeD0iMTAyMiIgeT0iMzgyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5SZWNoYXphciDinJc8L3RleHQ+CiAgPHRleHQgeD0iMTAyMiIgeT0iNDAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZlMWU0IiBmb250LXNpemU9IjkuNSI+cXVlZGEgUkVDSEFaQURPLCByZWludGVudGE8L3RleHQ+CgogIDwhLS0gcGVxdWVuYSBub3RhIHBpZSAtLT4KICA8dGV4dCB4PSI2MDAiIHk9IjQ0MCIgZmlsbD0iIzhkODZhOSIgZm9udC1zaXplPSIxMCI+TGEgdmVyZGFkIGRlbCBlc3RhZG8gbGEgcG9uZSBlbCBzZXJ2aWRvciBjZW50cmFsLCBubyBsYSBwYW50YWxsYS48L3RleHQ+Cjwvc3ZnPgo=" alt="Biblioteca Sistemas Owner"/><figcaption class="fig-caption">Figura · Biblioteca Sistemas Owner</figcaption></figure>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. Revisar certificaciones: el bloque de KYC pendientes</h2>
+<h3 class="sub" id="sub9">4.1 Qué ves y cómo se cargan las fotos</h3>
+<ul><li>El panel pide la lista de solicitudes <strong>PENDIENTES</strong> y muestra, por cada persona: su <strong>billetera</strong>, su <strong>tipo · nivel · medalla</strong> (por ejemplo "Particular · Nivel 2 · 🥈") y las <strong>dos fotos</strong>: el <strong>documento</strong> y la <strong>selfie</strong>.</li><li>Las fotos son privadas: la web las descarga con tu sesión de Owner (nadie más puede verlas, ni siquiera en el navegador, sin autorización).</li></ul>
+<h3 class="sub" id="sub10">4.2 Aprobar o rechazar</h3>
+<ul><li><strong>✅ Aprobar</strong> → la persona pasa a <strong>CERTIFICADO</strong> y la plataforma le <strong>emite su SBT</strong> (su credencial digital). Ves un aviso en verde.</li><li><strong>Rechazar</strong> → el trámite de esa persona queda <strong>RECHAZADO</strong>.</li><li>Después puedes pulsar "↻ Refrescar" para ver el resto de la cola y las cifras actualizadas.</li></ul>
+<blockquote class="info"><span class="tag">Nota</span><p>Si tienes dudas sobre qué es el SBT y por qué se emite al certificar, consulta el manual <code>03-Implementacion/09-certificacion-sbt.md</code>.</p></blockquote>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. Los servicios que alimentan el panel (para curiosos)</h2>
+<h3 class="sub" id="sub11">5.1 Los servicios <code>/admin</code></h3>
+<div class="table-wrap"><table><thead><tr><th>Servicio</th><th>Qué devuelve</th></tr></thead><tbody><tr><td><code>GET /admin/usuarios</code></td><td>Total de usuarios (solo SOCIO/Owner)</td></tr><tr><td><code>GET /admin/contratos</code></td><td>El mapa de contratos con sus direcciones</td></tr><tr><td><code>GET /admin/kpis-disputas</code></td><td>Total de trueques y disputas abiertas</td></tr><tr><td><code>GET /admin/db</code></td><td>Conteos de usuarios, artículos y trueques en la base</td></tr><tr><td><code>GET /admin/infra/health</code></td><td>Salud del relayer y del indexador</td></tr></tbody></table></div>
+<h3 class="sub" id="sub12">5.2 Los servicios de certificación del Owner</h3>
+<ul><li>Listar pendientes, ver una imagen concreta y aprobar/rechazar: tres servicios reservados al Owner (detalles en el manual de certificación).</li></ul>
+<h3 class="sub" id="sub13">5.3 El cliente de la web</h3>
+<ul><li>La página del panel tiene su "cartero" que habla con cada servicio y trae los datos: uno por cada tarjeta (contratos, base de datos, KPIs, infraestructura y usuarios).</li></ul>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. Operación guiada para el Owner</h2>
+<h3 class="sub" id="sub14">6.1 Preparar el terreno (una sola vez)</h3>
+<ol><li>Da de alta al Owner (cuenta 0) como <strong>CERTIFICADO + SOCIO</strong> en la base con el script de bootstrap (manual <code>04-Despliegue/02-reinicio-y-bootstrap.md</code>).</li><li>Asegúrate de que esa cuenta es el <strong>Owner on-chain</strong> del registro de Socios (para los servicios de certificación).</li><li>Conecta la billetera del Owner en el navegador e inicia sesión (una firma).</li></ol>
+<h3 class="sub" id="sub15">6.2 Revisar certificaciones pendientes</h3>
+<ol><li>Entra en <code>/suite/admin</code> (menú <svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#48cae4"><circle cx="8" cy="5.4" r="2.9"/><path d="M2.2 14.4c.6-3 3.2-4.6 5.8-4.6s5.2 1.6 5.8 4.6z"/></g></svg> → secciones → icono Admin, o la URL directa).</li><li>En "KYC pendientes de revisión (DNI + selfie)" revisa cada solicitud con sus dos fotos.</li><li>Pulsa <strong>Aprobar</strong> (pasa a CERTIFICADO y se emite su SBT) o <strong>Rechazar</strong>.</li><li>Pulsa "↻ Refrescar" para recargar cifras y cola.</li></ol>
+<h3 class="sub" id="sub16">6.3 Leer cifras, base de datos, contratos e infraestructura</h3>
+<ul><li><strong>Cifras</strong>: usuarios, artículos, trueques y disputas.</li><li><strong>Base de datos</strong>: conteos de la BD espejo (en la nube).</li><li><strong>Contratos</strong>: direcciones vivas de todas las piezas.</li><li><strong>Infraestructura</strong>: salud del relayer (estado y saldo) y del indexador (bloque leído, procesados y fallidos).</li></ul>
+<h3 class="sub" id="sub17">6.4 Verificación registrada en producción</h3>
+<ul><li>El 2026-09-08 se probó el flujo completo en producción: una usuaria sin SBT subió documento + selfie por la interfaz (PENDIENTE), el Owner la aprobó desde el panel → CERTIFICADO con su SBT emitido; otro usuario quedó CERTIFICADO por la vía automática del SBT. Queda registrado en <code>RepoTecnico/estado_proyecto.md</code> con capturas.</li></ul>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. Lo que falta por confirmar (resumen)</h2>
+<ol><li>El servicio que lista los contratos no exige rol de Owner (solo sesión); expone direcciones públicas, pero conviene confirmar si debe restringirse más.</li><li>Las cifras de disputas se calculan sobre el <strong>espejo</strong> de la base, no directamente sobre la cadena.</li><li>El aviso de "rol OWNER" del sistema no existe como columna en la base: la comprobación real es el tipo SOCIO (revisar coherencia con la verificación on-chain).</li></ol>
+</section>
+<section class="seccion" id="s8"><h2 class="seccion">8. Glosario de este manual</h2>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Significado</th></tr></thead><tbody><tr><td><strong>Owner</strong></td><td>La persona responsable de TrueKeate: cuenta 0, SOCIO CERTIFICADO</td></tr><tr><td><strong>Panel / dashboard</strong></td><td>Pantalla de control con cifras y acciones</td></tr><tr><td><strong>KPI</strong></td><td>Indicador: un número que resume el estado (usuarios, trueques…)</td></tr><tr><td><strong>Espejo</strong></td><td>La base de datos que copia lo que ocurre en la cadena</td></tr><tr><td><strong>KYC</strong></td><td>Trámite de certificación de identidad con fotos</td></tr><tr><td><strong>Relayer</strong></td><td>El servidor que firma operaciones sin que pagues gas</td></tr><tr><td><strong>Indexador</strong></td><td>El servicio que lee la cadena y llena la base espejo</td></tr><tr><td><strong>SBT</strong></td><td>Credencial digital emitida al certificar (ver manual 03·09)</td></tr><tr><td><strong>On-chain</strong></td><td>Lo que vive en la cadena (contratos y sus direcciones)</td></tr></tbody></table></div>
+</section>
+</main>
+
+</body>
+</html>

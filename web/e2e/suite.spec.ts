@@ -220,7 +220,7 @@ test.describe("Suite de usuario — control de acceso", () => {
     await expect(nav.getByRole("link", { name: /Socios/ })).toBeVisible(); // /suite/gobernanza
     await expect(nav.getByRole("link", { name: /Disputas/ })).toBeVisible();
     await expect(nav.getByRole("link", { name: /Finanzas/ })).toBeVisible();
-    await expect(nav.getByRole("link", { name: /Admin/ })).toBeVisible();
+    await expect(nav.getByRole("link", { name: /Sistemas/ })).toBeVisible(); // /suite/admin
     // La sección central del bottom (móvil) NO aparece en la barra superior PC.
     await expect(page.locator("nav[aria-label='Navegación principal']")).toBeHidden();
   });

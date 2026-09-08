@@ -1,7 +1,7 @@
 # Manual Técnico 05 — Diccionario de Datos (modelo PostgreSQL off-chain)
 
-> **Alcance**: diccionario de datos del esquema PostgreSQL real de TrueKeate (14 tablas, 10 tipos ENUM), su relación con las decisiones D17/D23/D26/D28/D32/D33/D34 y los eventos on-chain que alimentan cada tabla.
-> **Fuentes leídas**: `backend/db/schema.sql` (esquema real, 276 líneas), `RepoTecnico/diccionario_datos.md` (inventario de diseño), `backend/indexador.js` (eventos mapeados a tablas), eventos declarados en `sc/src/*.sol`.
+> **Alcance**: diccionario de datos del esquema PostgreSQL real de TrueKeate (16 tablas, 11 tipos ENUM), su relación con las decisiones D17/D23/D26/D28/D32/D33/D34 y los eventos on-chain que alimentan cada tabla. **Revisión 2026-09**: `username` en `usuarios`, columnas SBT/imágenes en `kyc`, enum `tipo_imagen` con `KYC_DNI`/`KYC_SELFIE` y `contenido`/`mime` en `imagenes_certificadas` (certificación D28 etapa 2).
+> **Fuentes leídas**: `backend/db/schema.sql` (esquema real, 327 líneas), `backend/db/migracion_sbt.sql`, `backend/db/migracion_username.sql`, `RepoTecnico/diccionario_datos.md` (inventario de diseño), `backend/indexador.js` (eventos mapeados a tablas), eventos declarados en `sc/src/*.sol`.
 > **Convención**: toda referencia `ruta:línea` apunta al código real. Lo que el código no implementa se marca **"pendiente de confirmar"** (por ejemplo, entidades del diccionario de diseño que aún no tienen tabla SQL o anclajes on-chain no materializados).
 
 ---
@@ -21,24 +21,26 @@ El esquema distingue explícitamente quién puede escribir cada tabla (cabecera 
 - La blockchain es la única fuente de verdad de los estados del escrow; el indexador **nunca escribe en cadena** (`backend/indexador.js:7-8`).
 - Extensiones habilitadas: `postgis` y `pgcrypto` (`backend/db/schema.sql:9-10`); PostGIS sostiene la regla de ≤10 km (RF-08.3/08.4) y `pgcrypto` el cifrado de PII (D17).
 
-### 1.2 Inventario: 14 tablas
+### 1.2 Inventario: 16 tablas
 
 | # | Tabla | Línea en schema.sql | Clase | Propósito |
 |---|---|---|---|---|
-| 1 | `usuarios` | 62-79 | Espejo parcial + off-chain | Registro e identidad (CU-01/02) |
-| 2 | `kyc` | 82-93 | Espejo parcial (merkle) | Metadata KYC cifrada (RF-01.7, D17) |
-| 3 | `articulos` | 96-108 | Off-chain | Publicaciones AtoA (CU-06) |
-| 4 | `truekes` | 111-126 | **Espejo del escrow** | Intercambios y su estado (RNF-01.1) |
-| 5 | `valoraciones` | 129-141 | Off-chain | Evaluación 1-5 al cierre (D18/D36) |
-| 6 | `puntos_encuentro` | 144-152 | Off-chain (PostGIS) | Zonas de encuentro ≤10 km (CU-16) |
-| 7 | `disputas` | 155-167 | Off-chain + espejo de votos | Disputas y apelaciones (CU-18/19) |
-| 8 | `imagenes_certificadas` | 170-181 | Off-chain (evidencia) | Certificación de imágenes (RF-11, D23) |
-| 9 | `suscripciones` | 184-194 | Espejo parcial | Suscripciones de empresa (CU-24, D33) |
-| 10 | `campanas` | 197-207 | Off-chain | Campañas VENTA/RECOLECTA (CU-09/10) |
-| 11 | `subastas` | 210-225 | Off-chain | Subastas de empresa (RF-17, CU-25/26) |
-| 12 | `finanzas` | 228-237 | Espejo parcial | Saldos y fondo global (CU-30/31) |
-| 13 | `auditoria` | 240-252 | Operación (append-only) | Registro auditable + idempotencia (RF-18.6) |
-| 14 | `indexador_checkpoint` | 255-260 | Operación | Checkpoints de reproceso (RNF-07.4) |
+| 1 | `usuarios` | 70-88 | Espejo parcial + off-chain | Registro e identidad (CU-01/02); `username` público |
+| 2 | `kyc` | 92-108 | Espejo parcial (merkle) + off-chain | Metadata KYC; certificación SBT e imágenes (2026-09) |
+| 3 | `articulos` | 111-125 | Off-chain | Publicaciones AtoA (CU-06) |
+| 4 | `truekes` | 130-151 | **Espejo del escrow** | Intercambios y su estado (RNF-01.1) |
+| 5 | `valoraciones` | 154-166 | Off-chain | Evaluación 1-5 al cierre (D18/D36) |
+| 6 | `puntos_encuentro` | 169-177 | Off-chain (PostGIS) | Zonas de encuentro ≤10 km (CU-16) |
+| 7 | `puntos_favoritos` | 182-189 | Off-chain | Últimos puntos usados (favoritos) |
+| 8 | `disputas` | 192-204 | Off-chain + espejo de votos | Disputas y apelaciones (CU-18/19) |
+| 9 | `imagenes_certificadas` | 207-220 | Off-chain (evidencia) | Imágenes certificadas + KYC (RF-11, D23) |
+| 10 | `suscripciones` | 223-233 | Espejo parcial | Suscripciones de empresa (CU-24, D33) |
+| 11 | `campanas` | 236-246 | Off-chain | Campañas VENTA/RECOLECTA (CU-09/10) |
+| 12 | `subastas` | 249-264 | Off-chain | Subastas de empresa (RF-17, CU-25/26) |
+| 13 | `finanzas` | 267-276 | Espejo parcial | Saldos y fondo global (CU-30/31) |
+| 14 | `auditoria` | 279-291 | Operación (append-only) | Registro auditable + idempotencia (RF-18.6) |
+| 15 | `indexador_checkpoint` | 294-299 | Operación | Checkpoints de reproceso (RNF-07.4) |
+| 16 | `sesiones` | 303-309 | Off-chain | Tokens de sesión del login con wallet (RF-16) |
 
 ### 1.3 Entidades de diseño aún NO materializadas (pendiente de confirmar)
 
@@ -86,19 +88,26 @@ Nota operativa: el mapa de eventos del indexador actual (`backend/indexador.js:7
 | `tipo_usuario` | `PARTICULAR` / `EMPRESA` / `SOCIO` | 14 | `usuarios.tipo` (rol funcional; `SOCIO` lo fija el indexador con `SocioAdmitido`) |
 | `nivel_usuario` | `INICIADO` / `COMUN` / `FRECUENTE` / `SOCIO` | 18 | `usuarios.nivel` (nivel por reputación, D12/D30); `subastas.nivel_ganador` (desempate D27) |
 | `medalla_usuario` | `BRONCE` / `PLATA` / `ORO` | 22 | `usuarios.medalla` |
-| `estado_kyc` | `PENDIENTE` / `APROBADO` / `RECHAZADO` / `APELACION` | 38 | `kyc.estado` |
-| `tipo_imagen` | `PUBLICACION` / `RECEPCION` | 42 | `imagenes_certificadas.tipo` (polimorfismo de `ref_id`) |
-| `estado_suscripcion` | `ACTIVA` / `IRREGULAR` / `CANCELADA` | 46 | `suscripciones.estado` (D33) |
-| `tipo_campana` | `VENTA` / `RECOLECTA` | 50 | `campanas.tipo` |
-| `estado_subasta` | `ABIERTA` / `CERRADA` / `ANULADA` | 54 | `subastas.estado` |
+| `estado_verificacion` | `INSCRITO` / `VERIFICADO` / `CERTIFICADO` | 27 | `usuarios.estado` (escalera D28 — §2.2) |
+| `estado_escrow` | 9 estados | 34 | `truekes.estado` (— §2.1) |
+| `categoria_item` | `ARTICULO` / `SERVICIO` / `BIEN` / `CRIPTO` | 42 | `articulos.categoria` (tipo de trueque) |
+| `estado_kyc` | `PENDIENTE` / `APROBADO` / `RECHAZADO` / `APELACION` | 46 | `kyc.estado` |
+| `tipo_imagen` | `PUBLICACION` / `RECEPCION` / `KYC_DNI` / `KYC_SELFIE` | 50 | `imagenes_certificadas.tipo` (polimorfismo de `ref_id`) |
+| `estado_suscripcion` | `ACTIVA` / `IRREGULAR` / `CANCELADA` | 54 | `suscripciones.estado` (D33) |
+| `tipo_campana` | `VENTA` / `RECOLECTA` | 58 | `campanas.tipo` |
+| `estado_subasta` | `ABIERTA` / `CERRADA` / `ANULADA` | 62 | `subastas.estado` |
 
 > ⚠️ `nivel_usuario` y `tipo_usuario` comparten el valor `SOCIO` con significados distintos: `tipo='SOCIO'` es rol de gobernanza (votación D21); `nivel='SOCIO'` es el nivel superior de reputación (mapeo D4).
+
+> **Nuevo (2026-09, certificación D28 etapa 2)**: el enum `tipo_imagen` incorpora **`KYC_DNI`** y
+> **`KYC_SELFIE`** (aplicado por `backend/db/migracion_sbt.sql:6-11`). Para esos tipos, `ref_id`
+> apunta al **`kyc.id`** de la solicitud (ver §3.2 y §4.3).
 
 ---
 
 ## 3. Identidad: `usuarios` y `kyc`
 
-### 3.1 `usuarios` — registro e identidad (`backend/db/schema.sql:62-79`)
+### 3.1 `usuarios` — registro e identidad (`backend/db/schema.sql:70-88`)
 
 **Propósito**: cuenta raíz de cada usuario (CU-01/02); una fila por wallet.
 
@@ -108,6 +117,7 @@ Nota operativa: el mapa de eventos del indexador actual (`backend/indexador.js:7
 |---|---|---|---|
 | `id` | `BIGINT GENERATED ALWAYS AS IDENTITY` | **PK** | Identificador interno; referenciado por 7 tablas |
 | `wallet` | `CHAR(42)` | `UNIQUE NOT NULL` | Dirección EOAs/Smart Account; es la clave natural on-chain |
+| `username` | `TEXT UNIQUE` | Handle público | **Nuevo (2026-09)** (`backend/db/migracion_username.sql:6-12`): el menú muestra `@username` en vez de la wallet; la migración lo deriva del correo o `u_<wallet>`; lo expone la API (`backend/api/lib/almacen-pg.js:23`, `web/lib/api.ts:14`) |
 | `correo`, `telefono`, `direccion_inscripcion` | `TEXT` | **PII†** (cifrado en reposo) | **D17** (`backend/db/schema.sql:65-67`; RNF-01.4 en `RepoTecnico/requerimientos.md:214`) |
 | `geog` | `GEOGRAPHY(Point,4326)` | — (PostGIS) | Regla ≤10 km entre direcciones de inscripción (RF-08.3/08.4) |
 | `tipo` | `tipo_usuario` | default `PARTICULAR` | Actualizado a `SOCIO` por el indexador: `SociosRegistry.SocioAdmitido` → `UPDATE usuarios SET tipo='SOCIO'` (`backend/indexador.js:126-135`) |
@@ -121,22 +131,26 @@ Nota operativa: el mapa de eventos del indexador actual (`backend/indexador.js:7
 
 **Eventos on-chain que la modifican** (vía indexador): `SmartAccount.OwnerActualizado` y `SmartAccount.RecuperacionEjecutada` actualizan `wallet` (recuperación social D34): `UPDATE usuarios SET wallet=$1 WHERE smart_account=$2` (`backend/indexador.js:115-121`). Consecuencia de diseño: `wallet` refleja al *owner actual* del Smart Account; por eso las tablas espejo (`truekes`, `valoraciones`, `disputas`) guardan la dirección **de forma denormalizada** (ver Manual 06 §3).
 
-### 3.2 `kyc` — metadata KYC cifrada (`backend/db/schema.sql:82-93`)
+### 3.2 `kyc` — metadata KYC + certificación SBT (`backend/db/schema.sql:92-108`)
 
-**Propósito**: almacenar la metadata del proceso KYC (RF-01.7) **cifrada en reposo**; solo una raíz merkle (hash) viaja al Smart Account.
+**Propósito**: almacenar la metadata del proceso KYC (RF-01.7) **cifrada en reposo**; solo una raíz merkle (hash) viaja al Smart Account. Desde 2026-09 también guarda la **certificación vía SBT** y las **imágenes** (DNI/selfie) cuando no hay SBT (etapa 2 de D28 — ver Manual 03 · 09-certificacion-sbt).
 
 **Campos clave**:
 
 | Campo | Tipo | PK/FK / notas | Relación con decisiones y eventos |
 |---|---|---|---|
 | `id` | `BIGINT IDENTITY` | **PK** | |
-| `usuario_id` | `BIGINT` | **FK → `usuarios(id)`** (`schema.sql:84`) | 1 registro KYC por usuario (relación 1:1 lógica; el esquema no impone `UNIQUE`) |
-| `documento_identidad` | `BYTEA` | **PII† cifrado** | **D17** (RNF-01.4) |
-| `selfie_ref` | `TEXT` | **PII†** referencia (IPFS/cifrada) | **D17** |
-| `selfie_hash` | `BYTEA` | — | Integridad de la selfie |
+| `usuario_id` | `BIGINT` | **FK → `usuarios(id)`** (`schema.sql:94`) | 1 registro KYC por usuario (relación 1:1 lógica; el esquema no impone `UNIQUE`) |
+| `documento_identidad` | `BYTEA` | **PII† cifrado** | **D17** (RNF-01.4); legado — el flujo 2026-09 guarda la imagen en `imagenes_certificadas` |
+| `selfie_ref` / `selfie_hash` | `TEXT` / `BYTEA` | **PII†** | **D17**; legado del diseño original |
 | `merkle_root` | `BYTEA` | Espejo on-chain | **D28/RF-01.7**: actualizado por el indexador al recibir `SmartAccount.MerkleRootActualizado` (`backend/indexador.js:106-114`; evento en `sc/src/SmartAccount.sol:61`) |
-| `estado` | `estado_kyc` | default `PENDIENTE` | Flujo PENDIENTE→APROBADO/RECHAZADO/APELACION |
-| `revisado_por` | `CHAR(42)` | Owner (RF-18.4) | Revisión humana del Owner (también requerida en la recuperación con KYC de D34) |
+| `estado` | `estado_kyc` | default `PENDIENTE` | Flujo PENDIENTE→APROBADO/RECHAZADO/APELACION; **APROBADO automático** vía SBT (`/kyc/auto-certificar`) |
+| `revisado_por` | `CHAR(42)` | Owner (RF-18.4) o minter | Revisión humana del Owner (`/kyc/review`) o la cuenta de la plataforma en auto-certificación (`routes/kyc.js:175-177`) |
+| `via_sbt` | `BOOLEAN NOT NULL DEFAULT FALSE` | — | **Nuevo (2026-09)** (`schema.sql:101`; `migracion_sbt.sql:14`): certificado con SBT |
+| `sbt_contrato` | `CHAR(42)` | — | Contrato del SBT usado (nativo `TrueKeateSBT` o externo) (`schema.sql:102`) |
+| `sbt_token_id` | `NUMERIC` | — | tokenId del SBT usado/minteado (`schema.sql:103`) |
+| `documento_img_id` | `BIGINT` | FK lógica → `imagenes_certificadas(id)` (`schema.sql:104`) | Imagen `KYC_DNI` subida por `/kyc/submit` |
+| `selfie_img_id` | `BIGINT` | FK lógica → `imagenes_certificadas(id)` (`schema.sql:105`) | Imagen `KYC_SELFIE` subida por `/kyc/submit` |
 | `created_at` / `updated_at` | `TIMESTAMPTZ` | default `now()` | |
 
 ---
@@ -192,25 +206,30 @@ Nota operativa: el mapa de eventos del indexador actual (`backend/indexador.js:7
 | `EscrowBloqueado` | 104 | estado = `BLOQUEADO` | 84 |
 | `RecepcionFirmadaA/B`, `ValoracionMarcadaA/B`, `AnulacionSolicitada`, `VotoSocio`, `ResolucionEjecutada`, `ResolucionPorDefecto`, `SancionProgramada` | 98-109 | **No mapeados en este ciclo** (C8) | — |
 
-### 4.3 `imagenes_certificadas` — evidencia de imágenes (RF-11, D23) (`backend/db/schema.sql:170-181`)
+### 4.3 `imagenes_certificadas` — evidencia de imágenes (RF-11, D23; KYC 2026-09) (`backend/db/schema.sql:207-220`)
 
-**Propósito**: evidencia inmutable de la imagen que certifica una publicación (`PUBLICACION`) o una recepción (`RECEPCION`); hash + firma + referencia IPFS.
+**Propósito**: evidencia inmutable de la imagen que certifica una publicación (`PUBLICACION`), una recepción (`RECEPCION`) o un **KYC** (`KYC_DNI`/`KYC_SELFIE`, 2026-09); hash + firma + referencia IPFS, y desde 2026-09 **binario + MIME** para servirlas por la API.
 
 **Campos clave**:
 
 | Campo | Tipo | PK/FK / notas | Relación |
 |---|---|---|---|
 | `id` | `BIGINT IDENTITY` | **PK** | |
-| `tipo` | `tipo_imagen` | `PUBLICACION`/`RECEPCION` | Determina la semántica de `ref_id` |
-| `ref_id` | `BIGINT NOT NULL` | **FK lógica polimórfica**: `articulos.id` si `tipo=PUBLICACION`, `truekes.id` si `tipo=RECEPCION` (**sin constraint real**) | Relaciona con la entidad certificada |
-| `hash_sha256` | `BYTEA NOT NULL` | — | Integridad (RF-11.2) |
+| `tipo` | `tipo_imagen` | `PUBLICACION`/`RECEPCION`/`KYC_DNI`/`KYC_SELFIE` (`schema.sql:209`) | Determina la semántica de `ref_id` |
+| `ref_id` | `BIGINT NOT NULL` | **FK lógica polimórfica**: `articulos.id` si `PUBLICACION`; `truekes.id` si `RECEPCION`; **`kyc.id` si `KYC_DNI`/`KYC_SELFIE`** (**sin constraint real**) | Relaciona con la entidad certificada |
+| `hash_sha256` | `BYTEA NOT NULL` | — | Integridad (RF-11.2); lo calcula `guardarImagen` (`backend/api/lib/almacen-pg.js:189`) |
 | `ipfs_cid` | `TEXT` | — | Almacenamiento IPFS con pinning propio (D23/RT-02.6) |
-| `wallet` | `CHAR(42) NOT NULL` | — | Autor de la certificación |
-| `firma_ecdsa` | `BYTEA NOT NULL` | — | Firma del hash (inmutabilidad, D23) |
+| `wallet` | `CHAR(42) NOT NULL` | — | Autor de la certificación (para KYC, la wallet del solicitante) |
+| `firma_ecdsa` | `BYTEA` | **Opcional desde 2026-09** (`schema.sql:214`; `migracion_sbt.sql:22`) | Las imágenes KYC las guarda la plataforma **sin firma** del usuario |
 | `metadata` | `JSONB` | — | Datos auxiliares |
-| `root_merkle_anclada` | `BYTEA` | Raíz merkle **anclada on-chain** | **D23** (`schema.sql:179`): el diseño prevé anclar la raíz en el contrato escrow (RT-02.7, `RepoTecnico/requerimientos.md:285`), pero **los contratos de este ciclo no declaran ese anclaje** (no existe `rootMerkle`/evento de imágenes en `sc/src/Escrow.sol`) → **pendiente de confirmar**. |
+| `root_merkle_anclada` | `BYTEA` | Raíz merkle **anclada on-chain** | **D23** (`schema.sql:216`): el diseño prevé anclar la raíz en el contrato escrow (RT-02.7, `RepoTecnico/requerimientos.md:285`), pero **los contratos de este ciclo no declaran ese anclaje** (no existe `rootMerkle`/evento de imágenes en `sc/src/Escrow.sol`) → **pendiente de confirmar**. |
+| `contenido` | `BYTEA` | — | **Nuevo (2026-09)** (`schema.sql:217`): binario de la imagen (KYC y artículos) |
+| `mime` | `TEXT` | — | **Nuevo (2026-09)** (`schema.sql:218`): `image/jpeg`, `image/png`, `image/webp`… |
 
-Nota: no hay eventos on-chain de imágenes; esta tabla la alimenta el backend (endpoint de carga de imágenes). No se encontró el INSERT en `backend/indexador.js` — confirmado que **no la escribe el indexador**; el endpoint exacto del backend es **pendiente de confirmar**.
+**Escritores reales (backend, no el indexador)**: `guardarImagen` (`almacen-pg.js:188-197`) para KYC
+(`POST /kyc/submit`, tipos `KYC_DNI`/`KYC_SELFIE` con `ref_id = kyc.id`) y `guardarImagenArticulo`
+(`almacen-pg.js:299-304`) para artículos (`PUBLICACION`); `getImagen` (`almacen-pg.js:317-324`) las
+sirve vía `GET /kyc/imagen/:id` (dueño u Owner). Confirmado: **no la escribe el indexador**.
 
 ---
 

@@ -85,9 +85,9 @@ const SECCIONES: (Seccion & { visible: (c: ContextoNav) => boolean })[] = [
   },
   {
     href: "/suite/admin",
-    label: "Admin",
+    label: "Sistemas",
     icono: "🛠️",
-    descripcion: "Panel del Owner (RF-13.1)",
+    descripcion: "Suite Sistemas: Panel del Owner y Biblioteca de Sistemas (RF-13.1)",
     visible: ES_SOCIO,
   },
   {

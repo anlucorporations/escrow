@@ -1,0 +1,8 @@
+# Envío a Cloud Build: excluir artefactos y dependencias locales
+node_modules/
+.next/
+out/
+playwright-report/
+test-results/
+*.log
+.env*

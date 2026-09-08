@@ -1,9 +1,10 @@
 // =============================================================================
-// TrueKeate — Ayuda: Manuales (agente INTEGRADOR)
-// Sección de ayuda navegable con el contenido literal de docs/Manuales/**:
-//   grupos (temas) -> manuales (acordeones) -> secciones (##) ->
-//   sub-secciones (###) con texto e imágenes /manual/imagenes/<nombre>.svg,
-//   y bloque de descarga PDF (/manual/pdf/<carpeta>-<archivo>.pdf).
+// TrueKeate — Ayuda: Biblioteca de Manuales (agente INTEGRADOR)
+// Sección de ayuda navegable por TÓPICOS (grupos) -> TEMAS (manuales):
+// cada tema muestra su tarjeta con título, descripción corta, infografía
+// (imagen representativa), botón "Descargar PDF" y la lectura por secciones
+// (##) -> sub-secciones (###) con imágenes /manual/imagenes/<nombre>.svg y
+// versión PDF /manual/pdf/<carpeta>-<id>.pdf.
 // Componente servidor: acordeones nativos <details> (sin JavaScript).
 // =============================================================================
 import type { Metadata } from "next";
@@ -14,11 +15,23 @@ import type { ManualAyuda, SeccionAyuda, SubseccionAyuda } from "@/lib/manual-da
 export const metadata: Metadata = {
   title: "Ayuda · Manuales TrueKeate",
   description:
-    "Manuales de TrueKeate en lenguaje sencillo: qué es la plataforma, cómo funciona un trueque con escrow, la billetera, las finanzas y mucho más. Con diagramas y versión PDF descargable.",
+    "Biblioteca de manuales de TrueKeate por temas, en lenguaje sencillo: qué es la plataforma, cómo funciona un trueque con escrow, la billetera, la certificación SBT, la suite Sistemas y mucho más. Con infografías y versión PDF descargable por tema.",
 };
 
 const pdfDe = (m: ManualAyuda) => `/manual/pdf/${m.carpeta}-${m.id}.pdf`;
 const imagenDe = (nombre: string) => `/manual/imagenes/${nombre}`;
+
+/** Infografía representativa del tema: la explícita o la primera de sus secciones. */
+function primeraImagen(m: ManualAyuda): string | undefined {
+  if (m.imagen) return m.imagen;
+  for (const sec of m.secciones) {
+    if (sec.imagen) return sec.imagen;
+    for (const sub of sec.subsecciones) {
+      if (sub.imagen) return sub.imagen;
+    }
+  }
+  return undefined;
+}
 
 function Parrafos({ items }: { items: string[] }) {
   if (!items || items.length === 0) return null;
@@ -84,51 +97,91 @@ function SeccionBloque({ seccion }: { seccion: SeccionAyuda }) {
   );
 }
 
-function ManualAcordeon({ manual }: { manual: ManualAyuda }) {
+/** Tarjeta de un tema de la biblioteca: cabecera + infografía + PDF + lectura. */
+function TemaBiblioteca({ manual, grupoEtiqueta }: { manual: ManualAyuda; grupoEtiqueta: string }) {
+  const imagen = primeraImagen(manual);
+  const numSecciones = manual.secciones.length;
   return (
-    <details className="group overflow-hidden rounded-card border border-navy-800/10 bg-white shadow-sm transition-shadow open:shadow-md">
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 [&::-webkit-details-marker]:hidden">
-        <span className="flex min-w-0 items-center gap-3">
-          <span aria-hidden className="text-2xl">
-            📖
-          </span>
-          <span className="min-w-0">
-            <span className="block truncate font-display text-lg font-semibold text-navy-800">
+    <article className="overflow-hidden rounded-card border border-navy-800/10 bg-white shadow-sm">
+      {/* Cabecera del tema (siempre visible) */}
+      <div className="flex flex-col gap-4 p-5 md:flex-row md:items-start md:gap-6">
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <span aria-hidden className="text-2xl">
+              📖
+            </span>
+            <h3 className="font-display text-lg font-semibold text-navy-800 md:text-xl">
               {manual.titulo}
+            </h3>
+          </div>
+          <p className="mt-1 text-[11px] font-medium uppercase tracking-wide text-navy-800/45">
+            {grupoEtiqueta} · {numSecciones} secciones
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-navy-800/70">{manual.resumen}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <a
+              href={pdfDe(manual)}
+              download
+              className="inline-flex items-center gap-2 rounded-pill bg-[linear-gradient(135deg,#1a2b4c_0%,#2a9d8f_100%)] px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_15px_rgba(42,157,143,0.35)] transition-transform hover:brightness-105 active:scale-95"
+            >
+              📄 Descargar PDF
+            </a>
+            <span className="hidden text-xs text-navy-800/40 sm:flex sm:items-center">
+              Despliega el tema para leerlo con sus diagramas.
             </span>
-            <span className="block text-xs text-navy-800/60">
-              {manual.secciones.length} secciones · {manual.resumen}
-            </span>
-          </span>
-        </span>
-        <span
-          aria-hidden
-          className="shrink-0 text-navy-800/40 transition-transform duration-200 group-open:rotate-180"
-        >
-          ▾
-        </span>
-      </summary>
-      <div className="space-y-3 border-t border-navy-800/10 px-5 py-4">
-        {manual.secciones.map((sec, i) => (
-          <SeccionBloque key={`${manual.id}-${i}`} seccion={sec} />
-        ))}
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
-          <a
-            href={pdfDe(manual)}
-            download
-            className="inline-flex items-center gap-2 rounded-pill bg-[linear-gradient(135deg,#1a2b4c_0%,#2a9d8f_100%)] px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_15px_rgba(42,157,143,0.35)] transition-transform active:scale-95"
-          >
-            📄 Descargar PDF de este manual
-          </a>
-          <Link
-            href="/"
-            className="text-xs font-medium text-navy-800/50 underline-offset-2 hover:text-teal-500 hover:underline"
-          >
-            Volver al inicio
-          </Link>
+          </div>
         </div>
+        {imagen ? (
+          <figure className="w-full shrink-0 md:w-48">
+            {/* eslint-disable-next-line @next/next/no-img-element -- SVG estático de los manuales */}
+            <img
+              src={imagenDe(imagen)}
+              alt={`Infografía del tema: ${manual.titulo}`}
+              loading="lazy"
+              className="h-auto w-full rounded-card border border-navy-800/10 bg-smoke p-2"
+            />
+            <figcaption className="mt-1 text-center text-[10px] italic text-navy-800/40">
+              {imagen}
+            </figcaption>
+          </figure>
+        ) : null}
       </div>
-    </details>
+
+      {/* Lectura por secciones (desplegable) */}
+      <details className="group border-t border-navy-800/10">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-3 transition-colors hover:bg-smoke [&::-webkit-details-marker]:hidden">
+          <span className="text-sm font-semibold text-teal-500">
+            📚 Leer el manual completo ({numSecciones} secciones)
+          </span>
+          <span
+            aria-hidden
+            className="shrink-0 text-navy-800/40 transition-transform duration-200 group-open:rotate-180"
+          >
+            ▾
+          </span>
+        </summary>
+        <div className="space-y-3 border-t border-navy-800/10 px-5 py-4">
+          {manual.secciones.map((sec, i) => (
+            <SeccionBloque key={`${manual.id}-${i}`} seccion={sec} />
+          ))}
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
+            <a
+              href={pdfDe(manual)}
+              download
+              className="inline-flex items-center gap-2 rounded-pill bg-[linear-gradient(135deg,#1a2b4c_0%,#2a9d8f_100%)] px-4 py-2 text-sm font-semibold text-white shadow-[0_4px_15px_rgba(42,157,143,0.35)] transition-transform active:scale-95"
+            >
+              📄 Descargar PDF de este manual
+            </a>
+            <Link
+              href="/"
+              className="text-xs font-medium text-navy-800/50 underline-offset-2 hover:text-teal-500 hover:underline"
+            >
+              Volver al inicio
+            </Link>
+          </div>
+        </div>
+      </details>
+    </article>
   );
 }
 
@@ -154,11 +207,11 @@ export default function AyudaManuales() {
             Ayuda — <span className="text-gradient-gold">Manuales TrueKeate</span>
           </h1>
           <p className="mt-4 max-w-2xl text-base text-white/80">
-            Guías en lenguaje sencillo de toda la plataforma: qué es TrueKeate, cómo se hace un
-            trueque con escrow, la tecnología por dentro y el glosario. Despliega cada manual para
-            leerlo con sus diagramas, o descarga la versión PDF.
+            Una biblioteca de manuales por <strong className="text-white">temas</strong>: cada
+            tarjeta trae su descripción corta, su infografía y su versión PDF descargable.
+            Despliega el tema que te interese para leerlo con sus diagramas y pasos.
           </p>
-          <nav aria-label="Índice de temas" className="mt-6 flex flex-wrap gap-2">
+          <nav aria-label="Índice de tópicos" className="mt-6 flex flex-wrap gap-2">
             {gruposManuales.map((g) => (
               <a
                 key={g.carpeta}
@@ -178,11 +231,11 @@ export default function AyudaManuales() {
         </div>
       </header>
 
-      {/* Manuales por grupo */}
+      {/* Tópicos -> Temas (tarjetas de biblioteca) */}
       <div className="mx-auto max-w-6xl space-y-12 px-6 py-12">
         {gruposManuales.map((grupo) => {
-          const manualesDelGrupo = manuales.filter((m) => m.carpeta === grupo.carpeta);
-          if (manualesDelGrupo.length === 0) return null;
+          const temasDelGrupo = manuales.filter((m) => m.carpeta === grupo.carpeta);
+          if (temasDelGrupo.length === 0) return null;
           return (
             <section key={grupo.carpeta} id={`grupo-${grupo.carpeta}`} className="scroll-mt-6">
               <div className="mb-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -192,11 +245,14 @@ export default function AyudaManuales() {
                 <h2 className="font-display text-2xl font-bold tracking-[-0.02em] text-navy-800 md:text-[28px]">
                   {grupo.etiqueta}
                 </h2>
+                <span className="rounded-pill bg-teal-500/10 px-2 py-0.5 text-[11px] font-semibold text-teal-500">
+                  {temasDelGrupo.length} {temasDelGrupo.length === 1 ? "tema" : "temas"}
+                </span>
               </div>
               <p className="mb-5 max-w-3xl text-sm text-navy-800/70">{grupo.descripcion}</p>
               <div className="space-y-4">
-                {manualesDelGrupo.map((m) => (
-                  <ManualAcordeon key={m.id} manual={m} />
+                {temasDelGrupo.map((m) => (
+                  <TemaBiblioteca key={m.id} manual={m} grupoEtiqueta={grupo.etiqueta} />
                 ))}
               </div>
             </section>
@@ -211,8 +267,8 @@ export default function AyudaManuales() {
             Descargar manual (PDF)
           </h2>
           <p className="mt-2 max-w-2xl text-sm text-navy-800/70">
-            Versión imprimible de cada manual con el mismo contenido, lista para leer sin conexión
-            o compartir.
+            Versión imprimible de cada tema de la biblioteca con el mismo contenido, lista para
+            leer sin conexión o compartir.
           </p>
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {manuales.map((m) => {

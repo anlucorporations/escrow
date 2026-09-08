@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · Certifícate en TrueKeate: la credencial SBT que abre puertas</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">03 · Implementación</div>
+    <h1>Certifícate en TrueKeate: la credencial SBT que abre puertas</h1>
+    <div class="intro">Versión en lenguaje sencillo del manual técnico "Certificación con SBT (escalera D28, etapa 2)" (<code>RepoTecnico/Manuales/03-Implementacion/09-certificacion-sbt.md</code>). Aquí contamos cómo demuestras <strong>quién eres</strong> en TrueKeate para llegar al nivel más alto de confianza (<strong>CERTIFICADO</strong>): con tu credencial SBT al instante, o con tus fotos de documento + selfie revisadas por una persona (el Owner). Pensado para público general: sin jerga técnica sin explicar.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>03-Implementacion/09-certificacion-sbt.md</b></span>
+      <span>Edición: <b>8 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/03-Implementacion/09-certificacion-sbt</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Implementación · Implementacion — Certifícate en TrueKeate: la credencial SBT que abre puertas</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>El panorama: piezas y camino de decisión</span></a><div class="subs"><a href="#sub1">2.1 Qué piezas intervienen</a><br><a href="#sub2">2.2 El cruce de caminos (decisión 2026-09)</a></div></li><li><a href="#s3"><span class="tnum">3</span><span>La credencial SBT: lo que es y lo que no es</span></a><div class="subs"><a href="#sub3">3.1 Un certificado "atado" a tu billetera</a><br><a href="#sub4">3.2 Quién puede emitir credenciales (el "minter")</a><br><a href="#sub5">3.3 Cómo nace tu SBT (la emisión)</a><br><a href="#sub6">3.4 ¿Se puede comprobar? Sí, y está probado</a></div></li><li><a href="#s4"><span class="tnum">4</span><span>La "cocina": cómo comprueba TrueKeate si tienes SBT</span></a><div class="subs"><a href="#sub7">4.1 El chequeo on-chain (dos fuentes)</a><br><a href="#sub8">4.2 La emisión por parte de la plataforma</a><br><a href="#sub9">4.3 Los metadatos del certificado</a></div></li><li><a href="#s5"><span class="tnum">5</span><span>Los trámites de certificación (servicios `/kyc`)</span></a><div class="subs"><a href="#sub10">5.1 Peldaño 1 — Verificar tu correo</a><br><a href="#sub11">5.2 El chequeo: *¿tienes SBT?* (un servicio que solo pregunta)</a><br><a href="#sub12">5.3 Vía rápida — Certificarte automáticamente con tu SBT</a><br><a href="#sub13">5.4 Vía con fotos — Subir documento + selfie</a><br><a href="#sub14">5.5 Tus fotos están a salvo</a><br><a href="#sub15">5.6 El Owner decide (aprobar o rechazar)</a><br><a href="#sub16">5.7 Consultar tu estado cuando quieras</a><br><a href="#sub17">5.8 Modos y límites del estado actual</a></div></li><li><a href="#s6"><span class="tnum">6</span><span>Dónde se guarda todo (la base de datos)</span></a></li><li><a href="#s7"><span class="tnum">7</span><span>La página de certificación en la app</span></a></li><li><a href="#s8"><span class="tnum">8</span><span>El viaje completo, paso a paso</span></a></li><li><a href="#s9"><span class="tnum">9</span><span>Lo que falta por confirmar (resumen)</span></a></li><li><a href="#s10"><span class="tnum">10</span><span>Glosario de este manual</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos</h2>
+<p>TrueKeate te pide probar tu identidad en dos peldaños:</p>
+<ol><li><strong>Paso 1 — Verifica tu correo</strong>: la plataforma te envía un código de 6 dígitos y tú lo escribes. Ya estás <strong>VERIFICADO</strong>.</li><li><strong>Paso 2 — Certifícate</strong>, por una de estas dos vías:<ul><li><strong>Vía rápida (SBT)</strong>: si tu billetera ya tiene una credencial SBT (la de TrueKeate u otra reconocida), pulsas un botón y quedas <strong>CERTIFICADO</strong> al momento.</li><li><strong>Vía con fotos</strong>: si no tienes SBT, subes una foto de tu documento (DNI/cédula) y una <strong>selfie</strong>. Una persona responsable (el Owner) revisa tus fotos y te aprueba.</li></ul></li></ol>
+<blockquote class="info"><span class="tag">Nota</span><p>La credencial SBT es un <strong>certificado digital que no se puede regalar ni vender</strong>: va ligado a tu billetera y solo existe uno por persona. Es como un título académico: está a tu nombre y no se transfiere.</p></blockquote>
+<p><strong>En resumen</strong>: verifica el correo → elige tu vía (SBT automático o fotos con revisión humana) → consigue tu <strong>badge de CERTIFICADO</strong> y disfruta de los niveles más altos de la plataforma.</p>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. El panorama: piezas y camino de decisión</h2>
+<h3 class="sub" id="sub1">2.1 Qué piezas intervienen</h3>
+<div class="table-wrap"><table><thead><tr><th>Pieza (nombre técnico)</th><th>Para qué sirve, en cristiano</th></tr></thead><tbody><tr><td><strong>Contrato <code>TrueKeateSBT</code></strong></td><td>La fábrica de credenciales: emite tu SBT y garantiza que no se transfiera</td></tr><tr><td><strong>Helper SBT del backend</strong></td><td>El "vigilante" que mira en la cadena si tu billetera tiene SBT y emite el tuyo</td></tr><tr><td><strong>Servicios <code>/kyc</code> de la API</strong></td><td>Los trámites: verificar correo, certificar, subir fotos, revisar</td></tr><tr><td><strong>Base de datos (PostgreSQL)</strong></td><td>Guarda tu estado, tus fotos y tu número de SBT</td></tr><tr><td><strong>Página de certificación</strong></td><td>La pantalla donde tú haces los pasos (<code>/suite/certificacion</code>)</td></tr><tr><td><strong>Revisión del Owner</strong></td><td>La persona que aprueba o rechaza tus fotos cuando no hay SBT</td></tr></tbody></table></div>
+<h3 class="sub" id="sub2">2.2 El cruce de caminos (decisión 2026-09)</h3>
+<p>Cuando llegas al peldaño de certificación, el sistema se pregunta:</p>
+<ol><li><strong>¿Tu billetera tiene un SBT?</strong> → <strong>Certificación automática</strong> al instante (y si el SBT era de otra plataforma reconocida, TrueKeate te emite el suyo propio como credencial).</li><li><strong>¿No tienes SBT?</strong> → Subes <strong>documento + selfie</strong> y queda en <strong>PENDIENTE</strong> → el <strong>Owner</strong> revisa tus fotos y <strong>aprueba</strong> (quedas CERTIFICADO y se te emite el SBT) o <strong>rechaza</strong>.</li></ol>
+<p>La escalera completa de confianza tiene tres peldaños: primero te <strong>inscribes</strong> (INSCRITO), luego <strong>verificas tu correo</strong> (VERIFICADO) y por último te <strong>certificas</strong> (CERTIFICADO). Este manual explica ese último peldaño.</p>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAwIDQ0MCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiPgogIDxkZWZzPgogICAgPG1hcmtlciBpZD0iYXJyIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjguNSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjYuNSIgbWFya2VySGVpZ2h0PSI2LjUiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj4KICAgICAgPHBhdGggZD0iTTAsMSBMOSw1IEwwLDkgeiIgZmlsbD0iIzFhMmI0YyIvPgogICAgPC9tYXJrZXI+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjQ0MCIgZmlsbD0iI2Y4ZjlmYSIvPgogIDxyZWN0IHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjU4IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTQiIHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjQiIGZpbGw9IiNkNGFmMzciLz4KICA8dGV4dCB4PSI2MDAiIHk9IjM3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjIxIiBmb250LXdlaWdodD0iYm9sZCI+TGEgZXNjYWxlcmEgZGUgY29uZmlhbnphIEQyODogaGFzdGEgQ0VSVElGSUNBRE8gKDIwMjYpPC90ZXh0PgoKICA8IS0tIElOU0NSSVRPIC0tPgogIDxyZWN0IHg9IjI1IiB5PSI5NSIgd2lkdGg9IjIwMCIgaGVpZ2h0PSI3MCIgcng9IjEzIiBmaWxsPSIjZTllNWYwIiBzdHJva2U9IiM4ZDg2YTkiIHN0cm9rZS13aWR0aD0iMS4yIi8+CiAgPHRleHQgeD0iMTI1IiB5PSIxMjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTQuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPklOU0NSSVRPPC90ZXh0PgogIDx0ZXh0IHg9IjEyNSIgeT0iMTQ4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwLjUiPnRlIGRpc3RlIGRlIGFsdGE8L3RleHQ+CgogIDwhLS0gVkVSSUZJQ0FETyAtLT4KICA8cmVjdCB4PSIyNzUiIHk9Ijk1IiB3aWR0aD0iMjIwIiBoZWlnaHQ9IjcwIiByeD0iMTMiIGZpbGw9IiM0OGNhZTQiLz4KICA8dGV4dCB4PSIzODUiIHk9IjEyNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxNC41IiBmb250LXdlaWdodD0iYm9sZCI+VkVSSUZJQ0FETzwvdGV4dD4KICA8dGV4dCB4PSIzODUiIHk9IjE0OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMC41Ij5jb25maXJtYXN0ZSB0dSBjb3JyZW88L3RleHQ+CgogIDwhLS0gRGVjaXNpb24gU0JUIC0tPgogIDxwb2x5Z29uIHBvaW50cz0iNTM1LDEzMCA2NjAsNzUgNzg1LDEzMCA2NjAsMTg1IiBmaWxsPSIjZjNlNWFiIiBzdHJva2U9IiNjNWEwNjUiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNjYwIiB5PSIxMjciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSJib2xkIj5QYXNvIDI6PC90ZXh0PgogIDx0ZXh0IHg9IjY2MCIgeT0iMTQ1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iYm9sZCI+wr90aWVuZXMgdW4gU0JUPC90ZXh0PgogIDx0ZXh0IHg9IjY2MCIgeT0iMTYyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iYm9sZCI+ZW4gdHUgd2FsbGV0PzwvdGV4dD4KCiAgPCEtLSBDRVJUSUZJQ0FETyBhbCBpbnN0YW50ZSAoU8OtKSAtLT4KICA8cmVjdCB4PSI4MzUiIHk9Ijk1IiB3aWR0aD0iMzQwIiBoZWlnaHQ9IjcwIiByeD0iMTMiIGZpbGw9IiMyYTlkOGYiLz4KICA8dGV4dCB4PSIxMDA1IiB5PSIxMjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTQuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkNFUlRJRklDQURPIGFsIGluc3RhbnRlPC90ZXh0PgogIDx0ZXh0IHg9IjEwMDUiIHk9IjE0OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2U3ZjdmNCIgZm9udC1zaXplPSIxMC41Ij52w61hIFNCVCDCtyBzaW4gcmV2aXNpw7NuIGh1bWFuYTwvdGV4dD4KCiAgPCEtLSBhcnJvd3MgdG9wIHJvdyAtLT4KICA8bGluZSB4MT0iMjI3IiB5MT0iMTMwIiB4Mj0iMjcxIiB5Mj0iMTMwIiBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+CiAgPGxpbmUgeDE9IjQ5NyIgeTE9IjEzMCIgeDI9IjUzMSIgeTI9IjEzMCIgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyKSIvPgogIDxsaW5lIHgxPSI3ODUiIHkxPSIxMzAiIHgyPSI4MzEiIHkyPSIxMzAiIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KICA8dGV4dCB4PSI4MDgiIHk9IjExOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9ImJvbGQiPlPDrSDinJM8L3RleHQ+CgogIDwhLS0gTm86IGJhamEgYWwgdHLDoW1pdGUgY29uIGZvdG9zIC0tPgogIDxwYXRoIGQ9Ik0gNjYwIDE4OCBMIDY2MCAyMjggTCAyMDUgMjI4IEwgMjA1IDI1OSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyKSIvPgogIDx0ZXh0IHg9IjY2OCIgeT0iMjEyIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5ObzwvdGV4dD4KCiAgPCEtLSBTdWJpciBkb2N1bWVudG8gKyBzZWxmaWUgLS0+CiAgPHJlY3QgeD0iMjUiIHk9IjI2NSIgd2lkdGg9IjI5MCIgaGVpZ2h0PSI3MCIgcng9IjEzIiBmaWxsPSIjZjRhMjYxIiBzdHJva2U9IiNiMDZhMmEiIHN0cm9rZS13aWR0aD0iMS4yIi8+CiAgPHRleHQgeD0iMTcwIiB5PSIyOTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTMuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPlN1YmVzIGRvY3VtZW50byArIHNlbGZpZTwvdGV4dD4KICA8dGV4dCB4PSIxNzAiIHk9IjMxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMC41Ij5lbCB0csOhbWl0ZSBxdWVkYSBQRU5ESUVOVEU8L3RleHQ+CgogIDwhLS0gT3duZXIgcmV2aXNhIC0tPgogIDxyZWN0IHg9IjM3MCIgeT0iMjY1IiB3aWR0aD0iMjcwIiBoZWlnaHQ9IjcwIiByeD0iMTMiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iI2Q0YWYzNyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8dGV4dCB4PSI1MDUiIHk9IjI5NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9ImJvbGQiPkVsIE93bmVyIHJldmlzYTwvdGV4dD4KICA8dGV4dCB4PSI1MDUiIHk9IjMxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMC41Ij50dXMgZm90b3MgZW4gZWwgUGFuZWw8L3RleHQ+CgogIDxsaW5lIHgxPSIzMTciIHkxPSIzMDAiIHgyPSIzNjYiIHkyPSIzMDAiIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KCiAgPCEtLSBBcHJvYmFkbyAtLT4KICA8cmVjdCB4PSI3MzAiIHk9IjIxNSIgd2lkdGg9IjMxMCIgaGVpZ2h0PSI2NCIgcng9IjEyIiBmaWxsPSIjMmE5ZDhmIi8+CiAgPHRleHQgeD0iODg1IiB5PSIyNDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIj5DRVJUSUZJQ0FETzwvdGV4dD4KICA8dGV4dCB4PSI4ODUiIHk9IjI2MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2U3ZjdmNCIgZm9udC1zaXplPSIxMC41Ij4rIHNlIHRlIGVtaXRlIHR1IFNCVCBuYXRpdm88L3RleHQ+CgogIDwhLS0gUmVjaGF6YWRvIC0tPgogIDxyZWN0IHg9IjczMCIgeT0iMzU1IiB3aWR0aD0iMzEwIiBoZWlnaHQ9IjY0IiByeD0iMTIiIGZpbGw9IiNlNjM5NDYiLz4KICA8dGV4dCB4PSI4ODUiIHk9IjM4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9ImJvbGQiPlJFQ0hBWkFETzwvdGV4dD4KICA8dGV4dCB4PSI4ODUiIHk9IjQwMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZTFlNCIgZm9udC1zaXplPSIxMC41Ij5wdWVkZXMgdm9sdmVyIGEgaW50ZW50YXJsbzwvdGV4dD4KCiAgPCEtLSBhcnJvd3MgcmFtYSBhcHJvYmFkbyAtLT4KICA8cGF0aCBkPSJNIDY0MCAyODMgQyA2NjUgMjgzIDY2NSAyNDcgNzI2IDI0NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMmE5ZDhmIiBzdHJva2Utd2lkdGg9IjIuMiIgbWFya2VyLWVuZD0idXJsKCNhcnJHKSIvPgogIDx0ZXh0IHg9IjY2OCIgeT0iMjcyIiBmaWxsPSIjMmE5ZDhmIiBmb250LXNpemU9IjkuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkFwcnVlYmEg4pyTPC90ZXh0PgoKICA8IS0tIGFycm93cyByYW1hIHJlY2hhemFkbyAtLT4KICA8cGF0aCBkPSJNIDY0MCAzMTcgQyA2NjUgMzE3IDY2NSAzODcgNzI2IDM4NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTYzOTQ2IiBzdHJva2Utd2lkdGg9IjIuMiIgbWFya2VyLWVuZD0idXJsKCNhcnJSKSIvPgogIDx0ZXh0IHg9IjY2OCIgeT0iMzM2IiBmaWxsPSIjZTYzOTQ2IiBmb250LXNpemU9IjkuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPlJlY2hhemEg4pyXPC90ZXh0PgoKICA8ZGVmcz4KICAgIDxtYXJrZXIgaWQ9ImFyckciIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOC41IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iNi41IiBtYXJrZXJIZWlnaHQ9IjYuNSIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjMmE5ZDhmIi8+CiAgICA8L21hcmtlcj4KICAgIDxtYXJrZXIgaWQ9ImFyclIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOC41IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iNi41IiBtYXJrZXJIZWlnaHQ9IjYuNSIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPgogICAgICA8cGF0aCBkPSJNMCwxIEw5LDUgTDAsOSB6IiBmaWxsPSIjZTYzOTQ2Ii8+CiAgICA8L21hcmtlcj4KICA8L2RlZnM+Cjwvc3ZnPgo=" alt="Escalera D28 2026"/><figcaption class="fig-caption">Figura · Escalera D28 2026</figcaption></figure>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. La credencial SBT: lo que es y lo que no es</h2>
+<h3 class="sub" id="sub3">3.1 Un certificado "atado" a tu billetera</h3>
+<ul><li>El SBT (por sus siglas en inglés, <em>Soulbound Token</em>) es un <strong>token de colección especial</strong>: representa tu certificación de identidad.</li><li>Es <strong>no transferible</strong>: no se puede regalar, vender ni pasar a otra billetera. Solo puede nacer (emisión) o morir (quemado).</li><li>Regla importante: <strong>un solo SBT por billetera</strong>. Si ya tienes uno, el sistema no te emite otro.</li><li>Cumple los estándares ERC-721 (colección) y ERC-5192 (token bloqueado). Su símbolo técnico es <strong>TKSBT</strong> y su nombre "TrueKeate SBT".</li></ul>
+<h3 class="sub" id="sub4">3.2 Quién puede emitir credenciales (el "minter")</h3>
+<ul><li>No cualquiera puede fabricar SBTs: solo la <strong>cuenta emisora</strong> (el <em>minter</em>), que en la práctica es <strong>la propia plataforma</strong> (cuenta del relayer).</li><li>El dueño del contrato puede cambiar quién es el minter; hoy lo opera TrueKeate, no los usuarios.</li></ul>
+<h3 class="sub" id="sub5">3.3 Cómo nace tu SBT (la emisión)</h3>
+<p>Cuando la plataforma te certifica, ocurre esto en la cadena:</p>
+<ol><li>Se comprueba que no tengas ya un SBT.</li><li>Se crea el token con su número (tokenId) y sus metadatos: el certificado con tu billetera y el esquema <strong>"D28-CERTIFICADO"</strong>.</li><li>Se guarda el enlace entre tu billetera y ese número de SBT (relación 1 a 1) y queda registrado para siempre en la cadena.</li></ol>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p>Técnicamente, el SBT vive en el contrato <code>TrueKeateSBT</code>. En la versión de producción de pruebas (2026-09) está desplegado en el anvil de GCP en la dirección <code>0x8705…3638</code>, y el comando exacto de su despliegue aún no está versionado → <strong>pendiente de confirmar</strong>.</p></blockquote>
+<h3 class="sub" id="sub6">3.4 ¿Se puede comprobar? Sí, y está probado</h3>
+<ul><li>Cualquiera puede preguntar en la cadena: <em>¿qué SBT tiene esta billetera?</em> y <em>¿está bloqueado?</em> (siempre responde que sí).</li><li>El contrato supera <strong>6 de 6 pruebas automáticas</strong> (que solo el minter emite, que no hay dos SBT por billetera, que no se puede transferir, que el Owner cambia el minter, y que cumple ERC-5192).</li></ul>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. La "cocina": cómo comprueba TrueKeate si tienes SBT</h2>
+<h3 class="sub" id="sub7">4.1 El chequeo on-chain (dos fuentes)</h3>
+<p>Antes de certificarte, el sistema mira en la cadena si tu billetera posee:</p>
+<ol><li><strong>SBT nativo</strong>: el <code>TrueKeateSBT</code> de TrueKeate (el de la dirección <code>0x8705…3638</code> en producción).</li><li><strong>SBT externo reconocido</strong>: credenciales de otras plataformas incluidas en una lista blanca de confianza (hoy la lista está <strong>vacía</strong>: no se reconoce ningún SBT externo todavía).</li></ol>
+<p>Si el contrato no responde (problemas de red), el sistema lo ignora y sigue sin darte por certificado: <strong>no inventa resultados</strong>.</p>
+<h3 class="sub" id="sub8">4.2 La emisión por parte de la plataforma</h3>
+<ul><li>Cuando te toca certificación y hace falta emitirte el SBT, lo firma la <strong>billetera de la plataforma</strong> (no la tuya, así no pagas gas).</li><li>Si la plataforma no tiene configurada la clave de emisión, el minteo se <strong>simula</strong> (queda registrado en la base, pero no llega a la cadena) → la certificación SBT quedaría incompleta. Es un modo de desarrollo.</li></ul>
+<h3 class="sub" id="sub9">4.3 Los metadatos del certificado</h3>
+<p>El SBT guarda una tarjeta de presentación digital con el nombre <strong>"TrueKeate · Certificación de identidad (KYC)"</strong> y el esquema <strong>D28-CERTIFICADO</strong>. Es lo que verías si inspeccionas el token.</p>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. Los trámites de certificación (servicios <code>/kyc</code>)</h2>
+<h3 class="sub" id="sub10">5.1 Peldaño 1 — Verificar tu correo</h3>
+<ol><li>La plataforma te envía un <strong>código de 6 dígitos</strong> a tu correo.</li><li>El código <strong>caduca a los 10 minutos</strong>.</li><li>Lo escribes y quedas <strong>VERIFICADO</strong> (tu usuario pasa a estado VERIFICADO y el trámite avanza a su etapa 2).</li></ol>
+<blockquote class="pend"><span class="tag">Pendiente de confirmar</span><p>Si el equipo no ha configurado el envío real de correos, el sistema funciona en <strong>modo demostración</strong> y te muestra el código directamente en pantalla. Los códigos viven en la memoria de la API: si se reinicia el servicio, se pierden → <strong>pendiente de confirmar</strong> su guardado permanente.</p></blockquote>
+<h3 class="sub" id="sub11">5.2 El chequeo: <em>¿tienes SBT?</em> (un servicio que solo pregunta)</h3>
+<p>La app consulta <code>GET /kyc/sbt</code> y la API le responde: <strong>sí/no</strong>, de qué fuente (nativo o externo), de qué contrato y con qué número de token. No cambia nada: solo mira.</p>
+<h3 class="sub" id="sub12">5.3 Vía rápida — Certificarte automáticamente con tu SBT</h3>
+<p>Cuando pulsas "Certificarme automáticamente con mi SBT":</p>
+<ol><li>El sistema comprueba que ya estás VERIFICADO (si no, te lo recuerda).</li><li>Comprueba de nuevo que tu billetera tiene SBT.</li><li>Si el SBT era <strong>externo</strong>, la plataforma te emite <strong>el SBT nativo de TrueKeate</strong>; si ya era nativo, se conserva el tuyo.</li><li>¡Listo! Tu usuario pasa a <strong>CERTIFICADO</strong> y tu trámite queda APROBADO por la vía del SBT, con el número de token y el contrato registrados.</li></ol>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAwIDQyNSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiPgogIDxkZWZzPgogICAgPG1hcmtlciBpZD0iYXJyIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjguNSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjYuNSIgbWFya2VySGVpZ2h0PSI2LjUiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj4KICAgICAgPHBhdGggZD0iTTAsMSBMOSw1IEwwLDkgeiIgZmlsbD0iIzFhMmI0YyIvPgogICAgPC9tYXJrZXI+CiAgICA8bWFya2VyIGlkPSJhcnJHIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjguNSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjYuNSIgbWFya2VySGVpZ2h0PSI2LjUiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj4KICAgICAgPHBhdGggZD0iTTAsMSBMOSw1IEwwLDkgeiIgZmlsbD0iIzJhOWQ4ZiIvPgogICAgPC9tYXJrZXI+CiAgICA8bWFya2VyIGlkPSJhcnJSIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjguNSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjYuNSIgbWFya2VySGVpZ2h0PSI2LjUiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj4KICAgICAgPHBhdGggZD0iTTAsMSBMOSw1IEwwLDkgeiIgZmlsbD0iI2U2Mzk0NiIvPgogICAgPC9tYXJrZXI+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjQyNSIgZmlsbD0iI2Y4ZjlmYSIvPgogIDxyZWN0IHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjU4IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTQiIHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjQiIGZpbGw9IiNkNGFmMzciLz4KICA8dGV4dCB4PSI2MDAiIHk9IjM3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjIxIiBmb250LXdlaWdodD0iYm9sZCI+Q2VydGlmaWNhcnRlIGNvbiBTQlQ6IGxhIHZpYSByYXBpZGEsIHBhc28gYSBwYXNvPC90ZXh0PgoKICA8IS0tIEE6IFZFUklGSUNBRE8gLS0+CiAgPHJlY3QgeD0iMjUiIHk9Ijk1IiB3aWR0aD0iMjMwIiBoZWlnaHQ9IjcwIiByeD0iMTMiIGZpbGw9IiM0OGNhZTQiLz4KICA8dGV4dCB4PSIxNDAiIHk9IjEyNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9ImJvbGQiPlZFUklGSUNBRE88L3RleHQ+CiAgPHRleHQgeD0iMTQwIiB5PSIxNDgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTAuNSI+eWEgY29uZmlybWFzdGUgdHUgY29ycmVvPC90ZXh0PgoKICA8IS0tIERlY2lzaW9uIC0tPgogIDxwb2x5Z29uIHBvaW50cz0iMjk1LDEzMCA0MjAsNzUgNTQ1LDEzMCA0MjAsMTg1IiBmaWxsPSIjZjNlNWFiIiBzdHJva2U9IiNjNWEwNjUiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNDIwIiB5PSIxMjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSJib2xkIj7Cv1R1IHdhbGxldDwvdGV4dD4KICA8dGV4dCB4PSI0MjAiIHk9IjE0MyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzBhMTEyOCIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiPnRpZW5lIHVuIFNCVD88L3RleHQ+CiAgPHRleHQgeD0iNDIwIiB5PSIxNjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwYTExMjgiIGZvbnQtc2l6ZT0iOS41Ij5jaGVxdWVvIG9uLWNoYWluPC90ZXh0PgoKICA8IS0tIEM6IHB1bHNhcyBjZXJ0aWZpY2FybWUgLS0+CiAgPHJlY3QgeD0iNTgwIiB5PSI5NSIgd2lkdGg9IjI1MCIgaGVpZ2h0PSI3MCIgcng9IjEzIiBmaWxsPSIjMWEyYjRjIi8+CiAgPHRleHQgeD0iNzA1IiB5PSIxMjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSJib2xkIj5QdWxzYXM6IENlcnRpZmljYXJtZTwvdGV4dD4KICA8dGV4dCB4PSI3MDUiIHk9IjE0NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMyIgZm9udC13ZWlnaHQ9ImJvbGQiPmF1dG9tYXRpY2FtZW50ZTwvdGV4dD4KCiAgPCEtLSBGOiBDRVJUSUZJQ0FETyBhbCBpbnN0YW50ZSAtLT4KICA8cmVjdCB4PSI5MDAiIHk9Ijk1IiB3aWR0aD0iMjc1IiBoZWlnaHQ9IjcwIiByeD0iMTMiIGZpbGw9IiMyYTlkOGYiLz4KICA8dGV4dCB4PSIxMDM3IiB5PSIxMjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTQuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPkNFUlRJRklDQURPPC90ZXh0PgogIDx0ZXh0IHg9IjEwMzciIHk9IjE0OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2U3ZjdmNCIgZm9udC1zaXplPSIxMC41Ij5hbCBpbnN0YW50ZSDCtyB0cmFtaXRlIEFQUk9CQURPPC90ZXh0PgoKICA8bGluZSB4MT0iMjU3IiB5MT0iMTMwIiB4Mj0iMjkxIiB5Mj0iMTMwIiBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+CiAgPGxpbmUgeDE9IjU0NyIgeTE9IjEzMCIgeDI9IjU3NiIgeTI9IjEzMCIgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyKSIvPgogIDx0ZXh0IHg9IjU2MiIgeT0iMTE5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwIiBmb250LXdlaWdodD0iYm9sZCI+U8OtIOKckzwvdGV4dD4KICA8bGluZSB4MT0iODMyIiB5MT0iMTMwIiB4Mj0iODk2IiB5Mj0iMTMwIiBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+CgogIDwhLS0gU0JUIGV4dGVybm8gLS0+CiAgPHJlY3QgeD0iNTgwIiB5PSIyMDUiIHdpZHRoPSI1NjAiIGhlaWdodD0iNDQiIHJ4PSIxMSIgZmlsbD0iI2YzZTVhYiIgc3Ryb2tlPSIjYzVhMDY1IiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDx0ZXh0IHg9Ijg2MCIgeT0iMjMyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iYm9sZCI+wr9FbCBTQlQgZXJhIGV4dGVybm8/IFRydWVLZWF0ZSB0ZSBlbWl0ZSBzdSBTQlQgbmF0aXZvIGNvbW8gY3JlZGVuY2lhbDwvdGV4dD4KICA8bGluZSB4MT0iMTAzNyIgeTE9IjIwMyIgeDI9IjEwMzciIHkyPSIxNjkiIHN0cm9rZT0iIzJhOWQ4ZiIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2FyckcpIi8+CgogIDwhLS0gTm86IHbDrWEgY29uIGZvdG9zIC0tPgogIDxwYXRoIGQ9Ik0gNDIwIDE4OCBMIDQyMCAyMjUgTCAxNzUgMjI1IEwgMTc1IDI0NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyKSIvPgogIDx0ZXh0IHg9IjQyOCIgeT0iMjA1IiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5ObzwvdGV4dD4KCiAgPCEtLSBFMTogc3ViaXIgZG9jdW1lbnRvICsgc2VsZmllIC0tPgogIDxyZWN0IHg9IjI1IiB5PSIyNTAiIHdpZHRoPSIzMDAiIGhlaWdodD0iNzAiIHJ4PSIxMyIgZmlsbD0iI2Y0YTI2MSIgc3Ryb2tlPSIjYjA2YTJhIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDx0ZXh0IHg9IjE3NSIgeT0iMjgxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEzLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj5TdWJlcyBkb2N1bWVudG8gKyBzZWxmaWU8L3RleHQ+CiAgPHRleHQgeD0iMTc1IiB5PSIzMDMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAuNSI+ZWwgdHJhbWl0ZSBxdWVkYSBQRU5ESUVOVEU8L3RleHQ+CgogIDwhLS0gRTI6IE93bmVyIHJldmlzYSAtLT4KICA8cmVjdCB4PSIzOTAiIHk9IjI2NSIgd2lkdGg9IjI4MCIgaGVpZ2h0PSI4MCIgcng9IjEzIiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiNkNGFmMzciIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNTMwIiB5PSIyOTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIj5FbCBPd25lciByZXZpc2E8L3RleHQ+CiAgPHRleHQgeD0iNTMwIiB5PSIzMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAuNSI+dHVzIGZvdG9zIGVuIHN1IFBhbmVsPC90ZXh0PgoKICA8bGluZSB4MT0iMzI3IiB5MT0iMjg1IiB4Mj0iMzg2IiB5Mj0iMjg1IiBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+CgogIDwhLS0gRTNhOiBDRVJUSUZJQ0FETyArIFNCVCAtLT4KICA8cmVjdCB4PSI3NDAiIHk9IjI1MCIgd2lkdGg9IjIyMCIgaGVpZ2h0PSI2MiIgcng9IjEyIiBmaWxsPSIjMmE5ZDhmIi8+CiAgPHRleHQgeD0iODUwIiB5PSIyNzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIj5DRVJUSUZJQ0FETzwvdGV4dD4KICA8dGV4dCB4PSI4NTAiIHk9IjI5NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2U3ZjdmNCIgZm9udC1zaXplPSIxMC41Ij4rIHNlIHRlIGVtaXRlIHR1IFNCVDwvdGV4dD4KCiAgPCEtLSBFM2I6IFJFQ0hBWkFETyAtLT4KICA8cmVjdCB4PSI3NDAiIHk9IjMzMCIgd2lkdGg9IjIyMCIgaGVpZ2h0PSI2MiIgcng9IjEyIiBmaWxsPSIjZTYzOTQ2Ii8+CiAgPHRleHQgeD0iODUwIiB5PSIzNTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIj5SRUNIQVpBRE88L3RleHQ+CiAgPHRleHQgeD0iODUwIiB5PSIzNzYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmUxZTQiIGZvbnQtc2l6ZT0iMTAuNSI+cHVlZGVzIHZvbHZlciBhIGludGVudGFybG88L3RleHQ+CgogIDxwYXRoIGQ9Ik0gNjcyIDI4NyBDIDcwMCAyODcgNzAwIDI4MSA3MzQgMjgxIiBmaWxsPSJub25lIiBzdHJva2U9IiMyYTlkOGYiIHN0cm9rZS13aWR0aD0iMi4yIiBtYXJrZXItZW5kPSJ1cmwoI2FyckcpIi8+CiAgPHRleHQgeD0iNjkwIiB5PSIyNzAiIGZpbGw9IiMyYTlkOGYiIGZvbnQtc2l6ZT0iOS41IiBmb250LXdlaWdodD0iYm9sZCI+QXBydWViYSDinJM8L3RleHQ+CgogIDxwYXRoIGQ9Ik0gNjcyIDMzOCBDIDcwMCAzMzggNzAwIDM2MSA3MzQgMzYxIiBmaWxsPSJub25lIiBzdHJva2U9IiNlNjM5NDYiIHN0cm9rZS13aWR0aD0iMi4yIiBtYXJrZXItZW5kPSJ1cmwoI2FyclIpIi8+CiAgPHRleHQgeD0iNjg4IiB5PSIzOTIiIGZpbGw9IiNlNjM5NDYiIGZvbnQtc2l6ZT0iOS41IiBmb250LXdlaWdodD0iYm9sZCI+UmVjaGF6YSDinJc8L3RleHQ+Cjwvc3ZnPgo=" alt="Flujo Certificacion Sbt"/><figcaption class="fig-caption">Figura · Flujo Certificacion Sbt</figcaption></figure>
+<h3 class="sub" id="sub13">5.4 Vía con fotos — Subir documento + selfie</h3>
+<p>Cuando no tienes SBT, la pantalla te pide <strong>dos imágenes reales</strong>:</p>
+<ol><li><strong>Foto de tu documento</strong> (DNI/cédula) — delante de ti.</li><li><strong>Tu selfie</strong> — tu cara, para comparar que el documento es tuyo.</li></ol>
+<p>Reglas de las fotos:</p>
+<ul><li>Formatos admitidos: <strong>JPEG, PNG o WebP</strong>.</li><li>Tamaño máximo: unos <strong>4 MB por imagen</strong> (la app te muestra una vista previa antes de enviar).</li></ul>
+<p>Al enviarlas, tu trámite queda <strong>PENDIENTE</strong>: ahora decide una persona.</p>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAwIDQwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiPgogIDxkZWZzPgogICAgPG1hcmtlciBpZD0iYXJyIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjguNSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjYuNSIgbWFya2VySGVpZ2h0PSI2LjUiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj4KICAgICAgPHBhdGggZD0iTTAsMSBMOSw1IEwwLDkgeiIgZmlsbD0iIzFhMmI0YyIvPgogICAgPC9tYXJrZXI+CiAgICA8bWFya2VyIGlkPSJhcnJHIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjguNSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjYuNSIgbWFya2VySGVpZ2h0PSI2LjUiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj4KICAgICAgPHBhdGggZD0iTTAsMSBMOSw1IEwwLDkgeiIgZmlsbD0iIzJhOWQ4ZiIvPgogICAgPC9tYXJrZXI+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2Y4ZjlmYSIvPgogIDxyZWN0IHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjU4IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTQiIHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjQiIGZpbGw9IiNkNGFmMzciLz4KICA8dGV4dCB4PSI2MDAiIHk9IjM3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjIxIiBmb250LXdlaWdodD0iYm9sZCI+Q2VydGlmaWNhcnRlIGNvbiBmb3RvczogZG9jdW1lbnRvICsgc2VsZmllPC90ZXh0PgoKICA8IS0tIEE6IGZvdG8gZG9jdW1lbnRvIC0tPgogIDxyZWN0IHg9IjI1IiB5PSIxMDAiIHdpZHRoPSIyMDAiIGhlaWdodD0iNzUiIHJ4PSIxMyIgZmlsbD0iI2Y0YTI2MSIgc3Ryb2tlPSIjYjA2YTJhIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDx0ZXh0IHg9IjEyNSIgeT0iMTMzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj4xIMK3IEZvdG8gZGVsIGRvY3VtZW50bzwvdGV4dD4KICA8dGV4dCB4PSIxMjUiIHk9IjE1NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMC41Ij5ETkkgbyBjw6lkdWxhPC90ZXh0PgoKICA8IS0tIEI6IHNlbGZpZSAtLT4KICA8cmVjdCB4PSIyNjAiIHk9IjEwMCIgd2lkdGg9IjE4MCIgaGVpZ2h0PSI3NSIgcng9IjEzIiBmaWxsPSIjZjRhMjYxIiBzdHJva2U9IiNiMDZhMmEiIHN0cm9rZS13aWR0aD0iMS4yIi8+CiAgPHRleHQgeD0iMzUwIiB5PSIxMzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPjIgwrcgVHUgc2VsZmllPC90ZXh0PgogIDx0ZXh0IHg9IjM1MCIgeT0iMTU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwLjUiPnR1IGNhcmEsIGRlIGZyZW50ZTwvdGV4dD4KCiAgPCEtLSBDOiB2aXN0YSBwcmV2aWEgLS0+CiAgPHJlY3QgeD0iNDc1IiB5PSIxMDAiIHdpZHRoPSIyNTAiIGhlaWdodD0iNzUiIHJ4PSIxMyIgZmlsbD0iI2U5ZTVmMCIgc3Ryb2tlPSIjOGQ4NmE5IiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDx0ZXh0IHg9IjYwMCIgeT0iMTMzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj4zIMK3IFJldmlzYSBsYSB2aXN0YSBwcmV2aWE8L3RleHQ+CiAgPHRleHQgeD0iNjAwIiB5PSIxNTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAuNSI+SlBFRyDCtyBQTkcgwrcgV2ViUCDCtyBtw6F4LiA0IE1CPC90ZXh0PgoKICA8IS0tIEQ6IGVudmlhciAtLT4KICA8cmVjdCB4PSI3NjAiIHk9IjEwMCIgd2lkdGg9IjE2MCIgaGVpZ2h0PSI3NSIgcng9IjEzIiBmaWxsPSIjZjNlNWFiIiBzdHJva2U9IiNjNWEwNjUiIHN0cm9rZS13aWR0aD0iMS4yIi8+CiAgPHRleHQgeD0iODQwIiB5PSIxMzMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPjQgwrcgRW52aWFyPC90ZXh0PgogIDx0ZXh0IHg9Ijg0MCIgeT0iMTU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwLjUiPnF1ZWRhIFBFTkRJRU5URTwvdGV4dD4KCiAgPCEtLSBFOiBvd25lciByZXZpc2EgLS0+CiAgPHJlY3QgeD0iOTU1IiB5PSIxMDAiIHdpZHRoPSIyMjAiIGhlaWdodD0iNzUiIHJ4PSIxMyIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjZDRhZjM3IiBzdHJva2Utd2lkdGg9IjEuNSIvPgogIDx0ZXh0IHg9IjEwNjUiIHk9IjEzMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+NSDCtyBFbCBPd25lciByZXZpc2E8L3RleHQ+CiAgPHRleHQgeD0iMTA2NSIgeT0iMTU1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjEwLjUiPmRvY3VtZW50byArIHNlbGZpZTwvdGV4dD4KCiAgPCEtLSBhcnJvd3MgLS0+CiAgPGxpbmUgeDE9IjIyOSIgeTE9IjEzNyIgeDI9IjI1NiIgeTI9IjEzNyIgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyKSIvPgogIDxsaW5lIHgxPSI0NDQiIHkxPSIxMzciIHgyPSI0NzEiIHkyPSIxMzciIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KICA8bGluZSB4MT0iNzI5IiB5MT0iMTM3IiB4Mj0iNzU2IiB5Mj0iMTM3IiBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+CiAgPGxpbmUgeDE9IjkyNCIgeTE9IjEzNyIgeDI9Ijk1MSIgeTI9IjEzNyIgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyKSIvPgoKICA8IS0tIHJhbWEgYXByb2JhZG8gLS0+CiAgPHBhdGggZD0iTSAxMDY1IDE3OCBMIDEwNjUgMjE1IEwgNzY1IDIxNSBMIDc2NSAyNDYiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzJhOWQ4ZiIgc3Ryb2tlLXdpZHRoPSIyLjIiIG1hcmtlci1lbmQ9InVybCgjYXJyRykiLz4KICA8dGV4dCB4PSI5MTIiIHk9IjIwNyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzJhOWQ4ZiIgZm9udC1zaXplPSI5LjUiIGZvbnQtd2VpZ2h0PSJib2xkIj50b2RvIGNvaW5jaWRlIOKckzwvdGV4dD4KCiAgPCEtLSByYW1hIHJlY2hhemFkbyAtLT4KICA8bGluZSB4MT0iMTEwNSIgeTE9IjE3OCIgeDI9IjExMDUiIHkyPSIyNDYiIHN0cm9rZT0iI2U2Mzk0NiIgc3Ryb2tlLXdpZHRoPSIyLjIiIG1hcmtlci1lbmQ9InVybCgjYXJyUikiLz4KICA8dGV4dCB4PSIxMTE1IiB5PSIyMTMiIGZpbGw9IiNlNjM5NDYiIGZvbnQtc2l6ZT0iOS41IiBmb250LXdlaWdodD0iYm9sZCI+YWxnbyBubyBjdWFkcmE8L3RleHQ+CgogIDwhLS0gQVBST0JBRE8gLS0+CiAgPHJlY3QgeD0iNjEwIiB5PSIyNTAiIHdpZHRoPSIzMTAiIGhlaWdodD0iODAiIHJ4PSIxMyIgZmlsbD0iIzJhOWQ4ZiIvPgogIDx0ZXh0IHg9Ijc2NSIgeT0iMjgyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjE1IiBmb250LXdlaWdodD0iYm9sZCI+QVBST0JBRE8gwrcgQ0VSVElGSUNBRE88L3RleHQ+CiAgPHRleHQgeD0iNzY1IiB5PSIzMDYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNlN2Y3ZjQiIGZvbnQtc2l6ZT0iMTEiPisgc2UgdGUgZW1pdGUgdHUgU0JUIG5hdGl2bzwvdGV4dD4KCiAgPCEtLSBSRUNIQVpBRE8gLS0+CiAgPHJlY3QgeD0iOTQ1IiB5PSIyNTAiIHdpZHRoPSIyMzAiIGhlaWdodD0iODAiIHJ4PSIxMyIgZmlsbD0iI2U2Mzk0NiIvPgogIDx0ZXh0IHg9IjEwNjAiIHk9IjI4MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9ImJvbGQiPlJFQ0hBWkFETzwvdGV4dD4KICA8dGV4dCB4PSIxMDYwIiB5PSIzMDYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmUxZTQiIGZvbnQtc2l6ZT0iMTEiPnB1ZWRlcyB2b2x2ZXIgYSBpbnRlbnRhcmxvPC90ZXh0PgoKICA8IS0tIG5vdGEgcHJpdmFjaWRhZCAtLT4KICA8cmVjdCB4PSIyNSIgeT0iMjUwIiB3aWR0aD0iNTQ1IiBoZWlnaHQ9IjgwIiByeD0iMTMiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iI2NiZDVlMSIgc3Ryb2tlLXdpZHRoPSIxLjIiLz4KICA8dGV4dCB4PSIyOTciIHk9IjI3OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMi41IiBmb250LXdlaWdodD0iYm9sZCI+VHVzIGZvdG9zIGVzdGFuIGEgc2Fsdm88L3RleHQ+CiAgPHRleHQgeD0iMjk3IiB5PSIzMDIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTAiPlNvbG8gcHVlZGVuIHZlcmxhcyB0dSBjdWVudGEgeSBlbCBPd25lcjwvdGV4dD4KICA8dGV4dCB4PSIyOTciIHk9IjMxOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMCI+aHVlbGxhIGRpZ2l0YWwgY29udHJhIGFsdGVyYWNpb25lczwvdGV4dD4KCiAgPGRlZnM+CiAgICA8bWFya2VyIGlkPSJhcnJSIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjguNSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjYuNSIgbWFya2VySGVpZ2h0PSI2LjUiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj4KICAgICAgPHBhdGggZD0iTTAsMSBMOSw1IEwwLDkgeiIgZmlsbD0iI2U2Mzk0NiIvPgogICAgPC9tYXJrZXI+CiAgPC9kZWZzPgo8L3N2Zz4K" alt="Kyc Imagenes Dni Selfie"/><figcaption class="fig-caption">Figura · Kyc Imagenes Dni Selfie</figcaption></figure>
+<h3 class="sub" id="sub14">5.5 Tus fotos están a salvo</h3>
+<ul><li>La foto de tu documento y tu selfie <strong>solo las puede ver</strong> la persona dueña de la cuenta (tú) y el Owner. Nadie más.</li><li>Se guardan en la base de datos (con su huella digital para detectar alteraciones) y la web no las muestra en público.</li></ul>
+<h3 class="sub" id="sub15">5.6 El Owner decide (aprobar o rechazar)</h3>
+<ul><li>El Owner ve en su <strong>Panel</strong> (<code>/suite/admin</code>) la lista de solicitudes PENDIENTES con las <strong>dos fotos</strong> de cada persona.</li><li><strong>Aprobar</strong> → la persona pasa a CERTIFICADO y se le emite su SBT nativo.</li><li><strong>Rechazar</strong> → el trámite queda RECHAZADO y la persona puede volver a intentarlo.</li><li>Solo el Owner puede hacer esto: el sistema comprueba su identidad en la cadena (que sea el dueño del registro de Socios de TrueKeate).</li></ul>
+<h3 class="sub" id="sub16">5.7 Consultar tu estado cuando quieras</h3>
+<p>En cualquier momento puedes preguntar "¿en qué punto estoy?" y la app te responde: tu estado (INSCRITO / VERIFICADO / CERTIFICADO / RECHAZADO), si fuiste certificado por SBT, el número de tu token y si tienes fotos pendientes de revisión.</p>
+<h3 class="sub" id="sub17">5.8 Modos y límites del estado actual</h3>
+<ul><li>El <strong>modo demostración</strong> (sin correos reales ni clave de emisión) sirve para probar, pero la certificación SBT de verdad necesita la configuración completa.</li><li>Sin la clave del minter, la emisión del SBT se simula → <strong>pendiente de confirmar</strong> para producción real de otras redes.</li></ul>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. Dónde se guarda todo (la base de datos)</h2>
+<p>Tu trámite de certificación toca varias "carpetas" de la base de datos:</p>
+<div class="table-wrap"><table><thead><tr><th>Carpeta (tabla)</th><th>Qué guarda de tu certificación</th></tr></thead><tbody><tr><td><strong><code>kyc</code></strong></td><td>Tu estado, la vía (SBT o fotos), el contrato y número de tu SBT, y las referencias a tus fotos</td></tr><tr><td><strong><code>imagenes_certificadas</code></strong></td><td>Las fotos (documento y selfie) con su tipo, contenido y huella digital</td></tr><tr><td><strong><code>usuarios</code></strong></td><td>Tu estado general (VERIFICADO → CERTIFICADO)</td></tr></tbody></table></div>
+<ul><li>La tabla de fotos distingue el tipo: foto de <strong>documento (KYC_DNI)</strong> o <strong>selfie (KYC_SELFIE)</strong>, y en este trámite las sube la propia plataforma (no necesitan firma tuya).</li><li>Estos cambios se aplican con una <strong>migración</strong> que se puede ejecutar varias veces sin romper nada (es idempotente).</li></ul>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. La página de certificación en la app</h2>
+<ul><li>Entras en la sección <strong>Certificación</strong> de la suite (rutas <code>/suite/verificacion</code> → <code>/suite/certificacion</code>).</li><li>Al abrirla, la app ya consulta tu estado y si tienes SBT, y te muestra la pantalla que te corresponde:<ul><li><strong>Ya certificado</strong> → ves tu badge "Certificado automáticamente con tu SBT".</li><li><strong>Con SBT y sin certificar</strong> → botón de certificación automática.</li><li><strong>Sin SBT</strong> → formulario de subida de documento + selfie.</li><li><strong>Enviado</strong> → aviso de que tu solicitud está PENDIENTE de revisión del Owner.</li><li><strong>Solo inscrito</strong> → recordatorio de que primero debes verificar tu correo.</li></ul></li><li>El Owner, por su parte, tiene su panel de revisión con las solicitudes y sus fotos, y los botones Aprobar/Rechazar.</li></ul>
+</section>
+<section class="seccion" id="s8"><h2 class="seccion">8. El viaje completo, paso a paso</h2>
+<ol><li>Te das de alta en TrueKeate (<strong>INSCRITO</strong>).</li><li>Verificas tu correo con el código de 6 dígitos (<strong>VERIFICADO</strong>).</li><li>Entras en Certificación; la app mira en la cadena si tu billetera tiene SBT.</li><li><strong>¿Tienes SBT?</strong> Pulsas "Certificarme automáticamente" → <strong>CERTIFICADO</strong> al instante.</li><li><strong>¿No tienes SBT?</strong> Subes documento + selfie → <strong>PENDIENTE</strong>.</li><li>El <strong>Owner</strong> revisa tus fotos y aprueba → <strong>CERTIFICADO</strong> y se te emite tu SBT (o rechaza → RECHAZADO).</li></ol>
+<p>¡Y ya está! Con tu SBT, la plataforma sabe que eres tú y puedes usar los servicios del nivel más alto de confianza.</p>
+</section>
+<section class="seccion" id="s9"><h2 class="seccion">9. Lo que falta por confirmar (resumen)</h2>
+<ol><li>El comando exacto con el que se desplegó el contrato <code>TrueKeateSBT</code> (no está en el script de despliegue habitual; la dirección de producción sí está registrada).</li><li>Guardar los códigos de verificación de correo de forma permanente (hoy viven en la memoria de la API y se pierden al reiniciar).</li><li>Aclarar el uso real de las columnas antiguas de documento/selfie que conviven con el nuevo sistema de fotos.</li><li>La comprobación de SBTs externos solo mira si la billetera tiene <em>algún</em> token de esa colección: no verifica todavía quién lo emitió de verdad.</li></ol>
+</section>
+<section class="seccion" id="s10"><h2 class="seccion">10. Glosario de este manual</h2>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Significado</th></tr></thead><tbody><tr><td><strong>SBT</strong></td><td>Credencial digital "atada" a tu billetera: no se transfiere</td></tr><tr><td><strong>Certificar</strong></td><td>Demostrar quién eres para llegar al nivel CERTIFICADO</td></tr><tr><td><strong>Minter</strong></td><td>La cuenta autorizada a emitir SBTs (hoy, la plataforma)</td></tr><tr><td><strong>KYC</strong></td><td>Trámite de conocer al cliente: verificar identidad con correo y/o fotos</td></tr><tr><td><strong>Selfie</strong></td><td>Tu foto de frente para comparar con el documento</td></tr><tr><td><strong>Owner</strong></td><td>La persona responsable de TrueKeate que revisa las solicitudes</td></tr><tr><td><strong>On-chain / cadena</strong></td><td>El registro público donde viven los contratos y los SBTs</td></tr><tr><td><strong>Token / tokenId</strong></td><td>La credencial digital y su número de serie</td></tr><tr><td><strong>PENDIENTE / RECHAZADO</strong></td><td>Estados de tu trámite: esperando revisión / denegado</td></tr></tbody></table></div>
+</section>
+</main>
+
+</body>
+</html>

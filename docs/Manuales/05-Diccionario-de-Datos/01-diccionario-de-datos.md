@@ -10,7 +10,7 @@
 ## 1. Empezar en 5 minutos
 
 Cada vez que usas TrueKeate, la plataforma guarda información en una base de
-datos (PostgreSQL). Esa información se organiza en **14 carpetas** (los
+datos (PostgreSQL). Esa información se organiza en **16 carpetas** (los
 técnicos las llaman "tablas"). Cada carpeta guarda un tema: tu identidad, tus
 artículos, tus trueques, tus notas, tus puntos de encuentro...
 
@@ -45,7 +45,7 @@ viaja a la cadena una "huella" (hash); el documento nunca sale de la base.
 
 ---
 
-## 2. Las 14 carpetas y quién las llena
+## 2. Las 16 carpetas y quién las llena
 
 ### 2.1 Tres clases de carpetas
 
@@ -54,31 +54,33 @@ El esquema separa quién puede escribir cada carpeta. Hay 3 clases:
 | Clase | Carpetas | Quién las escribe | Fuente de verdad |
 |---|---|---|---|
 | **Espejo de la cadena** | `truekes` y parte de `kyc`, `usuarios`, `finanzas`, `suscripciones` | **Solo el vigilante** (indexador) | La blockchain (sus eventos) |
-| **Negocio fuera de la cadena** | `articulos`, `valoraciones`, `puntos_encuentro`, `disputas`, `imagenes_certificadas`, `campanas`, `subastas` | La plataforma (su API) | La propia base + evidencias (fotos, firmas) |
+| **Negocio fuera de la cadena** | `articulos`, `valoraciones`, `puntos_encuentro`, `puntos_favoritos`, `disputas`, `imagenes_certificadas`, `campanas`, `subastas`, `sesiones` | La plataforma (su API) | La propia base + evidencias (fotos, firmas) |
 | **Cocina interna del vigilante** | `auditoria`, `indexador_checkpoint` | El vigilante | El registro de eventos procesados |
 
 La regla más importante: **la blockchain es la única fuente de verdad para
 los estados del escrow**. El vigilante solo copia (nunca escribe en la
 cadena), y nadie edita el espejo a mano.
 
-### 2.2 El inventario de las 14 carpetas
+### 2.2 El inventario de las 16 carpetas
 
 | Carpeta | Para qué sirve | Ejemplo |
 |---|---|---|
-| `usuarios` | Quién eres y tu identidad | La ficha de Ana |
-| `kyc` | Tu verificación de identidad (documento y selfie), cifrada | El trámite de Bruno para ser CERTIFICADO |
+| `usuarios` | Quién eres y tu identidad (con tu `@nombre` público desde 2026-09) | La ficha de Ana con su @ana |
+| `kyc` | Tu verificación de identidad (documento y selfie), cifrada; desde 2026-09 guarda también la certificación con carné SBT | El trámite de Bruno para ser CERTIFICADO |
 | `articulos` | Lo que la gente ofrece al trueque | La bicicleta de Ana |
 | `truekes` | Cada trueque y su estado (espejo del escrow) | El trueque bici ↔ curso |
 | `valoraciones` | Las notas 1-5 al cierre | Bruno puntúa a Ana |
 | `puntos_encuentro` | Lugares físicos de encuentro (con mapa) | El parque a 3 km |
+| `puntos_favoritos` | Los últimos puntos de encuentro que cada persona usa (favoritos) | Bruno guarda el parque como favorito |
 | `disputas` | Conflictos, votación de Socios y sanciones | Bruno dice que el curso no era lo prometido |
-| `imagenes_certificadas` | Fotos con "sello" (huella + firma) | La foto certificada de la bici |
+| `imagenes_certificadas` | Fotos con "sello" (huella + firma): anuncios, recepciones y, desde 2026-09, documento y selfie del KYC | La foto certificada de la bici o el DNI de Bruno |
 | `suscripciones` | El pago mensual de las empresas | La empresa de Ana paga su mes |
 | `campanas` | Ventas masivas o recolectas solidarias | Recolecta de juguetes |
 | `subastas` | Subastas de empresas | Subasta del último NFT |
 | `finanzas` | Saldos, moneda BRLT y el Fondo de Valor | El saldo de Bruno |
 | `auditoria` | Bitácora: cada evento procesado, sin borrar nada | "Evento CustodiaA, 12:03" |
 | `indexador_checkpoint` | Marcapáginas del vigilante | "Contrato Escrow: leído hasta el bloque 1.024" |
+| `sesiones` | Tus inicios de sesión con la billetera (tokens de sesión) | "Bruno entró el martes a las 10:03" |
 
 <!-- GENERAR_IMAGEN: glosario-datos.svg -->
 ```mermaid
@@ -98,6 +100,8 @@ flowchart TB
         N5[imagenes_certificadas]
         N6[campanas]
         N7[subastas]
+        N8[puntos_favoritos]
+        N9[sesiones]
     end
     subgraph cocina["Cocina interna del vigilante"]
         C1[auditoria · bitácora]
@@ -161,7 +165,7 @@ Tu nivel de confianza se sube por una **escalera de 3 peldaños**:
 |---|---|---|
 | `INSCRITO` | Crear tu cuenta (wallet + inscripción) | Ver ofertas; **no** puedes completar trueques |
 | `VERIFICADO` | Confirmar con códigos tu correo y tu teléfono | Crear y completar trueques; hasta **3 trueques activos** |
-| `CERTIFICADO` | KYC completo (documento + selfie) | Todas las operaciones, incluida la compra en subastas |
+| `CERTIFICADO` | Certificar tu identidad: con tu **carné SBT** (automático) o con **documento + selfie** revisados por el Owner | Todas las operaciones, incluida la compra en subastas |
 
 Lo bonito de la privacidad: para certificar tu peldaño en la cadena, solo se
 usa una **huella** (raíz merkle) de tu documento, nunca el documento mismo.
@@ -185,8 +189,9 @@ flowchart TB
 | Tipo de usuario | `PARTICULAR` / `EMPRESA` / `SOCIO` | Tu rol en la ficha `usuarios` |
 | Nivel de usuario | `INICIADO` / `COMUN` / `FRECUENTE` / `SOCIO` | Tu nivel por reputación |
 | Medalla | `BRONCE` / `PLATA` / `ORO` | Tu insignia (las empresas necesitan ORO) |
+| Tipo de artículo | `ARTICULO` / `SERVICIO` / `BIEN` / `CRIPTO` | Qué tipo de cosa ofreces (objeto, servicio, bien o cripto) |
 | Estado del KYC | `PENDIENTE` / `APROBADO` / `RECHAZADO` / `APELACION` | Tu trámite de identidad |
-| Tipo de imagen | `PUBLICACION` / `RECEPCION` | Foto del anuncio o foto al recibir |
+| Tipo de imagen | `PUBLICACION` / `RECEPCION` / `KYC_DNI` / `KYC_SELFIE` | Foto del anuncio, foto al recibir o, desde 2026-09, tu documento y tu selfie del KYC |
 | Estado de suscripción | `ACTIVA` / `IRREGULAR` / `CANCELADA` | Empresas que pagan |
 | Tipo de campaña | `VENTA` / `RECOLECTA` | Campañas de empresa |
 | Estado de subasta | `ABIERTA` / `CERRADA` / `ANULADA` | Subastas |
@@ -207,6 +212,7 @@ Cada cuenta tiene una ficha con:
 | Dato | Para qué sirve |
 |---|---|
 | `wallet` | Tu dirección pública; es única (una cuenta por dirección) |
+| `username` | Tu **apodo público** con @ (2026-09): el menú lo muestra en vez de la dirección larga |
 | Correo, teléfono y dirección de inscripción | Contacto y zona; **se guardan cifrados** (D17) |
 | Tu posición en el mapa (`geog`) | Para la regla de los 10 km (sección 7) |
 | Tipo, nivel, medalla | Tu rol, tu reputación y tu insignia |
@@ -217,25 +223,48 @@ Cada cuenta tiene una ficha con:
 
 ### 4.2 La carpeta `kyc` (verificación de identidad)
 
-Aquí vive tu trámite de identidad:
+Aquí vive tu trámite de identidad. Desde 2026-09 hay **dos caminos** para
+certificarte:
 
-1. Subes tu **documento** y tu **selfie**. Ambos se guardan **cifrados**.
-2. De ellos se calcula una **huella** (raíz merkle) que viaja al contrato de
+**Camino A — con tu carné SBT (automático).**
+Si tu billetera ya tiene un carné de certificación (SBT de TrueKeate u otro
+reconocido), la plataforma puede marcarte como `APROBADO` sin persona de por
+medio. La ficha guarda entonces:
+
+- `via_sbt`: que te certificaste con carné (sí o no).
+- `sbt_contrato`: qué contrato emitió tu carné.
+- `sbt_token_id`: el número de tu carné.
+
+**Camino B — con fotos (documento + selfie).**
+1. Subes tu **documento** y tu **selfie**. Las fotos no se guardan dentro de
+   esta carpeta: van a `imagenes_certificadas` (tipos `KYC_DNI` y
+   `KYC_SELFIE`) y aquí se anota su número de ficha
+   (`documento_img_id` y `selfie_img_id`).
+2. De ellas se calcula una **huella** (raíz merkle) que viaja al contrato de
    tu cuenta inteligente. Tu documento nunca sale de la base.
 3. Una persona responsable (el Owner) revisa tu trámite y lo marca
    `APROBADO`, `RECHAZADO` o, si pides revisión, `APELACION`.
-4. Cuando la huella cambia (por ejemplo, al actualizar tu documento), el
-   vigilante copia la nueva huella en la base.
+
+En los dos caminos, cuando la huella cambia (por ejemplo, al actualizar tu
+documento), el vigilante copia la nueva huella en la base. Los campos antiguos
+de documento y selfie guardados aquí mismo quedaron como legado del diseño
+original.
+
+> Los detalles de la certificación por SBT están en el manual 03 ·
+> certificación (09). El cambio se aplicó con un parche especial a la base
+> (`migracion_sbt.sql`) que es seguro repetir.
 
 ### 4.3 Privacidad: cifrado, consentimiento y borrado (D17 / GDPR)
 
 Lo que TrueKeate guarda de ti, y cómo lo protege:
 
-1. **Solo lo necesario**: correo, teléfono, dirección de inscripción,
-   documento y selfie (KYC), los puntos de encuentro que registras y tu
-   actividad. Nada más.
-2. **Cifrado en reposo**: todos esos datos personales se guardan cifrados.
-   Aunque alguien robara la base, no podría leerlos sin la llave.
+1. **Solo lo necesario**: correo, teléfono, dirección de inscripción, los
+   datos de tu trámite de identidad (KYC) con sus fotos de documento y
+   selfie, los puntos de encuentro que registras y tu actividad. Nada más.
+   Desde 2026-09, las fotos del KYC viven en la carpeta `imagenes_certificadas`
+   (sección 5.3) y solo las ves tú y el Owner.
+2. **Cifrado en reposo**: los datos de contacto y del trámite se guardan
+   cifrados. Aunque alguien robara la base, no podría leerlos sin la llave.
 3. **Consentimiento explícito**: al registrarte marcas una casilla y la base
    guarda la fecha. Sin consentimiento no hay cuenta (es lo que pide el GDPR,
    la ley europea de protección de datos; D17 es la decisión del proyecto que
@@ -324,17 +353,23 @@ flowchart LR
 ### 5.3 `imagenes_certificadas`: las fotos con sello
 
 Las fotos importantes llevan un **sello digital** para que no puedas
-engañar con una foto falsa:
+engañar con una foto falsa. Desde 2026-09, esta carpeta guarda también el
+**archivo** de la foto (para poder mostrarla en la app):
 
 1. Se calcula la **huella** de la imagen (SHA-256).
-2. La imagen se guarda en **IPFS** (un almacén de archivos distribuido).
-3. El autor **firma** la huella con su clave.
-4. Se guarda el tipo: `PUBLICACION` (foto del anuncio) o `RECEPCION` (foto
-   al recibir el objeto).
+2. Se guarda el archivo **`contenido`** y su tipo **`mime`** (jpeg, png,
+   webp…). La referencia a IPFS se mantiene.
+3. El autor **firma** la huella con su clave. ⚠️ Desde 2026-09 la firma es
+   **opcional**: las fotos del KYC (documento y selfie) las guarda la propia
+   plataforma, sin firma del usuario.
+4. Se guarda el tipo, que dice a qué ficha apunta la foto:
+   - `PUBLICACION`: foto del anuncio → la ficha del artículo.
+   - `RECEPCION`: foto al recibir el objeto → la ficha del trueque.
+   - `KYC_DNI` y `KYC_SELFIE` (2026-09): tu documento y tu selfie del trámite
+     de identidad → la ficha de `kyc` (sección 4.2).
 
 > ⚠️ Pendiente de confirmar: el diseño prevé anclar la huella de todas las
 > fotos en la cadena, pero los contratos actuales no lo declaran todavía.
-> También falta confirmar el punto exacto de la plataforma que sube las fotos.
 
 ---
 

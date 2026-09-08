@@ -1,7 +1,7 @@
 # Manual · Cómo se conectan los datos de TrueKeate
 
 > Versión en lenguaje sencillo del manual técnico 06 — Diagrama Relacional.
-> Aquí contamos cómo se unen las 14 carpetas de datos entre sí, con la
+> Aquí contamos cómo se unen las 16 carpetas de datos entre sí, con la
 > historia de Ana y Bruno de principio a fin.
 
 ---
@@ -50,6 +50,8 @@ erDiagram
     USUARIOS ||--o{ KYC : "verificación de identidad"
     USUARIOS ||--o{ ARTICULOS : "publica"
     USUARIOS ||--o{ PUNTOS_ENCUENTRO : "registra"
+    USUARIOS ||--o{ PUNTOS_FAVORITOS : "guarda favoritos"
+    USUARIOS ||--o{ SESIONES : "inicia sesión (wallet)"
     USUARIOS ||--|| FINANZAS : "tiene una ficha financiera"
     USUARIOS ||--o{ SUSCRIPCIONES : "empresa paga (empresa_id)"
     USUARIOS ||--o{ CAMPANAS : "organiza"
@@ -58,17 +60,25 @@ erDiagram
     ARTICULOS ||--o{ SUBASTAS : "se subasta"
     TRUEKES ||--o{ VALORACIONES : "recibe notas 1-5"
     TRUEKES ||--o{ DISPUTAS : "puede tener conflictos"
+    PUNTOS_ENCUENTRO ||--o{ PUNTOS_FAVORITOS : "es marcado como favorito"
     PUNTOS_ENCUENTRO o|--o{ TRUEKES : "punto acordado (sin candado)"
     ARTICULOS o|--o| IMAGENES_CERTIFICADAS : "foto con sello (sin candado)"
+    KYC o|--o{ IMAGENES_CERTIFICADAS : "documento y selfie (sin candado)"
     USUARIOS {
         bigint id "llave propia"
         char wallet "dirección única"
+        text username "@nombre (2026-09)"
         text estado "escalera D28"
     }
     KYC {
         bigint id "llave propia"
         bigint usuario_id "candado a usuarios"
         bytea merkle_root "huella del KYC"
+        boolean via_sbt "¿certificado con carné?"
+        text sbt_contrato "contrato del carné"
+        numeric sbt_token_id "número del carné"
+        bigint documento_img_id "foto DNI (sin candado)"
+        bigint selfie_img_id "selfie (sin candado)"
     }
     ARTICULOS {
         bigint id "llave propia"
@@ -96,6 +106,15 @@ erDiagram
         bigint id "llave propia"
         char tx_hash "transacción"
     }
+    PUNTOS_FAVORITOS {
+        bigint id "llave propia"
+        bigint usuario_id "candado a usuarios"
+        bigint punto_encuentro_id "candado a puntos_encuentro"
+    }
+    SESIONES {
+        text token "llave propia"
+        char wallet "candado a usuarios (wallet)"
+    }
 ```
 
 En el mapa hay **3 tipos de conexión**:
@@ -110,14 +129,17 @@ En el mapa hay **3 tipos de conexión**:
 Las formas de relacionarse:
 
 - **1 a muchos**: la más común. Una usuaria → muchos artículos; un trueque →
-  varias valoraciones.
+  varias valoraciones. En 2026-09 se sumaron dos hijas de `usuarios`:
+  `puntos_favoritos` (tus puntos guardados) y `sesiones` (tus inicios de
+  sesión).
 - **1 a 1**: cada persona tiene una sola ficha financiera (comparten la
   llave). También la verificación de identidad (una por persona, aunque la
   base no lo obliga del todo) y la foto con sello de un artículo.
 - **Muchos a muchos**: entre personas y artículos se resuelve con la ficha
   del trueque, que guarda 2 artículos y 2 personas (sección 5).
-- **Polimorfismo**: la ficha de la foto con sello apunta a un artículo o a un
-  trueque según su tipo (`PUBLICACION` o `RECEPCION`).
+- **Polimorfismo**: la ficha de la foto con sello apunta a un artículo, a un
+  trueque o, desde 2026-09, a tu verificación de identidad, según su tipo
+  (`PUBLICACION`, `RECEPCION`, `KYC_DNI` o `KYC_SELFIE`).
 
 ---
 
@@ -130,6 +152,8 @@ Desde **usuarios** (cada persona puede tener muchas...):
 | `kyc` | Su trámite de identidad |
 | `articulos` | Sus publicaciones |
 | `puntos_encuentro` | Sus puntos de encuentro |
+| `puntos_favoritos` | Sus puntos guardados como favoritos (nueva, 2026-09) |
+| `sesiones` | Sus inicios de sesión con la billetera (nueva, 2026-09) |
 | `suscripciones` | Sus ciclos de pago (si es empresa) |
 | `campanas` | Sus campañas |
 | `subastas` | Sus subastas (como empresa) y también como ganadora |
@@ -149,6 +173,12 @@ Desde **truekes** (la pieza central):
 | `valoraciones` | Las notas del trueque |
 | `disputas` | Los conflictos del trueque |
 
+Desde **puntos_encuentro** (cada punto puede ser favorito de muchas personas):
+
+| Ficha hija | Qué guarda la conexión |
+|---|---|
+| `puntos_favoritos` | Quiénes lo guardaron como favorito |
+
 ---
 
 ## 4. Las conexiones sin candado (y por qué existen)
@@ -156,8 +186,10 @@ Desde **truekes** (la pieza central):
 | Conexión | Qué une | Por qué no lleva candado |
 |---|---|---|
 | Foto con sello de un artículo | `articulos` → `imagenes_certificadas` | Es lógica: la base no obliga, la plataforma lo cuida |
+| Documento y selfie del KYC | `kyc` → `imagenes_certificadas` (`documento_img_id`, `selfie_img_id`) | Es lógica (2026-09): las fotos las guarda la plataforma al certificarte |
+| Carné de certificación | `kyc` → la cadena (`via_sbt`, `sbt_contrato`, `sbt_token_id`) | Son datos on-chain: la plataforma los anota al certificar |
 | Punto de encuentro de un trueque | `truekes` → `puntos_encuentro` | Es lógica: se acuerda fuera de la base |
-| Foto polimórfica | `imagenes_certificadas` → `articulos` o `truekes` | Depende del tipo de foto |
+| Foto polimórfica | `imagenes_certificadas` → `articulos`, `truekes` o `kyc` | Depende del tipo de foto |
 | Direcciones de participantes | `truekes`, `valoraciones`, `disputas` → `usuarios` | **Historia**: guardamos la dirección tal como era |
 | Número del escrow | `truekes.escrow_id` → la cadena | No apunta a una tabla local: es el puente con la blockchain |
 
@@ -243,6 +275,11 @@ flowchart LR
     style BIT fill:#e9e5f0,stroke:#8d86a9
 ```
 
+Y un caso especial desde 2026-09: el **carné de certificación (TrueKeateSBT)**
+**no tiene espejo en la base**. El vigilante no copia sus eventos: cuando te
+certificas, la propia plataforma escribe en tu ficha de `kyc` los datos del
+carné (`via_sbt`, `sbt_contrato`, `sbt_token_id`) directamente desde la API.
+
 > ⚠️ Pendiente de confirmar: algunos contratos ya emiten eventos que el
 > vigilante **todavía no copia** en este ciclo: el **Fondo de Valor**
 > (contribuciones, cambios de porcentaje, retiros) y los eventos de
@@ -261,7 +298,10 @@ Estas carpetas las llena la propia plataforma, con tu actividad:
 | `valoraciones` | Tus notas 1-5 | Candado a `truekes` |
 | `puntos_encuentro` | Tus puntos con mapa | Candado a `usuarios` |
 | `disputas` | Los conflictos | Candado a `truekes` |
-| `imagenes_certificadas` | Las fotos con sello | Apunte lógico a artículos o trueques |
+| `kyc` | Tu verificación de identidad y tu certificación | Candado a `usuarios`; la huella es espejo (§6) y la certificación por carné la escribe la propia plataforma (2026-09) |
+| `imagenes_certificadas` | Las fotos con sello (anuncios, recepciones y, desde 2026-09, documento y selfie del KYC) | Apunte lógico a artículos, trueques o `kyc`; guardan también el archivo (`contenido`/`mime`) |
+| `puntos_favoritos` | Tus puntos guardados como favoritos | Candados a `usuarios` y `puntos_encuentro` |
+| `sesiones` | Tus inicios de sesión con la billetera | Candado a `usuarios` (por la dirección `wallet`) |
 | `campanas` | Ventas masivas y recolectas | Candado a `usuarios` |
 | `subastas` | Subastas de empresa | Candados a `usuarios` y `articulos` |
 | `finanzas` | Saldos | 1 a 1 con `usuarios` (y espejo parcial de BRLT) |
@@ -378,8 +418,10 @@ Y estas son las **preguntas típicas** que la base responde al unir carpetas:
 |---|---|
 | ¿En qué estado está el trueque? | Busca la ficha en `truekes` por su número de escrow y lee la etiqueta |
 | ¿Qué peldaño tiene Ana? | Lee `usuarios.estado` (la escalera D28) y su trámite en `kyc` |
+| ¿Está certificada y con carné o con fotos? | Mira `kyc` (`via_sbt`, `sbt_contrato`, `sbt_token_id`) y sus fotos en `imagenes_certificadas` (`KYC_DNI`/`KYC_SELFIE`); en la cadena pregunta al contrato del carné |
 | ¿Quién participó y con qué? | Lee las 2 direcciones y los 2 artículos de la ficha del trueque |
 | ¿Qué notas recibió Bruno? | Busca las valoraciones del trueque |
+| ¿Qué puntos guardó como favoritos? | Busca en `puntos_favoritos` por su usuario |
 | ¿Hay puntos de encuentro cerca? | Pregunta al mapa de PostGIS (regla de los 10 km) |
 | ¿Pagó la empresa este mes? | Busca sus ciclos en `suscripciones` |
 | ¿Qué eventos ya se procesaron? | Lee la bitácora `auditoria` y el marcapáginas `indexador_checkpoint` |
@@ -390,20 +432,22 @@ Y estas son las **preguntas típicas** que la base responde al unir carpetas:
 
 | Carpeta | Llave propia | Candados reales | Conexiones lógicas / sueltas |
 |---|---|---|---|
-| `usuarios` | sí | — | la dirección `wallet` es su llave natural en la cadena |
-| `kyc` | sí | a `usuarios` | la huella (espejo) y quién la revisó |
+| `usuarios` | sí | — | la dirección `wallet` y el `@nombre` (`username`) |
+| `kyc` | sí | a `usuarios` | la huella (espejo), quién la revisó, el carné SBT (`via_sbt`/`sbt_contrato`/`sbt_token_id`) y sus fotos (apunte lógico) |
 | `articulos` | sí | a `usuarios` | su foto con sello (sin candado) |
 | `truekes` | sí | a `articulos` (×2) | número del escrow, direcciones, punto de encuentro |
 | `valoraciones` | sí | a `truekes` | las direcciones de quién valora a quién |
 | `puntos_encuentro` | sí | a `usuarios` | sus coordenadas en el mapa |
+| `puntos_favoritos` | sí | a `usuarios` y a `puntos_encuentro` | el par (usuario, punto) es único |
 | `disputas` | sí | a `truekes` | quien la pide y el registro de votos |
-| `imagenes_certificadas` | sí | — | apunte polimórfico a artículo o trueque |
+| `imagenes_certificadas` | sí | — | apunte polimórfico a artículo, trueque o `kyc` |
 | `suscripciones` | sí | a `usuarios` (empresa) | el recibo de la transacción |
 | `campanas` | sí | a `usuarios` | los artículos de la campaña |
 | `subastas` | sí | a `usuarios` (×2) y `articulos` | el número del escrow y el nivel del ganador |
 | `finanzas` | su llave es la de `usuarios` | a `usuarios` (1 a 1) | saldos, stocks y porcentajes |
 | `auditoria` | sí | — | la dirección del evento y su triple llave |
 | `indexador_checkpoint` | el nombre del contrato | — | el último bloque leído |
+| `sesiones` | el `token` de sesión | a `usuarios` (por `wallet`) | caduca a las 24 h |
 
 > Conclusión sencilla: **la identidad está en `usuarios`, el intercambio en
 > `truekes`, y todo lo demás cuelga de esos dos puntos con candados y

@@ -31,18 +31,27 @@
   (decisión D10, `entornos_globales.md:36-38`).
 - Servicios globales a usar: Foundry/anvil (chain 31337), PostgreSQL (patrón pgadmin + Secret
   Manager), GCP Secret Manager (`entornos_globales.md:41-45`).
-- **Estado del entorno**: en el momento de escribir este manual los archivos de entorno global
-  siguen apuntando al proyecto/entorno **MCC** (ver §2 y §6); no se verifica en el repositorio un
-  despliegue dedicado a `truekeate-main` → **pendiente de confirmar** ("GCP truekeate-main
-  pendiente de entorno real — D25").
+- **Estado del entorno (2026-09)**: los archivos globales siguen apuntando al proyecto/entorno
+  **MCC** (ver §2 y §6), pero **ya existe despliegue de producción operativo** registrado en
+  `RepoTecnico/estado_proyecto.md:468-488`: API y web en **Cloud Run** (`truekeate-api` / `truekeate-web`),
+  BD en **Cloud SQL** y contratos en el **anvil remoto de GCP** (chain 31337). Último estado
+  documentado (2026-09-08): **api rev 00017 · web rev 00019** con la certificación SBT
+  (TrueKeateSBT `0x870526b7973b56163a6997bB7C886F5E4EA53638`). Los nombres de servicios/puertos
+  concretos de ese despliegue no están versionados en este repositorio → detalle operativo
+  **pendiente de confirmar**.
 - Repositorios remotos y rama de trabajo `escrow-dsh-GCP`: GitHub y GitLab.com
   (`entornos_globales.md:11-16`); GitLab Codecrypto pendiente (D11, `entornos_globales.md:17`).
 
 ### 1.3 Contenedores/CI
 
-- **No se encontraron** en el repositorio `Dockerfile`, `docker-compose`, configuraciones de CI
-  (`.github/`), `vercel.json` ni similares (búsqueda global sin resultados) → el despliegue
-  contenerizado/automatizado es **pendiente de confirmar**.
+- El repositorio **sí** contiene hoy `backend/Dockerfile`, `scripts/cloudbuild.yaml` (Cloud Build →
+  Cloud Run de la imagen web) y los scripts raíz `deploy-gcp.sh` / `deploy-local.sh`
+  (`deploy-local.ps1`, `start*.sh`, `stop*.sh`, `verify-setup.sh`).
+- ⚠️ **Discrepancia**: esos scripts referencian nombres de contratos que **no** coinciden con
+  `sc/src/` ni con `backend/contratos.json` (p. ej. `SBTRegistry`, `UserRegistry`, `Exchange`,
+  `Subscription` en `scripts/deploy-contracts-gcp.sh:134-142` y `deploy-local.sh:91-99`) → su
+  correspondencia exacta con este repositorio es **pendiente de confirmar**. El registro fiable del
+  despliegue real del código está en `RepoTecnico/estado_proyecto.md` (revisiones api/web por ciclo).
 
 ---
 
@@ -108,6 +117,11 @@ source /home/dsh/workspace/gcp-env.sh
 | `PRIVATE_KEY` | Clave del owner en el script forge | — (`sc/script/Deploy.s.sol:29`, `vm.envUint`) |
 | `NEXT_PUBLIC_ESCROW` y `NEXT_PUBLIC_*` | Direcciones de contratos del frontend | direcciones anvil hardcodeadas (`web/lib/contracts.ts:22-29`) |
 | `BASE_URL` | baseURL de E2E Playwright | `http://127.0.0.1:3000` (`web/playwright.config.ts:15`) |
+| `SBT_ADDRESS` | Dirección del `TrueKeateSBT` para el chequeo/minteo on-chain de certificación | `contratos.TrueKeateSBT.direccion` (GCP: `0x8705…3638`) — `backend/api/routes/kyc.js:76-77` |
+| `SBT_ALLOWLIST` | Allowlist de **SBT/ERC-721 externos** reconocidos (direcciones separadas por coma) para auto-certificación | vacía (sin externos) — `backend/api/lib/sbt.js:22-27` |
+| `MINTER_PRIVATE_KEY` | Clave del minter del SBT nativo (alternativa a `RELAYER_PRIVATE_KEY`) | `RELAYER_PRIVATE_KEY` — `backend/api/routes/kyc.js:78` |
+| `KYC_EMAIL_USER` / `KYC_EMAIL_PASS` | SMTP para enviar el código de verificación de correo (sin ellas → modo demo con `codigoDemo`) | — `backend/api/routes/kyc.js:43-48` |
+| `KYC_EMAIL_HOST` / `KYC_EMAIL_PORT` | Host/puerto SMTP | `smtp.gmail.com` / `465` — `kyc.js:51-54` |
 
 ---
 
@@ -151,9 +165,21 @@ registran en `broadcast/` (deployment-info) (`Deploy.s.sol:25`).
 ### 3.4 Tras el despliegue
 
 - Actualizar `backend/contratos.json` (mapa `{ entidad: { direccion, abi } }`) — indicado en
-  `backend/README.md:14` ("actualizar tras cada deploy").
+  `backend/README.md:14` ("actualizar tras cada deploy"). Estado actual (2026-09-08): el mapa ya
+  incluye la clave **`TrueKeateSBT`** con `0x870526b7973b56163a6997bB7C886F5E4EA53638`
+  (`backend/contratos.json`; despliegue registrado en `estado_proyecto.md:471-472`).
 - Actualizar (si aplica) las direcciones del frontend (`web/lib/contracts.ts:21-30`, override por
   `NEXT_PUBLIC_*`).
+
+### 3.5 TrueKeateSBT (certificación, 2026-09)
+
+- Contrato `sc/src/TrueKeateSBT.sol` (ver Manual 03 · 09-certificacion-sbt §2). **No se despliega en
+  `sc/script/Deploy.s.sol`** (verificado: el script no lo crea, `Deploy.s.sol:33-60`) → su despliegue
+  se hizo de forma puntual sobre el anvil GCP con **minter = cuenta 1** (relayer)
+  (`estado_proyecto.md:471-472`); el comando exacto es **pendiente de confirmar**.
+- En runtime la API resuelve la dirección con la env `SBT_ADDRESS` o `contratos.TrueKeateSBT.direccion`
+  (`backend/api/routes/kyc.js:76-77`), y el rol `minter` lo firma la plataforma con
+  `RELAYER_PRIVATE_KEY`/`MINTER_PRIVATE_KEY` (`kyc.js:78`).
 
 ---
 
@@ -230,6 +256,7 @@ npm start        # servir el build (usa Playwright en E2E)
 |---|---|---|---|
 | anvil local | `http://localhost:8545` (RPC) | 8545 | `sc/script/Deploy.s.sol:22`, default `backend/indexador.js:19` |
 | anvil GCP (MCC compartido) | `https://mcc-foundry-anvil-1095249147821.europe-west1.run.app` | 443 | `.env.global:32` |
+| TrueKeateSBT (anvil GCP) | contrato `0x870526b7973b56163a6997bB7C886F5E4EA53638` | — | `backend/contratos.json`; `estado_proyecto.md:471` |
 | Chain ID | **31337** | — | `gcp-env.sh:55` |
 | API backend (local) | `http://127.0.0.1:4000` | 4000 | `backend/api/app.js:71` |
 | Web frontend (dev/build) | `http://localhost:3000` | 3000 | `web/README.md:32`; `web/playwright.config.ts:15` |
@@ -251,6 +278,9 @@ npm start        # servir el build (usa Playwright en E2E)
   (`gcp-env.sh:44-46`).
 - Custodia de RELAYER/ADMIN_PRIVATE_KEY: Owner como custodio, política de **rotación** y
   separación de funciones (RF-18.5, `requerimientos.md:195`; `entornos_globales.md:72-73`).
+- El minteo del SBT nativo (certificación) firma con `RELAYER_PRIVATE_KEY` (o `MINTER_PRIVATE_KEY`);
+  sin esa clave el minteo se **simula** y la certificación SBT queda incompleta
+  (`backend/api/lib/sbt.js:64-67`). `SBT_ADDRESS`/`SBT_ALLOWLIST` no son secretos (direcciones públicas).
 
 ### 7.2 Uso operativo recomendado
 
@@ -294,9 +324,13 @@ npm start        # servir el build (usa Playwright en E2E)
 ## 9. Resumen de pendientes de confirmar
 
 1. Entorno GCP dedicado a `truekeate-main` (hoy los archivos globales apuntan a MCC/
-   `mcc-ecommerce`): `entornos_globales.md:36-38` vs `.env.global:10`.
-2. Despliegues en Cloud Run/Docker/CI: no existe configuración en el repo (§1.3).
+   `mcc-ecommerce`): `entornos_globales.md:36-38` vs `.env.global:10`. El despliegue real de 2026-09
+   sí está operativo (Cloud Run + anvil GCP + Cloud SQL — §1.2), pero su configuración no está versionada.
+2. Despliegues en Cloud Run/Docker/CI: existen `backend/Dockerfile`, `scripts/cloudbuild.yaml` y
+   `deploy-gcp.sh`, pero referencian nombres de contratos distintos a `sc/src`/`contratos.json` (§1.3).
 3. Vinculación Escrow ↔ SociosRegistry ausente en `Deploy.s.sol` (§3.3).
 4. Servicio independiente del relayer con 2 instancias + cola de reintentos (D15) (§4.4).
 5. Red de producción destino (solo se trabaja sobre anvil 31337) (§6).
 6. Backups operativos RNF-07 y proceso D39 (§8).
+7. Comando de despliegue de `TrueKeateSBT` no versionado (no está en `Deploy.s.sol`; dirección de
+   producción registrada en `backend/contratos.json`) (§3.5).

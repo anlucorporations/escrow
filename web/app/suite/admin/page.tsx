@@ -1,10 +1,12 @@
 "use client";
 
 // =============================================================================
-// TrueKeate — Panel del Owner (/suite/admin, RF-13.1)
+// TrueKeate — Suite 'Sistemas': Panel del Owner (/suite/admin, RF-13.1)
 // Dashboard operativo REAL: usuarios, contratos, KPIs de disputas, estado de la
-// BD off-chain e infraestructura (relayer/indexador). Requiere sesión del Owner
-// (tipo SOCIO): se firma el mensaje EIP-191 con la wallet para obtener el token.
+// BD off-chain e infraestructura (relayer/indexador) + BIBLIOTECA DE SISTEMAS
+// (manuales técnicos de operación en PDF, solo Owner). Requiere sesión del
+// Owner (tipo SOCIO): se firma el mensaje EIP-191 con la wallet para obtener el
+// token.
 // =============================================================================
 import { useCallback, useEffect, useState } from "react";
 import { useEthereum } from "@/lib/ethereum";
@@ -19,6 +21,13 @@ import {
   type AdminKpis,
   type AdminInfra,
 } from "@/lib/api";
+import {
+  topicosSistemas,
+  pdfTecnico,
+  imagenTecnica,
+  type ManualTecnico,
+  type TopicoSistemas,
+} from "@/lib/sistemas-data";
 import { Card } from "@/components/Card";
 import { KycPendientesOwner } from "@/components/KycPendientesOwner";
 import { Button } from "@/components/Button";
@@ -30,6 +39,80 @@ function TarjetaKpi({ icono, label, valor, tono }: { icono: string; label: strin
       <p className="mt-1 font-display text-2xl font-bold text-navy-800">{valor}</p>
       <p className="text-xs text-navy-800/60">{label}</p>
     </div>
+  );
+}
+
+/** Tarjeta de un manual técnico de la Biblioteca de Sistemas. */
+function TarjetaManualSistemas({ manual }: { manual: ManualTecnico }) {
+  return (
+    <li className="flex items-center gap-3 rounded-xl border border-navy-800/5 bg-white p-2.5">
+      {manual.imagen ? (
+        // eslint-disable-next-line @next/next/no-img-element -- SVG estático de los manuales técnicos
+        <img
+          src={imagenTecnica(manual)}
+          alt={`Infografía: ${manual.titulo}`}
+          loading="lazy"
+          className="h-11 w-11 shrink-0 rounded-lg border border-navy-800/10 bg-smoke p-1"
+        />
+      ) : (
+        <span aria-hidden className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-navy-800/10 bg-smoke text-xl">
+          📄
+        </span>
+      )}
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-[13px] font-semibold text-navy-800">{manual.titulo}</p>
+        <p className="line-clamp-2 text-[11px] leading-snug text-navy-800/60">{manual.descripcion}</p>
+      </div>
+      <a
+        href={pdfTecnico(manual)}
+        download
+        title={`Descargar ${manual.titulo} (PDF)`}
+        className="inline-flex shrink-0 items-center rounded-pill bg-navy-800 px-3 py-1.5 text-xs font-bold text-white transition-transform hover:bg-teal-500 active:scale-95"
+      >
+        PDF
+      </a>
+    </li>
+  );
+}
+
+/** Bloque de un tópico técnico (grid de manuales) de la Biblioteca de Sistemas. */
+function TopicoSistemasBloque({ topico }: { topico: TopicoSistemas }) {
+  return (
+    <div className="rounded-xl border border-navy-800/10 bg-smoke p-4">
+      <p className="font-display text-[10px] font-bold uppercase tracking-[0.16em] text-gold-600">
+        {topico.carpeta}
+      </p>
+      <h3 className="mt-0.5 font-display text-[15px] font-bold text-navy-800">{topico.etiqueta}</h3>
+      <p className="mt-1 text-xs leading-relaxed text-navy-800/60">{topico.descripcion}</p>
+      <ul className="mt-3 space-y-2">
+        {topico.manuales.map((m) => (
+          <TarjetaManualSistemas key={m.id} manual={m} />
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** 📚 Biblioteca de Sistemas: manuales técnicos de operación en PDF (solo Owner). */
+function BibliotecaSistemas() {
+  return (
+    <Card className="p-5">
+      <div className="flex flex-wrap items-center gap-2">
+        <h2 className="font-display text-lg font-bold text-navy-800">📚 Biblioteca de Sistemas</h2>
+        <span className="rounded-pill bg-gold-600/10 px-2 py-0.5 text-[11px] font-semibold text-gold-600">
+          solo Owner
+        </span>
+      </div>
+      <p className="mt-1 text-xs text-navy-800/60">
+        Manuales técnicos de operación en PDF con sus imágenes: descarga el que necesites según el
+        tópico (Implementación, Despliegue, Wallets y la propia Suite Sistemas).
+      </p>
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        {topicosSistemas.map((t) => (
+          <TopicoSistemasBloque key={t.carpeta} topico={t} />
+        ))}
+      </div>
+    </Card>
   );
 }
 
@@ -79,8 +162,7 @@ export default function PaginaAdmin() {
   if (!conectado) {
     return (
       <Card className="p-8 text-center">
-        <p className="text-3xl">🛠️</p>
-        <h1 className="mt-2 font-display text-xl font-bold text-navy-800">Panel del Owner</h1>
+        <h1 className="font-display text-xl font-bold text-navy-800">🛠️ Sistemas · Panel del Owner</h1>
         <p className="mt-1 text-sm text-navy-800/60">Conecta la billetera del Owner para continuar.</p>
         <div className="mt-4 flex justify-center">
           <Button onClick={() => void conectar()} disabled={conectando}>
@@ -95,9 +177,9 @@ export default function PaginaAdmin() {
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h1 className="font-display text-2xl font-bold text-navy-800">🛠️ Panel del Owner</h1>
+          <h1 className="font-display text-2xl font-bold text-navy-800">🛠️ Sistemas · Panel del Owner</h1>
           <p className="text-sm text-navy-800/60">
-            Dashboard operativo (RF-13.1) · wallet{" "}
+            Suite Sistemas · Dashboard operativo (RF-13.1) · wallet{" "}
             <span className="font-mono">
               {account?.slice(0, 6)}…{account?.slice(-4)}
             </span>
@@ -114,6 +196,9 @@ export default function PaginaAdmin() {
         </p>
       )}
       {error && <p className="rounded-xl bg-crimson/10 px-4 py-2 text-xs text-crimson">⚠️ {error}</p>}
+
+      {/* 📚 Biblioteca de Sistemas (solo Owner) — estática, no depende de la API */}
+      {esOwner ? <BibliotecaSistemas /> : null}
 
       {activo && (
         <>

@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 470" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="470" fill="#f8f9fa"/>
+  <rect width="1200" height="58" fill="#1a2b4c"/>
+  <rect y="54" width="1200" height="4" fill="#d4af37"/>
+  <text x="600" y="37" text-anchor="middle" fill="#ffffff" font-size="21" font-weight="bold">Conectar en el movil: dos caminos hacia MetaMask</text>
+
+  <!-- A: pulsas conectar -->
+  <rect x="15" y="95" width="150" height="90" rx="13" fill="#f4a261" stroke="#b06a2a" stroke-width="1.2"/>
+  <text x="90" y="124" text-anchor="middle" fill="#1a2b4c" font-size="12.5" font-weight="bold">Pulsas Conectar</text>
+  <text x="90" y="147" text-anchor="middle" fill="#1a2b4c" font-size="10">en el navegador</text>
+  <text x="90" y="165" text-anchor="middle" fill="#1a2b4c" font-size="10">del movil</text>
+
+  <!-- B: decision -->
+  <polygon points="195,138 300,88 405,138 300,188" fill="#f3e5ab" stroke="#c5a065" stroke-width="1.5"/>
+  <text x="300" y="134" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">¿MetaMask</text>
+  <text x="300" y="152" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">dentro del</text>
+  <text x="300" y="168" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">navegador?</text>
+
+  <!-- G -->
+  <rect x="440" y="95" width="190" height="90" rx="13" fill="#2a9d8f"/>
+  <text x="535" y="126" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">MetaMask abre</text>
+  <text x="535" y="147" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">TrueKeate</text>
+  <text x="535" y="167" text-anchor="middle" fill="#e7f7f4" font-size="10">navegador interno</text>
+
+  <!-- H -->
+  <rect x="665" y="95" width="175" height="90" rx="13" fill="#48cae4"/>
+  <text x="752" y="124" text-anchor="middle" fill="#0a1128" font-size="12.5" font-weight="bold">Conectar:</text>
+  <text x="752" y="147" text-anchor="middle" fill="#0a1128" font-size="10.5">la app pide ver</text>
+  <text x="752" y="165" text-anchor="middle" fill="#0a1128" font-size="10.5">tus cuentas</text>
+
+  <!-- I -->
+  <rect x="875" y="95" width="150" height="90" rx="13" fill="#f3e5ab" stroke="#c5a065" stroke-width="1.2"/>
+  <text x="950" y="124" text-anchor="middle" fill="#1a2b4c" font-size="12.5" font-weight="bold">Firmas:</text>
+  <text x="950" y="147" text-anchor="middle" fill="#1a2b4c" font-size="10">TrueKeate:</text>
+  <text x="950" y="165" text-anchor="middle" fill="#1a2b4c" font-size="10">iniciar sesion</text>
+
+  <!-- J -->
+  <rect x="1060" y="95" width="130" height="90" rx="13" fill="#d4af37" stroke="#8a6d1f" stroke-width="1.2"/>
+  <text x="1125" y="131" text-anchor="middle" fill="#0a1128" font-size="13.5" font-weight="bold">¡Dentro</text>
+  <text x="1125" y="153" text-anchor="middle" fill="#0a1128" font-size="13.5" font-weight="bold">de la</text>
+  <text x="1125" y="173" text-anchor="middle" fill="#0a1128" font-size="13.5" font-weight="bold">suite!</text>
+
+  <!-- flechas fila 1 -->
+  <line x1="167" y1="140" x2="191" y2="140" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="407" y1="140" x2="436" y2="140" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="412" y="72" fill="#2a9d8f" font-size="10" font-weight="bold">Sí ✓ (navegador interno)</text>
+  <line x1="632" y1="140" x2="661" y2="140" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="842" y1="140" x2="871" y2="140" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="1027" y1="140" x2="1056" y2="140" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- C: espera -->
+  <rect x="40" y="300" width="290" height="80" rx="13" fill="#e9e5f0" stroke="#8d86a9" stroke-width="1.2"/>
+  <text x="185" y="330" text-anchor="middle" fill="#1a2b4c" font-size="12.5" font-weight="bold">La web espera 1,2 segundos</text>
+  <text x="185" y="352" text-anchor="middle" fill="#1a2b4c" font-size="10.5">por si una wallet se anuncia</text>
+  <text x="185" y="368" text-anchor="middle" fill="#1a2b4c" font-size="9.5">estandar EIP-6963</text>
+
+  <!-- B no -> C -->
+  <path d="M 300 190 L 300 245 L 185 245 L 185 296" fill="none" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="308" y="218" fill="#e63946" font-size="10" font-weight="bold">No</text>
+
+  <!-- D: decision 2 -->
+  <polygon points="365,340 470,290 575,340 470,390" fill="#f3e5ab" stroke="#c5a065" stroke-width="1.5"/>
+  <text x="470" y="336" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">¿Aparecio</text>
+  <text x="470" y="354" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">alguna</text>
+  <text x="470" y="370" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">wallet?</text>
+
+  <!-- C -> D -->
+  <line x1="332" y1="340" x2="361" y2="340" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- E: abrir en la app -->
+  <rect x="640" y="320" width="280" height="70" rx="13" fill="#1a2b4c"/>
+  <text x="780" y="348" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">Botón: Abrir en la app</text>
+  <text x="780" y="369" text-anchor="middle" fill="#c9d8f0" font-size="10">enlace profundo (deep link)</text>
+
+  <!-- D no movil -> E -->
+  <line x1="577" y1="345" x2="636" y2="345" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="606" y="336" text-anchor="middle" fill="#1a2b4c" font-size="9.5" font-weight="bold">No (movil)</text>
+
+  <!-- D si -> H (adopta) -->
+  <path d="M 470 288 L 470 240 L 750 240 L 750 189" fill="none" stroke="#2a9d8f" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="610" y="232" text-anchor="middle" fill="#2a9d8f" font-size="10" font-weight="bold">Sí: la adopta y sigue</text>
+
+  <!-- E -> H (abre TrueKeate) -->
+  <line x1="780" y1="318" x2="780" y2="189" stroke="#2a9d8f" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="792" y="262" fill="#2a9d8f" font-size="9.5" font-weight="bold">abre TrueKeate en su navegador</text>
+
+  <!-- D no pc -> F -->
+  <line x1="470" y1="392" x2="470" y2="427" stroke="#e63946" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="350" y="449" text-anchor="end" fill="#e63946" font-size="9.5" font-weight="bold">No (PC)</text>
+
+  <!-- F -->
+  <rect x="360" y="428" width="230" height="28" rx="9" fill="#ffffff" stroke="#e63946" stroke-width="1.2"/>
+  <text x="475" y="447" text-anchor="middle" fill="#1a2b4c" font-size="10.5">PC: instala la extension y recarga</text>
+
+  <text x="600" y="466" text-anchor="middle" fill="#8d86a9" font-size="10">TrueKeate · sin extensiones en movil: deep link o navegador interno de MetaMask</text>
+</svg>

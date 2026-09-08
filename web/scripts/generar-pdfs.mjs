@@ -33,6 +33,7 @@ const THEMES = {
   '05-Diccionario-de-Datos': 'Diccionario de Datos',
   '06-Diagrama-Relacional': 'Diagrama Relacional',
   '07-Wallets-y-Cuentas': 'Wallets y Cuentas',
+  '08-Suite-Sistemas': 'Suite de Sistemas',
 };
 
 const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
@@ -651,13 +652,14 @@ const footerTemplate = `
 </div>`;
 
 let browser = null;
-let pdfOk = true;
-for (let attempt = 1; attempt <= 2 && pdfOk; attempt++) {
+let pdfOk = false; // arranca en falso para que el intento 1 sí se ejecute
+for (let attempt = 1; attempt <= 2 && !pdfOk; attempt++) {
   pdfOk = false;
   try {
     browser = await chromium.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-dev-shm-usage', '--font-render-hinting=none'],
+      executablePath: process.env.CHROMIUM_EXECUTABLE || undefined,
+      args: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage', '--font-render-hinting=none'],
     });
     const context = await browser.newContext({ viewport: { width: 1240, height: 1754 } });
     const results = [];
@@ -717,4 +719,11 @@ headers/footers y la paleta TrueKeate (navy/teal/cyan/gold).
     }
   }
 }
-if (browser) await browser.close().catch(() => {});
+if (browser) {
+  // close acotado: si el shell de Chromium no termina, no bloquear el proceso
+  await Promise.race([
+    browser.close().catch(() => {}),
+    new Promise((r) => setTimeout(r, 8000)),
+  ]);
+}
+process.exit(pdfOk ? 0 : 1);

@@ -16,17 +16,21 @@ camarero (la app) te toma el pedido, lo pasa a la cocina, y la cocina
 prepara el plato con sus reglas (no se sirve alcohol a menores, el chef
 revisa cada plato...).
 
-Los servicios se agrupan por **familias**:
+Los servicios se agrupan por **familias**. Hoy son **11**:
 
 | Familia | Prefijo | Qué hace |
 |---|---|---|
 | **Acceso** | `/auth` | Registrarte, iniciar sesión |
-| **Verificación** | `/kyc` | Subir tu escalera de confianza |
+| **Verificación y certificación** | `/kyc` | Verificar tu correo y certificar tu identidad |
 | **Catálogo** | `/catalog` | Publicar objetos y ver ofertas |
 | **Trueques** | `/truekes` | Crear y seguir trueques |
 | **Panel del Owner** | `/admin` | Ver usuarios, contratos y salud |
 | **Reputación** | `/reputacion` | Calcular tu puntaje y nivel |
 | **Subastas** | `/subastas` | Subastas de empresas |
+| **Finanzas** | `/finanzas` | Ver saldos propios y globales |
+| **Disputas** | `/disputas` | Abrir y seguir una disputa |
+| **Gobernanza** | `/gobernanza` | Propuestas y votación de socios |
+| **Puntos de encuentro** | `/puntos-encuentro` | Proponer puntos para encontrarte |
 
 En 5 minutos: la API tiene **3 puertas de entrada** para proteger el
 servicio:
@@ -79,37 +83,59 @@ estás INSCRITO, la respuesta es clara: "estado requerido".
 > La **GDPR** es la ley europea de protección de datos personales. TrueKeate
 > exige tu consentimiento expreso para tratar tus datos.
 
-> ⚠️ Pendiente de confirmar: el diseño lista verificaciones de correo y
-> teléfono (`/auth/verify-email`, `/auth/verify-phone`) que **no están
-> implementadas** en este ciclo.
+> ⚠️ Pendiente de confirmar: el diseño prevé verificar por separado el
+> correo y el teléfono (`/auth/verify-email`, `/auth/verify-phone`), y esas
+> rutas **siguen sin existir**. La verificación real de tu correo se hace
+> dentro de la familia de verificación (KYC), con un código que caduca
+> (ver sección 4).
 
 ---
 
-## 4. Verificación: subir la escalera (/kyc) — 2 etapas
+## 4. Verificación y certificación: demostrar quién eres (/kyc)
 
-La verificación ocurre en **2 etapas** (la escalera que ya conoces del
-manual 02):
+Tu identidad se comprueba en **2 etapas** (la escalera que ya conoces del
+manual 02): **INSCRITO → VERIFICADO → CERTIFICADO**. En 2026-09 esta
+familia fue **reescrita por completo**: ya no es un simulacro, los códigos
+se validan de verdad y la revisión está protegida.
 
-**Etapa 1: llegar a VERIFICADO**
-1. Pides iniciar la verificación.
-2. El sistema dice: "se enviaron códigos a tu correo y teléfono".
-3. Escribes ambos códigos.
-4. Subes a **VERIFICADO**.
+**Etapa 1: llegar a VERIFICADO (verificar tu correo)**
+1. Pides empezar la verificación.
+2. La cocina genera un **código de 6 dígitos** y lo envía a tu correo.
+   El código **caduca en 10 minutos**.
+3. Escribes el código.
+4. Si es correcto, subes a **VERIFICADO**. Si caducó o falla, te avisa.
 
-> ⚠️ Pendiente de confirmar: en el código actual, los códigos solo deben
-> **estar presentes** (no se comprueban contra los reales enviados). El
-> envío real por correo (email) y la validación con vencimiento están
-> previstos pero **no implementados** → **pendiente de confirmar**.
+> ⚠️ El envío real por correo necesita que la plataforma tenga configurado
+> su servidor de email (SMTP). En el **modo demostración** (sin esa
+> configuración) el código aparece directamente en la respuesta de la app,
+> para poder probar el flujo.
 
-**Etapa 2: llegar a CERTIFICADO**
-1. Envías la **referencia de tu documento** y la de tu **selfie**.
-2. Tu solicitud queda **PENDIENTE**: la revisa un **humano** (el Owner).
-3. Si aprueba → subes a **CERTIFICADO**. Si rechaza → te avisa.
+**Etapa 2: llegar a CERTIFICADO — dos caminos**
 
-> ⚠️ Pendiente de confirmar (observación de seguridad): la ruta de revisión
-> no comprueba que quien aprueba sea realmente el Owner: **cualquier usuario
-> con sesión** podría aprobar o rechazar una verificación en el estado
-> actual. Está señalado para corregir.
+*Camino A — ya tienes una credencial (SBT).* Si tu billetera ya tiene un
+**SBT** (la "insignia digital" de certificación, emitida por TrueKeate o
+por otra entidad reconocida), la cocina comprueba tu billetera en la cadena
+y puedes pulsar **"Certificarme automáticamente con mi SBT"**: subes a
+CERTIFICADO al momento. Si tu insignia venía de otra entidad, la plataforma
+te crea su propio SBT nativo como respaldo.
+
+*Camino B — sin SBT: subes tus documentos.*
+1. Envías una foto de tu **documento (DNI/cédula)** y una **selfie**
+   (formatos de imagen habituales; cada imagen hasta ~4 MB).
+2. Las imágenes se guardan de verdad: **solo tú y el Owner** pueden verlas.
+3. Tu solicitud queda **PENDIENTE** hasta que el **Owner** la revise.
+4. Si aprueba → subes a **CERTIFICADO**. Si rechaza → te avisa.
+
+**La revisión ahora está protegida**: solo el **Owner real** puede aprobar
+o rechazar (la cocina lo comprueba en la cadena, contra el registro de
+socios). Antes cualquier usuario con sesión podía hacerlo: quedó corregido
+en la reescritura.
+
+> En cualquier momento puedes preguntar tu estado con "¿en qué peldaño
+> estoy?" y la cocina responde (tu estado y tu ficha de verificación).
+>
+> El detalle completo del flujo (rutas, imágenes y revisión del Owner) está
+> en el manual **03·09-certificacion-sbt.md**.
 
 <!-- GENERAR_IMAGEN: escalera-accesos.svg -->
 ```mermaid
@@ -182,13 +208,13 @@ Cuando valoras un trueque, puntúas **5 cosas** (de 1 a 5):
 4. **Confiabilidad**: ¿fue puntual y serio?
 5. **Compromiso**: ¿terminó lo que empezó?
 
-> ⚠️ Pendiente de confirmar: la app de trueques tiene preparado el envío a
-> la blockchain (por mensajero para particulares, o directo para empresas),
-> pero en el ciclo actual **ninguna ruta lo ejecuta**: los trueques se
-> guardan en un almacén de pruebas y las acciones de custodiar/firmar no
-> comprueban aún el estado real en la cadena. La integración completa está
-> **pendiente de confirmar**. También faltan las rutas de apertura,
-> anulación y disputa desde la app (en el diseño, no implementadas).
+> ⚠️ Pendiente de confirmar: la cocina de trueques tiene preparado el envío
+> a la blockchain (por mensajero para particulares, o directo para
+> empresas), pero **ninguna ruta lo ejecuta todavía**: los trueques se
+> guardan en un almacén de pruebas y custodiar/firmar no comprueban aún el
+> estado real en la cadena. Abrir o anular un trueque desde la app también
+> sigue pendiente. Las **disputas**, en cambio, ya tienen su propia familia
+> de servicios (`/disputas`).
 
 ---
 
@@ -205,8 +231,10 @@ El administrador (Owner) tiene su propio tablero:
 | **Salud de infraestructura** | Salud y métricas del mensajero y del vigilante |
 
 > ⚠️ Observación: el servicio de contratos no exige rol de Owner (solo
-> sesión), y el de salud responde vacío cuando no hay mensajero ni vigilante
-> conectados (como ocurre en el modo de pruebas actual).
+> sesión). El de salud responde vacío cuando no hay mensajero ni vigilante
+> conectados (modo de pruebas con almacén en memoria); en **producción**,
+> con el mensajero y el vigilante inyectados, muestra su salud y sus
+> métricas.
 
 ---
 
@@ -274,11 +302,15 @@ Al cerrar la subasta:
 flowchart TB
     APP["La app (móvil / web)"] -->|"peticiones con ticket de sesión"| API["La API (la cocina)<br/>máx. 120 peticiones/min"]
     API --> AUTH["/auth<br/>registro y sesión"]
-    API --> KYC["/kyc<br/>verificación 2 etapas"]
+    API --> KYC["/kyc<br/>verificación y certificación<br/>(ver manual 03·09)"]
     API --> CAT["/catalog<br/>escaparate y encargos"]
     API --> TRU["/truekes<br/>trueques y valoraciones"]
     API --> REP["/reputacion<br/>puntaje, nivel, medalla"]
     API --> SUB["/subastas<br/>subastas de empresa"]
+    API --> FIN["/finanzas<br/>saldos"]
+    API --> DIS["/disputas<br/>disputas"]
+    API --> GOB["/gobernanza<br/>propuestas y votos"]
+    API --> PUN["/puntos-encuentro<br/>puntos de encuentro"]
     API --> ADM["/admin<br/>panel del Owner"]
     style APP fill:#48cae4,stroke:#1d7fa8
     style API fill:#1a2b4c,color:#fff,stroke:#0a1128
@@ -288,6 +320,10 @@ flowchart TB
     style TRU fill:#2a9d8f,color:#fff,stroke:#1f6f64
     style REP fill:#d4af37,stroke:#8a6d1f
     style SUB fill:#d4af37,stroke:#8a6d1f
+    style FIN fill:#48cae4,stroke:#1d7fa8
+    style DIS fill:#f4a261,stroke:#b06a2a
+    style GOB fill:#d4af37,stroke:#8a6d1f
+    style PUN fill:#48cae4,stroke:#1d7fa8
     style ADM fill:#f4a261,stroke:#b06a2a
 ```
 
@@ -317,25 +353,33 @@ Cuando algo falla, la API responde con un **código claro**, no con un
 
 ## 11. Qué falta confirmar (resumen)
 
-1. La API guarda todo en **memoria** (se pierde al reiniciar): el puente a
-   la base de datos PostgreSQL real está declarado como trabajo de la
-   integración final → **pendiente de confirmar**.
-2. Verificación real de códigos de correo/teléfono y envío por email no
-   implementados → **pendiente de confirmar**.
-3. Sin control de rol Owner en la revisión de verificación (observación de
-   seguridad).
-4. Los trueques no se envían aún a la blockchain desde la app → **pendiente
-   de confirmar**.
-5. Reputación con volumen máximo fijo en 1 y recálculo mensual solo
-   simulado → **pendiente de confirmar**.
-6. Subastas en memoria, sin cierre automático ni persistencia →
+1. **En desarrollo**, la cocina guarda todo en **memoria** (se pierde al
+   reiniciar). **En producción**, la API se conecta a la **base de datos
+   PostgreSQL real** y arranca con el mensajero, el vigilante y los
+   contratos inyectados.
+2. La **verificación de códigos ya es real** (código de correo con
+   vencimiento de 10 minutos). Pendiente de confirmar: los códigos se
+   guardan en memoria y el envío real por email exige configurar el
+   servidor de correo (sin ello, modo demostración).
+3. La **revisión del Owner ya está protegida**: solo el Owner real
+   (comprobado en la cadena) aprueba o rechaza → resuelto en la
+   reescritura de 2026-09 (ver manual 03·09-certificacion-sbt.md).
+4. Los **trueques** no envían aún sus órdenes a la blockchain desde la
+   cocina (el mensajero está preparado, pero ninguna ruta lo invoca) →
    **pendiente de confirmar**.
-7. Muchos servicios del diseño no existen aún: verificación por email/
-   teléfono, apelaciones, cola de revisión, rutas de disputas y votaciones,
-   apertura/anulación de trueques, puntos de encuentro, campañas y finanzas
-   → **pendientes de confirmar** (integración final o ciclos posteriores).
-8. Los 14 tests de la API están verificados (14/14 verdes) con el almacén
-   en memoria (ver manual 08).
+5. La **reputación** usa un "volumen máximo del sistema" fijo en 1 y el
+   recálculo mensual automático solo responde un aviso → **pendiente de
+   confirmar**.
+6. Las **subastas** viven en memoria, se cierran a mano y no tienen
+   servicios de detalle ni de listado de pujas → **pendiente de confirmar**.
+7. Muchos servicios del diseño **ya existen**: finanzas, disputas,
+   gobernanza y puntos de encuentro están montados (11 familias) y la
+   verificación/certificación está reescrita. Siguen **pendientes**: las
+   verificaciones separadas de correo y teléfono en `/auth`, las apelaciones
+   de KYC, la cola de revisión del Owner, las campañas y las variantes de
+   abrir/anular un trueque directo en la cadena desde la app.
+8. Los **14 exámenes de la API** están verificados (14/14) con el almacén
+   en memoria; el backend completo suma 26/26 (ver manual 08).
 
 ---
 
@@ -351,6 +395,8 @@ Cuando algo falla, la API responde con un **código claro**, no con un
 | **GDPR** | Ley europea de protección de datos personales |
 | **KYC** | Verificación de identidad ("conoce a tu cliente") |
 | **Selfie** | Tu foto para verificar que eres tú |
+| **SBT** | Insignia digital en la cadena que certifica tu identidad ("soulbound token": no se puede transferir) |
+| **Código de verificación** | Código de 6 dígitos enviado a tu correo, válido 10 minutos |
 | **AtoA** | Intercambio entre personas (a to a) |
 | **Rubro** | Categoría del objeto (arte, tecnología...) |
 | **Encargo** | Pedir un objeto que no está en el mercado |

@@ -24,6 +24,8 @@ export interface ManualAyuda {
   carpeta: string;
   titulo: string;
   resumen: string;
+  /** Infografía/imagen representativa del tema (nombre de archivo en /manual/imagenes/). */
+  imagen?: string;
   secciones: SeccionAyuda[];
 }
 
@@ -69,6 +71,11 @@ export const gruposManuales: GrupoManual[] =   [
       "carpeta": "07-Wallets-y-Cuentas",
       "etiqueta": "Tu billetera y tus cuentas",
       "descripcion": "Manuales prácticos para conectar tu billetera (MetaMask) a la red de pruebas de TrueKeate: cómo crearla e instalarla, añadir la red RPC, importar las cuentas de prueba, ver el token BRLT y los NFTs de tus trueques, firmar y autorizar, con fichas didácticas de repaso."
+    },
+    {
+      "carpeta": "08-Suite-Sistemas",
+      "etiqueta": "La suite Sistemas del Owner",
+      "descripcion": "El cuadro de mandos del responsable de TrueKeate (solo Owner): cifras del momento, revisión de certificaciones con fotos (KYC), contratos desplegados, base de datos y salud de los servidores (relayer e indexador). Es la puerta de entrada a la Biblioteca de Sistemas."
     }
   ];
 
@@ -3710,6 +3717,596 @@ export const manuales: ManualAyuda[] =   [
           "titulo": "12. Glosario de este compendio",
           "parrafos": [
             "Wallet o billetera = aplicación que guarda tus claves y firma por ti (MetaMask) · RPC = la dirección del nodo al que se conecta la billetera · Chain ID = el número de identidad de una cadena (aquí, 31337) · Anvil = el simulador de blockchain de pruebas del proyecto · Clave privada = la llave secreta de una cuenta: quien la tiene, firma por ella · ETH = moneda de la red de pruebas; paga el gas · BRLT = token interno ERC-20 de la plataforma · NFT = certificado digital único (ERC-721) · Gas = el combustible que pagan las operaciones · Relayer = servicio de la plataforma que paga el gas de los trueques · EIP-191 y EIP-712 = formatos de firma (mensaje simple o datos estructurados) · Pendiente de confirmar = dato o función que aún no se ha podido verificar"
+          ],
+          "subsecciones": []
+        }
+      ]
+    },
+    {
+      "id": "09-certificacion-sbt",
+      "carpeta": "03-Implementacion",
+      "titulo": "Certifícate en TrueKeate: la credencial SBT que abre puertas",
+      "resumen": "Manual en lenguaje sencillo de la certificación con SBT (escalera D28, etapa 2): cómo demuestras quién eres para llegar al nivel CERTIFICADO, con tu credencial SBT al instante o con tus fotos de documento + selfie revisadas por una persona (el Owner).",
+      "imagen": "flujo-certificacion-sbt.svg",
+      "secciones": [
+        {
+          "titulo": "1. Empezar en 5 minutos",
+          "parrafos": [
+            "TrueKeate te pide probar tu identidad en dos peldaños:",
+            "1. Paso 1 — Verifica tu correo: la plataforma te envía un código de 6 dígitos y tú lo escribes. Ya estás VERIFICADO.",
+            "2. Paso 2 — Certifícate, por una de estas dos vías: vía rápida (SBT), si tu billetera ya tiene una credencial SBT (la de TrueKeate u otra reconocida) pulsas un botón y quedas CERTIFICADO al momento; o vía con fotos, si no tienes SBT subes una foto de tu documento (DNI/cédula) y una selfie, y una persona responsable (el Owner) revisa tus fotos y te aprueba.",
+            "La credencial SBT es un certificado digital que no se puede regalar ni vender: va ligado a tu billetera y solo existe uno por persona. Es como un título académico: está a tu nombre y no se transfiere.",
+            "En resumen: verifica el correo → elige tu vía (SBT automático o fotos con revisión humana) → consigue tu badge de CERTIFICADO y disfruta de los niveles más altos de la plataforma."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "2. El panorama: piezas y camino de decisión",
+          "parrafos": [],
+          "imagen": "escalera-d28-2026.svg",
+          "subsecciones": [
+            {
+              "titulo": "2.1 Qué piezas intervienen",
+              "parrafos": [
+                "Contrato TrueKeateSBT: la fábrica de credenciales; emite tu SBT y garantiza que no se transfiera.",
+                "Helper SBT del backend: el vigilante que mira en la cadena si tu billetera tiene SBT y emite el tuyo.",
+                "Servicios /kyc de la API: los trámites de verificar correo, certificar, subir fotos y revisar.",
+                "Base de datos (PostgreSQL): guarda tu estado, tus fotos y tu número de SBT.",
+                "Página de certificación: la pantalla donde haces los pasos (/suite/certificacion).",
+                "Revisión del Owner: la persona que aprueba o rechaza tus fotos cuando no hay SBT."
+              ]
+            },
+            {
+              "titulo": "2.2 El cruce de caminos (decisión 2026-09)",
+              "parrafos": [
+                "Cuando llegas al peldaño de certificación, el sistema se pregunta:",
+                "1. ¿Tu billetera tiene un SBT? → Certificación automática al instante (y si el SBT era de otra plataforma reconocida, TrueKeate te emite el suyo propio como credencial).",
+                "2. ¿No tienes SBT? → Subes documento + selfie y queda en PENDIENTE; el Owner revisa tus fotos y aprueba (quedas CERTIFICADO y se te emite el SBT) o rechaza.",
+                "La escalera completa de confianza tiene tres peldaños: primero te inscribes (INSCRITO), luego verificas tu correo (VERIFICADO) y por último te certificas (CERTIFICADO)."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "3. La credencial SBT: lo que es y lo que no es",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "3.1 Un certificado \"atado\" a tu billetera",
+              "parrafos": [
+                "El SBT (Soulbound Token) es un token de colección especial: representa tu certificación de identidad.",
+                "Es no transferible: no se puede regalar, vender ni pasar a otra billetera; solo puede nacer (emisión) o morir (quemado).",
+                "Regla importante: un solo SBT por billetera; si ya tienes uno, el sistema no te emite otro.",
+                "Cumple los estándares ERC-721 (colección) y ERC-5192 (token bloqueado); su símbolo técnico es TKSBT y su nombre TrueKeate SBT."
+              ]
+            },
+            {
+              "titulo": "3.2 Quién puede emitir credenciales (el \"minter\")",
+              "parrafos": [
+                "No cualquiera puede fabricar SBTs: solo la cuenta emisora (el minter), que en la práctica es la propia plataforma (cuenta del relayer).",
+                "El dueño del contrato puede cambiar quién es el minter; hoy lo opera TrueKeate, no los usuarios."
+              ]
+            },
+            {
+              "titulo": "3.3 Cómo nace tu SBT (la emisión)",
+              "parrafos": [
+                "Cuando la plataforma te certifica, ocurre esto en la cadena:",
+                "1. Se comprueba que no tengas ya un SBT.",
+                "2. Se crea el token con su número (tokenId) y sus metadatos: el certificado con tu billetera y el esquema D28-CERTIFICADO.",
+                "3. Se guarda el enlace entre tu billetera y ese número de SBT (relación 1 a 1) y queda registrado para siempre en la cadena.",
+                "Técnicamente, el SBT vive en el contrato TrueKeateSBT; en la versión de producción de pruebas (2026-09) está desplegado en el anvil de GCP en la dirección 0x8705…3638, y el comando exacto de su despliegue aún no está versionado: pendiente de confirmar."
+              ]
+            },
+            {
+              "titulo": "3.4 ¿Se puede comprobar? Sí, y está probado",
+              "parrafos": [
+                "Cualquiera puede preguntar en la cadena: ¿qué SBT tiene esta billetera? y ¿está bloqueado? (siempre responde que sí).",
+                "El contrato supera 6 de 6 pruebas automáticas: que solo el minter emite, que no hay dos SBT por billetera, que no se puede transferir, que el Owner cambia el minter, y que cumple ERC-5192."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "4. La \"cocina\": cómo comprueba TrueKeate si tienes SBT",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "4.1 El chequeo on-chain (dos fuentes)",
+              "parrafos": [
+                "Antes de certificarte, el sistema mira en la cadena si tu billetera posee:",
+                "1. SBT nativo: el TrueKeateSBT de TrueKeate (el de la dirección 0x8705…3638 en producción).",
+                "2. SBT externo reconocido: credenciales de otras plataformas incluidas en una lista blanca de confianza (hoy la lista está vacía: no se reconoce ningún SBT externo todavía).",
+                "Si el contrato no responde (problemas de red), el sistema lo ignora y sigue sin darte por certificado: no inventa resultados."
+              ]
+            },
+            {
+              "titulo": "4.2 La emisión por parte de la plataforma",
+              "parrafos": [
+                "Cuando te toca certificación y hace falta emitirte el SBT, lo firma la billetera de la plataforma (no la tuya, así no pagas gas).",
+                "Si la plataforma no tiene configurada la clave de emisión, el minteo se simula (queda registrado en la base, pero no llega a la cadena): la certificación SBT quedaría incompleta. Es un modo de desarrollo."
+              ]
+            },
+            {
+              "titulo": "4.3 Los metadatos del certificado",
+              "parrafos": [
+                "El SBT guarda una tarjeta de presentación digital con el nombre TrueKeate · Certificación de identidad (KYC) y el esquema D28-CERTIFICADO. Es lo que verías si inspeccionas el token."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "5. Los trámites de certificación (servicios /kyc)",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "5.1 Peldaño 1 — Verificar tu correo",
+              "parrafos": [
+                "1. La plataforma te envía un código de 6 dígitos a tu correo.",
+                "2. El código caduca a los 10 minutos.",
+                "3. Lo escribes y quedas VERIFICADO (tu usuario pasa a estado VERIFICADO y el trámite avanza a su etapa 2).",
+                "Si el equipo no ha configurado el envío real de correos, el sistema funciona en modo demostración y te muestra el código directamente en pantalla. Los códigos viven en la memoria de la API: si se reinicia el servicio, se pierden: pendiente de confirmar su guardado permanente."
+              ]
+            },
+            {
+              "titulo": "5.2 El chequeo: ¿tienes SBT? (un servicio que solo pregunta)",
+              "parrafos": [
+                "La app consulta GET /kyc/sbt y la API le responde: sí/no, de qué fuente (nativo o externo), de qué contrato y con qué número de token. No cambia nada: solo mira."
+              ]
+            },
+            {
+              "titulo": "5.3 Vía rápida — Certificarte automáticamente con tu SBT",
+              "parrafos": [
+                "Cuando pulsas Certificarme automáticamente con mi SBT:",
+                "1. El sistema comprueba que ya estás VERIFICADO (si no, te lo recuerda).",
+                "2. Comprueba de nuevo que tu billetera tiene SBT.",
+                "3. Si el SBT era externo, la plataforma te emite el SBT nativo de TrueKeate; si ya era nativo, se conserva el tuyo.",
+                "4. ¡Listo! Tu usuario pasa a CERTIFICADO y tu trámite queda APROBADO por la vía del SBT, con el número de token y el contrato registrados."
+              ],
+              "imagen": "flujo-certificacion-sbt.svg"
+            },
+            {
+              "titulo": "5.4 Vía con fotos — Subir documento + selfie",
+              "parrafos": [
+                "Cuando no tienes SBT, la pantalla te pide dos imágenes reales:",
+                "1. Foto de tu documento (DNI/cédula) — delante de ti.",
+                "2. Tu selfie — tu cara, para comparar que el documento es tuyo.",
+                "Reglas de las fotos: formatos admitidos JPEG, PNG o WebP; tamaño máximo unos 4 MB por imagen (la app te muestra una vista previa antes de enviar).",
+                "Al enviarlas, tu trámite queda PENDIENTE: ahora decide una persona."
+              ],
+              "imagen": "kyc-imagenes-dni-selfie.svg"
+            },
+            {
+              "titulo": "5.5 Tus fotos están a salvo",
+              "parrafos": [
+                "La foto de tu documento y tu selfie solo las pueden ver la persona dueña de la cuenta (tú) y el Owner. Nadie más.",
+                "Se guardan en la base de datos (con su huella digital para detectar alteraciones) y la web no las muestra en público."
+              ]
+            },
+            {
+              "titulo": "5.6 El Owner decide (aprobar o rechazar)",
+              "parrafos": [
+                "El Owner ve en su Panel (/suite/admin) la lista de solicitudes PENDIENTES con las dos fotos de cada persona.",
+                "Aprobar: la persona pasa a CERTIFICADO y se le emite su SBT nativo.",
+                "Rechazar: el trámite queda RECHAZADO y la persona puede volver a intentarlo.",
+                "Solo el Owner puede hacer esto: el sistema comprueba su identidad en la cadena (que sea el dueño del registro de Socios de TrueKeate)."
+              ]
+            },
+            {
+              "titulo": "5.7 Consultar tu estado cuando quieras",
+              "parrafos": [
+                "En cualquier momento puedes preguntar ¿en qué punto estoy? y la app te responde: tu estado (INSCRITO / VERIFICADO / CERTIFICADO / RECHAZADO), si fuiste certificado por SBT, el número de tu token y si tienes fotos pendientes de revisión."
+              ]
+            },
+            {
+              "titulo": "5.8 Modos y límites del estado actual",
+              "parrafos": [
+                "El modo demostración (sin correos reales ni clave de emisión) sirve para probar, pero la certificación SBT de verdad necesita la configuración completa.",
+                "Sin la clave del minter, la emisión del SBT se simula: pendiente de confirmar para producción real de otras redes."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "6. Dónde se guarda todo (la base de datos)",
+          "parrafos": [
+            "Tu trámite de certificación toca varias carpetas de la base de datos:",
+            "kyc: tu estado, la vía (SBT o fotos), el contrato y número de tu SBT, y las referencias a tus fotos.",
+            "imagenes_certificadas: las fotos (documento y selfie) con su tipo, contenido y huella digital.",
+            "usuarios: tu estado general (VERIFICADO → CERTIFICADO).",
+            "La tabla de fotos distingue el tipo: foto de documento (KYC_DNI) o selfie (KYC_SELFIE), y en este trámite las sube la propia plataforma (no necesitan firma tuya).",
+            "Estos cambios se aplican con una migración que se puede ejecutar varias veces sin romper nada (es idempotente)."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "7. La página de certificación en la app",
+          "parrafos": [
+            "Entras en la sección Certificación de la suite (rutas /suite/verificacion → /suite/certificacion).",
+            "Al abrirla, la app ya consulta tu estado y si tienes SBT, y te muestra la pantalla que te corresponde:",
+            "Ya certificado: ves tu badge Certificado automáticamente con tu SBT.",
+            "Con SBT y sin certificar: botón de certificación automática.",
+            "Sin SBT: formulario de subida de documento + selfie.",
+            "Enviado: aviso de que tu solicitud está PENDIENTE de revisión del Owner.",
+            "Solo inscrito: recordatorio de que primero debes verificar tu correo.",
+            "El Owner, por su parte, tiene su panel de revisión con las solicitudes y sus fotos, y los botones Aprobar/Rechazar."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "8. El viaje completo, paso a paso",
+          "parrafos": [
+            "1. Te das de alta en TrueKeate (INSCRITO).",
+            "2. Verificas tu correo con el código de 6 dígitos (VERIFICADO).",
+            "3. Entras en Certificación; la app mira en la cadena si tu billetera tiene SBT.",
+            "4. ¿Tienes SBT? Pulsas Certificarme automáticamente → CERTIFICADO al instante.",
+            "5. ¿No tienes SBT? Subes documento + selfie → PENDIENTE.",
+            "6. El Owner revisa tus fotos y aprueba → CERTIFICADO y se te emite tu SBT (o rechaza → RECHAZADO).",
+            "¡Y ya está! Con tu SBT, la plataforma sabe que eres tú y puedes usar los servicios del nivel más alto de confianza."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "9. Lo que falta por confirmar (resumen)",
+          "parrafos": [
+            "1. El comando exacto con el que se desplegó el contrato TrueKeateSBT (no está en el script de despliegue habitual; la dirección de producción sí está registrada).",
+            "2. Guardar los códigos de verificación de correo de forma permanente (hoy viven en la memoria de la API y se pierden al reiniciar).",
+            "3. Aclarar el uso real de las columnas antiguas de documento/selfie que conviven con el nuevo sistema de fotos.",
+            "4. La comprobación de SBTs externos solo mira si la billetera tiene algún token de esa colección: no verifica todavía quién lo emitió de verdad."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "10. Glosario de este manual",
+          "parrafos": [
+            "SBT = credencial digital atada a tu billetera: no se transfiere · Certificar = demostrar quién eres para llegar al nivel CERTIFICADO · Minter = la cuenta autorizada a emitir SBTs (hoy, la plataforma) · KYC = trámite de conocer al cliente: verificar identidad con correo y/o fotos · Selfie = tu foto de frente para comparar con el documento · Owner = la persona responsable de TrueKeate que revisa las solicitudes · On-chain / cadena = el registro público donde viven los contratos y los SBTs · Token / tokenId = la credencial digital y su número de serie · PENDIENTE / RECHAZADO = estados de tu trámite: esperando revisión / denegado"
+          ],
+          "subsecciones": []
+        }
+      ]
+    },
+    {
+      "id": "09-conexion-wallet-movil",
+      "carpeta": "07-Wallets-y-Cuentas",
+      "titulo": "Conecta tu billetera desde el móvil",
+      "resumen": "Manual en lenguaje sencillo de la conexión de wallet en móvil (deep link / navegador interno): cómo usar TrueKeate desde el teléfono con MetaMask cuando el navegador no tiene extensiones. Comprobado en un teléfono real el 2026-09-08. Complementa a 01-instalacion-wallet y 02-conexion-red-rpc.",
+      "imagen": "conexion-wallet-movil.svg",
+      "secciones": [
+        {
+          "titulo": "1. Empezar en 5 minutos",
+          "parrafos": [
+            "Si quieres usar TrueKeate desde tu móvil hoy, el método que funciona es este:",
+            "1. Instala la app de MetaMask en tu móvil (Google Play o App Store) y crea o importa tu billetera.",
+            "2. Asegúrate de que la app tiene la red del proyecto (anvil 31337) configurada: ver manual 02-conexion-red-rpc.",
+            "3. Vía automática: en la web de TrueKeate pulsa Conectar y luego 📲 Abrir en la app de MetaMask. La app se abre sola con la web dentro de su navegador.",
+            "4. Vía manual: dentro de la app de MetaMask abre su Navegador (menú ⋮) y escribe la dirección de TrueKeate.",
+            "5. Conecta y firma el mensaje TrueKeate: iniciar sesión → ¡dentro!",
+            "Recuerda: esta red es de pruebas y el dinero es simbólico. No uses cuentas con valor real (ver manual 03-cuentas-anvil)."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "2. El problema: los navegadores del móvil no tienen extensiones",
+          "parrafos": [],
+          "imagen": "conexion-wallet-movil.svg",
+          "subsecciones": [
+            {
+              "titulo": "2.1 Por qué la app se quedaba bloqueada",
+              "parrafos": [
+                "En el ordenador, MetaMask es una extensión que se mete dentro del navegador. En Android/iPhone no existen extensiones: el navegador del móvil no tiene a MetaMask dentro, así que la web de TrueKeate mostraba MetaMask no está instalado… y no dejaba entrar a la suite."
+              ]
+            },
+            {
+              "titulo": "2.2 La solución elegida (decisión del director, 2026-09-08)",
+              "parrafos": [
+                "Se adoptaron dos caminos que sí funcionan en móvil:",
+                "1. Enlace profundo (deep link): la web te manda a la app de MetaMask, que abre la misma página de TrueKeate dentro de su propio navegador (ahí MetaMask sí está dentro).",
+                "2. Navegador interno: tú mismo abres el navegador que trae la app de MetaMask y escribes la dirección de TrueKeate.",
+                "El estándar universal WalletConnect (conectar con cualquier wallet) queda anotado como mejora futura: necesita una clave de proyecto externa que hoy no está configurada."
+              ]
+            },
+            {
+              "titulo": "2.3 Dónde vive esta lógica en el código",
+              "parrafos": [
+                "Detector de móvil (web/lib/ethereum.tsx): detecta si navegas desde un teléfono.",
+                "Espera de wallet (web/lib/ethereum.tsx): espera 1,2 segundos a que una wallet se anuncie sola.",
+                "Adopción de la wallet (web/lib/ethereum.tsx): si no hay MetaMask en el navegador, adopta la que se anuncie.",
+                "Enlace a la app (web/lib/ethereum.tsx): construye el enlace metamask.app.link/dapp/<web>.",
+                "Tarjeta de ayuda móvil (web/components/SuiteGuard.tsx): te ofrece los dos caminos: botón Abrir en la app o pasos del navegador interno."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "3. Cómo funciona la conexión en el móvil, paso a paso",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "3.1 Paso 1 — Pulsas \"Conectar\" en el navegador",
+              "parrafos": [
+                "Cuando entras en una sección de la suite sin billetera conectada, la web te muestra la pantalla de conexión con el botón 🔗 Conectar MetaMask e iniciar sesión."
+              ]
+            },
+            {
+              "titulo": "3.2 Paso 2 — La web espera a que una wallet se presente",
+              "parrafos": [
+                "El navegador del móvil no tiene window.ethereum (la ventanilla por la que MetaMask se asoma en el PC). Por eso la web espera 1,2 segundos por si alguna wallet se anuncia sola (es el estándar EIP-6963: las apps de wallet se presentan cuando cargan).",
+                "Si no aparece ninguna, la web te muestra un mensaje distinto según tu aparato: en móvil te ofrece abrir la app de MetaMask; en el ordenador te pide instalar la extensión."
+              ]
+            },
+            {
+              "titulo": "3.3 Paso 3 — La web te abre la app de MetaMask (enlace profundo)",
+              "parrafos": [
+                "1. En la pantalla de conexión verás el botón 📲 Abrir en la app de MetaMask.",
+                "2. Al pulsarlo, tu móvil abre la app de MetaMask y esta carga la misma página de TrueKeate dentro de su navegador interno.",
+                "3. Dentro de ese navegador, MetaMask sí está disponible: el flujo continúa normal pidiéndote permiso para ver tus cuentas."
+              ]
+            },
+            {
+              "titulo": "3.4 Paso 3' — La vía manual: el navegador interno de MetaMask",
+              "parrafos": [
+                "Si prefieres hacerlo a mano:",
+                "1. Abre la app de MetaMask.",
+                "2. Pulsa el menú ⋮ → Navegador.",
+                "3. Escribe la dirección de TrueKeate (la web te muestra en pantalla el dominio al que tienes que ir).",
+                "4. Importante: la app debe tener configurada la red del proyecto (anvil 31337); si no, no podrá firmar ni ver tus saldos de prueba (ver manual 02-conexion-red-rpc)."
+              ]
+            },
+            {
+              "titulo": "3.5 Paso 4 — Firma y sesión",
+              "parrafos": [
+                "1. Dentro del navegador interno, MetaMask pide permiso para ver tus cuentas.",
+                "2. Luego viene el inicio de sesión único: firmas el mensaje TrueKeate: iniciar sesión (aparece el botón Firmar en la app).",
+                "3. Con eso ya tienes sesión y ves tus secciones según tu tipo de usuario, igual que en el ordenador."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "4. Comportamientos del código que conviene saber",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "4.1 La wallet se adopta una sola vez",
+              "parrafos": [
+                "Si el navegador interno de la wallet ya inyecta MetaMask al cargar, esa es la que se usa. La espera de 1,2 segundos solo actúa si aún no hay ninguna wallet disponible."
+              ]
+            },
+            {
+              "titulo": "4.2 En el ordenador la tarjeta es distinta",
+              "parrafos": [
+                "Si el fallo ocurre en el PC (no hay wallet), la tarjeta te pide instalar la extensión y recargar la página. No hay enlace a la app en el ordenador."
+              ]
+            },
+            {
+              "titulo": "4.3 En la barra superior del móvil",
+              "parrafos": [
+                "En el móvil, la barra superior no muestra el botón completo de conectar: aparece una píldora Sin billetera y la navegación la lleva la barra inferior. Sin sesión, solo puedes ver el Mercado; para el resto hay que conectar la billetera primero."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "5. Comprobado en un teléfono real, y lo que falta",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "5.1 Validado en dispositivo real (2026-09-08)",
+              "parrafos": [
+                "El director probó el flujo en su teléfono real y confirmó: al pulsar Conectar aparece la tarjeta móvil, el botón Abrir en la app de MetaMask abre la app, y dentro del navegador interno la conexión y la sesión se completan con normalidad."
+              ]
+            },
+            {
+              "titulo": "5.2 Pendientes de confirmar",
+              "parrafos": [
+                "1. WalletConnect universal (funcionar con cualquier wallet del móvil): necesita una clave de proyecto externa → mejora futura.",
+                "2. Probar en local con el teléfono: en desarrollo la web vive en 127.0.0.1:3000, que el móvil no puede alcanzar; haría falta exponerla en la red local o usar la versión de la nube.",
+                "3. Casos borde: la detección de móvil se basa en el navegador; una tablet con navegador interno de wallet podría comportarse como sin wallet (no probado)."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "6. Glosario de este manual",
+          "parrafos": [
+            "Deep link / enlace profundo = enlace que abre directamente una app en el móvil · Navegador interno = el navegador que trae la app de MetaMask dentro · EIP-6963 = estándar por el que las wallets se presentan solas a la web · window.ethereum = la ventanilla por la que la wallet se asoma en el navegador · Proveedor (provider) = la wallet que la web usa para firmar y ver cuentas · Red 31337 = la red de pruebas del proyecto (anvil) · Suite = la zona privada de TrueKeate tras iniciar sesión"
+          ],
+          "subsecciones": []
+        }
+      ]
+    },
+    {
+      "id": "01-panel-sistemas",
+      "carpeta": "08-Suite-Sistemas",
+      "titulo": "El Panel del Owner: el cuadro de mandos de TrueKeate",
+      "resumen": "Manual en lenguaje sencillo del Panel del Owner / Sistemas: qué ve y qué puede hacer la persona responsable de TrueKeate en su panel de control — cifras del momento, revisión de identidades con fotos, contratos desplegados y salud de los servidores. Pensado para público general y para el propio Owner.",
+      "imagen": "biblioteca-sistemas-owner.svg",
+      "secciones": [
+        {
+          "titulo": "1. Empezar en 5 minutos",
+          "parrafos": [
+            "El Panel del Owner es la sala de máquinas de TrueKeate. Con él puedes:",
+            "1. Ver las cifras del momento (KPIs): cuántos usuarios hay, cuántos artículos se ofrecen, cuántos trueques se han hecho y cuántas disputas hay abiertas.",
+            "2. Revisar solicitudes de certificación: ver las fotos (documento + selfie) de quien quiere certificarse y aprobar o rechazar.",
+            "3. Mirar la base de datos: cuántas filas hay en las carpetas principales (usuarios, artículos, truekes).",
+            "4. Mirar los contratos desplegados: las direcciones de la caja fuerte y demás piezas en la cadena.",
+            "5. Comprobar la salud de los servidores: si el relayer (el que firma por ti) y el indexador (el que copia la cadena a la base) están OK.",
+            "Para entrar necesitas ser el Owner (cuenta 0 del anvil, registrada como SOCIO CERTIFICADO) y tener la billetera conectada con sesión iniciada. Cómo prepararlo: manual 04-Despliegue/02-reinicio-y-bootstrap."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "2. Qué es el Panel del Owner",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "2.1 Propósito y alcance",
+              "parrafos": [
+                "Es una pantalla real de TrueKeate (no un dibujo): la encuentras en /suite/admin.",
+                "Reúne en una sola página: cifras (KPIs), estado de la base de datos, contratos desplegados, salud de los servidores y la revisión de certificaciones con fotos."
+              ]
+            },
+            {
+              "titulo": "2.2 Quién puede usarlo (varias comprobaciones)",
+              "parrafos": [
+                "El acceso está vigilado en varias capas, todas a la vez:",
+                "Menú y dirección (web): la sección Admin solo aparece si tu tipo de usuario es SOCIO.",
+                "Aviso en la página: si entras sin ser SOCIO, la web te avisa en rojo.",
+                "Servicios /admin: exigen sesión iniciada y ser SOCIO (o rol OWNER).",
+                "Servicios de certificación: exigen ser el Owner on-chain: la cuenta dueña del registro de Socios.",
+                "Registro en la base: el Owner debe estar dado de alta como CERTIFICADO + SOCIO (script de bootstrap).",
+                "Detalle fino: la web se fija en el tipo SOCIO del usuario, y los servicios de certificación verifican además la identidad del Owner en la cadena. Son dos comprobaciones que se complementan."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "3. La página del panel, pieza a pieza",
+          "parrafos": [],
+          "imagen": "biblioteca-sistemas-owner.svg",
+          "subsecciones": [
+            {
+              "titulo": "3.1 La estructura",
+              "parrafos": [
+                "Cabecera: el título, tu billetera corta (por ejemplo 0xf39F…2266) y el botón ↻ Refrescar para volver a pedir todos los datos.",
+                "Sin billetera conectada: ves una tarjeta Conecta la billetera del Owner.",
+                "Los datos solo se pintan cuando los cuatro servicios responden: mientras tanto ves un indicador de carga."
+              ]
+            },
+            {
+              "titulo": "3.2 Las tarjetas de cifras (KPIs)",
+              "parrafos": [
+                "Cuatro números con su icono: 👥 Usuarios inscritos, 📦 Artículos publicados, ⇄ Trueques (espejo) — los acuerdos registrados, y ⚖️ Disputas abiertas."
+              ]
+            },
+            {
+              "titulo": "3.3 La revisión de certificaciones (con fotos)",
+              "parrafos": [
+                "En el panel vive el bloque de KYC pendientes: solicitudes de personas que subieron documento + selfie y esperan tu decisión. Se explica en la sección 4."
+              ]
+            },
+            {
+              "titulo": "3.4 La base de datos off-chain",
+              "parrafos": [
+                "Una tarjeta resume la base de datos (PostgreSQL en la nube): cuántos usuarios, artículos y trueques hay guardados. Recuerda que esa base es un espejo de lo que ocurre en la cadena: la llenan los eventos que emiten los contratos."
+              ]
+            },
+            {
+              "titulo": "3.5 Los contratos desplegados",
+              "parrafos": [
+                "La tarjeta Contratos desplegados lista las piezas de la cadena con dirección real (ignora las vacías): el Escrow (la caja fuerte), la fábrica de cuentas, el registro de Socios, la moneda BRLT, las suscripciones de empresas, los NFTs de trueques y el TrueKeateSBT de certificación (desde 2026-09)."
+              ]
+            },
+            {
+              "titulo": "3.6 La infraestructura (relayer e indexador)",
+              "parrafos": [
+                "🤖 Relayer EIP-712 (el que firma las operaciones sin gas): muestra si está OK o caído, su billetera y un aviso de Saldo bajo: SÍ (recargar) si se está quedando sin fondos.",
+                "👁️ Indexador (el que copia la cadena a la base): muestra hasta qué bloque ha leído (cabeza), cuántos eventos ha procesado y cuántos han fallado.",
+                "Si el servicio no está activado en ese despliegue, la tarjeta lo dice: No configurado en este despliegue."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "4. Revisar certificaciones: el bloque de KYC pendientes",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "4.1 Qué ves y cómo se cargan las fotos",
+              "parrafos": [
+                "El panel pide la lista de solicitudes PENDIENTES y muestra, por cada persona: su billetera, su tipo · nivel · medalla (por ejemplo Particular · Nivel 2 · 🥈) y las dos fotos: el documento y la selfie.",
+                "Las fotos son privadas: la web las descarga con tu sesión de Owner (nadie más puede verlas, ni siquiera en el navegador, sin autorización)."
+              ]
+            },
+            {
+              "titulo": "4.2 Aprobar o rechazar",
+              "parrafos": [
+                "✅ Aprobar: la persona pasa a CERTIFICADO y la plataforma le emite su SBT (su credencial digital). Ves un aviso en verde.",
+                "Rechazar: el trámite de esa persona queda RECHAZADO.",
+                "Después puedes pulsar ↻ Refrescar para ver el resto de la cola y las cifras actualizadas.",
+                "Si tienes dudas sobre qué es el SBT y por qué se emite al certificar, consulta el manual 03-Implementacion/09-certificacion-sbt."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "5. Los servicios que alimentan el panel (para curiosos)",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "5.1 Los servicios /admin",
+              "parrafos": [
+                "GET /admin/usuarios: total de usuarios (solo SOCIO/Owner).",
+                "GET /admin/contratos: el mapa de contratos con sus direcciones.",
+                "GET /admin/kpis-disputas: total de trueques y disputas abiertas.",
+                "GET /admin/db: conteos de usuarios, artículos y trueques en la base.",
+                "GET /admin/infra/health: salud del relayer y del indexador."
+              ]
+            },
+            {
+              "titulo": "5.2 Los servicios de certificación del Owner",
+              "parrafos": [
+                "Listar pendientes, ver una imagen concreta y aprobar/rechazar: tres servicios reservados al Owner (detalles en el manual de certificación)."
+              ]
+            },
+            {
+              "titulo": "5.3 El cliente de la web",
+              "parrafos": [
+                "La página del panel tiene su cartero que habla con cada servicio y trae los datos: uno por cada tarjeta (contratos, base de datos, KPIs, infraestructura y usuarios)."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "6. Operación guiada para el Owner",
+          "parrafos": [],
+          "subsecciones": [
+            {
+              "titulo": "6.1 Preparar el terreno (una sola vez)",
+              "parrafos": [
+                "1. Da de alta al Owner (cuenta 0) como CERTIFICADO + SOCIO en la base con el script de bootstrap (manual 04-Despliegue/02-reinicio-y-bootstrap).",
+                "2. Asegúrate de que esa cuenta es el Owner on-chain del registro de Socios (para los servicios de certificación).",
+                "3. Conecta la billetera del Owner en el navegador e inicia sesión (una firma)."
+              ]
+            },
+            {
+              "titulo": "6.2 Revisar certificaciones pendientes",
+              "parrafos": [
+                "1. Entra en /suite/admin (menú de secciones, icono Sistemas, o la URL directa).",
+                "2. En KYC pendientes de revisión (DNI + selfie) revisa cada solicitud con sus dos fotos.",
+                "3. Pulsa Aprobar (pasa a CERTIFICADO y se emite su SBT) o Rechazar.",
+                "4. Pulsa ↻ Refrescar para recargar cifras y cola."
+              ]
+            },
+            {
+              "titulo": "6.3 Leer cifras, base de datos, contratos e infraestructura",
+              "parrafos": [
+                "Cifras: usuarios, artículos, trueques y disputas.",
+                "Base de datos: conteos de la BD espejo (en la nube).",
+                "Contratos: direcciones vivas de todas las piezas.",
+                "Infraestructura: salud del relayer (estado y saldo) y del indexador (bloque leído, procesados y fallidos)."
+              ]
+            },
+            {
+              "titulo": "6.4 Verificación registrada en producción",
+              "parrafos": [
+                "El 2026-09-08 se probó el flujo completo en producción: una usuaria sin SBT subió documento + selfie por la interfaz (PENDIENTE), el Owner la aprobó desde el panel → CERTIFICADO con su SBT emitido; otro usuario quedó CERTIFICADO por la vía automática del SBT. Queda registrado en RepoTecnico/estado_proyecto.md con capturas."
+              ]
+            }
+          ]
+        },
+        {
+          "titulo": "7. Lo que falta por confirmar (resumen)",
+          "parrafos": [
+            "1. El servicio que lista los contratos no exige rol de Owner (solo sesión); expone direcciones públicas, pero conviene confirmar si debe restringirse más.",
+            "2. Las cifras de disputas se calculan sobre el espejo de la base, no directamente sobre la cadena.",
+            "3. El aviso de rol OWNER del sistema no existe como columna en la base: la comprobación real es el tipo SOCIO (revisar coherencia con la verificación on-chain)."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "8. Glosario de este manual",
+          "parrafos": [
+            "Owner = la persona responsable de TrueKeate: cuenta 0, SOCIO CERTIFICADO · Panel / dashboard = pantalla de control con cifras y acciones · KPI = indicador: un número que resume el estado (usuarios, trueques…) · Espejo = la base de datos que copia lo que ocurre en la cadena · KYC = trámite de certificación de identidad con fotos · Relayer = el servidor que firma operaciones sin que pagues gas · Indexador = el servicio que lee la cadena y llena la base espejo · SBT = credencial digital emitida al certificar (ver manual 03·09) · On-chain = lo que vive en la cadena (contratos y sus direcciones)"
           ],
           "subsecciones": []
         }

@@ -3,6 +3,13 @@
 > **Alcance**: implementación real de la API REST/JSON de TrueKeate (Ciclo 6 y Ciclo 8): `app.js`, routers `/auth`, `/kyc`, `/catalog`, `/truekes`, `/admin`, `/reputacion`, `/subastas`, capa de almacén en memoria y reglas de negocio (D14, RF-14.4, D12/D30, D27, D17, D18, D28, RF-17.x).
 > **Fuentes leídas**: `backend/api/app.js`, `backend/api/index-api.js`, `backend/api/routes/*.js` (7 routers), `backend/api/lib/*.js` (almacen, auth, reputacion), `backend/test/api.test.js`, `backend/test/ciclo8.test.js`, `RepoTecnico/arquitectura_tecnica.md` §7 (diseño de referencia).
 > **Convención**: referencias `ruta:línea` al código real. Endpoints que el diseño §7 lista pero que el código no implementa se marcan explícitamente como **no implementados en este ciclo** para no prometer funciones inexistentes.
+>
+> ⚠️ **Revisión 2026-09**: este manual describe la base C6/C8 con el **almacén en memoria**. Desde la
+> integración con PostgreSQL y la certificación SBT, el router `/kyc` fue **reescrito** (verificación
+> con código real de correo, SBT/imágenes y guard Owner on-chain) → su documentación actualizada está
+> en **`03-Implementacion/09-certificacion-sbt.md`**; el Panel del Owner (rutas `/admin/*` + `/kyc/*`
+> Owner) en **`08-Suite-Sistemas/01-panel-sistemas.md`**. El montaje de producción inyecta
+> PostgreSQL/relayer/indexador (ver §1).
 
 ---
 
@@ -14,7 +21,9 @@
 - `express.json({ limit: '1mb' })` para el cuerpo JSON (`backend/api/app.js:33`).
 - **Rate-limiting global (D16/RF-09.6)**: 120 peticiones por minuto por ventana de 60 s, con `standardHeaders` y mensaje `{ error: 'rate_limit', detalle: 'demasiadas peticiones' }` (`backend/api/app.js:36-44`).
 - `GET /healthz` → `{ ok: true, servicio: 'truekeate-api' }` (`backend/api/app.js:46`).
-- Montaje de routers en sus prefijos (`backend/api/app.js:48-54`): `/auth`, `/kyc`, `/catalog`, `/truekes`, `/admin`, `/reputacion`, `/subastas`.
+- Montaje de routers en sus prefijos (`backend/api/app.js:76-86`): `/auth`, `/kyc`, `/catalog`,
+  `/truekes`, `/admin`, `/reputacion`, `/subastas`, `/finanzas`, `/disputas`, `/gobernanza`,
+  `/puntos-encuentro` (11 routers en el código actual).
 - Manejo de 404 (`{ error: 'not_found' }`) y error handler central que devuelve `status`/`code`/`detalle` en JSON (`backend/api/app.js:57-62`).
 
 ### 1.2 `iniciarServidor` y punto de entrada
@@ -49,28 +58,21 @@
 | `POST /auth/session` | Valida la firma EIP-191 del mensaje `'TrueKeate: iniciar sesión'`, crea token opaco y guarda la sesión; 401 `firma_invalida`, 404 `usuario_inexistente` | `backend/api/routes/auth.js:37-50` |
 
 - **Discrepancia documentada**: la cabecera de `app.js` menciona "JWT corto" (`backend/api/app.js:13-14`) y el diseño §7 "JWT de corta vida"; la implementación usa un **token opaco** (`backend/api/lib/auth.js:18-20`) — no hay JWT en el código.
-- **No implementados** (listados en diseño §7): `POST /auth/verify-email` y `POST /auth/verify-phone` → pendiente de confirmar; la verificación de códigos en este ciclo vive en `/kyc/verify-codes` sin validación real de código (ver §4).
+- **No implementados** (listados en diseño §7): `POST /auth/verify-email` y `POST /auth/verify-phone` → pendiente de confirmar; la verificación de códigos vive en `/kyc/verify-codes` — con validación real de código (TTL 10 min) en el router reescrito (ver Manual 09 §4.2).
 
 ---
 
-## 3. KYC en 2 etapas (escalera D28)
+## 3. KYC — reescrito en 2026-09 (ver Manual 09)
 
-### 3.1 Rutas /kyc (routes/kyc.js)
-
-| Método y ruta | Función | Línea |
-|---|---|---|
-| `POST /kyc/init` | Inicia la verificación (etapa 1); crea el registro KYC y responde el aviso de "códigos enviados al correo y teléfono" | `backend/api/routes/kyc.js:15-20` |
-| `POST /kyc/verify-codes` | Exige `codigoCorreo` y `codigoTelefono` (400 si faltan) y sube al usuario a **VERIFICADO** (etapa 1) | `backend/api/routes/kyc.js:23-32` |
-| `POST /kyc/submit` | Etapa 2: envía `documentoRef` + `selfieRef` (400 si faltan); deja el KYC en `PENDIENTE` para **revisión humana del Owner (RF-18.4)** | `backend/api/routes/kyc.js:35-46` |
-| `GET /kyc/status` | Devuelve `{ estado, kyc }` del usuario en sesión | `backend/api/routes/kyc.js:49-53` |
-| `POST /kyc/review` | Owner aprueba (`aprobar: true`) → usuario **CERTIFICADO** y KYC `APROBADO` con `revisadoPor`; rechaza → 422 `kyc_rechazado` y KYC `RECHAZADO` | `backend/api/routes/kyc.js:56-69` |
-
-### 3.2 Notas de fidelidad
-
-- **Validación de códigos real**: el código solo exige presencia; el comentario indica que en producción se validan contra los generados (hash + vencimiento) y se envían por email (Nodemailer+SMTP, D37) (`backend/api/routes/kyc.js:18,28`) — **no implementado**.
-- **Control de rol en `/kyc/review`**: la ruta usa `requiereSesion` pero **no verifica que el llamante sea el Owner** (tipo SOCIO/rol OWNER); cualquier usuario con sesión puede aprobar/rechazar KYC (`backend/api/routes/kyc.js:56-69`). Observación de seguridad del estado actual.
-- Cifrado en reposo de documento/selfie (D17): solo comentado; aquí se guardan referencias (`backend/api/routes/kyc.js:40`).
-- **No implementados** (diseño §7): `POST /kyc/appeal` y `GET /kyc/queue` (Owner).
+> ⚠️ La sección original de este manual describía el router `/kyc` del Ciclo 6 (almacén en memoria,
+> códigos sin validación real, submit con referencias y `/kyc/review` sin control de rol). Ese router
+> fue **reescrito por completo** (2026-09, decisión del director): verificación de correo con código
+> real (SMTP opcional/modo demo), **certificación con SBT** (`/kyc/sbt`, `/kyc/auto-certificar`),
+> **imágenes reales** DNI+selfie (`/kyc/submit`, `/kyc/imagen/:id`) y **guard Owner on-chain**
+> (`esOwner` → `SociosRegistry.owner()`) en `/kyc/pendientes` y `/kyc/review`.
+>
+> **Documentación actualizada y completa**: `03-Implementacion/09-certificacion-sbt.md` (§4 con todas
+> las rutas y referencias `backend/api/routes/kyc.js:<línea>`).
 
 ---
 
@@ -187,7 +189,7 @@
 
 | Regla | Implementación | Ref. |
 |---|---|---|
-| Escalera D28: INSCRITO → VERIFICADO → CERTIFICADO | Estados en `almacen.js:27`, transiciones en kyc.js | `backend/api/routes/kyc.js:29,62` |
+| Escalera D28: INSCRITO → VERIFICADO → CERTIFICADO | Estados en `almacen.js:27`, transiciones en kyc.js | `backend/api/routes/kyc.js:97,117` (ver Manual 09) |
 | Límites por nivel de artículos: 5/50/100/100 (D14) | `LIMITE_ARTICULOS_POR_NIVEL` | `backend/api/routes/catalog.js:10` |
 | Máx. 3 trueques activos para Verificado (RF-14.4) | Conteo de activos | `backend/api/routes/truekes.js:50-56` |
 | Valoraciones 1–5 en 5 dimensiones (D18) | Validación de enteros | `backend/api/routes/truekes.js:97-101` |
@@ -202,9 +204,14 @@
 
 ---
 
-## 10. Endpoints del diseño §7 no implementados en este ciclo
+## 10. Endpoints del diseño §7 aún no implementados (estado 2026-09)
 
-Los siguientes endpoints figuran en la tabla de diseño de `arquitectura_tecnica.md` §7 pero **no existen en el código actual** (verificados contra los 7 routers): `POST /auth/verify-email`, `POST /auth/verify-phone`, `POST /kyc/appeal`, `GET /kyc/queue`, rutas de disputas/votaciones (`/disputas`, `POST /disputas/:id/voto`), `POST /truekes/:id/apertura`, `POST /truekes/:id/anulacion`, `POST /truekes/:id/disputa`, puntos de encuentro (`/puntos-encuentro`), campañas (`/campanas`) y finanzas (`/finanzas/mi`, `/finanzas/globales`, `PUT /finanzas/porcentajes`). Todos quedan **pendientes de confirmar** (integración C8 o ciclos posteriores).
+Tras la integración C8 y la certificación 2026-09 **ya existen** en el código: `/finanzas/*`,
+`/disputas/*`, `/gobernanza/*`, `/puntos-encuentro/*` (montados en `backend/api/app.js:76-86`) y el
+router `/kyc` reescrito (Manual 09). Siguen **pendientes de confirmar** (sin router en el código):
+`POST /auth/verify-email`, `POST /auth/verify-phone`, `POST /kyc/appeal`, `GET /kyc/queue`,
+campañas (`/campanas/*`) y las variantes on-chain directas de apertura/anulación
+(`POST /truekes/:id/apertura`, `POST /truekes/:id/anulacion`).
 
 ---
 
@@ -225,9 +232,14 @@ Los siguientes endpoints figuran en la tabla de diseño de `arquitectura_tecnica
 
 ## 12. Limitaciones y pendientes observados
 
-- **Almacén en memoria** en toda la API (`backend/api/lib/almacen.js`): los datos se pierden al reiniciar; el puente a PostgreSQL real está declarado como trabajo de C8 (`almacen.js:1-6`) y **no se ha verificado** en este entorno.
-- **Sesiones en memoria**: tokens sin expiración implementada ni revocación.
-- **KYC**: sin envío/validación real de códigos (D37) y sin control de rol OWNER en `/kyc/review`.
+- **Almacén**: `backend/api/index-api.js` (dev) usa el **almacén en memoria** (`lib/almacen.js`) y los
+  datos se pierden al reiniciar; el entry de producción `backend/api/index-gcp.js` inyecta
+  **PostgreSQL** (`lib/almacen-pg.js`) cuando hay `DATABASE_URL`, más relayer e indexador desde
+  `backend/contratos.json` (`index-gcp.js:19-54`).
+- **Sesiones**: en memoria en dev; en producción persisten en la tabla `sesiones` (24 h —
+  `backend/db/schema.sql:303-309`).
+- **KYC (2026-09)**: resuelto en el router reescrito — código real con TTL 10 min (SMTP opcional,
+  `codigoDemo` en demo), guard Owner on-chain en `/kyc/review` y `/kyc/pendientes` (Manual 09).
 - **Truekes**: no se envían intents al relayer (helper `_enviar` sin invocar); estados espejo simplificados.
 - **Reputación**: `volumenMaximo` fijo en 1; lote mensual de recálculo solo simulado.
 - **Subastas**: estado en `Map` local (volátil), cierre manual, sin endpoints de detalle/pujas.

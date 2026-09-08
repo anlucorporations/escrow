@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 440" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="440" fill="#f8f9fa"/>
+  <rect width="1200" height="58" fill="#1a2b4c"/>
+  <rect y="54" width="1200" height="4" fill="#d4af37"/>
+  <text x="600" y="37" text-anchor="middle" fill="#ffffff" font-size="21" font-weight="bold">TrueKeate en produccion: la nube de Google (GCP)</text>
+
+  <!-- Contenedor GCP -->
+  <rect x="20" y="74" width="1160" height="340" rx="18" fill="#fdf6dd" stroke="#c5a065" stroke-width="2" stroke-dasharray="7 4"/>
+  <text x="45" y="100" fill="#8a6d1f" font-size="13" font-weight="bold">Nube de Google · proyecto truekeate-main · produccion (2026-09)</text>
+
+  <!-- SM -->
+  <rect x="70" y="110" width="280" height="74" rx="13" fill="#f3e5ab" stroke="#c5a065" stroke-width="1.2"/>
+  <text x="210" y="137" text-anchor="middle" fill="#1a2b4c" font-size="13.5" font-weight="bold">Secret Manager</text>
+  <text x="210" y="160" text-anchor="middle" fill="#1a2b4c" font-size="10.5">la caja fuerte de Google</text>
+
+  <!-- SQL -->
+  <rect x="70" y="220" width="280" height="74" rx="13" fill="#e9e5f0" stroke="#8d86a9" stroke-width="1.2"/>
+  <text x="210" y="247" text-anchor="middle" fill="#1a2b4c" font-size="13.5" font-weight="bold">Cloud SQL</text>
+  <text x="210" y="270" text-anchor="middle" fill="#1a2b4c" font-size="10.5">base de datos (PostgreSQL)</text>
+
+  <!-- ANVIL -->
+  <rect x="70" y="330" width="280" height="74" rx="13" fill="#1a2b4c"/>
+  <text x="210" y="357" text-anchor="middle" fill="#ffffff" font-size="13.5" font-weight="bold">Blockchain anvil (GCP)</text>
+  <text x="210" y="380" text-anchor="middle" fill="#c9d8f0" font-size="10.5">red 31337 · contratos + TrueKeateSBT</text>
+
+  <!-- WEB -->
+  <rect x="620" y="110" width="300" height="74" rx="13" fill="#48cae4"/>
+  <text x="770" y="137" text-anchor="middle" fill="#0a1128" font-size="13.5" font-weight="bold">Web · Cloud Run</text>
+  <text x="770" y="160" text-anchor="middle" fill="#0a1128" font-size="10.5">truekeate-web · revision 00019</text>
+
+  <!-- API -->
+  <rect x="620" y="270" width="300" height="110" rx="13" fill="#2a9d8f"/>
+  <text x="770" y="300" text-anchor="middle" fill="#ffffff" font-size="14.5" font-weight="bold">API · Cloud Run</text>
+  <text x="770" y="322" text-anchor="middle" fill="#e7f7f4" font-size="10.5">truekeate-api · revision 00017</text>
+  <text x="770" y="342" text-anchor="middle" fill="#e7f7f4" font-size="10.5">lee eventos · guarda · firma</text>
+  <text x="770" y="362" text-anchor="middle" fill="#e7f7f4" font-size="10">el corazon de los servicios</text>
+
+  <!-- WEB -> API -->
+  <line x1="770" y1="186" x2="770" y2="265" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="782" y="230" fill="#1a2b4c" font-size="10">pide datos</text>
+
+  <!-- API -> SM -->
+  <line x1="620" y1="288" x2="352" y2="150" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="500" y="213" fill="#1a2b4c" font-size="10">lee secretos</text>
+
+  <!-- API -> SQL -->
+  <line x1="620" y1="320" x2="352" y2="257" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="500" y="277" fill="#1a2b4c" font-size="10">guarda y lee</text>
+
+  <!-- API -> ANVIL -->
+  <line x1="620" y1="360" x2="352" y2="367" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="487" y="345" fill="#1a2b4c" font-size="10">lee eventos y firma</text>
+</svg>

@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 445" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="445" fill="#f8f9fa"/>
+  <rect width="1200" height="58" fill="#1a2b4c"/>
+  <rect y="54" width="1200" height="4" fill="#d4af37"/>
+  <text x="600" y="37" text-anchor="middle" fill="#ffffff" font-size="21" font-weight="bold">El Panel del Owner: la biblioteca de sistemas</text>
+
+  <!-- Owner -->
+  <rect x="25" y="170" width="200" height="105" rx="14" fill="#f4a261" stroke="#b06a2a" stroke-width="1.2"/>
+  <text x="125" y="203" text-anchor="middle" fill="#1a2b4c" font-size="16" font-weight="bold">Owner</text>
+  <text x="125" y="228" text-anchor="middle" fill="#1a2b4c" font-size="11">cuenta 0 · deployer</text>
+  <text x="125" y="248" text-anchor="middle" fill="#1a2b4c" font-size="11">CERTIFICADO · SOCIO</text>
+  <text x="125" y="266" text-anchor="middle" fill="#1a2b4c" font-size="9.5">medalla ORO</text>
+
+  <!-- Panel -->
+  <rect x="285" y="165" width="235" height="120" rx="14" fill="#48cae4"/>
+  <text x="402" y="200" text-anchor="middle" fill="#0a1128" font-size="15" font-weight="bold">Panel del Owner</text>
+  <text x="402" y="225" text-anchor="middle" fill="#0a1128" font-size="11.5">/suite/admin</text>
+  <text x="402" y="247" text-anchor="middle" fill="#0a1128" font-size="10">revisiones y control</text>
+  <text x="402" y="265" text-anchor="middle" fill="#0a1128" font-size="10">solo para SOCIOS</text>
+
+  <line x1="227" y1="222" x2="281" y2="222" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- contenedor tiles -->
+  <rect x="580" y="88" width="595" height="342" rx="16" fill="#ffffff" stroke="#d4af37" stroke-width="2"/>
+  <text x="600" y="110" fill="#8a6d1f" font-size="12.5" font-weight="bold">Lo que el Panel le muestra al Owner</text>
+  <line x1="522" y1="222" x2="576" y2="222" stroke="#1a2b4c" stroke-width="2.5" marker-end="url(#arr)"/>
+
+  <!-- T1 cifras -->
+  <rect x="600" y="128" width="270" height="88" rx="12" fill="#e9e5f0" stroke="#8d86a9" stroke-width="1.2"/>
+  <text x="735" y="152" text-anchor="middle" fill="#1a2b4c" font-size="13.5" font-weight="bold">Cifras (KPIs)</text>
+  <text x="735" y="174" text-anchor="middle" fill="#1a2b4c" font-size="10">usuarios · articulos</text>
+  <text x="735" y="192" text-anchor="middle" fill="#1a2b4c" font-size="10">truekes · disputas</text>
+  <text x="735" y="208" text-anchor="middle" fill="#8d86a9" font-size="9">cuantos hay guardados</text>
+
+  <!-- T2 base de datos -->
+  <rect x="600" y="232" width="270" height="88" rx="12" fill="#e9e5f0" stroke="#8d86a9" stroke-width="1.2"/>
+  <text x="735" y="256" text-anchor="middle" fill="#1a2b4c" font-size="13.5" font-weight="bold">Base de datos</text>
+  <text x="735" y="278" text-anchor="middle" fill="#1a2b4c" font-size="10">PostgreSQL en la nube</text>
+  <text x="735" y="294" text-anchor="middle" fill="#1a2b4c" font-size="10">es el espejo</text>
+  <text x="735" y="310" text-anchor="middle" fill="#8d86a9" font-size="9">de lo que pasa en la cadena</text>
+
+  <!-- T3 contratos -->
+  <rect x="600" y="336" width="270" height="80" rx="12" fill="#e9e5f0" stroke="#8d86a9" stroke-width="1.2"/>
+  <text x="735" y="360" text-anchor="middle" fill="#1a2b4c" font-size="13.5" font-weight="bold">Contratos desplegados</text>
+  <text x="735" y="382" text-anchor="middle" fill="#1a2b4c" font-size="10">Escrow · BRLT · SBT ·</text>
+  <text x="735" y="398" text-anchor="middle" fill="#1a2b4c" font-size="10">NFTs · Socios (con direccion)</text>
+
+  <!-- T4 infraestructura -->
+  <rect x="890" y="128" width="265" height="88" rx="12" fill="#e9e5f0" stroke="#8d86a9" stroke-width="1.2"/>
+  <text x="1022" y="152" text-anchor="middle" fill="#1a2b4c" font-size="13.5" font-weight="bold">Infraestructura</text>
+  <text x="1022" y="174" text-anchor="middle" fill="#1a2b4c" font-size="10">relayer EIP-712: OK o caido</text>
+  <text x="1022" y="192" text-anchor="middle" fill="#1a2b4c" font-size="10">aviso: saldo bajo</text>
+  <text x="1022" y="208" text-anchor="middle" fill="#8d86a9" font-size="9">indexador: cabeza y eventos</text>
+
+  <!-- T5 KYC -->
+  <rect x="890" y="232" width="265" height="184" rx="12" fill="#f3e5ab" stroke="#c5a065" stroke-width="1.4"/>
+  <text x="1022" y="256" text-anchor="middle" fill="#1a2b4c" font-size="13.5" font-weight="bold">Revision KYC (fotos)</text>
+  <text x="1022" y="274" text-anchor="middle" fill="#1a2b4c" font-size="9.5">solicitudes con documento + selfie</text>
+
+  <!-- pill aprobar -->
+  <rect x="900" y="292" width="245" height="58" rx="11" fill="#2a9d8f"/>
+  <text x="1022" y="315" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">Aprobar ✓</text>
+  <text x="1022" y="335" text-anchor="middle" fill="#e7f7f4" font-size="9.5">CERTIFICADO + se emite su SBT</text>
+
+  <!-- pill rechazar -->
+  <rect x="900" y="362" width="245" height="48" rx="11" fill="#e63946"/>
+  <text x="1022" y="382" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="bold">Rechazar ✗</text>
+  <text x="1022" y="400" text-anchor="middle" fill="#ffe1e4" font-size="9.5">queda RECHAZADO, reintenta</text>
+
+  <!-- pequena nota pie -->
+  <text x="600" y="440" fill="#8d86a9" font-size="10">La verdad del estado la pone el servidor central, no la pantalla.</text>
+</svg>

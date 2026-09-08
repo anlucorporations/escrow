@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 425" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="425" fill="#f8f9fa"/>
+  <rect width="1200" height="58" fill="#1a2b4c"/>
+  <rect y="54" width="1200" height="4" fill="#d4af37"/>
+  <text x="600" y="37" text-anchor="middle" fill="#ffffff" font-size="21" font-weight="bold">El portero de la suite: 4 comprobaciones antes de entrar</text>
+
+  <!-- D1 -->
+  <polygon points="30,145 120,100 210,145 120,190" fill="#f3e5ab" stroke="#c5a065" stroke-width="1.5"/>
+  <text x="120" y="141" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">¿Billetera</text>
+  <text x="120" y="158" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">conectada?</text>
+
+  <!-- D2 -->
+  <polygon points="260,145 350,100 440,145 350,190" fill="#f3e5ab" stroke="#c5a065" stroke-width="1.5"/>
+  <text x="350" y="141" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">¿Estas</text>
+  <text x="350" y="158" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">inscrito?</text>
+
+  <!-- D3 -->
+  <polygon points="490,145 580,100 670,145 580,190" fill="#f3e5ab" stroke="#c5a065" stroke-width="1.5"/>
+  <text x="580" y="141" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">¿Firmaste</text>
+  <text x="580" y="158" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">la sesion?</text>
+
+  <!-- D4 -->
+  <polygon points="720,145 810,100 900,145 810,190" fill="#f3e5ab" stroke="#c5a065" stroke-width="1.5"/>
+  <text x="810" y="141" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">¿Tu rol permite</text>
+  <text x="810" y="158" text-anchor="middle" fill="#0a1128" font-size="11.5" font-weight="bold">esta seccion?</text>
+
+  <!-- pass arrows -->
+  <line x1="212" y1="145" x2="256" y2="145" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="442" y1="145" x2="486" y2="145" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="672" y1="145" x2="716" y2="145" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="234" y="137" text-anchor="middle" fill="#2a9d8f" font-size="9.5" font-weight="bold">sí</text>
+  <text x="464" y="137" text-anchor="middle" fill="#2a9d8f" font-size="9.5" font-weight="bold">sí</text>
+  <text x="694" y="137" text-anchor="middle" fill="#2a9d8f" font-size="9.5" font-weight="bold">sí</text>
+
+  <!-- no arrows -->
+  <line x1="120" y1="192" x2="120" y2="243" stroke="#e63946" stroke-width="2" marker-end="url(#arrR)"/>
+  <line x1="350" y1="192" x2="350" y2="243" stroke="#e63946" stroke-width="2" marker-end="url(#arrR)"/>
+  <line x1="580" y1="192" x2="580" y2="243" stroke="#e63946" stroke-width="2" marker-end="url(#arrR)"/>
+  <line x1="810" y1="192" x2="810" y2="243" stroke="#e63946" stroke-width="2" marker-end="url(#arrR)"/>
+  <text x="128" y="222" fill="#e63946" font-size="9.5" font-weight="bold">no</text>
+  <text x="358" y="222" fill="#e63946" font-size="9.5" font-weight="bold">no</text>
+  <text x="588" y="222" fill="#e63946" font-size="9.5" font-weight="bold">no</text>
+  <text x="818" y="222" fill="#e63946" font-size="9.5" font-weight="bold">no</text>
+
+  <!-- N1 -->
+  <rect x="20" y="248" width="200" height="130" rx="13" fill="#1a2b4c"/>
+  <text x="120" y="276" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="bold">Conecta tu billetera</text>
+  <text x="120" y="297" text-anchor="middle" fill="#c9d8f0" font-size="10">pantalla de conexion</text>
+  <text x="120" y="316" text-anchor="middle" fill="#c9d8f0" font-size="10">PC: extension MetaMask</text>
+  <text x="120" y="333" text-anchor="middle" fill="#c9d8f0" font-size="10">movil: app MetaMask</text>
+  <text x="120" y="352" text-anchor="middle" fill="#c9d8f0" font-size="10">sin billetera no pasas</text>
+
+  <!-- N2 -->
+  <rect x="250" y="248" width="200" height="130" rx="13" fill="#e9e5f0" stroke="#8d86a9" stroke-width="1.2"/>
+  <text x="350" y="276" text-anchor="middle" fill="#1a2b4c" font-size="12" font-weight="bold">Solo 2 paginas</text>
+  <text x="350" y="297" text-anchor="middle" fill="#1a2b4c" font-size="10">Mercado</text>
+  <text x="350" y="313" text-anchor="middle" fill="#1a2b4c" font-size="10">y el formulario de</text>
+  <text x="350" y="329" text-anchor="middle" fill="#1a2b4c" font-size="10">Inscripcion</text>
+  <text x="350" y="354" text-anchor="middle" fill="#8d86a9" font-size="10">hasta completar tus datos</text>
+
+  <!-- N3 -->
+  <rect x="480" y="248" width="200" height="130" rx="13" fill="#1a2b4c"/>
+  <text x="580" y="276" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="bold">Pantalla: inicia sesion</text>
+  <text x="580" y="297" text-anchor="middle" fill="#c9d8f0" font-size="10">una sola firma</text>
+  <text x="580" y="313" text-anchor="middle" fill="#c9d8f0" font-size="10">(login unico)</text>
+  <text x="580" y="333" text-anchor="middle" fill="#c9d8f0" font-size="10">nunca una firma</text>
+  <text x="580" y="349" text-anchor="middle" fill="#c9d8f0" font-size="10">por cada pagina</text>
+
+  <!-- N4 -->
+  <rect x="710" y="248" width="200" height="130" rx="13" fill="#e63946"/>
+  <text x="810" y="282" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="bold">Aviso:</text>
+  <text x="810" y="306" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="bold">no tienes permiso</text>
+  <text x="810" y="326" text-anchor="middle" fill="#ffe1e4" font-size="10.5">para esta seccion</text>
+  <text x="810" y="352" text-anchor="middle" fill="#ffe1e4" font-size="10">matriz tipo · nivel · estado</text>
+
+  <!-- S: entras -->
+  <rect x="990" y="105" width="190" height="85" rx="13" fill="#d4af37" stroke="#8a6d1f" stroke-width="1.2"/>
+  <text x="1085" y="137" text-anchor="middle" fill="#0a1128" font-size="15" font-weight="bold">Entras ✓</text>
+  <text x="1085" y="160" text-anchor="middle" fill="#0a1128" font-size="10.5">ves la seccion segun</text>
+  <text x="1085" y="176" text-anchor="middle" fill="#0a1128" font-size="10.5">tu tipo, nivel y estado</text>
+  <line x1="902" y1="145" x2="986" y2="145" stroke="#2a9d8f" stroke-width="2.5" marker-end="url(#arrG)"/>
+  <text x="944" y="137" text-anchor="middle" fill="#2a9d8f" font-size="9.5" font-weight="bold">sí ✓</text>
+
+  <defs>
+    <marker id="arrR" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#e63946"/>
+    </marker>
+    <marker id="arrG" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#2a9d8f"/>
+    </marker>
+  </defs>
+</svg>

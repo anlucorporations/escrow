@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · Reiniciar TrueKeate y dar de alta al Owner</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">04 · Despliegue</div>
+    <h1>Reiniciar TrueKeate y dar de alta al Owner</h1>
+    <div class="intro">Versión en lenguaje sencillo del manual técnico "Operación: reinicio limpio y bootstrap del Owner" (<code>RepoTecnico/Manuales/04-Despliegue/02-reinicio-y-bootstrap.md</code>). Aquí contamos, para quien opera TrueKeate, cómo hacer una <strong>limpieza completa de la base de datos</strong> (sin tocar la cadena) y cómo <strong>dar de alta al Owner</strong> como CERTIFICADO y SOCIO para que pueda usar el Panel. Complementa al manual de despliegue <code>04-Despliegue/01-despliegue.md</code>.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>04-Despliegue/02-reinicio-y-bootstrap.md</b></span>
+      <span>Edición: <b>8 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/04-Despliegue/02-reinicio-y-bootstrap</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Despliegue · Despliegue — Reiniciar TrueKeate y dar de alta al Owner</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>Las dos cuentas clave (contexto)</span></a></li><li><a href="#s3"><span class="tnum">3</span><span>Limpiar la base de datos (sin tocar la cadena)</span></a><div class="subs"><a href="#sub1">3.1 Qué hace el reinicio</a><br><a href="#sub2">3.2 Qué NO hace (a propósito)</a><br><a href="#sub3">3.3 Cómo se usa (con cuidado)</a><br><a href="#sub4">3.4 Después del reinicio</a></div></li><li><a href="#s4"><span class="tnum">4</span><span>Dar de alta al Owner (el "bootstrap")</span></a><div class="subs"><a href="#sub5">4.1 Qué hace el script, en orden</a><br><a href="#sub6">4.2 Cómo se usa</a><br><a href="#sub7">4.3 Nota de honestidad técnica</a></div></li><li><a href="#s5"><span class="tnum">5</span><span>La secuencia recomendada (producción limpia)</span></a></li><li><a href="#s6"><span class="tnum">6</span><span>Dónde viven los scripts</span></a></li><li><a href="#s7"><span class="tnum">7</span><span>Glosario de este manual</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos</h2>
+<p>Si necesitas volver a empezar con datos limpios, la receta es:</p>
+<ol><li><strong>Diagnostica</strong>: <code>reiniciar-plataforma.sh --check</code> (solo mira, no borra).</li><li><strong>Limpia</strong> (cuando el director lo ordene): <code>reiniciar-plataforma.sh --confirmar</code> — borra los datos de las 14 "carpetas" de la base. <strong>La cadena (anvil) no se toca</strong>.</li><li><strong>Da de alta al Owner</strong>: <code>bootstrap-owner.sh --confirmar --smart-account</code> — registra al Owner (cuenta 0) como CERTIFICADO + SOCIO en la base y como Socio en la cadena.</li><li><strong>Verifica</strong> en el Panel del Owner (<code>/suite/admin</code>): usuarios, contratos e infraestructura.</li><li><strong>Vuelve a llenar el espejo</strong>: arranca el indexador en modo servicio.</li></ol>
+<blockquote class="warn"><span class="tag">Aviso</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> Estos comandos <strong>borran datos</strong>. Siempre se empieza con <code>--check</code> y, antes de borrar, conviene hacer un respaldo con <code>--respaldo</code>.</p></blockquote>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. Las dos cuentas clave (contexto)</h2>
+<div class="table-wrap"><table><thead><tr><th>Cuenta</th><th>Dirección (anvil por defecto)</th><th>Su papel</th></tr></thead><tbody><tr><td><strong>0</strong></td><td><code>0xf39F…2266</code></td><td><strong>Owner / deployer</strong>: despliega los contratos y es el dueño de ellos</td></tr><tr><td><strong>1</strong></td><td><code>0x7099…79C8</code></td><td><strong>Relayer</strong>: la cuenta general de la plataforma (paga el gas, firma operaciones)</td></tr></tbody></table></div>
+<p><strong>El motivo de este manual</strong>: al desplegar, la cuenta 0 queda como Owner <strong>en la cadena</strong>, pero nadie la da de alta <strong>en la base de datos</strong> como usuario CERTIFICADO y SOCIO. Sin ese alta, el Panel del Owner (<code>/suite/admin</code>) rechaza la entrada, porque exige que el usuario sea SOCIO. Por eso existe el "bootstrap" (sembrar al Owner).</p>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. Limpiar la base de datos (sin tocar la cadena)</h2>
+<h3 class="sub" id="sub1">3.1 Qué hace el reinicio</h3>
+<ul><li>Borra <strong>todos los datos</strong> de las <strong>14 carpetas (tablas)</strong> de la base: usuarios, certificaciones, artículos, trueques, valoraciones, puntos de encuentro, disputas, imágenes, suscripciones, campañas, subastas, finanzas, auditoría y puntos de control del indexador.</li><li>Los números de serie vuelven a empezar (como si las carpetas fueran nuevas).</li></ul>
+<h3 class="sub" id="sub2">3.2 Qué NO hace (a propósito)</h3>
+<ul><li>❌ <strong>No</strong> reinicia ni detiene la <strong>cadena</strong> (anvil): los contratos desplegados quedan intactos.</li><li>❌ <strong>No</strong> vuelve a desplegar contratos ni toca los secretos, los servidores en la nube, el relayer ni la API.</li><li>❌ <strong>No</strong> borra el esquema ni las extensiones especiales (mapas, criptografía): solo los datos.</li></ul>
+<h3 class="sub" id="sub3">3.3 Cómo se usa (con cuidado)</h3>
+<pre><code><span class="pre-label">bash</span>source /home/dsh/workspace/gcp-env.sh                       # prepara conexiones y claves
+bash backend/scripts/reiniciar-plataforma.sh --check        # diagnóstico: conteos, sin borrar
+bash backend/scripts/reiniciar-plataforma.sh --confirmar    # borra (te pide escribir BORRAR)
+bash backend/scripts/reiniciar-plataforma.sh --confirmar --respaldo   # respaldo previo</code></pre>
+<ul><li><strong>Seguridad</strong>: sin la palabra <code>--confirmar</code>, el script solo muestra el modo de uso y <strong>no modifica nada</strong>. Con ella, te pide escribir <strong>BORRAR</strong> para confirmar.</li><li>Con <code>--respaldo</code>, antes de borrar hace una copia de seguridad en la carpeta <code>backups/</code>.</li></ul>
+<h3 class="sub" id="sub4">3.4 Después del reinicio</h3>
+<ul><li>Para volver a llenar el espejo desde la cadena, arranca el indexador: <code>node backend/indexador-cli.js --watch</code>. Empieza desde el bloque 0 y reconstruye los datos.</li><li>Después, ejecuta el alta del Owner (sección 4) para recuperar la identidad operativa.</li></ul>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAwIDQwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiPgogIDxkZWZzPgogICAgPG1hcmtlciBpZD0iYXJyIiB2aWV3Qm94PSIwIDAgMTAgMTAiIHJlZlg9IjguNSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjYuNSIgbWFya2VySGVpZ2h0PSI2LjUiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj4KICAgICAgPHBhdGggZD0iTTAsMSBMOSw1IEwwLDkgeiIgZmlsbD0iIzFhMmI0YyIvPgogICAgPC9tYXJrZXI+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2Y4ZjlmYSIvPgogIDxyZWN0IHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjU4IiBmaWxsPSIjMWEyYjRjIi8+CiAgPHJlY3QgeT0iNTQiIHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjQiIGZpbGw9IiNkNGFmMzciLz4KICA8dGV4dCB4PSI2MDAiIHk9IjM3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjIxIiBmb250LXdlaWdodD0iYm9sZCI+UmVpbmljaW8gbGltcGlvIHkgYWx0YSBkZWwgT3duZXIgKGJvb3RzdHJhcCk8L3RleHQ+CgogIDwhLS0gMSDCtyBEaWFnbsOzc3RpY28gLS0+CiAgPHJlY3QgeD0iMTYiIHk9IjExMCIgd2lkdGg9IjE2OCIgaGVpZ2h0PSIxMjAiIHJ4PSIxMyIgZmlsbD0iI2U5ZTVmMCIgc3Ryb2tlPSIjOGQ4NmE5IiBzdHJva2Utd2lkdGg9IjEiLz4KICA8dGV4dCB4PSIxMDAiIHk9IjE0MSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMS41IiBmb250LXdlaWdodD0iYm9sZCI+MSDCtyBEaWFnbsOzc3RpY288L3RleHQ+CiAgPHRleHQgeD0iMTAwIiB5PSIxNjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iOSI+LS1jaGVjazwvdGV4dD4KICA8dGV4dCB4PSIxMDAiIHk9IjE4MSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSI5Ij5zb2xvIG1pcmEsIG5vIGJvcnJhPC90ZXh0PgoKICA8IS0tIDIgwrcgUmVzcGFsZG8gLS0+CiAgPHJlY3QgeD0iMjE2IiB5PSIxMTAiIHdpZHRoPSIxNjgiIGhlaWdodD0iMTIwIiByeD0iMTMiIGZpbGw9IiNlOWU1ZjAiIHN0cm9rZT0iIzhkODZhOSIgc3Ryb2tlLXdpZHRoPSIxIi8+CiAgPHRleHQgeD0iMzAwIiB5PSIxNDEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTEuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPjIgwrcgUmVzcGFsZG88L3RleHQ+CiAgPHRleHQgeD0iMzAwIiB5PSIxNjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iOSI+KG9wY2lvbmFsKSAtLXJlc3BhbGRvPC90ZXh0PgogIDx0ZXh0IHg9IjMwMCIgeT0iMTgxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMWEyYjRjIiBmb250LXNpemU9IjkiPmNvcGlhIHByZXZpYSBlbiBiYWNrdXBzLzwvdGV4dD4KCiAgPCEtLSAzIMK3IExpbXBpYXIgYmFzZSAtLT4KICA8cmVjdCB4PSI0MTYiIHk9IjExMCIgd2lkdGg9IjE2OCIgaGVpZ2h0PSIxMjAiIHJ4PSIxMyIgZmlsbD0iI2U2Mzk0NiIvPgogIDx0ZXh0IHg9IjUwMCIgeT0iMTQxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjExLjUiIGZvbnQtd2VpZ2h0PSJib2xkIj4zIMK3IExpbXBpYXIgbGEgYmFzZTwvdGV4dD4KICA8dGV4dCB4PSI1MDAiIHk9IjE2NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZTRlNyIgZm9udC1zaXplPSI5Ij4tLWNvbmZpcm1hcjwvdGV4dD4KICA8dGV4dCB4PSI1MDAiIHk9IjE4MSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZTRlNyIgZm9udC1zaXplPSI5Ij50ZSBwaWRlIGVzY3JpYmlyIEJPUlJBUjwvdGV4dD4KCiAgPCEtLSA0IMK3IEFsdGEgZGVsIE93bmVyIC0tPgogIDxyZWN0IHg9IjYxNiIgeT0iMTEwIiB3aWR0aD0iMTY4IiBoZWlnaHQ9IjEyMCIgcng9IjEzIiBmaWxsPSIjMmE5ZDhmIi8+CiAgPHRleHQgeD0iNzAwIiB5PSIxNDEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTEuNSIgZm9udC13ZWlnaHQ9ImJvbGQiPjQgwrcgQWx0YSBkZWwgT3duZXI8L3RleHQ+CiAgPHRleHQgeD0iNzAwIiB5PSIxNjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNkY2Y0ZjAiIGZvbnQtc2l6ZT0iOSI+Ym9vdHN0cmFwIC0tY29uZmlybWFyPC90ZXh0PgogIDx0ZXh0IHg9IjcwMCIgeT0iMTgxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZGNmNGYwIiBmb250LXNpemU9IjkiPi0tc21hcnQtYWNjb3VudDwvdGV4dD4KCiAgPCEtLSA1IMK3IFZlcmlmaWNhciAtLT4KICA8cmVjdCB4PSI4MTYiIHk9IjExMCIgd2lkdGg9IjE2OCIgaGVpZ2h0PSIxMjAiIHJ4PSIxMyIgZmlsbD0iI2YzZTVhYiIgc3Ryb2tlPSIjYzVhMDY1IiBzdHJva2Utd2lkdGg9IjEiLz4KICA8dGV4dCB4PSI5MDAiIHk9IjE0MSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSIxMS41IiBmb250LXdlaWdodD0iYm9sZCI+NSDCtyBWZXJpZmljYSBlbCBQYW5lbDwvdGV4dD4KICA8dGV4dCB4PSI5MDAiIHk9IjE2NCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzFhMmI0YyIgZm9udC1zaXplPSI5Ij4vc3VpdGUvYWRtaW48L3RleHQ+CiAgPHRleHQgeD0iOTAwIiB5PSIxODEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iOSI+T3duZXIgQ0VSVElGSUNBRE8gwrcgU09DSU88L3RleHQ+CgogIDwhLS0gNiDCtyBJbmRleGFkb3IgLS0+CiAgPHJlY3QgeD0iMTAxNiIgeT0iMTEwIiB3aWR0aD0iMTY4IiBoZWlnaHQ9IjEyMCIgcng9IjEzIiBmaWxsPSIjNDhjYWU0Ii8+CiAgPHRleHQgeD0iMTEwMCIgeT0iMTQxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iYm9sZCI+NiDCtyBJbmRleGFkb3I8L3RleHQ+CiAgPHRleHQgeD0iMTEwMCIgeT0iMTY0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjkiPi0td2F0Y2g8L3RleHQ+CiAgPHRleHQgeD0iMTEwMCIgeT0iMTgxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMGExMTI4IiBmb250LXNpemU9IjkiPnJlbGxlbmEgZWwgZXNwZWpvPC90ZXh0PgoKICA8IS0tIGFycm93cyAtLT4KICA8bGluZSB4MT0iMTg4IiB5MT0iMTcwIiB4Mj0iMjEwIiB5Mj0iMTcwIiBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+CiAgPGxpbmUgeDE9IjM4OCIgeTE9IjE3MCIgeDI9IjQxMCIgeTI9IjE3MCIgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIiIG1hcmtlci1lbmQ9InVybCgjYXJyKSIvPgogIDxsaW5lIHgxPSI1ODgiIHkxPSIxNzAiIHgyPSI2MTAiIHkyPSIxNzAiIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KICA8bGluZSB4MT0iNzg4IiB5MT0iMTcwIiB4Mj0iODEwIiB5Mj0iMTcwIiBzdHJva2U9IiMxYTJiNGMiIHN0cm9rZS13aWR0aD0iMiIgbWFya2VyLWVuZD0idXJsKCNhcnIpIi8+CiAgPGxpbmUgeDE9Ijk4OCIgeTE9IjE3MCIgeDI9IjEwMTAiIHkyPSIxNzAiIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyIiBtYXJrZXItZW5kPSJ1cmwoI2FycikiLz4KCiAgPCEtLSBub3RhIGRlIHNlZ3VyaWRhZCAtLT4KICA8cmVjdCB4PSIxMzAiIHk9IjI5MiIgd2lkdGg9Ijk0MCIgaGVpZ2h0PSI1MiIgcng9IjEyIiBmaWxsPSIjZmRmM2UwIiBzdHJva2U9IiNkNGFmMzciIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPHRleHQgeD0iNjAwIiB5PSIzMjMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMxYTJiNGMiIGZvbnQtc2l6ZT0iMTEuNSI+4pqgIEJvcnJhbiBkYXRvczogZW1waWV6YSBzaWVtcHJlIGNvbiAtLWNoZWNrIMK3IGNvbnZpZW5lIC0tcmVzcGFsZG8gYW50ZXMgwrcgbGEgY2FkZW5hIChhbnZpbCkgbm8gc2UgdG9jYTwvdGV4dD4KPC9zdmc+Cg==" alt="Secuencia Reinicio Bootstrap"/><figcaption class="fig-caption">Figura · Secuencia Reinicio Bootstrap</figcaption></figure>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. Dar de alta al Owner (el "bootstrap")</h2>
+<h3 class="sub" id="sub5">4.1 Qué hace el script, en orden</h3>
+<ol><li><strong>Comprueba</strong> que la clave que le das coincide con el Owner on-chain del registro de Socios.</li><li><strong>Te muestra</strong> la cuenta del relayer (para que sepas con qué clave se firmarán las operaciones).</li><li><strong>En la base de datos</strong>: registra (o actualiza) al Owner como usuario <strong>CERTIFICADO</strong>, tipo y nivel <strong>SOCIO</strong>, medalla <strong>ORO</strong> y con su consentimiento de datos personales (GDPR) marcado.</li><li><strong>En la cadena</strong>: lo admite como <strong>Socio</strong> en el registro de Socios si aún no lo era (la firma el propio Owner).</li><li>Con la opción <code>--smart-account</code>: le despliega su <strong>cuenta inteligente</strong> si no existe (arranca en el peldaño INSCRITO de la escalera).</li></ol>
+<h3 class="sub" id="sub6">4.2 Cómo se usa</h3>
+<pre><code><span class="pre-label">bash</span>source /home/dsh/workspace/gcp-env.sh
+export OWNER_PRIVATE_KEY=&lt;clave privada de la cuenta 0&gt;   # o ADMIN_PRIVATE_KEY
+bash backend/scripts/bootstrap-owner.sh --confirmar                  # base + Socio on-chain
+bash backend/scripts/bootstrap-owner.sh --confirmar --smart-account  # además, su SmartAccount</code></pre>
+<h3 class="sub" id="sub7">4.3 Nota de honestidad técnica</h3>
+<ul><li>La escalera <strong>on-chain</strong> (VERIFICADO/CERTIFICADO) de la cuenta inteligente se fija con la <strong>huella real (merkle root)</strong> que genera el servicio de certificación cuando alguien hace KYC de verdad.</li><li>Este script registra el CERTIFICADO en la <strong>base de datos</strong> (que es lo que el Panel usa para dar permisos) y la admisión como <strong>Socio en la cadena</strong>, que es lo comprobable sin un KYC real. Cuando el servicio KYC emita la huella, la cuenta inteligente deberá actualizarse a mano con esa huella (función técnica <code>cambiarEstadoVerificacion</code>).</li></ul>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. La secuencia recomendada (producción limpia)</h2>
+<ol><li><code>bash backend/scripts/reiniciar-plataforma.sh --check</code> → diagnóstico.</li><li>(Solo cuando el director lo ordene) <code>--confirmar --respaldo</code> → copia de seguridad y limpieza.</li><li><code>bash backend/scripts/bootstrap-owner.sh --confirmar --smart-account</code> → alta del Owner.</li><li><strong>Verificar</strong> con la sesión de la cuenta 0:<ul><li><code>/admin/usuarios</code> responde con el Owner presente.</li><li><code>/admin/contratos</code> muestra las direcciones de los contratos.</li><li>El relayer aparece en <code>/admin/infra/health</code>.</li></ul></li><li>Arrancar el indexador en modo servicio (<code>--watch</code>) para re-poblar el espejo desde la cadena.</li></ol>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. Dónde viven los scripts</h2>
+<pre><code>backend/scripts/
+├─ reiniciar-plataforma.sh   # entrada: limpieza total de la base (--confirmar)
+├─ reiniciar-plataforma.mjs  # motor: borra las 14 tablas (PostgreSQL)
+├─ bootstrap-owner.sh        # entrada: alta del Owner CERTIFICADO/SOCIO (--confirmar)
+├─ bootstrap-owner.mjs       # motor: base + admisión de Socio + SmartAccount
+└─ backups/                  # respaldos opcionales (--respaldo)</code></pre>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. Glosario de este manual</h2>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Significado</th></tr></thead><tbody><tr><td><strong>Reinicio / limpiar</strong></td><td>Borrar los datos de la base sin tocar la cadena</td></tr><tr><td><strong>Bootstrap / sembrar</strong></td><td>Dar de alta al Owner para que pueda operar</td></tr><tr><td><strong>Owner</strong></td><td>Cuenta 0: dueña de los contratos y responsable de TrueKeate</td></tr><tr><td><strong>Relayer</strong></td><td>Cuenta 1: firma las operaciones de la plataforma</td></tr><tr><td><strong>Espejo</strong></td><td>La base que copia lo que ocurre en la cadena</td></tr><tr><td><strong>Indexador</strong></td><td>El servicio que llena el espejo leyendo la cadena</td></tr><tr><td><strong>SmartAccount</strong></td><td>La cuenta inteligente de un usuario en la cadena</td></tr><tr><td><strong>GDPR</strong></td><td>Normativa de protección de datos personales</td></tr><tr><td><strong>On-chain</strong></td><td>Lo que vive en la cadena (contratos y cuentas)</td></tr></tbody></table></div>
+</section>
+</main>
+
+</body>
+</html>

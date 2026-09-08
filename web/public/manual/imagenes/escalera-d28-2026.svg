@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 440" font-family="sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#1a2b4c"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="440" fill="#f8f9fa"/>
+  <rect width="1200" height="58" fill="#1a2b4c"/>
+  <rect y="54" width="1200" height="4" fill="#d4af37"/>
+  <text x="600" y="37" text-anchor="middle" fill="#ffffff" font-size="21" font-weight="bold">La escalera de confianza D28: hasta CERTIFICADO (2026)</text>
+
+  <!-- INSCRITO -->
+  <rect x="25" y="95" width="200" height="70" rx="13" fill="#e9e5f0" stroke="#8d86a9" stroke-width="1.2"/>
+  <text x="125" y="126" text-anchor="middle" fill="#1a2b4c" font-size="14.5" font-weight="bold">INSCRITO</text>
+  <text x="125" y="148" text-anchor="middle" fill="#1a2b4c" font-size="10.5">te diste de alta</text>
+
+  <!-- VERIFICADO -->
+  <rect x="275" y="95" width="220" height="70" rx="13" fill="#48cae4"/>
+  <text x="385" y="126" text-anchor="middle" fill="#0a1128" font-size="14.5" font-weight="bold">VERIFICADO</text>
+  <text x="385" y="148" text-anchor="middle" fill="#0a1128" font-size="10.5">confirmaste tu correo</text>
+
+  <!-- Decision SBT -->
+  <polygon points="535,130 660,75 785,130 660,185" fill="#f3e5ab" stroke="#c5a065" stroke-width="1.5"/>
+  <text x="660" y="127" text-anchor="middle" fill="#0a1128" font-size="12" font-weight="bold">Paso 2:</text>
+  <text x="660" y="145" text-anchor="middle" fill="#0a1128" font-size="12" font-weight="bold">¿tienes un SBT</text>
+  <text x="660" y="162" text-anchor="middle" fill="#0a1128" font-size="12" font-weight="bold">en tu wallet?</text>
+
+  <!-- CERTIFICADO al instante (Sí) -->
+  <rect x="835" y="95" width="340" height="70" rx="13" fill="#2a9d8f"/>
+  <text x="1005" y="126" text-anchor="middle" fill="#ffffff" font-size="14.5" font-weight="bold">CERTIFICADO al instante</text>
+  <text x="1005" y="148" text-anchor="middle" fill="#e7f7f4" font-size="10.5">vía SBT · sin revisión humana</text>
+
+  <!-- arrows top row -->
+  <line x1="227" y1="130" x2="271" y2="130" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="497" y1="130" x2="531" y2="130" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="785" y1="130" x2="831" y2="130" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="808" y="118" text-anchor="middle" fill="#1a2b4c" font-size="10" font-weight="bold">Sí ✓</text>
+
+  <!-- No: baja al trámite con fotos -->
+  <path d="M 660 188 L 660 228 L 205 228 L 205 259" fill="none" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="668" y="212" fill="#1a2b4c" font-size="10.5" font-weight="bold">No</text>
+
+  <!-- Subir documento + selfie -->
+  <rect x="25" y="265" width="290" height="70" rx="13" fill="#f4a261" stroke="#b06a2a" stroke-width="1.2"/>
+  <text x="170" y="296" text-anchor="middle" fill="#1a2b4c" font-size="13.5" font-weight="bold">Subes documento + selfie</text>
+  <text x="170" y="318" text-anchor="middle" fill="#1a2b4c" font-size="10.5">el trámite queda PENDIENTE</text>
+
+  <!-- Owner revisa -->
+  <rect x="370" y="265" width="270" height="70" rx="13" fill="#ffffff" stroke="#d4af37" stroke-width="1.5"/>
+  <text x="505" y="296" text-anchor="middle" fill="#1a2b4c" font-size="14" font-weight="bold">El Owner revisa</text>
+  <text x="505" y="318" text-anchor="middle" fill="#1a2b4c" font-size="10.5">tus fotos en el Panel</text>
+
+  <line x1="317" y1="300" x2="366" y2="300" stroke="#1a2b4c" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Aprobado -->
+  <rect x="730" y="215" width="310" height="64" rx="12" fill="#2a9d8f"/>
+  <text x="885" y="240" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">CERTIFICADO</text>
+  <text x="885" y="262" text-anchor="middle" fill="#e7f7f4" font-size="10.5">+ se te emite tu SBT nativo</text>
+
+  <!-- Rechazado -->
+  <rect x="730" y="355" width="310" height="64" rx="12" fill="#e63946"/>
+  <text x="885" y="380" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="bold">RECHAZADO</text>
+  <text x="885" y="402" text-anchor="middle" fill="#ffe1e4" font-size="10.5">puedes volver a intentarlo</text>
+
+  <!-- arrows rama aprobado -->
+  <path d="M 640 283 C 665 283 665 247 726 247" fill="none" stroke="#2a9d8f" stroke-width="2.2" marker-end="url(#arrG)"/>
+  <text x="668" y="272" fill="#2a9d8f" font-size="9.5" font-weight="bold">Aprueba ✓</text>
+
+  <!-- arrows rama rechazado -->
+  <path d="M 640 317 C 665 317 665 387 726 387" fill="none" stroke="#e63946" stroke-width="2.2" marker-end="url(#arrR)"/>
+  <text x="668" y="336" fill="#e63946" font-size="9.5" font-weight="bold">Rechaza ✗</text>
+
+  <defs>
+    <marker id="arrG" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#2a9d8f"/>
+    </marker>
+    <marker id="arrR" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#e63946"/>
+    </marker>
+  </defs>
+</svg>
