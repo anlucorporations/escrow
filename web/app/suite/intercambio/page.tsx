@@ -20,6 +20,7 @@ import {
   firmarRecepcion,
   misTruekes,
   proponerEncuentro,
+  rolEncuentro,
   puntosFavoritos,
   crearPuntoEncuentro,
   valorarTrueke,
@@ -166,7 +167,7 @@ function PanelPropuestaEncuentro({ trueke, token }: { trueke: Trueke; token: str
         📍 Propuesta de encuentro (punto 5.1)
       </p>
       <p className="mt-1 text-[11px] text-navy-800/60">
-        Propone quien tenga mayor nivel/reputación (desempate: quien publicó). La contraparte solo acepta o rechaza.
+        Propone la parte con **mayor nivel y mayor reputación** (desempate: quien publicó). La contraparte (menor nivel/reputación) solo aprueba o rechaza el punto.
       </p>
 
       {/* Botón que abre el widget flotante del mapa */}
@@ -284,12 +285,34 @@ export default function PaginaIntercambio() {
     if (token) void cargar();
   }, [token, cargar]);
 
+  // Consulta el rol (propone/aprueba) de los trueques activos que esperan encuentro
+  useEffect(() => {
+    if (!token || !account) return;
+    const candidatos = truekes.filter(
+      (t) => t.usuarioB && (t.estado === "CREADO" || t.estado === "ACTIVO")
+    );
+    let activo = true;
+    (async () => {
+      const mapa: Record<number, "propone" | "aprueba"> = {};
+      for (const t of candidatos) {
+        try {
+          const r = await rolEncuentro(token!, t.id);
+          if (activo) mapa[t.id] = r.rol;
+        } catch { /* sin rol todavía */ }
+      }
+      if (activo) setRolEncuentroMap(mapa);
+    })();
+    return () => { activo = false; };
+  }, [token, account, truekes]);
+
   const activos = truekes.filter((t) => ESTADOS_ACTIVOS.includes(t.estado)).length;
 
   // ---------------------------------------------------------------- acciones por trueke
   const [ocupado, setOcupado] = useState<{ id: number; accion: string } | null>(null);
   const [firmados, setFirmados] = useState<ReadonlySet<number>>(new Set());
   const [valorados, setValorados] = useState<ReadonlySet<number>>(new Set());
+  // rol del usuario actual en cada trueque para el encuentro (director)
+  const [rolEncuentroMap, setRolEncuentroMap] = useState<Record<number, "propone" | "aprueba">>({});
 
   function miLado(t: Trueke): "A" | "B" | null {
     if (!account) return null;
@@ -683,13 +706,29 @@ export default function PaginaIntercambio() {
                     )}
                   </div>
 
-                  {/* Propuesta de encuentro (punto 5.1): solo en trueques acordados sin custodiar */}
-                  {(t.estado === "CREADO" || t.estado === "ACTIVO") &&
-                    t.usuarioB &&
-                    lado &&
-                    token && (
-                      <PanelPropuestaEncuentro trueke={t} token={token} />
-                    )}
+                  {/* Encuentro (punto 5.1, regla del director): propone el de MAYOR nivel y
+                      reputación; la contraparte (menor) solo aprueba/rechaza */}
+                  {t.estado === "CREADO" || t.estado === "ACTIVO"
+                    ? t.encuentroEstado === "PROPUESTO" ? (
+                        t.encuentroPropuestoPor?.toLowerCase() === (account ?? "").toLowerCase() ? (
+                          <div className="mt-3 rounded-xl border border-gold-500/40 bg-gold-500/5 px-3 py-2 text-[11px] text-navy-800/80">
+                            📍 Propuesta de encuentro enviada — esperando que la contraparte la apruebe (o la rechace).
+                          </div>
+                        ) : null
+                      ) : t.encuentroEstado === "ACEPTADO" ? null : (
+                        <>
+                          {lado && token && rolEncuentroMap[t.id] === "propone" && (
+                            <PanelPropuestaEncuentro trueke={t} token={token} />
+                          )}
+                          {lado && token && rolEncuentroMap[t.id] === "aprueba" && (
+                            <div className="mt-3 rounded-xl border border-navy-800/10 bg-smoke/70 px-3 py-2 text-[11px] text-navy-800/70">
+                              📍 Cuando la otra parte (mayor nivel/reputación) proponga el punto de
+                              encuentro, podrás <strong>aprobarlo o rechazarlo</strong> aquí.
+                            </div>
+                          )}
+                        </>
+                      )
+                    : null}
                 </Card>
               );
             })}

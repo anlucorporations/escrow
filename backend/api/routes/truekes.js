@@ -206,6 +206,49 @@ export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow
     } catch (e) { next(e); }
   });
 
+  // ===========================================================================
+  // Encuentro: regla del director — propone la parte de MAYOR NIVEL y MAYOR
+  // REPUTACIÓN; la contraparte (menor) solo aprueba o rechaza (desempate: A).
+  // ===========================================================================
+  const ORDEN_NIVEL = { INICIADO: 0, COMUN: 1, FRECUENTE: 2, SOCIO: 3 };
+
+  /** Decide quién propone el punto de encuentro de un trueke acordado. */
+  async function quienProponeEncuentro(t) {
+    const [uA, uB] = [await almacen.getUsuario(t.usuarioA), await almacen.getUsuario(t.usuarioB)];
+    const nivelA = ORDEN_NIVEL[uA?.nivel ?? 'INICIADO'] ?? 0;
+    const nivelB = ORDEN_NIVEL[uB?.nivel ?? 'INICIADO'] ?? 0;
+    // reputación = nº de trueques COMPLETADOS de cada parte (proxy D12)
+    const todos = await almacen.listarTruekes();
+    const completados = (w) => todos.filter((x) => x.estado === 'COMPLETADO' && (x.usuarioA === w || x.usuarioB === w)).length;
+    if (nivelA !== nivelB) return nivelA > nivelB ? t.usuarioA : t.usuarioB;
+    const repA = completados(t.usuarioA);
+    const repB = completados(t.usuarioB);
+    if (repA !== repB) return repA > repB ? t.usuarioA : t.usuarioB;
+    return t.usuarioA; // desempate: quien publicó
+  }
+
+  // GET /truekes/:id/encuentro/rol — rol del usuario actual en el encuentro
+  // (propone = mayor nivel/reputación · aprueba = la contraparte).
+  r.get('/:id/encuentro/rol', requiereSesion(almacen), async (req, res, next) => {
+    try {
+      const t = await almacen.getTrueke(req.params.id);
+      if (!t) return res.status(404).json({ error: 'trueke_inexistente' });
+      if (!t.usuarioB) return res.status(409).json({ error: 'sin_contraparte' });
+      const soyParte = t.usuarioA === req.wallet || t.usuarioB === req.wallet;
+      if (!soyParte) return res.status(403).json({ error: 'no_autorizado' });
+      const propone = await quienProponeEncuentro(t);
+      const aprueba = propone === t.usuarioA ? t.usuarioB : t.usuarioA;
+      res.json({
+        rol: req.wallet === propone ? 'propone' : 'aprueba',
+        propone,
+        aprueba,
+        regla: 'mayor nivel D12 → mayor reputación (trueques completados) → quien publicó (A)',
+        estado: t.estado,
+        encuentroEstado: t.encuentroEstado ?? null,
+      });
+    } catch (e) { next(e); }
+  });
+
   // POST /truekes/:id/propuesta-encuentro — propone punto/fecha/hora del encuentro (punto 5.1)
   // Decide quién propone: mayor nivel D12 → mayor reputación → quien publicó (A).
   // Body: { puntoEncuentroId, horaPautada }  — el que gana la regla puede proponer.
@@ -223,26 +266,10 @@ export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow
         return res.status(400).json({ error: 'datos_incompletos', detalle: 'puntoEncuentroId y horaPautada' });
       }
 
-      // ---- regla: nivel D12 → reputación → A ----
-      const ORDEN_NIVEL = { INICIADO: 0, COMUN: 1, FRECUENTE: 2, SOCIO: 3 };
-      const [uA, uB] = [await almacen.getUsuario(t.usuarioA), await almacen.getUsuario(t.usuarioB)];
-      const nivelA = ORDEN_NIVEL[uA?.nivel ?? 'INICIADO'] ?? 0;
-      const nivelB = ORDEN_NIVEL[uB?.nivel ?? 'INICIADO'] ?? 0;
-
-      // reputación = nº de trueques COMPLETADOS de cada parte (proxy de la fórmula D12)
-      const todos = await almacen.listarTruekes();
-      const completados = (w) => todos.filter((x) => x.estado === 'COMPLETADO' && (x.usuarioA === w || x.usuarioB === w)).length;
-
-      let propone;
-      if (nivelA !== nivelB) propone = nivelA > nivelB ? t.usuarioA : t.usuarioB;
-      else {
-        const repA = completados(t.usuarioA);
-        const repB = completados(t.usuarioB);
-        if (repA !== repB) propone = repA > repB ? t.usuarioA : t.usuarioB;
-        else propone = t.usuarioA; // desempate: quien publicó (A)
-      }
+      // ---- regla (director): propone la parte de mayor nivel y mayor reputación ----
+      const propone = await quienProponeEncuentro(t);
       if (req.wallet !== propone) {
-        return res.status(403).json({ error: 'no_autorizado', detalle: 'la propuesta de encuentro la hace la parte de mayor nivel/reputación' });
+        return res.status(403).json({ error: 'no_autorizado', detalle: 'la propuesta de encuentro la hace la parte de mayor nivel/reputación; la contraparte solo aprueba o rechaza' });
       }
 
       const actualizado = await almacen.actualizarTrueke(t.id, {

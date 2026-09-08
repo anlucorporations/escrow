@@ -275,6 +275,20 @@ export function acordarOferta(token: string, id: number, articuloBId: number, fi
   return pedirAuth<{ trueke: Trueke }>(`/truekes/${id}/acordar`, token, { metodo: "POST", body: { articuloBId, ...(firma ?? {}) } });
 }
 
+/** GET /truekes/:id/encuentro/rol — rol del usuario en el encuentro (director):
+ *  'propone' = mayor nivel+reputación · 'aprueba' = la contraparte. */
+export interface RolEncuentro {
+  rol: "propone" | "aprueba";
+  propone: string;
+  aprueba: string;
+  regla?: string;
+  estado?: string;
+  encuentroEstado?: string | null;
+}
+export function rolEncuentro(token: string, id: number): Promise<RolEncuentro> {
+  return pedirAuth<RolEncuentro>(`/truekes/${id}/encuentro/rol`, token);
+}
+
 /** POST /truekes/:id/propuesta-encuentro — quien gana la regla propone punto + fecha/hora. */
 export function proponerEncuentro(token: string, id: number, datos: { puntoEncuentroId: number; horaPautada: string }, firma?: FirmaAccion): Promise<{ trueke: Trueke; propone: string }> {
   return pedirAuth<{ trueke: Trueke; propone: string }>(`/truekes/${id}/propuesta-encuentro`, token, { metodo: "POST", body: { ...datos, ...(firma ?? {}) } });
