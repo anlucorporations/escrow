@@ -70,13 +70,14 @@ export function TopBar() {
     <header className="bg-navy-900 px-4 py-2 text-white shadow">
       {/* Fila única: marca | secciones (PC) | usuario */}
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
-        {/* Marca: icono de LOGO (imagen) + marca textual (ajuste del director) */}
+        {/* Marca: icono TrueKeate_logo + TrueKeate_titulo (ajuste del director) */}
         <Link
           href="/suite/dashboard"
           className="flex shrink-0 items-center gap-2"
           aria-label="Inicio de la suite — TrueKeate"
         >
-          {/* TrueKeate_logo.svg es monocromo negro → se invierte a blanco sobre la barra navy */}
+          {/* TrueKeate_logo.svg + TrueKeate_titulo.svg son monocromos negros →
+              se invierten a blanco sobre la barra navy (marca = logo + titulo) */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/brand/TrueKeate_logo.svg"
@@ -84,9 +85,12 @@ export function TopBar() {
             aria-hidden
             className="h-7 w-auto brightness-0 invert"
           />
-          <span className="hidden font-display text-lg font-bold tracking-tight sm:inline">
-            TrueKeat<span className="text-gold-400">☑</span>
-          </span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/brand/TrueKeate_titulo.svg"
+            alt="TrueKeate"
+            className="hidden h-[18px] w-auto brightness-0 invert sm:block lg:h-[22px]"
+          />
         </Link>
 
         {/* ---- Secciones de la suite: SOLO PC (≥lg) — unidas a la barra ---- */}
