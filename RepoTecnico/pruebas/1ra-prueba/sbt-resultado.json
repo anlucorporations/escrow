@@ -1,0 +1,25 @@
+{
+  "fecha": "2026-09-08T16:08:38.084Z",
+  "pasos": [
+    {
+      "p": "Suite sin SBT: pide subir DNI+selfie",
+      "ok": true,
+      "d": "panel \"No detectamos un SBT\" visible"
+    },
+    {
+      "p": "Mint SBT nativo a Carlos (minter plataforma)",
+      "ok": true,
+      "d": "tokenId #1 en 0x870526b7…"
+    },
+    {
+      "p": "Suite con SBT: detectado y botón de auto-certificación",
+      "ok": true,
+      "d": "panel verde \"posee un SBT de certificación\""
+    },
+    {
+      "p": "Auto-certificación por SBT completada",
+      "ok": true,
+      "d": "estado CERTIFICADO (kyc via_sbt=true)"
+    }
+  ]
+}

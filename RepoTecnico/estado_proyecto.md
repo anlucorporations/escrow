@@ -464,3 +464,12 @@ Implementado:
 - Doc: `RepoTecnico/PROPUESTA_CERTIFICACION_SBT.md`.
 Pendiente (orden del director): aplicar migración BD, desplegar TrueKeateSBT en anvil GCP,
 registrar en contratos.json/secreto, redesplegar api+web y push.
+
+### Despliegue certificación SBT (2026-09-08) — en producción
+
+Aplicado: migración `db/migracion_sbt.sql` en Cloud SQL (cols kyc, enum KYC_DNI/SELFIE,
+firma opcional) · TrueKeateSBT desplegado en anvil GCP `0x870526b7973b56163a6997bB7C886F5E4EA53638`
+(minter cuenta 1) y registrado en `backend/contratos.json` · Cloud Run **api rev 00017** y
+**web rev 00019** (imágenes release-c440204). E2E en producción (Carlos): sin SBT → pide
+DNI+selfie; mint SBT nativo #1; detección y **auto-certificación → CERTIFICADO** (kyc via_sbt).
+Capturas: `RepoTecnico/pruebas/1ra-prueba/sbt-*.png`. Commit `c440204` en los 3 repos.
