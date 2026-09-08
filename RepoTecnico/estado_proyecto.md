@@ -506,3 +506,13 @@ El director probó la conexión de wallet en su **teléfono real** y confirmó q
 "Abrir en la app de MetaMask" abre la app, y la sesión/operación dentro del
 navegador interno de la wallet completa el flujo (RF-16). Fix móvil cerrado.
 Pendiente opcional futuro: WalletConnect universal (projectId).
+
+### 📚 Biblioteca de manuales + suite 'Sistemas' del Owner (2026-09-08)
+
+Workflow @manuales 5 roles (commit 25548ae): técnicos 27 (nuevos: certificación SBT,
+wallet móvil, grupo 08-Suite-Sistemas), literales 27, imágenes 49 (8 infografías
+horizontales nuevas 1200px), PDF 27 A4 con estilo TrueKeate. /help/manual → biblioteca
+por tópicos→temas con imagen y descarga PDF (26 temas, 8 tópicos). /suite/admin →
+'Sistemas · Panel del Owner' + Biblioteca de Sistemas (solo Owner, PDF técnicos).
+Desplegado: web rev 00022 (release-25548ae). Verificado: ayuda 200 con temas nuevos,
+estáticos PDF/imágenes 200.
