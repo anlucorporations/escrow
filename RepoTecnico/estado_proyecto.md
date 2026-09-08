@@ -516,3 +516,25 @@ por tópicos→temas con imagen y descarga PDF (26 temas, 8 tópicos). /suite/ad
 'Sistemas · Panel del Owner' + Biblioteca de Sistemas (solo Owner, PDF técnicos).
 Desplegado: web rev 00022 (release-25548ae). Verificado: ayuda 200 con temas nuevos,
 estáticos PDF/imágenes 200.
+
+## 🕊️ Regla del punto de encuentro (director, 2026-09-08) — commit fae6c48
+
+Regla del director: **quién propone el punto de encuentro** = la parte con MAYOR
+nivel D12 y, a igual nivel, la de MAYOR reputación (nº de trueques COMPLETADOS);
+la contraparte (menor nivel/reputación) solo **aprueba o rechaza**.
+- Backend `api/routes/truekes.js`: helper `quienProponeEncuentro(t)` (nivel
+  INICIADO<COMUN<FRECUENTE<SOCIO → reputación → desempate quien publicó A),
+  endpoint `GET /truekes/:id/encuentro/rol` → `{rol:'propone'|'aprueba', ...}`
+  y `propuesta-encuentro` valida la regla (403 si la propone la parte equivocada).
+- Web `app/suite/intercambio/page.tsx`: al tener trueke CREADO/ACTIVO se consulta
+  el rol; el panel "Proponer encuentro" solo aparece para la parte `propone`; la
+  parte `aprueba` ve "esperando propuesta" (y acepta/rechaza).
+- Desplegado: API rev **truekeate-api-00018-hxk**, web rev **truekeate-web-00023-ltm**
+  (release-fae6c48), 100 % serving. Commit empujado a los 3 remotos (gitlab/github/codecrypto).
+- Verificación en vivo (GCP): oferta 91 acordada Bruno→CREADO; `encuentro/rol`:
+  Ana (A) = **propone**, Bruno = **aprueba** (mismo nivel SOCIO, misma reputación,
+  gana quien publicó); Bruno intenta proponer → **403**; Ana propone (Puerta del Sol,
+  punto id 3) → **encuentroEstado PROPUESTO** ✅.
+- Fix aplicado en prod: faltaban las columnas `encuentro_propuesto_por` y
+  `encuentro_estado` en `truekes` (la migración `db/migracion_trueke_abierto.sql`
+  no se había aplicado completa) → ALTER TABLE idempotente ejecutado vía proxy.
