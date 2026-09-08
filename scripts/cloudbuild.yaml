@@ -1,0 +1,53 @@
+# ============================================================================
+# TrueKeate — Cloud Build (Cloud Run, imagen web)
+# ============================================================================
+# Contexto de build: web/  →  gcloud builds submit --config scripts/cloudbuild.yaml \
+#     --substitutions=_ESCROW=0x...,_REGISTRY=0x...,... web/
+# Las direcciones NEXT_PUBLIC_* se hornean en el bundle del cliente.
+# Los secretos NO: se inyectan en runtime con --set-secrets.
+# ============================================================================
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_ESCROW_ADDRESS=$_ESCROW'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_USER_REGISTRY_ADDRESS=$_REGISTRY'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_EXCHANGE_ADDRESS=$_EXCHANGE'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_GOVERNANCE_ADDRESS=$_GOVERNANCE'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_SUBSCRIPTION_ADDRESS=$_SUBSCRIPTION'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_TOKEN_A_ADDRESS=$_TKA'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_TOKEN_B_ADDRESS=$_TKB'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_USDT_ADDRESS=$_USDT'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_DELIVERY_ADDRESS=$_DELIVERY'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_BRLT_ADDRESS=$_BRLT'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_SBT_REGISTRY_ADDRESS=$_SBT_REGISTRY'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_TRUEKE_SBT_ADDRESS=$_TRUEKE_SBT'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_TRUEKE_RWA_ADDRESS=$_TRUEKE_RWA'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_TRUEKE_SERVICE_ADDRESS=$_TRUEKE_SERVICE'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_CHAIN_ID=$_CHAIN_ID'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_RPC_URL=$_RPC_URL'
+      - '-t'
+      - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/truekeate-repo/truekeate-web'
+      - '.'
+
+images:
+  - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/truekeate-repo/truekeate-web'
+
+options:
+  logging: CLOUD_LOGGING_ONLY

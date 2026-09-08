@@ -22,3 +22,9 @@ web/data/
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Registro local de repos/claves (NO subir a git)
+REGISTRO_REPOSITORIOS_DESPLIEGUE_Y_CLAVES.md
+
+# Respaldos de BD (nunca al repositorio)
+backend/scripts/backups/

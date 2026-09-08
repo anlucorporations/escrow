@@ -380,3 +380,32 @@ Decisión del director (bloques de 3 preguntas) e implementación, ver `RepoTecn
 - **A5 — Imágenes en inventario/mercado (punto 1)**: hasta 5 imágenes por artículo (base64 → BD `imagenes_certificadas.contenido/mime`, servidas por `GET /catalog/:id/imagen/:imagenId`; Cloud Run FS inmutable). Miniaturas en Inventario y Mercado; galería en la ficha de mercado.
 - **A6 — Widget flotante de mapa (punto 4)**: `web/components/MapaWidget.tsx` (Leaflet solo-cliente vía `next/dynamic`, tiles OSM, pin arrastrable, búsqueda Nominatim, favoritos) que se abre desde la ficha del trueque; al confirmar incrusta lat/lng/dirección en el formulario de la propuesta.
 - **A7 — Verificación final**: Foundry (con TrueKeateNFT v2 `0x6C2d…7892` en anvil GCP con `usar()`), backend 44/44, E2E 47 passed / 3 skipped (PC-only). **Estado final: DESPLEGADO y publicado** ✅ (orden del director): commit `efa8425` pusheado a GitHub, GitLab.com y gitlab.codecrypto.academy; en GCP: BD migrada, TrueKeateNFT v2 con `usar()` (`0x6C2d…7892`), API desplegada (revisión 00013; rutas nuevas verificadas en vivo: `/truekes/:id/encuentro/aceptar|rechazar` y `/truekes/:id/contacto` responden 401 → existen) y web desplegada (revisión 00014; widget `Señalar en el mapa` presente en el bundle servido).
+
+## @InyectaDatos — BaseOperaciones + script de inyección (2026-09-08)
+
+Orden del director: inyectar un historial operativo coherente con las cuentas 2–7 del anvil
+(2 Socios ORO/CERT 2000 BRLT · 2 Empresas PLATA/CERT 2000 BRLT con 2 art + 2 bienes + 2
+servicios tokenizados · 2 Comunes BRONCE/VERIF 1000 BRLT · 10 trueques realizados por cada
+usuario con valoraciones variadas). Entregado y **validado** (2 ejecuciones idempotentes en
+PostgreSQL local con el esquema real: 6 usuarios · 24 ítems · 30 truekes COMPLETADOS = 10 por
+usuario · 60 valoraciones; matriz permutada 15 pares × 2 sentidos):
+
+- `RepoTecnico/BaseOperaciones/` — documentación de la inyección (`estructura_datos.md`,
+  `casos_uso_inyeccion.md`, `cuentas_anvil.md`, `estado_inyeccion.md`).
+- `scripts/inyectar_datos_operativos.mjs` — script controlado (confirmación interactiva,
+  `--dry-run`, `--yes`, `--solo-bd`): persiste usuarios/kyc/artículos/truekes/valoraciones/
+  finanzas en PostgreSQL; opcionalmente mint REAL de los 24 NFT (TrueKeateNFT GCP) y emisión
+  REAL de BRLT con quórum de Socios (D32) con distribución 2000/2000/2000/2000/1000/1000.
+- **NO ejecutado en producción** (decisión del director: solo generar el script; requiere
+  orden explícita + respaldo previo `reiniciar-plataforma.sh --respaldo`).
+
+Hallazgo documentado: `imagenes_certificadas.firma_ecdsa` es NOT NULL y el router actual no la
+persiste → la inyección omite imágenes (pendiente de confirmar en producción).
+
+### Push 2026-09-08 (orden del director)
+
+Commit de documentación + scripts (`BaseOperaciones/`, `scripts/`, `.gitignore`,
+`estado_proyecto.md`) publicado en **GitHub**, **GitLab.com** y **gitlab.codecrypto.academy**
+(rama `escrow-dsh-GCP`). Excluidos del repo por seguridad/herencia: `REGISTRO_*_CLAVES.md`
+(claves), `backend/scripts/backups/` (respaldos de BD) y los scripts de la raíz heredados de la
+rama antigua (`deploy-local.*`, `accounts.sh`, `setup.sh`, `start/stop*`, `verify-setup.sh`).
