@@ -498,3 +498,11 @@ documentado como mejora futura — requiere projectId de cloud.walletconnect.com
 - `components/SuiteGuard.tsx`: tarjetas de ayuda contextuales: móvil → "Abrir en la app de
   MetaMask" + pasos del Navegador interno; escritorio → instalar extensión.
 - Pendiente futuro: integración WalletConnect universal (projectId).
+
+### ✅ Validación en móvil real (2026-09-08) — CONFIRMADA por el director
+
+El director probó la conexión de wallet en su **teléfono real** y confirmó que
+**todo funciona**: la tarjeta móvil aparece al pulsar Conectar, el botón
+"Abrir en la app de MetaMask" abre la app, y la sesión/operación dentro del
+navegador interno de la wallet completa el flujo (RF-16). Fix móvil cerrado.
+Pendiente opcional futuro: WalletConnect universal (projectId).
