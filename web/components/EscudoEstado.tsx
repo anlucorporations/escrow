@@ -28,28 +28,22 @@ export function EscudoEstado({ className = "" }: { className?: string }) {
 
   const etiqueta =
     estado === "INSCRITO"
-      ? "Verificar mi identidad (código de correo)"
+      ? "Paso 1 · Verificar mi identidad (código de correo)"
       : estado === "VERIFICADO"
-        ? "Completar certificación (KYC)"
-        : "Certificado — ver mi perfil";
+        ? "Paso 2 · Completar certificación (KYC)"
+        : "Paso 3 · Certificado — ver mi perfil";
 
-  // Colores del escudo según estado
-  const color =
-    estado === "INSCRITO"
-      ? "bg-gold-500 text-navy-800 shadow-[0_0_0_3px_rgba(212,175,55,0.35)]"
-      : estado === "VERIFICADO"
-        ? "bg-teal-500 text-white shadow-[0_0_0_3px_rgba(42,157,143,0.35)]"
-        : "bg-[linear-gradient(135deg,#2a9d8f,#1a7a6e)] text-white shadow-[0_0_0_3px_rgba(212,175,55,0.55)]";
-
+  // Símbolo minimalista (emoji) que acompaña al username según el estado D28
+  // (ajuste del director): INSCRITO 🟡 · VERIFICADO 🟢 · CERTIFICADO 🥇
   const icono =
-    estado === "INSCRITO" ? "🛡️" : estado === "VERIFICADO" ? "🛡️" : "🛡️✨";
+    estado === "INSCRITO" ? "🟡" : estado === "VERIFICADO" ? "🟢" : "🥇";
 
   return (
     <Link
       href={destino}
       title={etiqueta}
-      aria-label={`Escudo de estado: ${estado} — ${etiqueta}`}
-      className={`inline-flex h-9 w-9 items-center justify-center rounded-full text-base transition-transform hover:scale-110 ${color} ${className}`}
+      aria-label={`Estado: ${estado} — ${etiqueta}`}
+      className={`inline-flex items-center justify-center text-lg leading-none transition-opacity hover:opacity-75 ${className}`}
     >
       <span aria-hidden>{icono}</span>
     </Link>

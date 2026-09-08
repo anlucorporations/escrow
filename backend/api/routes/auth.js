@@ -14,10 +14,25 @@ import { recuperarFirmante, nuevoToken } from '../lib/auth.js';
 const RE_WALLET = /^0x[0-9a-fA-F]{40}$/;
 const MENSAJE = 'TrueKeate: iniciar sesión';
 
-/** Vista pública de un usuario (sin PII). */
+/** Deriva un username legible (handle) a partir del correo o de la wallet. */
+export function derivarUsername(correo, wallet) {
+  if (correo && typeof correo === 'string') {
+    const local = correo.split('@')[0].trim();
+    if (local) return local.replace(/[^a-zA-Z0-9_.-]/g, '.').slice(0, 40);
+  }
+  return `u_${(wallet || '').slice(2, 10).toLowerCase()}`;
+}
+
+/** Vista pública de un usuario (sin PII: nunca expone correo/teléfono). */
 function vistaPublica(u) {
   if (!u) return null;
-  return { wallet: u.wallet, tipo: u.tipo, nivel: u.nivel, estado: u.estado };
+  return {
+    wallet: u.wallet,
+    username: u.username ?? null,
+    tipo: u.tipo,
+    nivel: u.nivel,
+    estado: u.estado,
+  };
 }
 
 export function crearRouterAuth({ almacen }) {
@@ -54,7 +69,7 @@ export function crearRouterAuth({ almacen }) {
   // POST /auth/register — inscripción formal (upsert): crea o completa el usuario
   // con correo/teléfono/dirección + consentimiento GDPR → estado INSCRITO (D28).
   r.post('/register', async (req, res) => {
-    const { wallet, correo, telefono, direccionInscripcion, consentimientoGdpr } = req.body;
+    const { wallet, correo, telefono, direccionInscripcion, consentimientoGdpr, username } = req.body;
     const w = (wallet || '').toLowerCase();
     if (!RE_WALLET.test(w)) return res.status(400).json({ error: 'wallet_invalida' });
     if (!consentimientoGdpr) {
@@ -66,6 +81,10 @@ export function crearRouterAuth({ almacen }) {
     const existente = await almacen.getUsuario(w);
     const u = await almacen.crearUsuario({
       wallet: w,
+      // username explícito si llega; si no, derivado del correo (handle legible)
+      username:
+        (typeof username === 'string' && username.trim() ? username.trim().replace(/[^a-zA-Z0-9_.-]/g, '.').slice(0, 40) : null) ??
+        derivarUsername(correo, w),
       correo,
       telefono,
       direccionInscripcion: direccionInscripcion ?? null,

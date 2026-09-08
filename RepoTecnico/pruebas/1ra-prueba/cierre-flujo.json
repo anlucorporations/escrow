@@ -1,0 +1,25 @@
+{
+  "fecha": "2026-09-08T12:14:35.040Z",
+  "pasos": [
+    {
+      "paso": "Mercado: oferta de Ana (MacBook) visible",
+      "ok": false,
+      "detalle": "botón Conectar+Login ya usado; listado PROPUESTO"
+    },
+    {
+      "paso": "Perfil Ana: reputación con 10 trueques",
+      "ok": false,
+      "detalle": "sin etiqueta →  de verificación D28 | ✓ | INSCRITO | ✓ | VERIFICADO | 3 | CERTIFICADO | CERTIFICADO | Peldaño 3 de 3 | Reputación (D12/D30) |  | Puntaje de confianza 0–100 calculado con la fórmula oficial y recálculo mensual (D30). Requiere autenticación con firma de tu wallet. |  | PUNTAJE |  | 50/100 |  | NIVEL COMUN | 🥈 PLATA | ORO HISTÓRICO: NO |  | 5 |  | TRUEQUES EFECTIVOS |  | 0 |  | APELACIONES |  | 0 / 5 |  | REPUTACIÓN MEDIA |  | FÓRMULA (D12/D30): 0,5·rep + 0,3·vol + 0,2·(1−ratioAp) — insumos 0–100 (D12/D30)"
+    },
+    {
+      "paso": "Bruno acuerda la oferta de Ana",
+      "ok": false,
+      "detalle": "firma por acción \"acordar trueke\""
+    },
+    {
+      "paso": "Intercambio Bruno: trueque en curso visible",
+      "ok": true,
+      "detalle": "historial/activos"
+    }
+  ]
+}

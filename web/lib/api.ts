@@ -10,6 +10,8 @@ export const API_URL =
 
 export interface UsuarioPublico {
   wallet: string;
+  /** Nombre de usuario público (handle). Se muestra en el menú de usuario en vez de la dirección. */
+  username?: string | null;
   tipo: "PARTICULAR" | "EMPRESA" | "SOCIO";
   nivel: "INICIADO" | "COMUN" | "FRECUENTE" | "SOCIO";
   estado: "INSCRITO" | "VERIFICADO" | "CERTIFICADO";

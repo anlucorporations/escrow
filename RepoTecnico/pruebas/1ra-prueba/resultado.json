@@ -1,0 +1,86 @@
+{
+  "fecha": "2026-09-08T11:58:22.456Z",
+  "web": "https://truekeate-web-593453426217.europe-west1.run.app",
+  "pasos": [
+    {
+      "paso": "Landing pública",
+      "ok": true,
+      "detalle": "título=\"TrueKeate — El Universo del Intercambio Descentralizado\" h1=\"El Universo del Intercambio Descentralizado\""
+    },
+    {
+      "paso": "Login wallet Ana (SOCIO)",
+      "ok": true,
+      "detalle": "conexión + firma EIP-191 \"TrueKeate: iniciar sesión\" → suite"
+    },
+    {
+      "paso": "Perfil Ana: 10 trueques efectivos",
+      "ok": false,
+      "detalle": "etiqueta ausente → ⇄\nTrueKeat☑\n🛡️✨\n👤\n0x3c44…93bc\nCERTIFICADO\n▼\n🏠Mi Trueke Central\n🛒Mercado\n⇄Intercambio\n💼Inventario\n🏛️Socios\n⚖️Disputas\n💰Finanzas\n🛠️Adm"
+    },
+    {
+      "paso": "Finanzas Ana: BRLT 2.000",
+      "ok": true,
+      "detalle": "saldo BRLT 2000 visible → BRLT\n\n2.000 BRLT\n\n🏦 FONDO DE VALOR\n\n0 BRLT\n\nConfig: 1% trueques"
+    },
+    {
+      "paso": "Inventario Ana: 3 ítems tokenizados",
+      "ok": true,
+      "detalle": "Olympus/vinilos/MacBook listados"
+    },
+    {
+      "paso": "Ana publica trueke",
+      "ok": false,
+      "detalle": "formulario no visible → ⇄ | TrueKeat☑ | 🛡️✨ | 👤 | 0x3c44…93bc | CERTIFICADO | ▼ | 🏠Mi Trueke Central | 🛒Mercado | ⇄Intercambio | 💼Inventario | 🏛️Socios | ⚖️Disputas | 💰Finanzas | 🛠️Admin | 👤Perfi"
+    },
+    {
+      "paso": "Mercado muestra la oferta",
+      "ok": false,
+      "detalle": "oferta PROPUESTO en el mercado"
+    },
+    {
+      "paso": "Login wallet Bruno (SOCIO)",
+      "ok": true,
+      "detalle": "conexión + sesión"
+    },
+    {
+      "paso": "Bruno acuerda la oferta de Ana",
+      "ok": false,
+      "detalle": "firma por acción \"acordar trueke\""
+    },
+    {
+      "paso": "Login wallet EcoTech (EMPRESA)",
+      "ok": true,
+      "detalle": "conexión + sesión"
+    },
+    {
+      "paso": "Inventario EcoTech: 6 ítems (2 art + 2 bienes + 2 serv)",
+      "ok": false,
+      "detalle": "categorías ARTICULO/BIEN/SERVICIO tokenizadas"
+    },
+    {
+      "paso": "Finanzas EcoTech: BRLT 2.000",
+      "ok": false,
+      "detalle": "saldo empresa 2000 BRLT"
+    },
+    {
+      "paso": "Login wallet Carlos (PARTICULAR)",
+      "ok": true,
+      "detalle": "conexión + sesión"
+    },
+    {
+      "paso": "Finanzas Carlos: BRLT 1.000",
+      "ok": false,
+      "detalle": "saldo común 1000 BRLT"
+    },
+    {
+      "paso": "Perfil Carlos: escalera VERIFICADO",
+      "ok": false,
+      "detalle": "estado D28 Verificado"
+    },
+    {
+      "paso": "Inventario Carlos: 3 ítems",
+      "ok": false,
+      "detalle": "artículos listados"
+    }
+  ]
+}

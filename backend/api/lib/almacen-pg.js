@@ -19,6 +19,7 @@ function filaAUsuario(f) {
   if (!f) return null;
   return {
     wallet: (f.wallet || '').trim().toLowerCase(),
+    username: f.username ?? null,
     correo: f.correo ?? null,
     telefono: f.telefono ?? null,
     direccionInscripcion: f.direccion_inscripcion ?? null,
@@ -43,10 +44,11 @@ export async function crearAlmacenPg(pool) {
       const wallet = NORMALIZA_WALLET(usuario.wallet);
       const r = await pool.query(
         `INSERT INTO usuarios
-           (wallet, correo, telefono, direccion_inscripcion, tipo, nivel, medalla, estado,
+           (wallet, username, correo, telefono, direccion_inscripcion, tipo, nivel, medalla, estado,
             consentimiento_gdpr, consentimiento_fecha, smart_account)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,now(),$10)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,now(),$11)
          ON CONFLICT (wallet) DO UPDATE SET
+           username=COALESCE(EXCLUDED.username, usuarios.username),
            correo=EXCLUDED.correo, telefono=EXCLUDED.telefono,
            direccion_inscripcion=EXCLUDED.direccion_inscripcion,
            tipo=EXCLUDED.tipo, nivel=EXCLUDED.nivel, medalla=EXCLUDED.medalla,
@@ -55,6 +57,7 @@ export async function crearAlmacenPg(pool) {
          RETURNING *`,
         [
           wallet,
+          usuario.username ?? null,
           usuario.correo ?? null,
           usuario.telefono ?? null,
           usuario.direccionInscripcion ?? null,
@@ -84,11 +87,12 @@ export async function crearAlmacenPg(pool) {
       const n = { ...u, ...cambios };
       const r = await pool.query(
         `UPDATE usuarios SET
-           correo=$2, telefono=$3, direccion_inscripcion=$4, tipo=$5, nivel=$6,
-           medalla=$7, estado=$8, consentimiento_gdpr=$9, smart_account=$10, updated_at=now()
+           username=$2, correo=$3, telefono=$4, direccion_inscripcion=$5, tipo=$6, nivel=$7,
+           medalla=$8, estado=$9, consentimiento_gdpr=$10, smart_account=$11, updated_at=now()
          WHERE wallet=$1 RETURNING *`,
         [
           NORMALIZA_WALLET(wallet),
+          n.username ?? null,
           n.correo ?? null,
           n.telefono ?? null,
           n.direccionInscripcion ?? null,

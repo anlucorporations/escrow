@@ -1,0 +1,25 @@
+{
+  "fecha": "2026-09-08T12:08:38.317Z",
+  "pasos": [
+    {
+      "paso": "Mercado lista la oferta de Ana (MacBook)",
+      "ok": false,
+      "detalle": "GET /truekes/ofertas → PROPUESTO visible"
+    },
+    {
+      "paso": "Perfil Ana: reputación y 10 trueques",
+      "ok": false,
+      "detalle": "métrica: (no encontrada)"
+    },
+    {
+      "paso": "Bruno acuerda oferta de Ana",
+      "ok": false,
+      "detalle": "POST /truekes/:id/acordar con firma por acción"
+    },
+    {
+      "paso": "Intercambio Bruno (trueque en curso)",
+      "ok": false,
+      "detalle": "historial/activos visible"
+    }
+  ]
+}

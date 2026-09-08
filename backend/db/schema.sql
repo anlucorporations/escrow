@@ -70,6 +70,7 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 CREATE TABLE IF NOT EXISTS usuarios (
     id                  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     wallet              CHAR(42) UNIQUE NOT NULL,
+    username            TEXT UNIQUE,        -- nombre de usuario público (handle)
     correo              TEXT,               -- [PII†] cifrado en reposo (D17)
     telefono            TEXT,               -- [PII†]
     direccion_inscripcion TEXT,             -- [PII†]

@@ -104,12 +104,13 @@ test.describe("Escalera D28 — Verificación y Certificación", () => {
     await expect(page.getByText(/pendiente de revisión humana del Owner/)).toBeVisible();
   });
 
-  test("Escudo de estado: un INSCRITO ve el escudo amarillo que lleva a Verificación", async ({ page }) => {
+  test("Símbolo de estado: un INSCRITO ve el símbolo 🟡 que lleva a Verificación", async ({ page }) => {
     await simularEscalera(page, { tipo: "PARTICULAR", nivel: "INICIADO", estado: "INSCRITO" }, "000000");
     await page.goto("/suite/dashboard");
-    const escudo = page.getByRole("link", { name: /Escudo de estado: INSCRITO/ });
-    await expect(escudo).toBeVisible();
-    await escudo.click();
+    const simbolo = page.getByRole("link", { name: /Estado: INSCRITO/ });
+    await expect(simbolo).toBeVisible();
+    await expect(simbolo).toContainText("🟡");
+    await simbolo.click();
     await expect(page).toHaveURL(/\/suite\/verificacion/);
   });
 });

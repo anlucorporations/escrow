@@ -135,42 +135,48 @@ const PERFILES = [
   {
     idx: 2, nombre: 'Ana López', rol: 'socio',
     tipo: 'SOCIO', nivel: 'SOCIO', medalla: 'ORO', estado: 'CERTIFICADO',
-    correo: 'ana.lopez@truekeate.org', telefono: '+34 600 111 222',
+    correo: 'ana.lopez@truekeate.org',
+    username: 'ana.lopez', telefono: '+34 600 111 222',
     direccion: 'Paseo de la Castellana 45, Madrid', brlt: 2000,
     rubro: 'tecnología y coleccionismo', bio: 'Coleccionista de piezas vintage y tecnología reacondicionada.',
   },
   {
     idx: 3, nombre: 'Bruno Fernández', rol: 'socio',
     tipo: 'SOCIO', nivel: 'SOCIO', medalla: 'ORO', estado: 'CERTIFICADO',
-    correo: 'bruno.fernandez@truekeate.org', telefono: '+34 600 333 444',
+    correo: 'bruno.fernandez@truekeate.org',
+    username: 'bruno.fernandez', telefono: '+34 600 333 444',
     direccion: 'Avinguda Diagonal 208, Barcelona', brlt: 2000,
     rubro: 'audio y diseño', bio: 'Diseñador de producto; truequea equipos de audio y mobiliario.',
   },
   {
     idx: 4, nombre: 'EcoTech Solutions', rol: 'empresa',
     tipo: 'EMPRESA', nivel: 'FRECUENTE', medalla: 'PLATA', estado: 'CERTIFICADO',
-    correo: 'contacto@ecotechsolutions.example', telefono: '+34 960 555 666',
+    correo: 'contacto@ecotechsolutions.example',
+    username: 'ecotech', telefono: '+34 960 555 666',
     direccion: 'Parque Tecnológico, Calle Marconi 12, Valencia', brlt: 2000,
     rubro: 'energía limpia y agro', bio: 'Empresa de soluciones solares y domótica sostenible.',
   },
   {
     idx: 5, nombre: 'ServiPro Digital', rol: 'empresa',
     tipo: 'EMPRESA', nivel: 'FRECUENTE', medalla: 'PLATA', estado: 'CERTIFICADO',
-    correo: 'ventas@serviprodigital.example', telefono: '+34 950 777 888',
+    correo: 'ventas@serviprodigital.example',
+    username: 'servipro', telefono: '+34 950 777 888',
     direccion: 'Polígono Innovación, Parcela 8, Sevilla', brlt: 2000,
     rubro: 'tecnología y servicios TI', bio: 'Proveedora de servicios de ciberseguridad, desarrollo y cloud.',
   },
   {
     idx: 6, nombre: 'Carlos Mendoza', rol: 'comun',
     tipo: 'PARTICULAR', nivel: 'COMUN', medalla: 'BRONCE', estado: 'VERIFICADO',
-    correo: 'carlos.mendoza@truekeate.org', telefono: '+34 610 999 000',
+    correo: 'carlos.mendoza@truekeate.org',
+    username: 'carlos.mendoza', telefono: '+34 610 999 000',
     direccion: 'Calle Gran Vía 1, Bilbao', brlt: 1000,
     rubro: 'fitness y gaming', bio: 'Entusiasta del deporte y los videojuegos; rota su equipamiento.',
   },
   {
     idx: 7, nombre: 'Diana Rojas', rol: 'comun',
     tipo: 'PARTICULAR', nivel: 'COMUN', medalla: 'BRONCE', estado: 'VERIFICADO',
-    correo: 'diana.rojas@truekeate.org', telefono: '+34 620 111 333',
+    correo: 'diana.rojas@truekeate.org',
+    username: 'diana.rojas', telefono: '+34 620 111 333',
     direccion: 'Calle Alfonso I 22, Zaragoza', brlt: 1000,
     rubro: 'fotografía y diseño', bio: 'Fotógrafa freelance; truequea ópticas, luces y gadgets.',
   },
@@ -260,7 +266,11 @@ async function main() {
       console.error('❌ No se pudo conectar a la BD:', e.message);
       process.exit(1);
     }
-    await pool.query('BEGIN');
+    // NOTA: autocommit por sentencia (sin BEGIN/COMMIT explícitos): sobre un pool
+    // remoto (proxy Cloud SQL) cada pool.query() puede usar un cliente distinto y
+    // un corte de conexión revierte la transacción entera en silencio. Cada
+    // INSERT/UPDATE es idempotente (ON CONFLICT / pre-checks), así que una
+    // ejecución interrumpida se puede relanzar sin duplicar datos.
   }
 
   const owner = new ethers.Wallet(PK_OWNER);
@@ -276,10 +286,6 @@ async function main() {
     console.log(`  cuenta ${i} → ${w.address}  [${p.nombre}]`);
   }
 
-  if (!DRY) {
-    await pool.query('BEGIN');
-  }
-
   // =====================================================================
   // 1. USUARIOS + KYC (idempotente)
   // =====================================================================
@@ -292,16 +298,17 @@ async function main() {
     if (!DRY) {
       const r = await pool.query(
         `INSERT INTO usuarios
-           (wallet, correo, telefono, direccion_inscripcion, tipo, nivel, medalla, estado,
+           (wallet, username, correo, telefono, direccion_inscripcion, tipo, nivel, medalla, estado,
             consentimiento_gdpr, consentimiento_fecha, actividad_ultima, created_at, updated_at)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8, TRUE, now() - interval '120 days', now() - interval '2 days', now() - interval '120 days', now())
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9, TRUE, now() - interval '120 days', now() - interval '2 days', now() - interval '120 days', now())
          ON CONFLICT (wallet) DO UPDATE SET
+           username=COALESCE(EXCLUDED.username, usuarios.username),
            correo=EXCLUDED.correo, telefono=EXCLUDED.telefono,
            direccion_inscripcion=EXCLUDED.direccion_inscripcion,
            tipo=EXCLUDED.tipo, nivel=EXCLUDED.nivel, medalla=EXCLUDED.medalla,
            estado=EXCLUDED.estado, consentimiento_gdpr=TRUE, updated_at=now()
          RETURNING id, wallet`,
-        [wallet, p.correo, p.telefono, p.direccion, p.tipo, p.nivel, p.medalla, p.estado]
+        [wallet, p.username ?? null, p.correo, p.telefono, p.direccion, p.tipo, p.nivel, p.medalla, p.estado]
       );
       const uid = Number(r.rows[0].id);
       const kycPrev = await pool.query(`SELECT id FROM kyc WHERE usuario_id=$1`, [uid]);
@@ -341,6 +348,12 @@ async function main() {
   }
 
   const articuloIdPorIdx = {}; // p.idx -> [ids]
+  const REUSE_TOKENS = process.env.REUTILIZAR_TOKEN_ID_BASE
+    ? Number(process.env.REUTILIZAR_TOKEN_ID_BASE)
+    : null;
+  if (REUSE_TOKENS !== null) {
+    console.log(`  → Reutilizando tokens on-chain ya minteados (base ${REUSE_TOKENS}): no se vuelve a mintear.`);
+  }
   for (const [n, item] of CATALOGO.entries()) {
     const perfil = PERFILES.find((x) => x.idx === item.p);
     const usuarioWallet = wallets[item.p].address.toLowerCase();
@@ -348,7 +361,9 @@ async function main() {
 
     // Mint on-chain real (minter plataforma) → nft_token_id; si no hay red, simulado
     let tokenId = null;
-    if (!DRY && !SOLO_BD && cNft) {
+    if (REUSE_TOKENS !== null) {
+      tokenId = REUSE_TOKENS + n; // el mint ya ocurrió (ids consecutivos en orden de CATALOGO)
+    } else if (!DRY && !SOLO_BD && cNft) {
       try {
         const uri = `data:application/json,${encodeURIComponent(JSON.stringify({
           name: item.titulo, description: item.desc, rubro: item.rubro, categoria,
@@ -600,7 +615,7 @@ async function main() {
     }
 
     // (b) propuesta única EMITIR_BRLT (tipo 0 según enum) por el Owner
-    const proposito = ethers.encodeBytes32String('inyeccion datos operativos @inyectaDatos');
+    const proposito = ethers.encodeBytes32String('Inyeccion operativa TrueKeate');
     const txP = await registry.crearPropuesta(0, proposito, ethers.parseEther(String(GROSSO)));
     const recP = await txP.wait();
     // id real de la propuesta: se lee del evento PropuestaCreada del recibo
@@ -667,7 +682,6 @@ async function main() {
       );
       console.log(`  ✓ ${p.nombre.padEnd(18)} finanzas.brlt = ${brltFinal} · NFTs = ${CATALOGO.filter(c => c.p === p.idx).length}`);
     }
-    await pool.query('COMMIT');
   } else {
     console.log('  [dry] finanzas.brlt = 2000/2000/2000/2000/1000/1000');
   }

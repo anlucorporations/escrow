@@ -1,0 +1,40 @@
+{
+  "fecha": "2026-09-08T12:06:49.875Z",
+  "pasos": [
+    {
+      "paso": "Login Ana",
+      "ok": true,
+      "detalle": "dashboard suite"
+    },
+    {
+      "paso": "Ana publica oferta",
+      "ok": false,
+      "detalle": "\"MacBook Pro 14\" M1 Pro reacondicio\" → PROPUESTO (firma por acción)"
+    },
+    {
+      "paso": "Mercado muestra la oferta de Ana",
+      "ok": false,
+      "detalle": "consulta pública /truekes/ofertas"
+    },
+    {
+      "paso": "Perfil Ana: reputación 10 trueques",
+      "ok": false,
+      "detalle": "sin métrica"
+    },
+    {
+      "paso": "Login Bruno",
+      "ok": true,
+      "detalle": "dashboard suite"
+    },
+    {
+      "paso": "Bruno acuerda la oferta de Ana",
+      "ok": false,
+      "detalle": "firma por acción \"acordar trueke\""
+    },
+    {
+      "paso": "Intercambio Bruno: historial/activos",
+      "ok": true,
+      "detalle": "sección consultada"
+    }
+  ]
+}

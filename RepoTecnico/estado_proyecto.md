@@ -409,3 +409,16 @@ Commit de documentación + scripts (`BaseOperaciones/`, `scripts/`, `.gitignore`
 (rama `escrow-dsh-GCP`). Excluidos del repo por seguridad/herencia: `REGISTRO_*_CLAVES.md`
 (claves), `backend/scripts/backups/` (respaldos de BD) y los scripts de la raíz heredados de la
 rama antigua (`deploy-local.*`, `accounts.sh`, `setup.sh`, `start/stop*`, `verify-setup.sh`).
+
+## 1.ª PRUEBA DEL PROYECTO (2026-09-08) — ejecutada en GCP
+
+Orden del director (trabajo en segundo plano): desplegar en GCP, BD en limpio, servicios probados,
+inyección de datos y **pruebas desde el navegador interno (Chromium headless)** como usuario.
+Resumen: despliegue verificado al día (API 00013 / web 00014) · BD reseteada con respaldo previo ·
+inyección ejecutada (6 usuarios, 24 ítems con NFT reales 6–29, 30 truekes = 10 por usuario,
+60 valoraciones, BRLT 2000/2000/2000/2000/1000/1000 emitido con quórum) · login con firma real de
+4 personas, inventario/finanzas/dashboard y publicación de trueque (201) verificados en el navegador.
+Documento completo con hallazgos: `RepoTecnico/INFORME_PRUEBA_1.md` (evidencia en
+`RepoTecnico/pruebas/1ra-prueba/`). Hallazgos: H1 (reputación cuenta solo parte A + nivel calculado
+no perfil), H2 (listado de Mercado lento en headless), H3 (firma única al recargar), H4 (permite
+ofertar dos veces el mismo artículo), H5 (mensaje de éxito transitorio).
