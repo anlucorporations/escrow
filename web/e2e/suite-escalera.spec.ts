@@ -12,6 +12,8 @@ interface UsuarioSim {
   tipo: "PARTICULAR" | "EMPRESA" | "SOCIO";
   nivel: "INICIADO" | "COMUN" | "FRECUENTE" | "SOCIO";
   estado: "INSCRITO" | "VERIFICADO" | "CERTIFICADO";
+  medalla?: "BRONCE" | "PLATA" | "ORO";
+  username?: string;
 }
 
 async function simularEscalera(page: Page, usuario: UsuarioSim, codigo: string) {
@@ -104,13 +106,22 @@ test.describe("Escalera D28 — Verificación y Certificación", () => {
     await expect(page.getByText(/pendiente de revisión humana del Owner/)).toBeVisible();
   });
 
-  test("Símbolo de estado: un INSCRITO ve el símbolo 🟡 que lleva a Verificación", async ({ page }) => {
-    await simularEscalera(page, { tipo: "PARTICULAR", nivel: "INICIADO", estado: "INSCRITO" }, "000000");
+  test("Menú de usuario: botón con icono + emoji de estado y encabezado username·nivel / tipo·medalla", async ({ page }) => {
+    await simularEscalera(
+      page,
+      { tipo: "PARTICULAR", nivel: "COMUN", estado: "INSCRITO", medalla: "BRONCE", username: "ana.prueba" },
+      "000000"
+    );
     await page.goto("/suite/dashboard");
-    const simbolo = page.getByRole("link", { name: /Estado: INSCRITO/ });
-    await expect(simbolo).toBeVisible();
-    await expect(simbolo).toContainText("🟡");
-    await simbolo.click();
-    await expect(page).toHaveURL(/\/suite\/verificacion/);
+    // Botón del menú: SOLO icono de usuario + emoji del estado (INSCRITO → 🟡)
+    const botonMenu = page.getByRole("button", { name: /Menú de usuario/ });
+    await expect(botonMenu).toBeVisible();
+    await expect(botonMenu).toContainText("🟡");
+    // Al desplegar: título "username · nivel" y subtítulo "tipo · medalla"
+    await botonMenu.click();
+    await expect(page.getByText(/@ana\.prueba/)).toBeVisible();
+    await expect(page.getByText(/·\s*COMUN/)).toBeVisible();
+    await expect(page.getByText(/PARTICULAR/)).toBeVisible();
+    await expect(page.getByText(/🥉\s*BRONCE/)).toBeVisible();
   });
 });

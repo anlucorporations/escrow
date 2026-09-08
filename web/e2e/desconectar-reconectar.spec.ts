@@ -149,8 +149,13 @@ test.describe("Desconectar billetera y reconectar con OTRA wallet", () => {
     // El login único firma con B (inscrita) → dashboard con la sesión de B
     await expect(page.getByRole("heading", { name: "Mi Trueke Central" })).toBeVisible();
     const menu = page.getByRole("button", { name: "Menú de usuario" });
-    await expect(menu).toContainText("0x3c44"); // B corta (en minúsculas, como se normaliza)
-    await expect(menu).not.toContainText("0xf39f"); // NUNCA la wallet anterior
+    await expect(menu).toBeVisible();
+    // El botón muestra solo icono + emoji de estado; la identidad (username o
+    // wallet corta si no hay handle) aparece en el encabezado del desplegable.
+    await menu.click();
+    const panel = page.locator('div[class*="rounded-modal"]').last();
+    await expect(panel).toContainText("0x3c44"); // B corta (en minúsculas, como se normaliza)
+    await expect(panel).not.toContainText("0xf39f"); // NUNCA la wallet anterior
 
     // Token global ligado a la wallet B
     const wallet = await page.evaluate(() => localStorage.getItem("truekeate.token.wallet"));

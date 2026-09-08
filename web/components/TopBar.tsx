@@ -17,13 +17,26 @@ import { useEthereum } from "@/lib/ethereum";
 import { useSesion } from "@/lib/sesion";
 import { seccionesPara } from "@/lib/navegacion";
 import { Button } from "@/components/Button";
-import { EscudoEstado } from "@/components/EscudoEstado";
 import { BotonConectarLogin } from "@/components/BotonConectarLogin";
 
 const ETIQUETA_ESTADO: Record<string, string> = {
   INSCRITO: "Inscrito",
   VERIFICADO: "Verificado",
   CERTIFICADO: "Certificado",
+};
+
+/** Símbolo minimalista del estado D28 que acompaña al icono de usuario. */
+const EMOJI_ESTADO: Record<string, string> = {
+  INSCRITO: "🟡",
+  VERIFICADO: "🟢",
+  CERTIFICADO: "🥇",
+};
+
+/** Medalla de reputación con su emoji (subtítulo del menú). */
+const MEDALLA_LABEL: Record<string, string> = {
+  BRONCE: "🥉 BRONCE",
+  PLATA: "🥈 PLATA",
+  ORO: "🥇 ORO",
 };
 
 function walletCorta(account: string) {
@@ -49,13 +62,14 @@ export function TopBar() {
   const noInscrito = conectado && acceso.fase === "conectadoNoInscrito";
   const inscrito = acceso.fase === "inscrito" ? acceso.usuario : null;
 
-  // Nombre visible en el menú: USERNAME cuando existe (ajuste del director);
-  // si aún no hay usuario (no inscrito) o falta el handle, se muestra la wallet.
+  // Nombre visible: username cuando existe; si no, wallet corta.
   const nombreVisible = inscrito?.username
     ? `@${inscrito.username}`
     : account
       ? walletCorta(account)
       : "";
+  const emojiEstado = inscrito ? EMOJI_ESTADO[inscrito.estado] ?? null : null;
+  const medallaTexto = inscrito?.medalla ? MEDALLA_LABEL[inscrito.medalla] ?? inscrito.medalla : null;
 
   // Secciones permitidas (PC) según tipo/nivel/estado (matriz única navegacion.ts)
   const secciones = seccionesPara({
@@ -152,29 +166,23 @@ export function TopBar() {
             </>
           ) : (
             <>
-              {/* Escudo de estado D28 → acceso rápido a Verificar/Certificar */}
-              <EscudoEstado />
               <div className="relative" ref={menuRef}>
-                {/* Botón del menú de usuario: muestra el USERNAME (ajuste del director) */}
+                {/* Botón del menú de usuario: SOLO icono de usuario + emoji de estado
+                    (ajuste del director); el username/nivel/tipo se muestran al desplegar */}
                 <button
                   onClick={() => setAbierto((v) => !v)}
                   aria-label="Menú de usuario"
-                  className="flex items-center gap-2 rounded-pill border border-gold-500/60 px-2.5 py-1 text-[11px] font-semibold text-gold-300 transition-colors hover:bg-white/10"
+                  title={`${nombreVisible}${inscrito ? ` · ${ETIQUETA_ESTADO[inscrito.estado] ?? inscrito.estado}` : noInscrito ? " · No inscrito" : ""}`}
+                  className="flex items-center gap-1.5 rounded-pill border border-gold-500/60 px-2.5 py-1.5 text-base leading-none transition-colors hover:bg-white/10"
                 >
                   <span aria-hidden>👤</span>
-                  <span className="hidden max-w-40 truncate sm:inline" title={nombreVisible}>
-                    {nombreVisible}
-                  </span>
-                  <span
-                    className={`rounded-pill px-1.5 py-0.5 text-[9px] font-bold uppercase ${
-                      noInscrito ? "bg-crimson/90 text-white" : "bg-gold-500 text-navy-800"
-                    }`}
-                  >
-                    {noInscrito ? "No inscrito" : inscrito ? ETIQUETA_ESTADO[inscrito.estado] ?? inscrito.estado : "…"}
-                  </span>
-                  <span aria-hidden className="text-[8px]">
-                    {abierto ? "▲" : "▼"}
-                  </span>
+                  {emojiEstado ? (
+                    <span aria-hidden>{emojiEstado}</span>
+                  ) : noInscrito ? (
+                    <span className="rounded-pill bg-crimson/90 px-1.5 py-0.5 text-[9px] font-bold uppercase text-white">
+                      No inscrito
+                    </span>
+                  ) : null}
                 </button>
 
                 {/* Desplegable del menú de usuario */}
@@ -184,13 +192,23 @@ export function TopBar() {
                       <p className="text-[10px] uppercase tracking-wide text-navy-800/50">
                         {inscrito ? "Usuario" : "Billetera"}
                       </p>
-                      {/* USERNAME en lugar de la dirección (ajuste del director) */}
-                      <p className="truncate text-base font-bold">{nombreVisible}</p>
-                      {inscrito && (
-                        <p className="mt-1 text-[11px] text-navy-800/60">
-                          Estado: <strong>{ETIQUETA_ESTADO[inscrito.estado] ?? inscrito.estado}</strong> ·{" "}
-                          {inscrito.nivel} · {inscrito.tipo}
-                        </p>
+                      {inscrito ? (
+                        <>
+                          {/* Título: username + nivel (D12) */}
+                          <p className="truncate text-base font-bold">
+                            {nombreVisible}
+                            {inscrito.nivel ? (
+                              <span className="ml-1.5 text-gold-600">· {inscrito.nivel}</span>
+                            ) : null}
+                          </p>
+                          {/* Subtítulo (segundo nivel): tipo de usuario + medalla de reputación */}
+                          <p className="mt-0.5 truncate text-[11px] font-semibold uppercase tracking-wide text-navy-800/55">
+                            {inscrito.tipo}
+                            {medallaTexto ? <span className="ml-1.5">{medallaTexto}</span> : null}
+                          </p>
+                        </>
+                      ) : (
+                        <p className="truncate text-base font-bold">{nombreVisible}</p>
                       )}
                     </div>
 

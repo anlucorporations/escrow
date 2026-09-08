@@ -15,6 +15,8 @@ export interface UsuarioPublico {
   tipo: "PARTICULAR" | "EMPRESA" | "SOCIO";
   nivel: "INICIADO" | "COMUN" | "FRECUENTE" | "SOCIO";
   estado: "INSCRITO" | "VERIFICADO" | "CERTIFICADO";
+  /** Medalla de reputación (D12). */
+  medalla?: "BRONCE" | "PLATA" | "ORO" | null;
   /** Correo registrado (visible solo en consultas propias). */
   correo?: string | null;
 }

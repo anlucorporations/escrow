@@ -32,6 +32,7 @@ function vistaPublica(u) {
     tipo: u.tipo,
     nivel: u.nivel,
     estado: u.estado,
+    medalla: u.medalla ?? null,
   };
 }
 
