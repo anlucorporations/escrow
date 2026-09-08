@@ -53,6 +53,10 @@ async function simularEscalera(page: Page, usuario: UsuarioSim, codigo: string) 
         if (url.includes("/kyc/status")) {
           return json({ estado: estadoActual, kyc: null });
         }
+        if (url.includes("/kyc/sbt")) {
+          // sin SBT → la suite pide documentos; con 'conSbt' simulado se certifica
+          return json({ tieneSbt: false, fuente: null, contrato: null, tokenId: null, estado: estadoActual });
+        }
         if (url.includes("/kyc/init") && init?.method === "POST") {
           return json({ kyc: null, aviso: "código generado (demo)", codigoDemo: cod });
         }
@@ -61,7 +65,7 @@ async function simularEscalera(page: Page, usuario: UsuarioSim, codigo: string) 
           return json({ usuario: { wallet: cuenta, tipo: "PARTICULAR", nivel: "INICIADO", estado: "VERIFICADO" }, kyc: null });
         }
         if (url.includes("/kyc/submit") && init?.method === "POST") {
-          return json({ kyc: { estado: "PENDIENTE" }, aviso: "KYC enviado — pendiente de revisión" });
+          return json({ kyc: { estado: "PENDIENTE", viaSbt: false }, aviso: "KYC enviado — pendiente de revisión" });
         }
         return orig(input, init);
       };
@@ -89,19 +93,26 @@ test.describe("Escalera D28 — Verificación y Certificación", () => {
     await expect(page.getByText("¡Correo verificado!")).toBeVisible();
   });
 
-  test("Certificación: Verificado envía documento y selfie (KYC) → PENDIENTE", async ({ page }) => {
+  test("Certificación: Verificado sin SBT sube documento y selfie (imágenes) → PENDIENTE", async ({ page }) => {
     await simularEscalera(page, { tipo: "PARTICULAR", nivel: "INICIADO", estado: "VERIFICADO" }, "000000");
     await page.goto("/suite/certificacion");
     await expect(page.getByRole("heading", { name: /Certificación \(KYC\)/ })).toBeVisible();
     const btnLogin = page.getByRole("button", { name: /Iniciar sesión|Autenticar/ });
     if (await btnLogin.isVisible().catch(() => false)) await btnLogin.click();
-    // Espera el formulario (tras el login) y llénalo
-    const botonEnviar = page.getByRole("button", { name: /Enviar KYC/ });
-    await expect(botonEnviar).toBeVisible({ timeout: 10_000 });
-    await page.locator("#doc").fill("ipfs://doc-abc");
-    await page.locator("#selfie").fill("ipfs://selfie-abc");
-    await expect(botonEnviar).toBeEnabled();
-    await botonEnviar.click();
+    // Sin SBT: la suite pide subir documento + selfie
+    await expect(page.getByText(/No detectamos un SBT/)).toBeVisible();
+    await page.locator("#doc-img").setInputFiles({
+      name: "doc.png",
+      mimeType: "image/png",
+      buffer: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64"),
+    });
+    await page.locator("#selfie-img").setInputFiles({
+      name: "selfie.png",
+      mimeType: "image/png",
+      buffer: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64"),
+    });
+    await expect(page.getByRole("button", { name: /Enviar KYC \(DNI \+ selfie\)/ })).toBeEnabled();
+    await page.getByRole("button", { name: /Enviar KYC \(DNI \+ selfie\)/ }).click();
     await expect(page.getByText("KYC enviado")).toBeVisible();
     await expect(page.getByText(/pendiente de revisión humana del Owner/)).toBeVisible();
   });

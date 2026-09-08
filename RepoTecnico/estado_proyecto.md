@@ -446,3 +446,21 @@ las secciones por rol y la marca con logo. Captura: `RepoTecnico/pruebas/1ra-pru
 - Se eliminó el componente EscudoEstado; la API pública expone `medalla`.
 - Despliegue GCP: API rev 00016 · web rev 00018 (imágenes release-169d345). Verificado en
   navegador: `👤🥇 @ana.lopez·SOCIO SOCIO🥇ORO` y `👤🟢 @carlos.mendoza·COMUN PARTICULAR🥉BRONCE`.
+
+## Certificación con SBT (/suite/certificacion) — implementado (2026-09)
+
+Orden del director (@asistenteProyecto) + bloque de decisiones: SBT nativo TrueKeateSBT ·
+chequeo on-chain (allowlist configurable) · auto-certificación · imágenes reales si no hay SBT.
+Implementado:
+- Contrato `sc/src/TrueKeateSBT.sol` (soulbound ERC-721/ERC-5192, 1 SBT por wallet, minter
+  plataforma) + `sc/test/TrueKeateSBT.t.sol` (6/6).
+- Backend: `api/lib/sbt.js` (detectarSbt/mintSbtNativo), rutas `/kyc/sbt`, `/kyc/auto-certificar`,
+  `/kyc/submit` (imágenes DNI/selfie base64), `/kyc/pendientes` y `/kyc/review` (Owner) con mint
+  del SBT nativo al aprobar; migración `db/migracion_sbt.sql` (kyc via_sbt/sbt_* e imágenes,
+  enum KYC_DNI/KYC_SELFIE, firma opcional).
+- Web: `/suite/certificacion` (verifica SBT → certifica automático o pide subir DNI+selfie con
+  preview) y componente `KycPendientesOwner` en el Panel del Owner (aprobar/rechazar).
+- Verificaciones: Foundry 6/6 nuevos · backend 21/21 · build web OK.
+- Doc: `RepoTecnico/PROPUESTA_CERTIFICACION_SBT.md`.
+Pendiente (orden del director): aplicar migración BD, desplegar TrueKeateSBT en anvil GCP,
+registrar en contratos.json/secreto, redesplegar api+web y push.

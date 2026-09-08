@@ -12,6 +12,7 @@
 // Uso: const almacen = await crearAlmacenPg(pool);   // pool pg ya conectado
 // =============================================================================
 import { crearAlmacen } from './almacen.js';
+import crypto from 'node:crypto';
 
 const NORMALIZA_WALLET = (w) => (w || '').toLowerCase();
 
@@ -128,7 +129,8 @@ export async function crearAlmacenPg(pool) {
 
     async getKyc(wallet) {
       const r = await pool.query(
-        `SELECT k.id, k.estado, k.revisado_por, k.created_at, u.wallet
+        `SELECT k.id, k.estado, k.revisado_por, k.via_sbt, k.sbt_contrato, k.sbt_token_id,
+                k.documento_img_id, k.selfie_img_id, k.created_at, u.wallet
            FROM kyc k JOIN usuarios u ON u.id = k.usuario_id
           WHERE u.wallet = $1 ORDER BY k.id DESC LIMIT 1`,
         [NORMALIZA_WALLET(wallet)]
@@ -136,9 +138,15 @@ export async function crearAlmacenPg(pool) {
       if (r.rowCount === 0) return null;
       const k = r.rows[0];
       return {
+        id: Number(k.id),
         wallet: k.wallet.trim().toLowerCase(),
         estado: k.estado,
         revisadoPor: k.revisado_por ? k.revisado_por.trim().toLowerCase() : null,
+        viaSbt: Boolean(k.via_sbt),
+        sbtContrato: k.sbt_contrato ? k.sbt_contrato.trim().toLowerCase() : null,
+        sbtTokenId: k.sbt_token_id !== null && k.sbt_token_id !== undefined ? Number(k.sbt_token_id) : null,
+        documentoImgId: k.documento_img_id !== null ? Number(k.documento_img_id) : null,
+        selfieImgId: k.selfie_img_id !== null ? Number(k.selfie_img_id) : null,
         createdAt: k.created_at ? k.created_at.toISOString() : null,
       };
     },
@@ -148,8 +156,23 @@ export async function crearAlmacenPg(pool) {
       if (!k) return null;
       const cols = [];
       const vals = [];
-      if (cambios.estado) { cols.push('estado'); vals.push(cambios.estado); }
-      if (cambios.revisadoPor) { cols.push('revisado_por'); vals.push(NORMALIZA_WALLET(cambios.revisadoPor)); }
+      const mapa = {
+        estado: 'estado',
+        revisadoPor: 'revisado_por',
+        viaSbt: 'via_sbt',
+        sbtContrato: 'sbt_contrato',
+        sbtTokenId: 'sbt_token_id',
+        documentoImgId: 'documento_img_id',
+        selfieImgId: 'selfie_img_id',
+      };
+      for (const [clave, col] of Object.entries(mapa)) {
+        if (cambios[clave] !== undefined) {
+          cols.push(col);
+          let valor = cambios[clave];
+          if (clave === 'revisadoPor' || clave === 'sbtContrato') valor = NORMALIZA_WALLET(valor);
+          vals.push(valor);
+        }
+      }
       if (cols.length === 0) return k;
       cols.push('updated_at');
       vals.push(new Date().toISOString());
@@ -159,6 +182,41 @@ export async function crearAlmacenPg(pool) {
         [NORMALIZA_WALLET(wallet), ...vals]
       );
       return this.getKyc(wallet);
+    },
+
+    /** Guarda una imagen genérica (p. ej. KYC DNI/selfie) en imagenes_certificadas. */
+    async guardarImagen({ tipo, refId, wallet, contenido, mime }) {
+      const hash = crypto.createHash('sha256').update(contenido).digest();
+      const r = await pool.query(
+        `INSERT INTO imagenes_certificadas (tipo, ref_id, hash_sha256, wallet, contenido, mime, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, now())
+         RETURNING id`,
+        [tipo, Number(refId), hash, NORMALIZA_WALLET(wallet), Buffer.from(contenido), mime ?? 'image/jpeg']
+      );
+      return Number(r.rows[0].id);
+    },
+
+    /** Lista KYC pendientes de revisión (Owner) con datos del usuario. */
+    async listarKycPendientes() {
+      const r = await pool.query(
+        `SELECT k.id AS kyc_id, k.estado, k.via_sbt, k.documento_img_id, k.selfie_img_id, k.created_at,
+                u.wallet, u.tipo, u.nivel, u.medalla
+           FROM kyc k JOIN usuarios u ON u.id = k.usuario_id
+          WHERE k.estado = 'PENDIENTE'
+          ORDER BY k.created_at ASC`
+      );
+      return r.rows.map((f) => ({
+        kycId: Number(f.kyc_id),
+        estado: f.estado,
+        viaSbt: Boolean(f.via_sbt),
+        documentoImgId: f.documento_img_id !== null ? Number(f.documento_img_id) : null,
+        selfieImgId: f.selfie_img_id !== null ? Number(f.selfie_img_id) : null,
+        wallet: f.wallet.trim().toLowerCase(),
+        tipo: f.tipo,
+        nivel: f.nivel,
+        medalla: f.medalla,
+        createdAt: f.created_at ? f.created_at.toISOString() : null,
+      }));
     },
 
     // ------------------------------------------------------------ catálogo (persistido)

@@ -431,7 +431,31 @@ export interface KycInitResult {
 
 export interface KycStatusResult {
   estado: "INSCRITO" | "VERIFICADO" | "CERTIFICADO" | null;
-  kyc: { wallet?: string; estado?: string; etapa?: number; revisadoPor?: string } | null;
+  kyc: {
+    wallet?: string;
+    estado?: string;
+    etapa?: number;
+    revisadoPor?: string;
+    viaSbt?: boolean;
+    sbtContrato?: string | null;
+    sbtTokenId?: number | null;
+    documentoImgId?: number | null;
+    selfieImgId?: number | null;
+  } | null;
+}
+
+export interface InfoSbt {
+  tieneSbt: boolean;
+  fuente: "nativo" | "externa" | null;
+  contrato: string | null;
+  tokenId: number | null;
+  estado?: string;
+}
+
+/** Imagen subida en base64 con su MIME. */
+export interface ImagenBase64 {
+  data: string;
+  mime: string;
 }
 
 /** POST /kyc/init — inicia la verificación: genera y envía el código al correo. */
@@ -452,7 +476,47 @@ export function estadoKyc(token: string): Promise<KycStatusResult> {
   return pedirAuth<KycStatusResult>("/kyc/status", token);
 }
 
-/** POST /kyc/submit — envía documento + selfie → PENDIENTE (revisión Owner). */
-export function enviarKyc(token: string, datos: { documentoRef: string; selfieRef: string }): Promise<{ kyc: unknown; aviso: string }> {
+/** GET /kyc/sbt — ¿la wallet posee un SBT de certificación? (on-chain). */
+export function checkearSbt(token: string): Promise<InfoSbt> {
+  return pedirAuth<InfoSbt>("/kyc/sbt", token);
+}
+
+/** POST /kyc/auto-certificar — con SBT → CERTIFICADO automático (mintea SBT nativo). */
+export function autoCertificarSbt(token: string): Promise<{ ok: boolean; yaCertificado?: boolean; usuario: UsuarioPublico; kyc: unknown; sbt?: InfoSbt & { minteoNativo?: unknown } }> {
+  return pedirAuth<{ ok: boolean; usuario: UsuarioPublico; kyc: unknown }>("/kyc/auto-certificar", token, { metodo: "POST", body: {} });
+}
+
+/** POST /kyc/submit — sin SBT: sube DNI/cédula + selfie (imágenes) → PENDIENTE. */
+export function enviarKyc(
+  token: string,
+  datos: { documento: ImagenBase64; selfie: ImagenBase64 }
+): Promise<{ kyc: unknown; aviso: string }> {
   return pedirAuth<{ kyc: unknown; aviso: string }>("/kyc/submit", token, { metodo: "POST", body: datos });
+}
+
+export interface KycPendiente {
+  wallet: string;
+  estado: string;
+  viaSbt?: boolean;
+  documentoImgId?: number | null;
+  selfieImgId?: number | null;
+  tipo?: string | null;
+  nivel?: string | null;
+  medalla?: string | null;
+  urlDocumento?: string | null;
+  urlSelfie?: string | null;
+  createdAt?: string | null;
+}
+
+/** GET /kyc/pendientes — Owner: solicitudes KYC en revisión. */
+export function kycPendientes(token: string): Promise<{ pendientes: KycPendiente[] }> {
+  return pedirAuth<{ pendientes: KycPendiente[] }>("/kyc/pendientes", token);
+}
+
+/** POST /kyc/review — Owner aprueba (true) o rechaza (false) una solicitud. */
+export function revisarKyc(token: string, wallet: string, aprobar: boolean): Promise<{ usuario: UsuarioPublico; kyc: unknown }> {
+  return pedirAuth<{ usuario: UsuarioPublico; kyc: unknown }>("/kyc/review", token, {
+    metodo: "POST",
+    body: { wallet, aprobar },
+  });
 }

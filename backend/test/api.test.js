@@ -109,7 +109,12 @@ test('KYC: códigos → VERIFICADO; submit + revisión Owner → CERTIFICADO (D2
   assert.equal(v.status, 200);
   assert.equal(v.body.usuario.estado, 'VERIFICADO');
 
-  const sub = await request(app).post('/kyc/submit').set('Authorization', `Bearer ${token}`).send({ documentoRef: 'ipfs/doc1', selfieRef: 'ipfs/selfie1' });
+  // Sin SBT → sube imágenes reales (DNI + selfie) → PENDIENTE (revisión Owner)
+  const PNG_1x1 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+  const sub = await request(app).post('/kyc/submit').set('Authorization', `Bearer ${token}`).send({
+    documento: { data: PNG_1x1, mime: 'image/png' },
+    selfie: { data: PNG_1x1, mime: 'image/png' },
+  });
   assert.equal(sub.status, 200);
   assert.equal(sub.body.kyc.estado, 'PENDIENTE', 'revisión humana del Owner (RF-18.4)');
 

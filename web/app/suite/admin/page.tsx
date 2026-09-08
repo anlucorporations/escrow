@@ -20,6 +20,7 @@ import {
   type AdminInfra,
 } from "@/lib/api";
 import { Card } from "@/components/Card";
+import { KycPendientesOwner } from "@/components/KycPendientesOwner";
 import { Button } from "@/components/Button";
 
 function TarjetaKpi({ icono, label, valor, tono }: { icono: string; label: string; valor: string | number; tono: string }) {
@@ -123,6 +124,9 @@ export default function PaginaAdmin() {
             <TarjetaKpi icono="⇄" label="Truekes (espejo)" valor={kpis.totalTruekes} tono="border-navy-800/10 bg-smoke" />
             <TarjetaKpi icono="⚖️" label="Disputas abiertas" valor={kpis.disputasAbiertas} tono="border-coral/40 bg-coral/10" />
           </div>
+
+          {/* KYC pendientes: revisión humana del Owner (RF-18.4) */}
+          {token ? <KycPendientesOwner token={token} /> : null}
 
           {/* BD */}
           <Card className="p-5">

@@ -127,6 +127,37 @@ export function crearAlmacen() {
     listarImagenesArticulo(articuloId) {
       return [...estado.imagenes.values()].filter((i) => i.articuloId === Number(articuloId));
     },
+    /** Guarda una imagen genérica (KYC DNI/selfie, etc.) en el almacén. */
+    guardarImagen({ tipo, refId, wallet, contenido, mime }) {
+      const id = proxImagen++;
+      estado.imagenes.set(id, {
+        id, tipo, refId: Number(refId), wallet,
+        contenido: Buffer.isBuffer(contenido) ? contenido : Buffer.from(contenido ?? ''),
+        mime: mime ?? 'image/jpeg',
+        createdAt: new Date().toISOString(),
+      });
+      return id;
+    },
+    /** Lista KYC pendientes de revisión (Owner). */
+    listarKycPendientes() {
+      return [...estado.kyc.entries()]
+        .filter(([, k]) => k.estado === 'PENDIENTE')
+        .map(([wallet, k]) => {
+          const u = estado.usuarios.get(wallet) ?? {};
+          return {
+            kycId: 0,
+            wallet,
+            estado: k.estado,
+            viaSbt: Boolean(k.viaSbt),
+            documentoImgId: k.documentoImgId ?? null,
+            selfieImgId: k.selfieImgId ?? null,
+            tipo: u.tipo ?? null,
+            nivel: u.nivel ?? null,
+            medalla: u.medalla ?? null,
+            createdAt: k.createdAt ?? null,
+          };
+        });
+    },
     getImagen(id) {
       return estado.imagenes.get(Number(id)) ?? null;
     },

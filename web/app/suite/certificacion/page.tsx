@@ -2,46 +2,125 @@
 
 // =============================================================================
 // TrueKeate — Certificación (KYC) (/suite/certificacion)
-// Etapa 2 de la escalera D28 (CU-02): el usuario Verificado envía documento de
-// identidad + selfie. El KYC queda PENDIENTE de revisión humana del Owner
-// (RF-18.4) → estado CERTIFICADO (RF-01.5).
-// Nota: el servicio verificador automático de documentos es externo y está
-// documentado en la propuesta de metodología (RepoTecnico).
+// Etapa 2 de la escalera D28 (CU-02) — lógica con SBT (decisión del director):
+//   1. Al entrar, verifica si la wallet posee un SBT de certificación (on-chain):
+//      el SBT nativo TrueKeateSBT del proyecto o uno externo reconocido.
+//   2. Si posee SBT → botón "Certificarme con mi SBT": CERTIFICADO automático y
+//      la plataforma mintea el SBT nativo TrueKeateSBT (credencial propia).
+//   3. Si NO posee SBT → sube imagen real del documento (cédula/DNI) + selfie
+//      → PENDIENTE de revisión humana del Owner (RF-18.4) → CERTIFICADO.
 // =============================================================================
 import { useCallback, useEffect, useState } from "react";
 import { useSesion } from "@/lib/sesion";
-import { estadoKyc, enviarKyc } from "@/lib/api";
+import { estadoKyc, checkearSbt, autoCertificarSbt, enviarKyc, type InfoSbt } from "@/lib/api";
 import { Card } from "@/components/Card";
 import { Button } from "@/components/Button";
 
 const inputCls =
   "w-full rounded-xl border border-navy-800/15 bg-white px-3 py-2 text-sm text-navy-800 outline-none transition-colors focus:border-teal-500";
 
+/** Lee un archivo como dataURL base64. */
+function leerArchivo(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => resolve(String(fr.result));
+    fr.onerror = () => reject(new Error("no se pudo leer la imagen"));
+    fr.readAsDataURL(file);
+  });
+}
+
 export default function PaginaCertificacion() {
-  const { acceso, token } = useSesion();
+  const { token } = useSesion();
   const [estado, setEstado] = useState<string | null>(null);
-  const [documentoRef, setDocumentoRef] = useState("");
-  const [selfieRef, setSelfieRef] = useState("");
+  const [kycViaSbt, setKycViaSbt] = useState(false);
+  const [sbt, setSbt] = useState<InfoSbt | null>(null);
+  const [revisandoSbt, setRevisandoSbt] = useState(true);
+  const [docPreview, setDocPreview] = useState<string | null>(null);
+  const [selfiePreview, setSelfiePreview] = useState<string | null>(null);
+  const [docData, setDocData] = useState<{ data: string; mime: string } | null>(null);
+  const [selfieData, setSelfieData] = useState<{ data: string; mime: string } | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [enviado, setEnviado] = useState(false);
 
-  const cargarEstado = useCallback(async () => {
+  const cargar = useCallback(async () => {
     if (!token) return;
+    setRevisandoSbt(true);
     try {
       const st = await estadoKyc(token!);
       setEstado(st.estado);
+      setKycViaSbt(Boolean(st.kyc?.viaSbt));
+      // Punto 1: verificar si la wallet posee un SBT para certificar
+      const info = await checkearSbt(token!);
+      setSbt(info);
     } catch {
-      /* sin token */
+      /* sin token o red */
+    } finally {
+      setRevisandoSbt(false);
     }
   }, [token]);
 
   useEffect(() => {
-    void cargarEstado();
-  }, [cargarEstado]);
+    void cargar();
+  }, [cargar]);
+
+  async function onArchivo(tipo: "doc" | "selfie", file?: File) {
+    if (!file) return;
+    if (file.size > 4 * 1024 * 1024) {
+      setError("La imagen supera ~4 MB.");
+      return;
+    }
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setError("Usa una imagen JPEG, PNG o WebP.");
+      return;
+    }
+    const dataUrl = await leerArchivo(file);
+    const b64 = dataUrl.split(",")[1] ?? "";
+    if (tipo === "doc") {
+      setDocPreview(dataUrl);
+      setDocData({ data: b64, mime: file.type || "image/jpeg" });
+    } else {
+      setSelfiePreview(dataUrl);
+      setSelfieData({ data: b64, mime: file.type || "image/jpeg" });
+    }
+    setError(null);
+  }
+
+  async function certificarConSbt() {
+    setOcupado(true);
+    setError(null);
+    try {
+      await autoCertificarSbt(token!);
+      setEstado("CERTIFICADO");
+      setEnviado(true);
+      setKycViaSbt(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "no se pudo certificar");
+      void cargar();
+    } finally {
+      setOcupado(false);
+    }
+  }
+
+  async function enviar(e: React.FormEvent) {
+    e.preventDefault();
+    if (!docData || !selfieData) {
+      setError("Sube ambas imágenes: documento (cédula/DNI) y selfie.");
+      return;
+    }
+    setOcupado(true);
+    setError(null);
+    try {
+      await enviarKyc(token!, { documento: docData, selfie: selfieData });
+      setEnviado(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "no se pudo enviar el KYC");
+    } finally {
+      setOcupado(false);
+    }
+  }
 
   if (!token) {
-    // El guard de la suite ya pide la firma única; protección de respaldo.
     return (
       <Card className="mx-auto max-w-xl p-8 text-center">
         <p className="text-3xl">🛡️</p>
@@ -58,9 +137,15 @@ export default function PaginaCertificacion() {
       <Card className="mx-auto max-w-xl p-8 text-center">
         <p className="text-4xl">🏆</p>
         <h1 className="mt-2 font-display text-2xl font-bold text-navy-800">¡Ya estás Certificado!</h1>
-        <p className="mt-1 text-sm text-navy-800/60">
-          Tienes acceso a todas las operaciones de la plataforma, historial y subastas (RF-14.5/17.2).
-        </p>
+        {kycViaSbt ? (
+          <p className="mx-auto mt-2 inline-flex items-center gap-1 rounded-pill bg-teal-500/10 px-3 py-1 text-xs font-bold text-teal-700">
+            🪪 Certificado automáticamente con tu SBT
+          </p>
+        ) : (
+          <p className="mt-1 text-sm text-navy-800/60">
+            Tienes acceso a todas las operaciones de la plataforma, historial y subastas (RF-14.5/17.2).
+          </p>
+        )}
         <p className="mt-4">
           <a href="/suite/dashboard" className="text-sm font-semibold text-teal-500 underline">
             Ir a Mi Trueke Central →
@@ -87,20 +172,22 @@ export default function PaginaCertificacion() {
     );
   }
 
-  async function enviar(e: React.FormEvent) {
-    e.preventDefault();
-    setOcupado(true);
-    setError(null);
-    try {
-      await enviarKyc(token!, { documentoRef: documentoRef.trim(), selfieRef: selfieRef.trim() });
-      setEnviado(true);
-      // Refresco local (no toca el contexto global para no remontar la página).
-      void cargarEstado();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "no se pudo enviar el KYC");
-    } finally {
-      setOcupado(false);
-    }
+  if (enviado && estado === "CERTIFICADO") {
+    return (
+      <Card className="mx-auto max-w-xl p-8 text-center">
+        <p className="text-4xl">🪪</p>
+        <h1 className="mt-2 font-display text-2xl font-bold text-navy-800">¡Certificado con tu SBT!</h1>
+        <p className="mt-1 text-sm text-navy-800/60">
+          Tu wallet poseía un SBT de certificación y TrueKeate te certificó al instante. Se registró tu
+          credencial y, si no la tenías, la plataforma minteó tu <strong>SBT nativo TrueKeate</strong>.
+        </p>
+        <p className="mt-4">
+          <a href="/suite/dashboard" className="text-sm font-semibold text-teal-500 underline">
+            Ir a Mi Trueke Central →
+          </a>
+        </p>
+      </Card>
+    );
   }
 
   if (enviado) {
@@ -109,8 +196,8 @@ export default function PaginaCertificacion() {
         <p className="text-4xl">📋</p>
         <h1 className="mt-2 font-display text-2xl font-bold text-navy-800">KYC enviado</h1>
         <p className="mt-1 text-sm text-navy-800/60">
-          Tu documentación quedó <strong>pendiente de revisión humana del Owner</strong> (RF-18.4).
-          Te notificaremos cuando se apruebe y pases a <strong>Certificado</strong>.
+          Tu documentación (cédula/DNI + selfie) quedó <strong>pendiente de revisión humana del Owner</strong>{" "}
+          (RF-18.4). Te notificaremos cuando se apruebe y pases a <strong>Certificado</strong>.
         </p>
         <p className="mt-4">
           <a href="/suite/dashboard" className="text-sm font-semibold text-teal-500 underline">
@@ -126,54 +213,99 @@ export default function PaginaCertificacion() {
       <div>
         <h1 className="font-display text-2xl font-bold text-navy-800">🛡️ Certificación (KYC)</h1>
         <p className="text-sm text-navy-800/60">
-          Paso 2 de la escalera D28: envía tu <strong>documento de identidad</strong> y una{" "}
-          <strong>selfie</strong> para pasar de Verificado a <strong>Certificado</strong> (RF-01.5).
+          Paso 2 de la escalera D28. Comprobamos primero si tu wallet posee un{" "}
+          <strong>SBT de certificación</strong> (credencial no transferible); si lo tiene, te certificas
+          automáticamente. Si no, sube tu documento (cédula/DNI) y una selfie (RF-01.5 / RF-18.4).
         </p>
         <p className="mt-1 text-xs text-navy-800/40">
-          Estado actual: <strong>{estado}</strong> · Tu documentación se cifra en reposo (D17); solo una
-          huella (merkle root) se sube a la cadena (RF-01.7).
+          Estado actual: <strong>{estado}</strong> · Tus imágenes se cifran en reposo (D17).
         </p>
       </div>
 
-      <Card className="p-6">
-        <form onSubmit={enviar} className="space-y-4">
-          <div>
-            <label htmlFor="doc" className="mb-1 block text-xs font-semibold uppercase tracking-wide text-navy-800/60">
-              Referencia del documento de identidad *
-            </label>
-            <input
-              id="doc"
-              required
-              value={documentoRef}
-              onChange={(e) => setDocumentoRef(e.target.value)}
-              placeholder="Ej: ipfs://CID-del-documento o referencia del verificador"
-              className={inputCls}
-            />
-          </div>
-          <div>
-            <label htmlFor="selfie" className="mb-1 block text-xs font-semibold uppercase tracking-wide text-navy-800/60">
-              Referencia de la selfie *
-            </label>
-            <input
-              id="selfie"
-              required
-              value={selfieRef}
-              onChange={(e) => setSelfieRef(e.target.value)}
-              placeholder="Ej: ipfs://CID-de-la-selfie"
-              className={inputCls}
-            />
-          </div>
-          <p className="rounded-xl bg-smoke px-3 py-2 text-[11px] text-navy-800/50">
-            En producción, el documento y la selfie pasan por un <strong>servicio verificador</strong>{" "}
-            automático y la revisión humana del Owner (RF-18.4) — ver propuesta de metodología en
-            RepoTecnico. Aquí se registran las referencias cifradas.
+      {revisandoSbt && !sbt ? (
+        <Card className="p-6 text-center text-sm text-navy-800/60">
+          🔎 Verificando si tu wallet posee un SBT de certificación…
+        </Card>
+      ) : sbt?.tieneSbt ? (
+        // ------------------------------------------------------------ con SBT
+        <Card className="border-teal-500/40 p-6">
+          <p className="text-lg font-bold text-teal-700">🪪 Tu wallet posee un SBT de certificación</p>
+          <p className="mt-1 text-sm text-navy-800/70">
+            Fuente:{" "}
+            <strong>{sbt.fuente === "nativo" ? "SBT nativo TrueKeate" : "SBT externo reconocido"}</strong>
+            {sbt.tokenId ? <> · tokenId #{sbt.tokenId}</> : null}
+            {sbt.contrato ? (
+              <span className="block break-all font-mono text-[10px] text-navy-800/40">{sbt.contrato}</span>
+            ) : null}
           </p>
-          {error && <p className="text-xs text-crimson">⚠️ {error}</p>}
-          <Button type="submit" disabled={ocupado || !documentoRef || !selfieRef} className="w-full">
-            {ocupado ? "Enviando…" : "📋 Enviar KYC para certificación"}
+          <Button
+            onClick={() => void certificarConSbt()}
+            disabled={ocupado}
+            className="mt-4 w-full"
+          >
+            {ocupado ? "Certificando…" : "✅ Certificarme automáticamente con mi SBT"}
           </Button>
-        </form>
-      </Card>
+          {error ? <p className="mt-2 text-xs text-crimson">{error}</p> : null}
+        </Card>
+      ) : (
+        // ------------------------------------------------------------ sin SBT
+        <>
+          <Card className="border-gold-500/30 p-6">
+            <p className="text-sm font-semibold text-navy-800">
+              🪪 No detectamos un SBT de certificación en tu wallet.
+            </p>
+            <p className="mt-1 text-xs text-navy-800/60">
+              Sube una foto de tu <strong>documento de identidad (cédula/DNI)</strong> y una{" "}
+              <strong>selfie</strong>. Un revisor humano (Owner) aprobará tu certificación (RF-18.4).
+            </p>
+          </Card>
+
+          <Card className="p-6">
+            <form onSubmit={enviar} className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-navy-800/60">
+                    Documento (cédula/DNI) *
+                  </label>
+                  <input
+                    id="doc-img"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className={inputCls}
+                    onChange={(e) => void onArchivo("doc", e.target.files?.[0])}
+                  />
+                  {docPreview ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={docPreview} alt="Documento" className="mt-2 h-28 w-full rounded-xl bg-smoke object-contain" />
+                  ) : null}
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-navy-800/60">
+                    Selfie *
+                  </label>
+                  <input
+                    id="selfie-img"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className={inputCls}
+                    onChange={(e) => void onArchivo("selfie", e.target.files?.[0])}
+                  />
+                  {selfiePreview ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={selfiePreview} alt="Selfie" className="mt-2 h-28 w-full rounded-xl bg-smoke object-contain" />
+                  ) : null}
+                </div>
+              </div>
+
+              {error ? <p className="text-xs text-crimson">{error}</p> : null}
+
+              <Button type="submit" disabled={ocupado || !docData || !selfieData} className="w-full">
+                {ocupado ? "Enviando…" : "📤 Enviar KYC (DNI + selfie)"}
+              </Button>
+            </form>
+          </Card>
+        </>
+      )}
     </div>
   );
 }

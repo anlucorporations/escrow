@@ -47,7 +47,7 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
-    CREATE TYPE tipo_imagen AS ENUM ('PUBLICACION','RECEPCION');
+    CREATE TYPE tipo_imagen AS ENUM ('PUBLICACION','RECEPCION','KYC_DNI','KYC_SELFIE');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
@@ -87,7 +87,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
     updated_at          TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Metadata KYC cifrada (RF-01.7, D17)
+-- Metadata KYC cifrada (RF-01.7, D17). Campos de certificación vía SBT (D28,
+-- decisión del director 2026-09): via_sbt + contrato/tokenId + imágenes DNI/selfie.
 CREATE TABLE IF NOT EXISTS kyc (
     id                  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     usuario_id          BIGINT NOT NULL REFERENCES usuarios(id),
@@ -96,7 +97,12 @@ CREATE TABLE IF NOT EXISTS kyc (
     selfie_hash         BYTEA,
     merkle_root         BYTEA,              -- espejo del Smart Account on-chain
     estado              estado_kyc NOT NULL DEFAULT 'PENDIENTE',
-    revisado_por        CHAR(42),           -- Owner (RF-18.4)
+    revisado_por        CHAR(42),           -- Owner (RF-18.4) o minter (vía SBT)
+    via_sbt             BOOLEAN NOT NULL DEFAULT FALSE,   -- certificado con SBT
+    sbt_contrato        CHAR(42),           -- contrato del SBT usado (nativo/externo)
+    sbt_token_id        NUMERIC,            -- tokenId del SBT usado/minteado
+    documento_img_id    BIGINT,             -- imagen DNI/cédula (imagenes_certificadas)
+    selfie_img_id       BIGINT,             -- imagen selfie (imagenes_certificadas)
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at          TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -205,7 +211,7 @@ CREATE TABLE IF NOT EXISTS imagenes_certificadas (
     hash_sha256         BYTEA NOT NULL,
     ipfs_cid            TEXT,
     wallet              CHAR(42) NOT NULL,
-    firma_ecdsa         BYTEA NOT NULL,
+    firma_ecdsa         BYTEA,            -- firma del dueño (opcional; KYC/D23)
     metadata            JSONB,
     root_merkle_anclada BYTEA,              -- raíz merkle anclada on-chain (D23)
     contenido           BYTEA,              -- binario de la imagen (punto 1: imágenes en mercado)
