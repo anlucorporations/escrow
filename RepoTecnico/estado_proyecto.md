@@ -609,3 +609,40 @@ on-chain del SociosRegistry (`owner()` = 0xf39F…2266 en GCP), no un "tipo".
   Ana no ve el icono Sistemas ni entra por URL (bloqueado); Owner ve el icono y
   accede al panel. Capturas: `RepoTecnico/pruebas/1ra-prueba/sistemas-owner.png`
   y `sistemas-socio-bloqueado.png`.
+
+## 💎 VALOR + ajustes de suite (director, 2026-09-09) — commits a665847/e6c61f7
+
+4 bloques:
+1. **Botón de escalera D28**: Perfil y menú de usuario muestran el botón para
+   iniciar el proceso según el caso: INSCRITO → "🛡️ Iniciar verificación (D28)"
+   (/suite/verificacion); VERIFICADO → "🪪 Iniciar certificación (KYC)"
+   (/suite/certificacion); CERTIFICADO → aviso de identidad completa.
+2. **Intercambio por pestañas**: "🔄 Activos" (en curso: CREADO/ACTIVO/CUSTODIADO/
+   APERTURA/EN_DISPUTA/RESOLUCION_SOCIOS) y "🕘 Histórico"
+   (COMPLETADO/ANULADO/BLOQUEADO con etiqueta de resultado).
+3. **Inventario**: alta de nuevo elemento en un FLOTANTE con imágenes
+   referenciales (1-5, se muestran en el Mercado); botón "＋ Nuevo elemento".
+4. **Finanzas → VALOR** (/suite/valor; /suite/finanzas redirige):
+   · 4.1 Criptos del socio: Recargar / Retirar / Convertir ETH ⇄ BRLT — SIEMPRE
+     contra la PLATAFORMA como contraparte (sin P2P; entre socios la cripto solo
+     se mueve vía Trueke). Tasa interna 1 ETH ≈ 3000 BRLT (env TASA_ETH_BRLT).
+   · 4.2 Reputación (puntaje D12/D30) + trueques COMPLETADOS sin valorar con
+     valoración inline 1–5 + últimos 10 trueques valorados (valoraciones ahora
+     se persisten en la tabla `valoraciones`).
+   · 4.3 BRLT (Empresa/SOCIO/Owner; no visible al resto): Recargar con fiat vía
+     Stripe Checkout ALOJADO (no pasarela propia) + webhook que acredita BRLT;
+     Retirar (registro; desembolso real por Stripe Payouts documentado);
+     Convertir. Claves Stripe test guardadas en Secret Manager
+     (STRIPE_SECRET_KEY / STRIPE_PUBLISHABLE_KEY); NEXT_PUBLIC_STRIPE_KEY en la
+     web. VALOR es visible para todo inscrito con contenido restringido por rol.
+- BD: migración `db/migracion_valor.sql` (movimientos_valor, movimientos_brlt)
+  aplicada en prod.
+- Tests backend 27/27 (nuevos: criptos/BRLT por rol, checkout demo, webhook que
+  acredita); E2E: suite.spec 11/11 (Valor en barra), suite-pantallas 7/7 (Socio
+  gestiona / Particular restringido), suite-escalera 3/3. tsc y build OK.
+- Desplegado GCP: API rev **truekeate-api-00022-s24**, web rev
+  **truekeate-web-00028-mwk** (release-e6c61f7), 100 % serving.
+- Verificación en vivo (GCP): Ana (SOCIO) recarga ETH, convierte ETH→BRLT y
+  BRLT→ETH, checkout Stripe devuelve URL checkout.stripe.com real, retira BRLT;
+  Carlos (PARTICULAR) → 403 y UI solo lectura. Capturas:
+  `RepoTecnico/pruebas/1ra-prueba/valor-owner.png` y `valor-particular.png`.
