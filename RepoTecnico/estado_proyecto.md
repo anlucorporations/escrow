@@ -583,3 +583,29 @@ Cambios:
   Web rev **truekeate-web-00026-fch** (release-9cc3966). Verificado en GCP
   (caso EN_VOTACION #4): flotante con fotos blob de ambas partes + botones de
   voto. Captura: `RepoTecnico/pruebas/1ra-prueba/flotante-votacion.png`.
+
+## 🛠️ Endurecimiento: Sistemas SOLO Owner (director, 2026-09-09) — commit 3e62c52
+
+Hallazgo: el icono "Sistemas" (/suite/admin) se mostraba a TODO tipo SOCIO
+(Ana/Bruno también son SOCIO) y el backend admitía `tipo === 'SOCIO'` en
+/usuarios (el resto de rutas /admin/* ni validaban). El Owner REAL es el dueño
+on-chain del SociosRegistry (`owner()` = 0xf39F…2266 en GCP), no un "tipo".
+- Nuevo `api/lib/es-owner.js`: detector del Owner (on-chain `owner()` del
+  registry; sin red → env OWNER_WALLET o usuario BD rol OWNER) + middleware
+  `requiereOwner` + caché 30 s. Endpoint público `GET /admin/owner`.
+- Backend: TODAS las rutas /admin/* (usuarios, contratos, kpis, db, infra) ahora
+  exigen sesión + Owner → 403 `solo_owner` para SOCIO no-owner. /auth/estado y
+  /auth/session devuelven `esOwner`.
+- Web: `navegacion.ts` Sistemas `visible: (c) => c.esOwner === true` (ya no
+  ES_SOCIO); TopBar/BottomNav/SuiteGuard reciben `esOwner` del contexto de
+  sesión; página /suite/admin usa `esOwner` real. El icono NO aparece a Socios.
+- Tests backend 25/25 (nuevo: SOCIO sin rol OWNER → 403 en las 5 rutas admin;
+  /admin/owner público devuelve la wallet del Owner). E2E suite.spec 11/11
+  (nuevos: SOCIO no ve Sistemas en barra; Owner sí; SOCIO bloqueado por URL).
+- Desplegado GCP: API rev **truekeate-api-00020-lx5**, web rev
+  **truekeate-web-00027-8r5** (release-3e62c52), 100 % serving.
+- Verificación en vivo (GCP): /auth/estado Ana → esOwner:false, Owner →
+  esOwner:true; Ana/Bruno GET /admin/db → 403 solo_owner, Owner → 200; barra:
+  Ana no ve el icono Sistemas ni entra por URL (bloqueado); Owner ve el icono y
+  accede al panel. Capturas: `RepoTecnico/pruebas/1ra-prueba/sistemas-owner.png`
+  y `sistemas-socio-bloqueado.png`.
