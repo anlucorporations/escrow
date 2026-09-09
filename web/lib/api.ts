@@ -481,9 +481,9 @@ export function votarDisputa(token: string, id: number, voto: "ANULAR" | "VALIDO
   return pedirAuth<{ ok: boolean; disputa: Disputa; voto: string }>(`/disputas/${id}/votar`, token, { metodo: "POST", body: { voto } });
 }
 
-/** GET /disputas/:id/evidencia/:evId — imagen de una evidencia (con sesión). */
+/** Ruta relativa a la imagen de una evidencia (ImagenProtegida antepone API_URL). */
 export function urlEvidenciaDisputa(id: number, evId: number): string {
-  return `${API_URL}/disputas/${id}/evidencia/${evId}`;
+  return `/disputas/${id}/evidencia/${evId}`;
 }
 
 // ---------------------------------------------------------------------------
