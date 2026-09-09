@@ -18,6 +18,7 @@ import { useSesion } from "@/lib/sesion";
 import { seccionesPara } from "@/lib/navegacion";
 import { Button } from "@/components/Button";
 import { BotonConectarLogin } from "@/components/BotonConectarLogin";
+import { CampanaNotificaciones } from "@/components/CampanaNotificaciones";
 
 const ETIQUETA_ESTADO: Record<string, string> = {
   INSCRITO: "Inscrito",
@@ -46,7 +47,7 @@ function walletCorta(account: string) {
 export function TopBar() {
   const pathname = usePathname() ?? "";
   const { account, conectado, desconectar } = useEthereum();
-  const { acceso, cerrarSesion } = useSesion();
+  const { acceso, cerrarSesion, token: tokenSesion } = useSesion();
   const [abierto, setAbierto] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -168,6 +169,7 @@ export function TopBar() {
             </>
           ) : (
             <>
+              <CampanaNotificaciones token={tokenSesion} />
               <div className="relative" ref={menuRef}>
                 {/* Botón del menú de usuario: SOLO icono de usuario + emoji de estado
                     (ajuste del director); el username/nivel/tipo se muestran al desplegar */}

@@ -35,6 +35,7 @@ import {
 import { Card } from "@/components/Card";
 import { Button } from "@/components/Button";
 import { StatusBadge } from "@/components/StatusBadge";
+import { SubirFotos, type FotoSubida } from "@/components/SubirFotos";
 
 // Leaflet usa `window` al cargarse → solo cliente (evita romper el SSR).
 const MapaWidget = dynamic(
@@ -362,6 +363,13 @@ export default function PaginaIntercambio() {
   // ---------------------------------------------------------------- cierre conforme/no conforme (punto 9)
   const [cerrando, setCerrando] = useState<number | null>(null);
   const [cerradoOk, setCerradoOk] = useState<ReadonlySet<number>>(new Set());
+  // Formulario de disputa (✗ No Conforme): motivo + fotos de evidencia
+  const [disputaDe, setDisputaDe] = useState<{ trueke: Trueke; lado: "A" | "B" } | null>(null);
+  const [motivoDisputa, setMotivoDisputa] = useState("");
+  const [fotosDisputa, setFotosDisputa] = useState<FotoSubida[]>([]);
+  const [errorDisputa, setErrorDisputa] = useState<string | null>(null);
+  const [enviandoDisputa, setEnviandoDisputa] = useState(false);
+  const [disputaOk, setDisputaOk] = useState<string | null>(null);
 
   /** Mi cierre registrado en el espejo (CONFORME/NO_CONFORME) o null. */
   function miCierre(t: Trueke, lado: "A" | "B" | null): string | null {
@@ -371,12 +379,22 @@ export default function PaginaIntercambio() {
 
   async function firmarCierre(t: Trueke, lado: "A" | "B", conforme: boolean) {
     if (!token) return;
+    // ✗ No Conforme → abre el formulario de disputa (decisión del director:
+    // la disputa nace con motivo + fotos de evidencia, no con un clic seco)
+    if (!conforme) {
+      setDisputaDe({ trueke: t, lado });
+      setMotivoDisputa("");
+      setFotosDisputa([]);
+      setErrorDisputa(null);
+      setDisputaOk(null);
+      return;
+    }
     setCerrando(t.id);
     setError(null);
     try {
       const firmaCierre = await firmarAccion("cerrar trueque");
       if (!firmaCierre) throw new Error("Firma requerida: desbloquea tu billetera.");
-      const r = await cerrarTrueke(token, t.id, lado, conforme, firmaCierre);
+      const r = await cerrarTrueke(token, t.id, lado, true, firmaCierre);
       setCerradoOk((prev) => new Set(prev).add(t.id));
       if (r.disputa) setError(null);
       await cargar();
@@ -384,6 +402,40 @@ export default function PaginaIntercambio() {
       setError(e instanceof Error ? e.message : "no se pudo registrar el cierre");
     } finally {
       setCerrando(null);
+    }
+  }
+
+  /** Envía el formulario de disputa (✗ No Conforme con motivo + fotos). */
+  async function enviarDisputa() {
+    if (!token || !disputaDe) return;
+    setEnviandoDisputa(true);
+    setErrorDisputa(null);
+    try {
+      if (!motivoDisputa.trim()) throw new Error("Describí el motivo de tu No Conforme.");
+      if (fotosDisputa.length === 0) throw new Error("Subí al menos una foto de evidencia.");
+      const firmaCierre = await firmarAccion("cerrar trueque");
+      if (!firmaCierre) throw new Error("Firma requerida: desbloquea tu billetera.");
+      const r = await cerrarTrueke(token, disputaDe.trueke.id, disputaDe.lado, false, firmaCierre, {
+        motivo: motivoDisputa.trim(),
+        fotos: fotosDisputa,
+      });
+      const disp = r.disputa;
+      const msg =
+        disp?.estado === "ESPERA_JUSTIFICATIVO"
+          ? "Disputa reportada: la contraparte está conforme y debe cargar su justificativo (3 días)."
+          : disp?.estado === "EN_VOTACION"
+            ? "Disputa reportada: ambas partes declararon No Conforme → votación de Socios abierta."
+            : "Disputa reportada (#" + (disp?.id ?? "") + "): esperando la postura de la contraparte.";
+      setDisputaOk(msg);
+      setCerradoOk((prev) => new Set(prev).add(disputaDe.trueke.id));
+      setDisputaDe(null);
+      setMotivoDisputa("");
+      setFotosDisputa([]);
+      await cargar();
+    } catch (e) {
+      setErrorDisputa(e instanceof Error ? e.message : "no se pudo registrar la disputa");
+    } finally {
+      setEnviandoDisputa(false);
     }
   }
 
@@ -684,7 +736,7 @@ export default function PaginaIntercambio() {
                     )}
                     {(t.estado === "EN_DISPUTA" || t.estado === "RESOLUCION_SOCIOS") && (
                       <span className="self-center text-[11px] font-semibold text-crimson">
-                        ⚖️ En disputa — resolución de Socios
+                        ⚖️ En disputa — seguí el flujo en <em>Disputas</em> (justificativo → votación de Socios)
                       </span>
                     )}
 
@@ -735,6 +787,83 @@ export default function PaginaIntercambio() {
           </div>
         )}
       </div>
+
+      {/* Modal: formulario de disputa (✗ No Conforme — motivo + fotos) */}
+      {disputaDe && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy-900/60 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-2xl">
+            <h3 className="font-display text-lg font-bold text-navy-800">
+              ⚖️ Declarar No Conforme — disputa
+            </h3>
+            <p className="mt-1 text-sm text-navy-800/60">
+              Trueque #{disputaDe.trueke.id} · Declarás que lo recibido{" "}
+              <strong>no es conforme</strong>. Describí el motivo y subí las fotos de
+              evidencia: con esto se abre la disputa y los Socios resolverán viendo
+              las pruebas de ambas partes.
+            </p>
+
+            {disputaOk && (
+              <p className="mt-3 rounded-xl border border-teal-500/40 bg-teal-500/10 px-4 py-2 text-xs text-navy-800/80">
+                ✅ {disputaOk}
+              </p>
+            )}
+            {errorDisputa && (
+              <p className="mt-3 rounded-xl bg-crimson/10 px-4 py-2 text-xs text-crimson">
+                ⚠️ {errorDisputa}
+              </p>
+            )}
+
+            <div className="mt-4 space-y-3">
+              <div>
+                <label
+                  htmlFor="motivo-disputa-nc"
+                  className="mb-1 block text-xs font-semibold text-navy-800/70"
+                >
+                  Motivo del reclamo{" "}
+                  <span className="font-normal text-navy-800/40">(obligatorio)</span>
+                </label>
+                <textarea
+                  id="motivo-disputa-nc"
+                  value={motivoDisputa}
+                  onChange={(e) => setMotivoDisputa(e.target.value)}
+                  rows={3}
+                  maxLength={500}
+                  placeholder="Ej.: el artículo llegó dañado / no coincide con lo publicado…"
+                  className="w-full rounded-xl border border-navy-800/15 bg-white px-3 py-2 text-sm text-navy-800 outline-none transition-colors focus:border-teal-500"
+                  disabled={enviandoDisputa}
+                />
+              </div>
+              <SubirFotos
+                fotos={fotosDisputa}
+                onChange={setFotosDisputa}
+                max={5}
+                etiqueta="Fotos de evidencia de tu reclamo"
+              />
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <Button
+                  className="!border-crimson !text-crimson hover:!bg-crimson/5"
+                  variante="outline-navy"
+                  disabled={enviandoDisputa || !motivoDisputa.trim() || fotosDisputa.length === 0}
+                  onClick={() => void enviarDisputa()}
+                >
+                  {enviandoDisputa ? "Reportando…" : "✗ Reportar No Conforme"}
+                </Button>
+                <Button
+                  variante="outline-navy"
+                  disabled={enviandoDisputa}
+                  onClick={() => {
+                    setDisputaDe(null);
+                    setDisputaOk(null);
+                    setErrorDisputa(null);
+                  }}
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

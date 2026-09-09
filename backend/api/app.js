@@ -25,6 +25,7 @@ import { crearRouterReputacion } from './routes/reputacion.js';
 import { crearRouterSubastas } from './routes/subastas.js';
 import { crearRouterFinanzas } from './routes/finanzas.js';
 import { crearRouterDisputas } from './routes/disputas.js';
+import { crearRouterNotificaciones } from './routes/notificaciones.js';
 import { crearRouterGobernanza } from './routes/gobernanza.js';
 import { crearRouterPuntosEncuentro } from './routes/puntos-encuentro.js';
 
@@ -34,7 +35,7 @@ import { crearRouterPuntosEncuentro } from './routes/puntos-encuentro.js';
  */
 export function crearApp(deps = {}) {
   const app = express();
-  app.use(express.json({ limit: '1mb' }));
+  app.use(express.json({ limit: '12mb' }));
 
   // CORS: la web (Cloud Run truekeate-web) llama a esta API desde otro origen.
   // En producción se restringe al origen real; CORS_ORIGEN_EXTRA permite añadir
@@ -82,6 +83,7 @@ export function crearApp(deps = {}) {
   app.use('/subastas', crearRouterSubastas(deps));
   app.use('/finanzas', crearRouterFinanzas(deps));
   app.use('/disputas', crearRouterDisputas(deps));
+  app.use('/notificaciones', crearRouterNotificaciones(deps));
   app.use('/gobernanza', crearRouterGobernanza(deps));
   app.use('/puntos-encuentro', crearRouterPuntosEncuentro(deps));
 

@@ -15,9 +15,11 @@
 // =============================================================================
 import { Router } from 'express';
 import { requiereSesion, requiereEstado, requiereFirmaAccion } from '../lib/auth.js';
+import { crearMotorDisputas } from '../lib/flujo-disputas.js';
 
-export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow, walletEmpresas, minteadorNft }) {
+export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow, walletEmpresas, minteadorNft, proveedor, registryAddress }) {
   const r = Router();
+  const motorDisputas = crearMotorDisputas({ almacen, proveedor, registryAddress });
 
   // GET /truekes — mis trueques (solo los de la wallet conectada)
   r.get('/', requiereSesion(almacen), async (req, res, next) => {
@@ -329,9 +331,10 @@ export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow
   });
 
   // POST /truekes/:id/cierre — firma Recibido Conforme / No Conforme (punto 9)
-  // Body: { lado: 'A'|'B', conforme: true|false }
+  // Body: { lado: 'A'|'B', conforme: true|false, motivo?, fotos?: [{data,mime}] }
   //   Conforme ✓  → cierre_a/b = CONFORME; con ambos conformes + valoraciones → COMPLETADO.
-  //   No Conforme ✗ → cierre = NO_CONFORME y se abre disputa (estado EN_DISPUTA).
+  //   No Conforme ✗ → formulario de disputa (motivo + fotos de evidencia) → la disputa
+  //     nace SOLO aquí (decisión del director): REPORTADA → (justificativo) → EN_VOTACION.
   r.post('/:id/cierre', requiereSesion(almacen), requiereFirmaAccion('cerrar trueque'), async (req, res, next) => {
     try {
       const t = await almacen.getTrueke(req.params.id);
@@ -348,16 +351,55 @@ export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow
       const actualizado = await almacen.registrarCierre(t.id, { lado, conforme });
 
       if (!conforme) {
-        // No Conforme → abre el proceso de disputa (RF-06.1)
-        const d = await almacen.crearDisputa({ truekeId: t.id, solicitante: req.wallet, motivo: 'No conforme con lo recibido' });
-        await almacen.actualizarTrueke(t.id, { estado: 'EN_DISPUTA' });
-        return res.json({ trueke: await almacen.getTrueke(t.id), disputa: d });
+        // No Conforme → formulario de disputa del director: motivo + fotos de evidencia
+        const { motivo, fotos } = req.body ?? {};
+        if (!motivo || !String(motivo).trim()) {
+          return res.status(400).json({ error: 'motivo_requerido', detalle: 'describí el motivo del No Conforme (formulario de disputa)' });
+        }
+        const lista = Array.isArray(fotos) ? fotos.filter((f) => f && typeof f.data === 'string') : [];
+        if (lista.length === 0) {
+          return res.status(400).json({ error: 'fotos_requeridas', detalle: 'subí al menos una foto de evidencia de tu reclamo' });
+        }
+        const { disputa } = await motorDisputas.abrirDisputaDesdeCierre({
+          truekeId: t.id, reclamante: req.wallet, motivo: String(motivo).trim(), fotos: lista,
+        });
+        return res.json({ trueke: await almacen.getTrueke(t.id), disputa });
       }
 
       // Conforme: revisar si ambas partes ya firmaron conforme → COMPLETADO (invariante I7:
       // cierre exige firmas de ambas; la valoración es paso posterior marcado por el espejo).
+      // Si existe una disputa activa del trueke, el conforme de la contraparte NO completa:
+      // la disputa pasa a ESPERA_JUSTIFICATIVO (motor) y el trueke queda EN_DISPUTA.
       const trasCierre = await almacen.getTrueke(t.id);
       const otra = lado === 'A' ? trasCierre.cierreB : trasCierre.cierreA;
+      const disputas = await almacen.listarDisputas();
+      const disputaActiva = disputas.find((d) => d.truekeId === t.id && ['REPORTADA', 'ESPERA_JUSTIFICATIVO', 'EN_VOTACION'].includes(d.estado));
+      if (disputaActiva) {
+        // el que firmó Conforme es la contraparte del reclamante → pedir su justificativo
+        const esReclamante = disputaActiva.solicitante === req.wallet;
+        if (!esReclamante) {
+          const DIA_MS = 24 * 60 * 60 * 1000;
+          const nuevo = await almacen.actualizarDisputa(disputaActiva.id, {
+            estado: 'ESPERA_JUSTIFICATIVO',
+            justificativoVenceAt: new Date(Date.now() + 3 * DIA_MS).toISOString(),
+          });
+          // eslint-disable-next-line no-unused-vars
+          void nuevo;
+          await almacen.actualizarTrueke(t.id, { estado: 'EN_DISPUTA' });
+          const contraparte = trasCierre.usuarioA === req.wallet ? trasCierre.usuarioB : trasCierre.usuarioA;
+          try {
+            if (contraparte && almacen.crearNotificacion) {
+              await almacen.crearNotificacion({
+                wallet: contraparte, tipo: 'PEDIDO_JUSTIFICATIVO',
+                titulo: '📷 Cargá tu justificativo',
+                cuerpo: `Declaraste No Conforme y la contraparte firmó Conforme. Ahora la contraparte debe cargar su justificativo con fotos. Estado: esperando justificativo.`,
+                refTipo: 'disputa', refId: disputaActiva.id,
+              });
+            }
+          } catch (e) { console.error('[truekes] notificación justificativo:', e.message); }
+        }
+        return res.json({ trueke: await almacen.getTrueke(t.id), disputa: await almacen.getDisputa(disputaActiva.id) });
+      }
       if (otra === 'CONFORME') {
         await almacen.actualizarTrueke(t.id, { estado: 'COMPLETADO' });
         // Lógica post-trueke punto 0: liberación EN CRUZ del inventario — el artículo A

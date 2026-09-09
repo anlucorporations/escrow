@@ -203,13 +203,62 @@ export interface Disputa {
   truekeId: number;
   solicitante: string;
   motivo?: string;
-  estado: string;
+  estado: string; // REPORTADA | ESPERA_JUSTIFICATIVO | EN_VOTACION | RESUELTA
   resolucion?: string;
   sancion?: string;
+  veredicto?: string | null; // 'ANULAR' | 'VALIDO' (cuando RESUELTA)
+  justificativoVenceAt?: string | null;
+  votacionVenceAt?: string | null;
+  resueltaEn?: string | null;
   registroVotos?: unknown;
   usuarioA: string;
-  usuarioB: string;
+  usuarioB: string | null;
+  cierreA?: string | null;
+  cierreB?: string | null;
   estadoTrueke: string;
+  createdAt: string;
+}
+
+export interface EvidenciaDisputa {
+  id: number;
+  autor: string;
+  tipo: "RECLAMO" | "JUSTIFICATIVO";
+  mime: string;
+  createdAt: string;
+}
+
+export interface VotoDisputa {
+  socio: string;
+  voto: "ANULAR" | "VALIDO";
+}
+
+export interface DetalleDisputa {
+  disputa: Disputa;
+  trueke: Trueke | null;
+  evidencias: EvidenciaDisputa[];
+  votos: VotoDisputa[];
+  esParte: boolean;
+  esSocio: boolean;
+  miVoto: string | null;
+  puedeVotar: boolean;
+}
+
+export interface VotacionSocio extends Disputa {
+  evidencias: EvidenciaDisputa[];
+  votos: VotoDisputa[];
+  soyParte: boolean;
+  miVoto: string | null;
+  puedeVotar: boolean;
+}
+
+export interface Notificacion {
+  id: number;
+  tipo: string;
+  titulo: string;
+  cuerpo?: string | null;
+  refTipo?: string | null;
+  refId?: number | null;
+  leida: boolean;
   createdAt: string;
 }
 
@@ -309,9 +358,19 @@ export function rechazarEncuentro(token: string, id: number, firma?: FirmaAccion
   return pedirAuth<{ trueke: Trueke; encuentroEstado: string }>(`/truekes/${id}/encuentro/rechazar`, token, { metodo: "POST", body: { ...(firma ?? {}) } });
 }
 
-/** POST /truekes/:id/cierre — firma Recibido Conforme (true) / No Conforme (false). */
-export function cerrarTrueke(token: string, id: number, lado: "A" | "B", conforme: boolean, firma?: FirmaAccion): Promise<{ trueke: Trueke; disputa?: Disputa }> {
-  return pedirAuth<{ trueke: Trueke; disputa?: Disputa }>(`/truekes/${id}/cierre`, token, { metodo: "POST", body: { lado, conforme, ...(firma ?? {}) } });
+/** POST /truekes/:id/cierre — firma Recibido Conforme / No Conforme (punto 9). */
+export function cerrarTrueke(
+  token: string,
+  id: number,
+  lado: "A" | "B",
+  conforme: boolean,
+  firma?: FirmaAccion,
+  formulario?: { motivo: string; fotos: { data: string; mime: string }[] }
+): Promise<{ trueke: Trueke; disputa?: Disputa }> {
+  return pedirAuth<{ trueke: Trueke; disputa?: Disputa }>(`/truekes/${id}/cierre`, token, {
+    metodo: "POST",
+    body: { lado, conforme, ...(firma ?? {}), ...(formulario ?? {}) },
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -392,9 +451,58 @@ export function misDisputas(token: string): Promise<{ disputas: Disputa[] }> {
   return pedirAuth<{ disputas: Disputa[] }>("/disputas", token);
 }
 
-/** POST /disputas — solicitar anulación. */
-export function solicitarDisputa(token: string, datos: { truekeId: number; motivo?: string }): Promise<{ disputa: Disputa }> {
-  return pedirAuth<{ disputa: Disputa }>("/disputas", token, { metodo: "POST", body: datos });
+/** GET /disputas/padron — padrón de socios + esSocio de la wallet. */
+export function padronDisputas(token: string): Promise<{ esSocio: boolean; totalSocios: number; padron: string[] }> {
+  return pedirAuth<{ esSocio: boolean; totalSocios: number; padron: string[] }>("/disputas/padron", token);
+}
+
+/** GET /disputas/:id — detalle con pruebas de ambas partes + votos. */
+export function detalleDisputa(token: string, id: number): Promise<DetalleDisputa> {
+  return pedirAuth<DetalleDisputa>(`/disputas/${id}`, token);
+}
+
+/** GET /disputas/votaciones — disputas EN_VOTACION / RESUELTAS para Socios (con pruebas). */
+export function votacionesDisputas(token: string): Promise<{ votaciones: VotacionSocio[] }> {
+  return pedirAuth<{ votaciones: VotacionSocio[] }>("/disputas/votaciones", token);
+}
+
+/** POST /disputas/:id/justificativo — el conforme carga fotos de justificativo. */
+export function cargarJustificativo(token: string, id: number, fotos: { data: string; mime: string }[]): Promise<{ disputa: Disputa }> {
+  return pedirAuth<{ disputa: Disputa }>(`/disputas/${id}/justificativo`, token, { metodo: "POST", body: { fotos } });
+}
+
+/** POST /disputas/:id/no-conforme — la contraparte declara TAMBIÉN No Conforme (motivo + fotos). */
+export function declararNoConforme(token: string, id: number, datos: { motivo: string; fotos: { data: string; mime: string }[] }): Promise<{ disputa: Disputa }> {
+  return pedirAuth<{ disputa: Disputa }>(`/disputas/${id}/no-conforme`, token, { metodo: "POST", body: datos });
+}
+
+/** POST /disputas/:id/votar — voto del Socio: ANULAR | VALIDO. */
+export function votarDisputa(token: string, id: number, voto: "ANULAR" | "VALIDO"): Promise<{ ok: boolean; disputa: Disputa; voto: string }> {
+  return pedirAuth<{ ok: boolean; disputa: Disputa; voto: string }>(`/disputas/${id}/votar`, token, { metodo: "POST", body: { voto } });
+}
+
+/** GET /disputas/:id/evidencia/:evId — imagen de una evidencia (con sesión). */
+export function urlEvidenciaDisputa(id: number, evId: number): string {
+  return `${API_URL}/disputas/${id}/evidencia/${evId}`;
+}
+
+// ---------------------------------------------------------------------------
+// Notificaciones (campana — decisión del director)
+// ---------------------------------------------------------------------------
+
+/** GET /notificaciones — mis avisos (últimas 50) + no leídas. */
+export function misNotificaciones(token: string): Promise<{ notificaciones: Notificacion[]; noLeidas: number }> {
+  return pedirAuth<{ notificaciones: Notificacion[]; noLeidas: number }>("/notificaciones", token);
+}
+
+/** POST /notificaciones/:id/leida — marca una como leída. */
+export function marcarNotificacionLeida(token: string, id: number): Promise<{ ok: boolean }> {
+  return pedirAuth<{ ok: boolean }>(`/notificaciones/${id}/leida`, token, { metodo: "POST", body: {} });
+}
+
+/** POST /notificaciones/leer-todas — marca todas como leídas. */
+export function marcarNotificacionesLeidas(token: string): Promise<{ ok: boolean }> {
+  return pedirAuth<{ ok: boolean }>("/notificaciones/leer-todas", token, { metodo: "POST", body: {} });
 }
 
 /** GET /gobernanza/propuestas — propuestas del registry on-chain. */

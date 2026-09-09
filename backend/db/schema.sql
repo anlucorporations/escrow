@@ -188,19 +188,66 @@ CREATE TABLE IF NOT EXISTS puntos_favoritos (
     UNIQUE (usuario_id, punto_encuentro_id)
 );
 
--- Disputas y apelaciones (CU-18/19)
+-- Disputas y apelaciones (CU-18/19) — flujo afinado del director (2026-09-08)
+-- Estados: REPORTADA → ESPERA_JUSTIFICATIVO → EN_VOTACION → RESUELTA
+--   · REPORTADA: el reclamante declaró ✗ No Conforme (cierre) con motivo + fotos.
+--   · ESPERA_JUSTIFICATIVO: la contraparte CONFORME debe cargar su justificativo
+--     con imágenes de evidencia (plazo 3 días → justificativo_vence_at).
+--   · EN_VOTACION: ambas partes aportaron evidencia → votan los Socios (padrón
+--     on-chain), 1 voto c/u, salvo socios involucrados (partes del trueke).
+--   · RESUELTA: veredicto ANULAR (devolución total, trueke ANULADO) o VALIDO
+--     (trueke COMPLETADO, liberación en cruz). Mayoría simple de votantes; sin
+--     votos en 5 días (votacion_vence_at) → ANULA por defecto.
 CREATE TABLE IF NOT EXISTS disputas (
     id                  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     trueke_id           BIGINT NOT NULL REFERENCES truekes(id),
-    solicitante         CHAR(42) NOT NULL,
-    motivo              TEXT,
-    estado              TEXT NOT NULL DEFAULT 'ABIERTA',
-    resolucion          TEXT,
+    solicitante         CHAR(42) NOT NULL,  -- reclamante (quien firmó No Conforme)
+    motivo              TEXT,               -- motivo del reclamo (formulario)
+    estado              TEXT NOT NULL DEFAULT 'REPORTADA',
+    justificativo_vence_at TIMESTAMPTZ,     -- plazo 3 días del conforme (D-director)
+    votacion_vence_at   TIMESTAMPTZ,        -- plazo 5 días de la votación (D13/D21)
+    veredicto           TEXT,               -- 'ANULAR' | 'VALIDO' (RESUELTA)
+    resuelta_en         TIMESTAMPTZ,        -- cuando se resolvió
+    resolucion          TEXT,               -- detalle legible del desenlace
     sancion             TEXT,
     timelock_ejecuta_at TIMESTAMPTZ,        -- timelock 6h (D21, solo sanciones)
-    registro_votos      JSONB,              -- espejo de votos on-chain (D21)
+    registro_votos      JSONB,              -- espejo de votos (D21)
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at          TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Evidencias (fotos) de cada parte en la disputa
+CREATE TABLE IF NOT EXISTS evidencias_disputa (
+    id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    disputa_id BIGINT NOT NULL REFERENCES disputas(id) ON DELETE CASCADE,
+    autor      CHAR(42) NOT NULL,           -- wallet de la parte que sube la foto
+    tipo       TEXT NOT NULL CHECK (tipo IN ('RECLAMO','JUSTIFICATIVO')),
+    contenido  BYTEA NOT NULL,              -- binario de la imagen
+    mime       TEXT NOT NULL DEFAULT 'image/jpeg',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Votos de los socios en la disputa (1 voto por socio y disputa)
+CREATE TABLE IF NOT EXISTS votos_disputa (
+    id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    disputa_id BIGINT NOT NULL REFERENCES disputas(id) ON DELETE CASCADE,
+    socio      CHAR(42) NOT NULL,
+    voto       TEXT NOT NULL CHECK (voto IN ('ANULAR','VALIDO')),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (disputa_id, socio)
+);
+
+-- Notificaciones in-app (campana; decisión del director)
+CREATE TABLE IF NOT EXISTS notificaciones (
+    id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    wallet     CHAR(42) NOT NULL,           -- destinatario
+    tipo       TEXT NOT NULL,               -- 'DISPUTA_REPORTADA'|'PEDIDO_JUSTIFICATIVO'|'VOTACION_ABIERTA'|'VEREDICTO'|'SISTEMA'
+    titulo     TEXT NOT NULL,
+    cuerpo     TEXT,
+    ref_tipo   TEXT,                        -- 'disputa' | 'trueke'
+    ref_id     BIGINT,
+    leida      BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 -- Evidencia de imágenes certificadas (RF-11, D23)
@@ -321,6 +368,9 @@ CREATE INDEX IF NOT EXISTS idx_auditoria_tx ON auditoria(tx_hash, log_index);
 CREATE INDEX IF NOT EXISTS idx_puntos_geog ON puntos_encuentro USING GIST(geog);
 CREATE INDEX IF NOT EXISTS idx_puntos_favoritos_usuario ON puntos_favoritos(usuario_id, ultimo_uso DESC);
 CREATE INDEX IF NOT EXISTS idx_imagenes_ref ON imagenes_certificadas(tipo, ref_id);
+CREATE INDEX IF NOT EXISTS ix_evidencias_disputa ON evidencias_disputa (disputa_id, tipo);
+CREATE INDEX IF NOT EXISTS ix_votos_disputa ON votos_disputa (disputa_id);
+CREATE INDEX IF NOT EXISTS ix_notificaciones_wallet ON notificaciones (wallet, leida, created_at DESC);
 
 -- Distancia ≤ 10 km entre partes (RF-08.3/08.4, R3) — consulta PostGIS de ejemplo:
 -- SELECT * FROM puntos_encuentro pe, usuarios u

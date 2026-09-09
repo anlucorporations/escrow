@@ -1,38 +1,39 @@
 "use client";
 
 // =============================================================================
-// TrueKeate — Suite: Disputas (/suite/disputas) — RF-14.8 · D13 · D21
-// El usuario ve los trueques donde es parte (A o B) que están en disputa y puede
-// solicitar la anulación de un trueque propio en custodia:
-//   · Sección 1 — "Mis disputas activas": GET /disputas (misDisputas). El backend
-//     ya filtra a las disputas donde la wallet es parte; el estado de la disputa
-//     se muestra aparte del estado del escrow (StatusBadge).
-//   · Sección 2 — "Solicitar anulación": selector de mis trueques (GET /truekes,
-//     misTruekes) en CUSTODIADO/APERTURA + motivo opcional → POST /disputas
-//     (solicitarDisputa); el backend pasa el trueque a EN_DISPUTA (D13).
-// Nota: misDisputas NO incluye tituloA/tituloB, así que el título del trueque se
-// enriquece en el cliente con los truekes ya cargados (sin llamada extra); si no
-// se encuentra, se muestra "Trueque #id" + la wallet de la contraparte.
-// El Socio además participa en la resolución (votación on-chain D21): aquí solo
-// se muestra el aviso; la votación vive on-chain/gobernanza.
+// TrueKeate — Suite: Disputas (/suite/disputas) — flujo afinado del director
+// =============================================================================
+// La disputa nace SOLO desde el cierre ✗ No Conforme (formulario con motivo +
+// fotos). Estados: REPORTADA → ESPERA_JUSTIFICATIVO → EN_VOTACION → RESUELTA.
+//   · Parte reclamante: ve su reclamo con fotos y el avance.
+//   · Parte contraparte: si está conforme → carga JUSTIFICATIVO con fotos;
+//     si también está No Conforme → declara su reclamo (motivo + fotos).
+//   · Socio (no parte): vota ANULAR (devolución) o VALIDO viendo las pruebas
+//     de ambas partes (mismo acceso al trueke en disputa — punto 4 del director).
 // =============================================================================
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useEthereum } from "@/lib/ethereum";
-import { useSesion } from "@/lib/sesion";
 import { useSesionAutenticada } from "@/lib/useSesionAutenticada";
 import {
   misDisputas,
   misTruekes,
-  solicitarDisputa,
+  detalleDisputa,
+  cargarJustificativo,
+  declararNoConforme,
+  votarDisputa,
+  votacionesDisputas,
+  padronDisputas,
+  urlEvidenciaDisputa,
   type Disputa,
+  type DetalleDisputa,
   type Trueke,
+  type VotacionSocio,
 } from "@/lib/api";
 import { Card } from "@/components/Card";
 import { Button } from "@/components/Button";
 import { StatusBadge, type BadgeTono } from "@/components/StatusBadge";
-
-/** Estados del escrow en los que se puede pedir anulación (D13; el backend valida). */
-const ESTADOS_DISPUTABLES = ["CUSTODIADO", "APERTURA"];
+import { SubirFotos, type FotoSubida } from "@/components/SubirFotos";
+import { ImagenProtegida } from "@/components/ImagenProtegida";
 
 const inputCls =
   "w-full rounded-xl border border-navy-800/15 bg-white px-3 py-2 text-sm text-navy-800 outline-none transition-colors focus:border-teal-500";
@@ -46,7 +47,8 @@ function mismaWallet(a?: string | null, b?: string | null): boolean {
   return Boolean(a && b && a.toLowerCase() === b.toLowerCase());
 }
 
-function formatearFecha(iso: string): string {
+function formatearFecha(iso?: string | null): string {
+  if (!iso) return "—";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
   return d.toLocaleString("es-AR", {
@@ -58,55 +60,81 @@ function formatearFecha(iso: string): string {
   });
 }
 
-/** Tono del estado de la disputa: ABIERTA → coral; otras → gold/crimson según desenlace. */
+/** Tono del estado de la disputa (flujo afinado). */
 function tonoDeDisputa(estado: string): BadgeTono {
   const e = estado.toUpperCase();
-  if (e === "ABIERTA") return "coral";
-  if (/ANUL|RECHAZ|DENEG|BLOQ/.test(e)) return "crimson";
-  return "gold"; // resuelta/cerrada
+  if (e === "REPORTADA" || e === "ESPERA_JUSTIFICATIVO") return "coral";
+  if (e === "EN_VOTACION") return "gold";
+  if (e === "RESUELTA") return "teal";
+  return "gold";
 }
 
-/** Etiqueta de una opción del selector de anulación. */
-function rotuloTrueke(t: Trueke): string {
-  const titulos =
-    t.tituloA && t.tituloB ? `${t.tituloA} ⇄ ${t.tituloB}` : "";
-  return titulos
-    ? `#${t.id} · ${titulos} — ${t.estado}`
-    : `Trueque #${t.id} — ${t.estado}`;
+/** Etiqueta corta del estado para la UI. */
+function rotuloEstado(estado: string): string {
+  const map: Record<string, string> = {
+    REPORTADA: "Reportada — esperando postura de la contraparte",
+    ESPERA_JUSTIFICATIVO: "Esperando justificativo del conforme",
+    EN_VOTACION: "Votación de Socios abierta",
+    RESUELTA: "Resuelta",
+  };
+  return map[estado] ?? estado;
+}
+
+/** Determina mi rol en la disputa (reclamante | contraparte | socio). */
+function miRol(d: Disputa, account?: string | null, esSocio = false): "reclamante" | "contraparte" | "socio" | "observador" {
+  if (!account) return "observador";
+  if (mismaWallet(d.solicitante, account)) return "reclamante";
+  if (mismaWallet(d.usuarioA, account) || mismaWallet(d.usuarioB, account)) return "contraparte";
+  if (esSocio) return "socio";
+  return "observador";
 }
 
 export default function PaginaDisputas() {
-  const { account, conectado, signer, conectar, conectando } = useEthereum();
-  const { acceso } = useSesion();
-  const {
-    token,
-    autenticar,
-    cargando: autenticando,
-    error: errorAutenticacion,
-  } = useSesionAutenticada();
+  const { account } = useEthereum();
+  const { token } = useSesionAutenticada();
 
   const [disputas, setDisputas] = useState<Disputa[]>([]);
   const [truekes, setTruekes] = useState<Trueke[]>([]);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [truekeSeleccionado, setTruekeSeleccionado] = useState("");
+  // votación de Socios
+  const [esSocio, setEsSocio] = useState(false);
+  const [votaciones, setVotaciones] = useState<VotacionSocio[]>([]);
+
+  // detalle expandido (pruebas de ambas partes)
+  const [detalle, setDetalle] = useState<Record<number, DetalleDisputa>>({});
+  const [cargandoDetalle, setCargandoDetalle] = useState<number | null>(null);
+
+  // formularios
+  const [accionDe, setAccionDe] = useState<{ id: number; accion: "justificativo" | "no-conforme" } | null>(null);
   const [motivo, setMotivo] = useState("");
-  const [solicitando, setSolicitando] = useState(false);
-  const [exito, setExito] = useState<string | null>(null);
-  const [errorSolicitud, setErrorSolicitud] = useState<string | null>(null);
+  const [fotos, setFotos] = useState<FotoSubida[]>([]);
+  const [ocupado, setOcupado] = useState(false);
+  const [aviso, setAviso] = useState<string | null>(null);
+  const [errorAccion, setErrorAccion] = useState<string | null>(null);
 
-  const esSocio = acceso.fase === "inscrito" && acceso.usuario.tipo === "SOCIO";
+  const esSocioPadron = esSocio;
 
-  /** Carga ambas listas (mis disputas + mis trueques) con el token de sesión. */
   const cargar = useCallback(async () => {
     if (!token) return;
     setCargando(true);
     setError(null);
     try {
-      const [d, t] = await Promise.all([misDisputas(token), misTruekes(token)]);
+      const [d, t, p] = await Promise.all([
+        misDisputas(token),
+        misTruekes(token),
+        padronDisputas(token).catch(() => ({ esSocio: false, totalSocios: 0, padron: [] })),
+      ]);
       setDisputas(d.disputas ?? []);
       setTruekes(t.truekes ?? []);
+      setEsSocio(Boolean(p.esSocio));
+      if (p.esSocio) {
+        const v = await votacionesDisputas(token).catch(() => ({ votaciones: [] }));
+        setVotaciones(v.votaciones ?? []);
+      } else {
+        setVotaciones([]);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "no se pudieron cargar las disputas");
     } finally {
@@ -118,64 +146,106 @@ export default function PaginaDisputas() {
     void cargar();
   }, [cargar]);
 
-  // Al cambiar de cuenta se descartan los datos del usuario anterior.
   useEffect(() => {
     setDisputas([]);
     setTruekes([]);
-    setExito(null);
+    setVotaciones([]);
+    setDetalle({});
     setError(null);
-    setErrorSolicitud(null);
-    setTruekeSeleccionado("");
-    setMotivo("");
+    setErrorAccion(null);
+    setAviso(null);
+    setAccionDe(null);
   }, [account]);
 
-  /** Mis trueques disputables: solo los propios en CUSTODIADO/APERTURA (D13). */
-  const disputables = useMemo(
-    () =>
-      truekes.filter(
-        (t) =>
-          ESTADOS_DISPUTABLES.includes(t.estado) &&
-          (mismaWallet(t.usuarioA, account) || mismaWallet(t.usuarioB, account))
-      ),
-    [truekes, account]
-  );
-
-  /** Índice truekeId → trueque (enriquece títulos de las disputas, sin llamada extra). */
+  /** Índice truekeId → trueque (títulos). */
   const truekesPorId = useMemo(() => new Map(truekes.map((t) => [t.id, t])), [truekes]);
 
-  const tituloDeDisputa = (d: Disputa): string => {
-    const t = truekesPorId.get(d.truekeId);
+  const tituloDe = (truekeId: number): string => {
+    const t = truekesPorId.get(truekeId);
     if (t?.tituloA && t?.tituloB) return `${t.tituloA} ⇄ ${t.tituloB}`;
-    return `Trueque #${d.truekeId}`;
+    return `Trueque #${truekeId}`;
   };
 
-  const contraparteDe = (d: Disputa): string =>
-    mismaWallet(d.usuarioA, account) ? d.usuarioB : d.usuarioA;
+  /** Mi postura según mis cierres en el trueke (para saber si puedo justificar o declararme). */
+  function miCierreEn(d: Disputa, account?: string | null): string | null {
+    if (!account) return null;
+    if (mismaWallet(d.usuarioA, account)) return d.cierreA ?? null;
+    if (mismaWallet(d.usuarioB, account)) return d.cierreB ?? null;
+    return null;
+  }
 
-  const enviarSolicitud = useCallback(async () => {
-    if (!token || !truekeSeleccionado) return;
-    setSolicitando(true);
-    setExito(null);
-    setErrorSolicitud(null);
-    try {
-      const r = await solicitarDisputa(token, {
-        truekeId: Number(truekeSeleccionado),
-        motivo: motivo.trim() || undefined,
+  async function abrirDetalle(id: number) {
+    if (!token) return;
+    if (detalle[id]) {
+      setDetalle((prev) => {
+        const copia = { ...prev };
+        delete copia[id];
+        return copia;
       });
-      setExito(
-        `Disputa #${r.disputa.id} solicitada: el trueque pasó a EN_DISPUTA y se someterá a la resolución de Socios (D13/D21).`
-      );
-      setTruekeSeleccionado("");
-      setMotivo("");
-      await cargar(); // refresca ambas listas
-    } catch (e) {
-      setErrorSolicitud(
-        e instanceof Error ? e.message : "no se pudo solicitar la anulación"
-      );
-    } finally {
-      setSolicitando(false);
+      return;
     }
-  }, [token, truekeSeleccionado, motivo, cargar]);
+    setCargandoDetalle(id);
+    try {
+      const dd = await detalleDisputa(token, id);
+      setDetalle((prev) => ({ ...prev, [id]: dd }));
+    } catch (e) {
+      setErrorAccion(e instanceof Error ? e.message : "no se pudo cargar el detalle");
+    } finally {
+      setCargandoDetalle(null);
+    }
+  }
+
+  function abrirFormulario(d: Disputa, accion: "justificativo" | "no-conforme") {
+    setAccionDe({ id: d.id, accion });
+    setMotivo("");
+    setFotos([]);
+    setAviso(null);
+    setErrorAccion(null);
+  }
+
+  async function enviarFormulario(d: Disputa) {
+    if (!token || !accionDe || accionDe.id !== d.id) return;
+    setOcupado(true);
+    setErrorAccion(null);
+    try {
+      if (fotos.length === 0) throw new Error("Subí al menos una foto.");
+      if (accionDe.accion === "justificativo") {
+        await cargarJustificativo(token, d.id, fotos);
+        setAviso("✅ Justificativo cargado: la disputa pasa a votación de Socios.");
+      } else {
+        if (!motivo.trim()) throw new Error("Describí el motivo de tu No Conforme.");
+        await declararNoConforme(token, d.id, { motivo: motivo.trim(), fotos });
+        setAviso("✅ Reclamo registrado: ambas partes aportaron evidencia → votación de Socios.");
+      }
+      setAccionDe(null);
+      setMotivo("");
+      setFotos([]);
+      await cargar();
+    } catch (e) {
+      setErrorAccion(e instanceof Error ? e.message : "no se pudo enviar");
+    } finally {
+      setOcupado(false);
+    }
+  }
+
+  async function votar(d: VotacionSocio, voto: "ANULAR" | "VALIDO") {
+    if (!token) return;
+    setOcupado(true);
+    setErrorAccion(null);
+    try {
+      await votarDisputa(token, d.id, voto);
+      setAviso(voto === "ANULAR" ? "🗳️ Votaste ANULAR (devolución)." : "🗳️ Votaste VALIDO (el trueke se completa).");
+      await cargar();
+    } catch (e) {
+      setErrorAccion(e instanceof Error ? e.message : "no se pudo votar");
+    } finally {
+      setOcupado(false);
+    }
+  }
+
+  function noDisputasActivas() {
+    return disputas.length === 0 && !cargando && !error;
+  }
 
   return (
     <div className="space-y-5">
@@ -184,18 +254,16 @@ export default function PaginaDisputas() {
         <div>
           <h1 className="font-display text-2xl font-bold text-navy-800">⚖️ Disputas</h1>
           <p className="text-sm text-navy-800/60">
-            Trueques donde participas que están en disputa y solicitud de anulación de
-            custodia (RF-14.8, D13). Certificado ve · Socio resuelve (D21).
+            Flujo del director: ✗ No Conforme (con motivo + fotos) → justificativo del
+            conforme → votación de Socios → veredicto (ANULAR o VALIDO).
           </p>
         </div>
         {account && (
-          <p className="font-mono text-[10px] text-navy-800/40">
-            {resumirWallet(account)}
-          </p>
+          <p className="font-mono text-[10px] text-navy-800/40">{resumirWallet(account)}</p>
         )}
       </div>
 
-      {/* Sin token: el guard de la suite ya pidió la firma única (respaldo). */}
+      {/* Sin token: respaldo del guard de la suite */}
       {!token && (
         <Card className="p-8 text-center">
           <p className="text-3xl">🔏</p>
@@ -210,21 +278,29 @@ export default function PaginaDisputas() {
 
       {token && (
         <>
-          {/* Aviso para Socios: la resolución es votación on-chain (D21). */}
-          {esSocio && (
+          {aviso && (
+            <p className="rounded-xl border border-teal-500/40 bg-teal-500/10 px-4 py-2 text-xs text-navy-800/80">
+              ✅ {aviso}
+            </p>
+          )}
+          {errorAccion && (
+            <p className="rounded-xl bg-crimson/10 px-4 py-2 text-xs text-crimson">⚠️ {errorAccion}</p>
+          )}
+
+          {/* Aviso para Socios */}
+          {esSocioPadron && (
             <div className="rounded-xl border border-gold-500/40 bg-gold-500/10 px-4 py-3 text-sm text-navy-800/80">
-              🏛️ <strong>Como Socio</strong> puedes participar en la resolución de estas
-              disputas: votación on-chain de anulación, un voto por Socio y quórum ≥2/3
-              (D21). La votación se realiza en la cadena; aquí verás el estado resultante.
+              🏛️ <strong>Como Socio</strong> resolvés las disputas votando{" "}
+              <strong>ANULAR</strong> (devolución total de los NFTs en custodia) o{" "}
+              <strong>VALIDO</strong> (el trueke se completa). Un voto por Socio; si sos
+              parte del trueke en disputa <strong>no podés votar</strong> (punto 4).
             </div>
           )}
 
           {/* Sección 1 — Mis disputas activas */}
           <section>
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-              <h2 className="font-display text-lg font-bold text-navy-800">
-                Mis disputas activas
-              </h2>
+              <h2 className="font-display text-lg font-bold text-navy-800">Mis disputas</h2>
               <Button
                 variante="outline-navy"
                 className="!px-3 !py-1.5 !text-xs"
@@ -236,9 +312,7 @@ export default function PaginaDisputas() {
             </div>
 
             {cargando && (
-              <Card className="p-8 text-center text-sm text-navy-800/50">
-                Cargando disputas…
-              </Card>
+              <Card className="p-8 text-center text-sm text-navy-800/50">Cargando disputas…</Card>
             )}
 
             {!cargando && error && (
@@ -246,22 +320,21 @@ export default function PaginaDisputas() {
                 <p className="text-sm text-crimson">No se pudieron cargar las disputas.</p>
                 <p className="mt-1 text-xs text-navy-800/50">{error}</p>
                 <div className="mt-4">
-                  <Button variante="outline-navy" onClick={() => void cargar()}>
-                    ↻ Reintentar
-                  </Button>
+                  <Button variante="outline-navy" onClick={() => void cargar()}>↻ Reintentar</Button>
                 </div>
               </Card>
             )}
 
-            {!cargando && !error && disputas.length === 0 && (
+            {noDisputasActivas() && (
               <Card className="p-8 text-center">
                 <p className="text-3xl">🕊️</p>
                 <h3 className="mt-2 font-display text-lg font-semibold text-navy-800">
-                  No tienes disputas activas
+                  No tenés disputas activas
                 </h3>
                 <p className="mx-auto mt-1 max-w-md text-sm text-navy-800/60">
-                  Cuando tú o la otra parte solicite la anulación de un trueque en custodia
-                  (D13), la disputa aparecerá aquí y el trueque pasará a EN_DISPUTA.
+                  Cuando una parte declare <strong>✗ No Conforme</strong> en el cierre del
+                  trueque (formulario con motivo + fotos), la disputa aparecerá acá y
+                  seguirá el flujo: justificativo → votación de Socios → veredicto.
                 </p>
               </Card>
             )}
@@ -269,17 +342,25 @@ export default function PaginaDisputas() {
             {!cargando && !error && disputas.length > 0 && (
               <div className="space-y-3">
                 {disputas.map((d) => {
-                  const contraparte = contraparteDe(d);
+                  const rol = miRol(d, account, esSocioPadron);
+                  const miCierre = miCierreEn(d, account);
+                  const contraparte = mismaWallet(d.solicitante, account) ? (mismaWallet(d.usuarioA, account) ? d.usuarioB : d.usuarioA) : d.solicitante;
+                  const elDetalle = detalle[d.id];
                   return (
                     <Card key={d.id} className="p-4">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="min-w-0">
                           <p className="font-display text-base font-bold text-navy-800">
-                            {tituloDeDisputa(d)}
+                            {tituloDe(d.truekeId)}
                           </p>
                           <p className="mt-0.5 text-xs text-navy-800/50">
-                            Contraparte:{" "}
-                            <span className="font-mono">{resumirWallet(contraparte)}</span>
+                            {rol === "reclamante" ? (
+                              <>Reclamante: <strong className="text-navy-800">vos</strong> · Contraparte: <span className="font-mono">{resumirWallet(contraparte)}</span></>
+                            ) : rol === "contraparte" ? (
+                              <>Contraparte: <strong className="text-navy-800">vos</strong> · Reclamante: <span className="font-mono">{resumirWallet(d.solicitante)}</span></>
+                            ) : (
+                              <>Partes: <span className="font-mono">{resumirWallet(d.usuarioA)}</span> ⇄ <span className="font-mono">{resumirWallet(d.usuarioB)}</span></>
+                            )}
                           </p>
                         </div>
                         <div className="flex flex-wrap items-center gap-1.5">
@@ -288,24 +369,156 @@ export default function PaginaDisputas() {
                         </div>
                       </div>
 
-                      {d.motivo && (
-                        <p className="mt-2 rounded-xl bg-smoke px-3 py-2 text-xs italic text-navy-800/70">
-                          “{d.motivo}”
-                        </p>
+                      <p className="mt-2 rounded-xl bg-smoke px-3 py-2 text-xs italic text-navy-800/70">
+                        “{d.motivo ?? "Sin motivo"}”
+                      </p>
+
+                      {/* Mi acción pendiente */}
+                      {rol === "contraparte" && ["REPORTADA", "ESPERA_JUSTIFICATIVO"].includes(d.estado) && miCierre !== "NO_CONFORME" && (
+                        <div className="mt-3 rounded-xl border border-coral/30 bg-coral/5 px-3 py-2">
+                          <p className="text-xs font-semibold text-navy-800/80">
+                            {miCierre === "CONFORME" || d.estado === "ESPERA_JUSTIFICATIVO" ? (
+                              <>📷 La contraparte declaró No Conforme y vos estás conforme: cargá tu <strong>justificativo con fotos</strong> (plazo 3 días).</>
+                            ) : (
+                              <>Declará tu postura: si estás conforme cargá tu justificativo, o declará tu propio No Conforme con fotos.</>
+                            )}
+                          </p>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            <Button
+                              className="!px-3 !py-1.5 !text-xs"
+                              disabled={ocupado || !token}
+                              onClick={() => abrirFormulario(d, "justificativo")}
+                            >
+                              ✓ Estoy conforme — cargar justificativo
+                            </Button>
+                            {!miCierre && (
+                              <Button
+                                variante="outline-navy"
+                                className="!px-3 !py-1.5 !text-xs !border-crimson !text-crimson hover:!bg-crimson/5"
+                                disabled={ocupado || !token}
+                                onClick={() => abrirFormulario(d, "no-conforme")}
+                              >
+                                ✗ También No Conforme
+                              </Button>
+                            )}
+                          </div>
+                        </div>
                       )}
 
-                      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-navy-800/50">
-                        <span>
-                          Solicitante:{" "}
-                          {mismaWallet(d.solicitante, account) ? (
-                            <strong className="text-navy-800">tú</strong>
-                          ) : (
-                            <span className="font-mono">{resumirWallet(d.solicitante)}</span>
+                      {/* Formulario activo */}
+                      {accionDe?.id === d.id && rol === "contraparte" && (
+                        <div className="mt-3 space-y-3 rounded-xl border border-navy-800/10 bg-white p-3">
+                          <SubirFotos fotos={fotos} onChange={setFotos} max={5} etiqueta="Tus fotos de evidencia" />
+                          {accionDe.accion === "no-conforme" && (
+                            <div>
+                              <label htmlFor={`motivo-${d.id}`} className="mb-1 block text-xs font-semibold text-navy-800/70">
+                                Motivo de tu No Conforme <span className="font-normal text-navy-800/40">(obligatorio)</span>
+                              </label>
+                              <textarea
+                                id={`motivo-${d.id}`}
+                                value={motivo}
+                                onChange={(e) => setMotivo(e.target.value)}
+                                rows={2}
+                                maxLength={500}
+                                placeholder="Ej.: lo que recibí no coincide con lo acordado…"
+                                className={inputCls}
+                              />
+                            </div>
                           )}
-                        </span>
+                          <div className="flex flex-wrap gap-2">
+                            <Button
+                              className="!px-3 !py-1.5 !text-xs"
+                              disabled={
+                                ocupado ||
+                                fotos.length === 0 ||
+                                (accionDe.accion === "no-conforme" && !motivo.trim())
+                              }
+                              onClick={() => void enviarFormulario(d)}
+                            >
+                              {ocupado
+                                ? "Enviando…"
+                                : accionDe.accion === "justificativo"
+                                  ? "📷 Enviar justificativo"
+                                  : "✗ Declarar mi No Conforme"}
+                            </Button>
+                            <Button variante="outline-navy" className="!px-3 !py-1.5 !text-xs" onClick={() => setAccionDe(null)}>
+                              Cancelar
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Plazos y veredicto */}
+                      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-navy-800/50">
                         <span>🗓 {formatearFecha(d.createdAt)}</span>
-                        {d.resolucion && <span>Resolución: {d.resolucion}</span>}
-                        {d.sancion && <span>Sanción: {d.sancion}</span>}
+                        {d.estado === "ESPERA_JUSTIFICATIVO" && d.justificativoVenceAt && (
+                          <span className="text-coral">⏳ Justificativo vence: {formatearFecha(d.justificativoVenceAt)}</span>
+                        )}
+                        {d.estado === "EN_VOTACION" && d.votacionVenceAt && (
+                          <span>🗳️ Votación vence: {formatearFecha(d.votacionVenceAt)}</span>
+                        )}
+                        {d.estado === "RESUELTA" && (
+                          <span>
+                            {d.veredicto === "ANULAR" ? (
+                              <strong className="text-crimson">Veredicto: ANULAR — devolución total</strong>
+                            ) : d.veredicto === "VALIDO" ? (
+                              <strong className="text-teal-600">Veredicto: VALIDO — trueke completado</strong>
+                            ) : null}
+                            {d.resolucion ? <> · {d.resolucion}</> : null}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Ver pruebas (detalle con evidencias de ambas partes) */}
+                      <div className="mt-3">
+                        <Button
+                          variante="outline-navy"
+                          className="!px-3 !py-1.5 !text-xs"
+                          onClick={() => void abrirDetalle(d.id)}
+                          disabled={cargandoDetalle === d.id}
+                        >
+                          {elDetalle ? "▾ Ocultar pruebas" : "🔍 Ver pruebas de ambas partes"}
+                        </Button>
+                        {cargandoDetalle === d.id && (
+                          <p className="mt-2 text-xs text-navy-800/50">Cargando pruebas…</p>
+                        )}
+                        {elDetalle && (
+                          <div className="mt-3 grid gap-3 rounded-xl bg-smoke p-3 md:grid-cols-2">
+                            <div>
+                              <p className="mb-1 text-[11px] font-bold uppercase tracking-wide text-navy-800/60">
+                                🗣️ Reclamo ({resumirWallet(d.solicitante)})
+                              </p>
+                              {elDetalle.evidencias.filter((e) => e.tipo === "RECLAMO").length === 0 ? (
+                                <p className="text-xs text-navy-800/40">Sin fotos del reclamo.</p>
+                              ) : (
+                                <div className="flex flex-wrap gap-2">
+                                  {elDetalle.evidencias.filter((e) => e.tipo === "RECLAMO").map((e) => (
+                                    <ImagenProtegida key={e.id} token={token!} ruta={urlEvidenciaDisputa(d.id, e.id)} alt="reclamo" className="h-20 w-20" />
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                            <div>
+                              <p className="mb-1 text-[11px] font-bold uppercase tracking-wide text-navy-800/60">
+                                📷 Justificativo del conforme
+                              </p>
+                              {elDetalle.evidencias.filter((e) => e.tipo === "JUSTIFICATIVO").length === 0 ? (
+                                <p className="text-xs text-navy-800/40">Aún no cargó justificativo.</p>
+                              ) : (
+                                <div className="flex flex-wrap gap-2">
+                                  {elDetalle.evidencias.filter((e) => e.tipo === "JUSTIFICATIVO").map((e) => (
+                                    <ImagenProtegida key={e.id} token={token!} ruta={urlEvidenciaDisputa(d.id, e.id)} alt="justificativo" className="h-20 w-20" />
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                            {elDetalle.votos.length > 0 && (
+                              <p className="text-[11px] text-navy-800/50 md:col-span-2">
+                                🗳️ Votos: {elDetalle.votos.filter((v) => v.voto === "ANULAR").length} ANULAR · {elDetalle.votos.filter((v) => v.voto === "VALIDO").length} VALIDO
+                              </p>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </Card>
                   );
@@ -314,94 +527,112 @@ export default function PaginaDisputas() {
             )}
           </section>
 
-          {/* Sección 2 — Solicitar anulación */}
-          <Card className="p-5">
-            <h2 className="font-display text-lg font-bold text-navy-800">
-              Solicitar anulación
-            </h2>
-            <p className="mt-1 text-sm text-navy-800/60">
-              Puedes pedir la anulación de un trueque <strong>propio</strong> en{" "}
-              <StatusBadge estado="CUSTODIADO" /> o <StatusBadge estado="APERTURA" /> (D13):
-              la solicitud lo pasa a <StatusBadge estado="EN_DISPUTA" /> y los Socios la
-              resuelven por votación on-chain.
-            </p>
+          {/* Sección 2 — Votación de Socios */}
+          {esSocioPadron && (
+            <section>
+              <h2 className="mb-3 font-display text-lg font-bold text-navy-800">
+                🏛️ Votación de Socios
+              </h2>
+              {votaciones.length === 0 ? (
+                <Card className="p-6 text-center text-sm text-navy-800/50">
+                  No hay votaciones abiertas ni resueltas recientes.
+                </Card>
+              ) : (
+                <div className="space-y-3">
+                  {votaciones.map((v) => {
+                    const t = truekesPorId.get(v.truekeId);
+                    return (
+                      <Card key={v.id} className="p-4">
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="font-display text-base font-bold text-navy-800">
+                              {t?.tituloA && t?.tituloB ? `${t.tituloA} ⇄ ${t.tituloB}` : `Trueque #${v.truekeId}`}
+                            </p>
+                            <p className="mt-0.5 text-xs text-navy-800/50">
+                              {resumirWallet(v.usuarioA)} ⇄ {resumirWallet(v.usuarioB)} · “{v.motivo ?? ""}”
+                            </p>
+                          </div>
+                          <StatusBadge estado={v.estado} tono={tonoDeDisputa(v.estado)} />
+                        </div>
 
-            {errorSolicitud && (
-              <p className="mt-3 rounded-xl bg-crimson/10 px-4 py-2 text-xs text-crimson">
-                ⚠️ {errorSolicitud}
-              </p>
-            )}
-            {exito && (
-              <p className="mt-3 rounded-xl border border-teal-500/40 bg-teal-500/10 px-4 py-2 text-xs text-navy-800/80">
-                ✅ {exito}
-              </p>
-            )}
+                        {/* pruebas de ambas partes (mismo acceso para todo Socio) */}
+                        <div className="mt-3 grid gap-3 rounded-xl bg-smoke p-3 md:grid-cols-2">
+                          <div>
+                            <p className="mb-1 text-[11px] font-bold uppercase tracking-wide text-navy-800/60">🗣️ Reclamo ({resumirWallet(v.solicitante)})</p>
+                            {v.evidencias.filter((e) => e.tipo === "RECLAMO").length === 0 ? (
+                              <p className="text-xs text-navy-800/40">Sin fotos.</p>
+                            ) : (
+                              <div className="flex flex-wrap gap-2">
+                                {v.evidencias.filter((e) => e.tipo === "RECLAMO").map((e) => (
+                                  <ImagenProtegida key={e.id} token={token!} ruta={urlEvidenciaDisputa(v.id, e.id)} alt="reclamo" className="h-20 w-20" />
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <p className="mb-1 text-[11px] font-bold uppercase tracking-wide text-navy-800/60">📷 Justificativo del conforme</p>
+                            {v.evidencias.filter((e) => e.tipo === "JUSTIFICATIVO").length === 0 ? (
+                              <p className="text-xs text-navy-800/40">Sin fotos.</p>
+                            ) : (
+                              <div className="flex flex-wrap gap-2">
+                                {v.evidencias.filter((e) => e.tipo === "JUSTIFICATIVO").map((e) => (
+                                  <ImagenProtegida key={e.id} token={token!} ruta={urlEvidenciaDisputa(v.id, e.id)} alt="justificativo" className="h-20 w-20" />
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
 
-            {disputables.length === 0 ? (
-              <p className="mt-4 rounded-xl bg-smoke px-4 py-3 text-sm text-navy-800/60">
-                No tienes trueques propios en custodia/apretura que puedan disputarse. Los
-                trueques en <strong>CUSTODIADO</strong> o <strong>APERTURA</strong> aparecerán
-                aquí para solicitar su anulación (D13).
-              </p>
-            ) : (
-              <div className="mt-4 space-y-3">
-                <div>
-                  <label
-                    htmlFor="trueke-disputa"
-                    className="mb-1 block text-xs font-semibold text-navy-800/70"
-                  >
-                    Trueque a disputar
-                  </label>
-                  <select
-                    id="trueke-disputa"
-                    value={truekeSeleccionado}
-                    onChange={(e) => setTruekeSeleccionado(e.target.value)}
-                    className={inputCls}
-                    disabled={solicitando}
-                  >
-                    <option value="">Selecciona un trueque…</option>
-                    {disputables.map((t) => (
-                      <option key={t.id} value={t.id}>
-                        {rotuloTrueke(t)}
-                      </option>
-                    ))}
-                  </select>
+                        <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                          <p className="text-[11px] text-navy-800/50">
+                            Votos: {v.votos.filter((x) => x.voto === "ANULAR").length} ANULAR · {v.votos.filter((x) => x.voto === "VALIDO").length} VALIDO
+                            {v.votacionVenceAt ? ` · vence ${formatearFecha(v.votacionVenceAt)}` : ""}
+                          </p>
+                          {v.estado === "EN_VOTACION" && (
+                            v.soyParte ? (
+                              <span className="text-xs font-semibold text-crimson">Sos parte del trueke: no podés votar</span>
+                            ) : v.miVoto ? (
+                              <span className="text-xs font-semibold text-teal-600">✓ Ya votaste: {v.miVoto}</span>
+                            ) : (
+                              <div className="flex gap-2">
+                                <Button
+                                  className="!px-3 !py-1.5 !text-xs !bg-crimson hover:!bg-crimson/90"
+                                  disabled={ocupado || !token}
+                                  onClick={() => void votar(v, "ANULAR")}
+                                >
+                                  🗳️ ANULAR (devolver)
+                                </Button>
+                                <Button
+                                  className="!px-3 !py-1.5 !text-xs !bg-[linear-gradient(135deg,#2a9d8f,#2a9d8f)]"
+                                  disabled={ocupado || !token}
+                                  onClick={() => void votar(v, "VALIDO")}
+                                >
+                                  🗳️ VALIDO (completar)
+                                </Button>
+                              </div>
+                            )
+                          )}
+                          {v.estado === "RESUELTA" && (
+                            <span className="text-xs font-semibold text-navy-800/70">
+                              {v.veredicto === "ANULAR" ? "❌ ANULAR — devolución total" : "✅ VALIDO — trueke completado"}
+                            </span>
+                          )}
+                        </div>
+                      </Card>
+                    );
+                  })}
                 </div>
+              )}
+            </section>
+          )}
 
-                <div>
-                  <label
-                    htmlFor="motivo-disputa"
-                    className="mb-1 block text-xs font-semibold text-navy-800/70"
-                  >
-                    Motivo <span className="font-normal text-navy-800/40">(opcional)</span>
-                  </label>
-                  <textarea
-                    id="motivo-disputa"
-                    value={motivo}
-                    onChange={(e) => setMotivo(e.target.value)}
-                    rows={3}
-                    maxLength={500}
-                    placeholder="Ej.: la contraparte no entregó el artículo acordado…"
-                    className={inputCls}
-                    disabled={solicitando}
-                  />
-                </div>
-
-                <div className="flex flex-wrap items-center gap-3">
-                  <Button
-                    onClick={() => void enviarSolicitud()}
-                    disabled={solicitando || !truekeSeleccionado}
-                  >
-                    {solicitando ? "Solicitando…" : "Solicitar anulación (D13)"}
-                  </Button>
-                  <p className="text-[11px] text-navy-800/40">
-                    {truekeSeleccionado
-                      ? "El backend validará el estado antes de abrir la disputa."
-                      : "Elige primero un trueque en custodia/apretura."}
-                  </p>
-                </div>
-              </div>
-            )}
+          {/* Nota de origen del flujo */}
+          <Card className="p-4 text-xs text-navy-800/60">
+            💡 <strong>Origen de la disputa:</strong> la disputa nace en el cierre del
+            trueque cuando una parte declara <strong>✗ No Conforme</strong> (botón en{" "}
+            <em>Trueke Central</em>) y completa el formulario con motivo y fotos. Acá
+            seguís el flujo: justificativo del conforme (3 días) → votación de Socios
+            (5 días, mayoría simple) → veredicto.
           </Card>
         </>
       )}

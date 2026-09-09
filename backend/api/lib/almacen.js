@@ -204,17 +204,138 @@ export function crearAlmacen() {
         truekeId: Number(truekeId),
         solicitante,
         motivo: motivo ?? null,
-        estado: 'ABIERTA',
+        estado: 'REPORTADA',
+        veredicto: null,
+        justificativoVenceAt: null,
+        votacionVenceAt: null,
+        resueltaEn: null,
+        resolucion: null,
         createdAt: new Date().toISOString(),
         usuarioA: t.usuarioA,
         usuarioB: t.usuarioB,
+        cierreA: t.cierreA ?? null,
+        cierreB: t.cierreB ?? null,
+        estadoTrueke: t.estado,
       };
       estado.disputas.set(id, d);
       t.estado = 'EN_DISPUTA';
       return d;
     },
     listarDisputas() {
-      return [...(estado.disputas?.values() ?? [])];
+      return [...(estado.disputas?.values() ?? [])].map((d) => {
+        const t = estado.truekes.get(Number(d.truekeId));
+        return {
+          ...d,
+          usuarioA: t?.usuarioA ?? d.usuarioA,
+          usuarioB: t?.usuarioB ?? d.usuarioB,
+          cierreA: t?.cierreA ?? null,
+          cierreB: t?.cierreB ?? null,
+          estadoTrueke: t?.estado ?? d.estadoTrueke,
+        };
+      });
+    },
+    async getDisputa(id) {
+      const d = estado.disputas?.get(Number(id));
+      if (!d) return null;
+      const t = estado.truekes.get(Number(d.truekeId));
+      return {
+        ...d,
+        usuarioA: t?.usuarioA ?? d.usuarioA,
+        usuarioB: t?.usuarioB ?? d.usuarioB,
+        cierreA: t?.cierreA ?? null,
+        cierreB: t?.cierreB ?? null,
+        estadoTrueke: t?.estado ?? d.estadoTrueke,
+      };
+    },
+    async actualizarDisputa(id, cambios) {
+      const d = estado.disputas?.get(Number(id));
+      if (!d) return false;
+      Object.assign(d, {
+        estado: cambios.estado ?? d.estado,
+        justificativoVenceAt: cambios.justificativoVenceAt
+          ? new Date(cambios.justificativoVenceAt).toISOString()
+          : d.justificativoVenceAt,
+        votacionVenceAt: cambios.votacionVenceAt
+          ? new Date(cambios.votacionVenceAt).toISOString()
+          : d.votacionVenceAt,
+        veredicto: cambios.veredicto ?? d.veredicto,
+        resueltaEn: cambios.resueltaEn ? new Date(cambios.resueltaEn).toISOString() : d.resueltaEn,
+        resolucion: cambios.resolucion ?? d.resolucion,
+      });
+      return true;
+    },
+    async agregarEvidenciaDisputa({ disputaId, autor, tipo, contenido, mime }) {
+      if (!estado.evidenciasDisputa) estado.evidenciasDisputa = new Map();
+      const id = (estado.evidenciasDisputa.size || 0) + 1;
+      estado.evidenciasDisputa.set(id, {
+        id,
+        disputaId: Number(disputaId),
+        autor: autor.toLowerCase(),
+        tipo,
+        contenido: Buffer.from(contenido),
+        mime: mime ?? 'image/jpeg',
+        createdAt: new Date().toISOString(),
+      });
+      return id;
+    },
+    async listarEvidenciasDisputa(disputaId) {
+      return [...(estado.evidenciasDisputa?.values() ?? [])]
+        .filter((e) => e.disputaId === Number(disputaId))
+        .map((e) => ({ id: e.id, autor: e.autor, tipo: e.tipo, mime: e.mime, createdAt: e.createdAt }));
+    },
+    async getEvidenciaDisputa(id) {
+      const e = estado.evidenciasDisputa?.get(Number(id));
+      if (!e) return null;
+      return { ...e };
+    },
+    async registrarVotoDisputa({ disputaId, socio, voto }) {
+      if (!estado.votosDisputa) estado.votosDisputa = new Map();
+      const clave = `${disputaId}:${socio.toLowerCase()}`;
+      estado.votosDisputa.set(clave, { disputaId: Number(disputaId), socio: socio.toLowerCase(), voto, createdAt: new Date().toISOString() });
+      return 1;
+    },
+    async listarVotosDisputa(disputaId) {
+      return [...(estado.votosDisputa?.values() ?? [])]
+        .filter((v) => v.disputaId === Number(disputaId))
+        .map((v) => ({ socio: v.socio, voto: v.voto }));
+    },
+
+    // ------------------------------------------------------------ notificaciones (memoria)
+    async crearNotificacion({ wallet, tipo, titulo, cuerpo, refTipo, refId }) {
+      if (!estado.notificaciones) estado.notificaciones = [];
+      const n = {
+        id: estado.notificaciones.length + 1,
+        wallet: wallet.toLowerCase(),
+        tipo,
+        titulo: titulo ?? '',
+        cuerpo: cuerpo ?? null,
+        refTipo: refTipo ?? null,
+        refId: refId ?? null,
+        leida: false,
+        createdAt: new Date().toISOString(),
+      };
+      estado.notificaciones.push(n);
+      return n;
+    },
+    async listarNotificaciones(wallet) {
+      return [...(estado.notificaciones ?? [])]
+        .filter((n) => n.wallet === wallet.toLowerCase())
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .slice(0, 50);
+    },
+    async contarNotificacionesNoLeidas(wallet) {
+      return (estado.notificaciones ?? []).filter((n) => n.wallet === wallet.toLowerCase() && !n.leida).length;
+    },
+    async marcarNotificacionLeida(id, wallet) {
+      const n = (estado.notificaciones ?? []).find((x) => x.id === Number(id) && x.wallet === wallet.toLowerCase());
+      if (n) n.leida = true;
+      return true;
+    },
+    async marcarNotificacionesLeidas(wallet) {
+      for (const n of estado.notificaciones ?? []) {
+        if (n.wallet === wallet.toLowerCase()) n.leida = true;
+      }
+      return true;
     },
 
     // ------------------------------------------------------------ puntos de encuentro (CU-16, punto 5.1)

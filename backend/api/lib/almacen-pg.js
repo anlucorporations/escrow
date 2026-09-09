@@ -516,7 +516,7 @@ export async function crearAlmacenPg(pool) {
     async crearDisputa({ truekeId, solicitante, motivo }) {
       const r = await pool.query(
         `INSERT INTO disputas (trueke_id, solicitante, motivo, estado)
-         VALUES ($1, $2, $3, 'ABIERTA')
+         VALUES ($1, $2, $3, 'REPORTADA')
          RETURNING id, trueke_id, solicitante, motivo, estado, created_at`,
         [Number(truekeId), NORMALIZA_WALLET(solicitante), motivo ?? null]
       );
@@ -534,7 +534,8 @@ export async function crearAlmacenPg(pool) {
 
     async listarDisputas() {
       const r = await pool.query(
-        `SELECT d.*, t.usuario_a, t.usuario_b, t.estado AS estado_trueke
+        `SELECT d.*, t.usuario_a, t.usuario_b, t.estado AS estado_trueke,
+                t.cierre_a, t.cierre_b
            FROM disputas d JOIN truekes t ON t.id = d.trueke_id
           ORDER BY d.id DESC`
       );
@@ -545,13 +546,200 @@ export async function crearAlmacenPg(pool) {
         motivo: f.motivo,
         estado: f.estado,
         resolucion: f.resolucion,
+        veredicto: f.veredicto,
+        justificativoVenceAt: f.justificativo_vence_at ? f.justificativo_vence_at.toISOString() : null,
+        votacionVenceAt: f.votacion_vence_at ? f.votacion_vence_at.toISOString() : null,
+        resueltaEn: f.resuelta_en ? f.resuelta_en.toISOString() : null,
         sancion: f.sancion,
         registroVotos: f.registro_votos,
         usuarioA: f.usuario_a.trim().toLowerCase(),
-        usuarioB: f.usuario_b.trim().toLowerCase(),
+        usuarioB: f.usuario_b ? f.usuario_b.trim().toLowerCase() : null,
+        cierreA: f.cierre_a ?? null,
+        cierreB: f.cierre_b ?? null,
         estadoTrueke: f.estado_trueke,
         createdAt: f.created_at.toISOString(),
       }));
+    },
+
+    async getDisputa(id) {
+      const r = await pool.query(
+        `SELECT d.*, t.usuario_a, t.usuario_b, t.estado AS estado_trueke,
+                t.cierre_a, t.cierre_b, t.articulo_a_id, t.articulo_b_id,
+                aa.titulo AS titulo_a, ab.titulo AS titulo_b
+           FROM disputas d JOIN truekes t ON t.id = d.trueke_id
+           LEFT JOIN articulos aa ON aa.id = t.articulo_a_id
+           LEFT JOIN articulos ab ON ab.id = t.articulo_b_id
+          WHERE d.id = $1`,
+        [Number(id)]
+      );
+      const f = r.rows[0];
+      if (!f) return null;
+      return {
+        id: Number(f.id),
+        truekeId: Number(f.trueke_id),
+        solicitante: f.solicitante.trim().toLowerCase(),
+        motivo: f.motivo,
+        estado: f.estado,
+        resolucion: f.resolucion,
+        veredicto: f.veredicto,
+        justificativoVenceAt: f.justificativo_vence_at ? f.justificativo_vence_at.toISOString() : null,
+        votacionVenceAt: f.votacion_vence_at ? f.votacion_vence_at.toISOString() : null,
+        resueltaEn: f.resuelta_en ? f.resuelta_en.toISOString() : null,
+        registroVotos: f.registro_votos,
+        usuarioA: f.usuario_a.trim().toLowerCase(),
+        usuarioB: f.usuario_b ? f.usuario_b.trim().toLowerCase() : null,
+        cierreA: f.cierre_a ?? null,
+        cierreB: f.cierre_b ?? null,
+        estadoTrueke: f.estado_trueke,
+        articuloAId: f.articulo_a_id !== null ? Number(f.articulo_a_id) : null,
+        articuloBId: f.articulo_b_id !== null ? Number(f.articulo_b_id) : null,
+        tituloA: f.titulo_a ?? null,
+        tituloB: f.titulo_b ?? null,
+        createdAt: f.created_at.toISOString(),
+      };
+    },
+
+    /** Actualiza campos de la disputa (estado, vencimientos, veredicto…). */
+    async actualizarDisputa(id, cambios) {
+      const r = await pool.query(
+        `UPDATE disputas
+            SET estado = COALESCE($2, estado),
+                justificativo_vence_at = COALESCE($3, justificativo_vence_at),
+                votacion_vence_at = COALESCE($4, votacion_vence_at),
+                veredicto = COALESCE($5, veredicto),
+                resuelta_en = COALESCE($6, resuelta_en),
+                resolucion = COALESCE($7, resolucion),
+                updated_at = now()
+          WHERE id = $1 RETURNING id`,
+        [
+          Number(id),
+          cambios.estado ?? null,
+          cambios.justificativoVenceAt ? new Date(cambios.justificativoVenceAt).toISOString() : null,
+          cambios.votacionVenceAt ? new Date(cambios.votacionVenceAt).toISOString() : null,
+          cambios.veredicto ?? null,
+          cambios.resueltaEn ? new Date(cambios.resueltaEn).toISOString() : null,
+          cambios.resolucion ?? null,
+        ]
+      );
+      return r.rowCount > 0;
+    },
+
+    /** Guarda una foto de evidencia de una parte (RECLAMO del reclamante o JUSTIFICATIVO del conforme). */
+    async agregarEvidenciaDisputa({ disputaId, autor, tipo, contenido, mime }) {
+      const r = await pool.query(
+        `INSERT INTO evidencias_disputa (disputa_id, autor, tipo, contenido, mime)
+         VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+        [Number(disputaId), NORMALIZA_WALLET(autor), tipo, Buffer.from(contenido), mime ?? 'image/jpeg']
+      );
+      return Number(r.rows[0].id);
+    },
+
+    /** Metadatos de las evidencias de una disputa (sin binario). */
+    async listarEvidenciasDisputa(disputaId) {
+      const r = await pool.query(
+        `SELECT id, autor, tipo, mime, created_at FROM evidencias_disputa
+          WHERE disputa_id = $1 ORDER BY id`,
+        [Number(disputaId)]
+      );
+      return r.rows.map((f) => ({
+        id: Number(f.id),
+        autor: f.autor.trim().toLowerCase(),
+        tipo: f.tipo,
+        mime: f.mime,
+        createdAt: f.created_at.toISOString(),
+      }));
+    },
+
+    /** Binario de una evidencia (para servir la imagen). */
+    async getEvidenciaDisputa(id) {
+      const r = await pool.query(
+        `SELECT id, disputa_id, autor, tipo, contenido, mime FROM evidencias_disputa WHERE id = $1`,
+        [Number(id)]
+      );
+      const f = r.rows[0];
+      if (!f) return null;
+      return {
+        id: Number(f.id),
+        disputaId: Number(f.disputa_id),
+        autor: f.autor.trim().toLowerCase(),
+        tipo: f.tipo,
+        contenido: f.contenido,
+        mime: f.mime ?? 'image/jpeg',
+      };
+    },
+
+    /** Registra el voto de un socio (1 voto por socio y disputa — UNIQUE). */
+    async registrarVotoDisputa({ disputaId, socio, voto }) {
+      const r = await pool.query(
+        `INSERT INTO votos_disputa (disputa_id, socio, voto)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (disputa_id, socio) DO UPDATE SET voto = EXCLUDED.voto, created_at = now()
+         RETURNING id`,
+        [Number(disputaId), NORMALIZA_WALLET(socio), voto]
+      );
+      return Number(r.rows[0].id);
+    },
+
+    async listarVotosDisputa(disputaId) {
+      const r = await pool.query(
+        `SELECT socio, voto FROM votos_disputa WHERE disputa_id = $1`,
+        [Number(disputaId)]
+      );
+      return r.rows.map((f) => ({ socio: f.socio.trim().toLowerCase(), voto: f.voto }));
+    },
+
+    // ------------------------------------------------------------ notificaciones (campana)
+    async crearNotificacion({ wallet, tipo, titulo, cuerpo, refTipo, refId }) {
+      const r = await pool.query(
+        `INSERT INTO notificaciones (wallet, tipo, titulo, cuerpo, ref_tipo, ref_id)
+         VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, leida, created_at`,
+        [NORMALIZA_WALLET(wallet), tipo, titulo ?? '', cuerpo ?? null, refTipo ?? null, refId ?? null]
+      );
+      const f = r.rows[0];
+      return { id: Number(f.id), leida: f.leida, createdAt: f.created_at.toISOString() };
+    },
+
+    async listarNotificaciones(wallet) {
+      const r = await pool.query(
+        `SELECT id, tipo, titulo, cuerpo, ref_tipo, ref_id, leida, created_at
+           FROM notificaciones WHERE wallet = $1
+          ORDER BY created_at DESC LIMIT 50`,
+        [NORMALIZA_WALLET(wallet)]
+      );
+      return r.rows.map((f) => ({
+        id: Number(f.id),
+        tipo: f.tipo,
+        titulo: f.titulo,
+        cuerpo: f.cuerpo,
+        refTipo: f.ref_tipo,
+        refId: f.ref_id !== null ? Number(f.ref_id) : null,
+        leida: f.leida,
+        createdAt: f.created_at.toISOString(),
+      }));
+    },
+
+    async contarNotificacionesNoLeidas(wallet) {
+      const r = await pool.query(
+        `SELECT count(*)::int AS n FROM notificaciones WHERE wallet = $1 AND leida = FALSE`,
+        [NORMALIZA_WALLET(wallet)]
+      );
+      return r.rows[0].n;
+    },
+
+    async marcarNotificacionLeida(id, wallet) {
+      await pool.query(
+        `UPDATE notificaciones SET leida = TRUE WHERE id = $1 AND wallet = $2`,
+        [Number(id), NORMALIZA_WALLET(wallet)]
+      );
+      return true;
+    },
+
+    async marcarNotificacionesLeidas(wallet) {
+      await pool.query(
+        `UPDATE notificaciones SET leida = TRUE WHERE wallet = $1`,
+        [NORMALIZA_WALLET(wallet)]
+      );
+      return true;
     },
 
     // ------------------------------------------------------------ puntos de encuentro (CU-16, punto 5.1)

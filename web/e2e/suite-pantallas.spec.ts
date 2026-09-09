@@ -108,15 +108,25 @@ async function simularSuite(
           });
         }
         // Disputas
+        if (url.includes("/disputas/padron")) {
+          return json({ esSocio: usuarioSim.tipo === "SOCIO", totalSocios: 3, padron: [cuenta, otra] });
+        }
+        if (url.includes("/disputas/votaciones")) {
+          return json({ votaciones: [] });
+        }
         if (url.includes("/disputas") && (!init?.method || init?.method === "GET")) {
           return json({
             disputas: [
-              { id: 1, truekeId: 11, solicitante: cuenta, motivo: "no entrega", estado: "ABIERTA", usuarioA: cuenta, usuarioB: otra, estadoTrueke: "EN_DISPUTA" },
+              { id: 1, truekeId: 11, solicitante: cuenta, motivo: "no entrega", estado: "REPORTADA", usuarioA: cuenta, usuarioB: otra, cierreA: "CONFORME", cierreB: "NO_CONFORME", estadoTrueke: "EN_DISPUTA", createdAt: new Date().toISOString() },
             ],
           });
         }
         if (url.includes("/disputas") && init?.method === "POST") {
-          return json({ disputa: { id: 2, truekeId: 11, estado: "ABIERTA", solicitante: cuenta } }, 201);
+          return json({ disputa: { id: 2, truekeId: 11, estado: "EN_VOTACION", solicitante: cuenta } }, 201);
+        }
+        // Notificaciones
+        if (url.includes("/notificaciones")) {
+          return json({ notificaciones: [], noLeidas: 0 });
         }
         // Gobernanza
         if (url.includes("/gobernanza/socios")) {
@@ -186,7 +196,7 @@ test.describe("Pantallas de la suite (integración)", () => {
     await expect(page.getByRole("heading", { name: /Disputas/ })).toBeVisible();
     const btnAuth = page.getByRole("button", { name: /Autenticar/ });
     if (await btnAuth.isVisible().catch(() => false)) await btnAuth.click();
-    await expect(page.getByText("no entrega")).toBeVisible();
+    await expect(page.getByText(/no entrega/)).toBeVisible();
   });
 
   test("Gobernanza: un Socio ve propuestas y puede votar", async ({ page }) => {
