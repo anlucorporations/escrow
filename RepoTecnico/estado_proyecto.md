@@ -575,3 +575,11 @@ Cambios:
   Owner vota VALIDO → RESUELTA/VALIDO → trueke COMPLETADO → notificación
   VEREDICTO a ambas partes. 10/10 pasos OK. Captura UI:
   `RepoTecnico/pruebas/1ra-prueba/disputas-flujo.png` (campana 🔔 con badge).
+  Ajuste UI (2026-09-09): la votación de Socios abre el caso en un **flotante
+  (modal)** con las evidencias de AMBAS partes (miniaturas con clic para ampliar),
+  el motivo del reclamo y el conteo de votos; desde el modal se vota ANULAR/VALIDO
+  y refleja el veredicto al cerrarse la votación. Fix: ruta relativa de evidencia
+  (ImagenProtegida antepone API_URL; las fotos cargaban con URL duplicada).
+  Web rev **truekeate-web-00026-fch** (release-9cc3966). Verificado en GCP
+  (caso EN_VOTACION #4): flotante con fotos blob de ambas partes + botones de
+  voto. Captura: `RepoTecnico/pruebas/1ra-prueba/flotante-votacion.png`.
