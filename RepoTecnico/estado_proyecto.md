@@ -538,3 +538,40 @@ la contraparte (menor nivel/reputación) solo **aprueba o rechaza**.
 - Fix aplicado en prod: faltaban las columnas `encuentro_propuesto_por` y
   `encuentro_estado` en `truekes` (la migración `db/migracion_trueke_abierto.sql`
   no se había aplicado completa) → ALTER TABLE idempotente ejecutado vía proxy.
+
+## ⚖️ Flujo de disputas afinado (director, 2026-09-09) — commit 8528107
+
+Regla del director (6 puntos):
+1. La disputa nace SOLO desde el cierre ✗ No Conforme: formulario con **motivo +
+   fotos de evidencia** del reclamante → disputa REPORTADA.
+2. Si la contraparte está CONFORME → ESPERA_JUSTIFICATIVO: se le solicita cargar
+   justificativo con imágenes (plazo 3 días; si no lo carga → falla a favor del
+   reclamante → ANULAR). Si también es No Conforme (motivo+fotos) → votación directa.
+3. Con las evidencias de ambas partes → EN_VOTACION: se notifica a TODOS los
+   socios (padrón on-chain SociosRegistry; fallback usuarios tipo SOCIO sin red).
+4. Cada socio ve el trueke en disputa con las pruebas de ambas; un socio PARTE
+   (A o B) NO puede votar (403 socio_involucrado).
+5. Veredicto por mayoría simple de votantes (1 voto/socio): ANULAR → trueke
+   ANULADO (devolución total de los NFTs en custodia); VALIDO → trueke COMPLETADO
+   (liberación en cruz). Sin votos en 5 días → ANULA por defecto; empate → ANULA.
+6. Notificación a los involucrados del veredicto (campana in-app).
+
+Cambios:
+- BD `migracion_disputas_v2.sql`: columnas de disputas (justificativo_vence_at,
+  votacion_vence_at, veredicto, resuelta_en), tablas `evidencias_disputa`,
+  `votos_disputa`, `notificaciones`. Aplicada en prod.
+- Backend: motor `lib/flujo-disputas.js` (padrón on-chain, vencimientos,
+  veredictos, notificaciones), router `/disputas` (justificativo, no-conforme,
+  votar, votaciones, detalle con evidencias), `/notificaciones` (campana), cierre
+  No Conforme con formulario. Tests API 24/24 (3 nuevos del flujo).
+- Web: `/suite/disputas` rediseñada (mis disputas por rol + votación de Socios con
+  pruebas), modal de disputa con fotos en `/suite/intercambio` (✗ No Conforme),
+  campana de notificaciones en la TopBar. tsc OK, build web OK.
+- Desplegado GCP: API rev **truekeate-api-00019-xjf**, web rev
+  **truekeate-web-00024-gkk** (release-8528107), 100 % serving.
+- Verificación en vivo (GCP, trueke 91 Ana↔Bruno): Ana ✗ No Conforme (2 fotos) →
+  REPORTADA → Bruno carga justificativo → EN_VOTACION (vence +5 días) → Ana (parte
+  y SOCIO) vota → 403 socio_involucrado → Owner notificado (VOTACION_ABIERTA) →
+  Owner vota VALIDO → RESUELTA/VALIDO → trueke COMPLETADO → notificación
+  VEREDICTO a ambas partes. 10/10 pasos OK. Captura UI:
+  `RepoTecnico/pruebas/1ra-prueba/disputas-flujo.png` (campana 🔔 con badge).
