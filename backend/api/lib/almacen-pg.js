@@ -512,6 +512,138 @@ export async function crearAlmacenPg(pool) {
       return this.getFinanzas(wallet);
     },
 
+    /** Suma/resta saldo de cripto (moneda) o BRLT de la wallet. `deltaCripto` es { moneda: delta }. */
+    async moverSaldo(wallet, { deltaCripto = {}, deltaBrlt = 0 }) {
+      const f = await this.asegurarFinanzas(wallet);
+      const criptos = { ...(f.criptos ?? {}) };
+      for (const [moneda, delta] of Object.entries(deltaCripto)) {
+        criptos[moneda] = Math.round(((Number(criptos[moneda] ?? 0) + Number(delta)) + Number.EPSILON) * 1e6) / 1e6;
+        if (criptos[moneda] < 0) throw new Error('saldo_insuficiente');
+      }
+      const brlt = Math.round((Number(f.brlt ?? 0) + Number(deltaBrlt) + Number.EPSILON) * 1e6) / 1e6;
+      if (brlt < 0) throw new Error('saldo_insuficiente');
+      await pool.query(
+        `UPDATE finanzas
+            SET criptos = $2, brlt = $3, updated_at = now()
+          WHERE usuario_id = (SELECT id FROM usuarios WHERE wallet = $1)`,
+        [NORMALIZA_WALLET(wallet), JSON.stringify(criptos), brlt]
+      );
+      return { criptos, brlt };
+    },
+
+    /** Auditoría append-only de movimientos de VALOR (criptos/BRLT). */
+    async registrarMovimientoValor({ wallet, tipo, moneda, monto, contraparte, detalle, txHash }) {
+      const r = await pool.query(
+        `INSERT INTO movimientos_valor (wallet, tipo, moneda, monto, contraparte, detalle, tx_hash)
+         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, created_at`,
+        [NORMALIZA_WALLET(wallet), tipo, moneda, Number(monto), NORMALIZA_WALLET(contraparte), detalle ?? null, txHash ?? null]
+      );
+      const f = r.rows[0];
+      return { id: Number(f.id), createdAt: f.created_at.toISOString() };
+    },
+
+    async listarMovimientosValor(wallet, limite = 50) {
+      const r = await pool.query(
+        `SELECT id, tipo, moneda, monto, contraparte, detalle, tx_hash, created_at
+           FROM movimientos_valor WHERE wallet = $1 ORDER BY id DESC LIMIT $2`,
+        [NORMALIZA_WALLET(wallet), Number(limite)]
+      );
+      return r.rows.map((f) => ({
+        id: Number(f.id),
+        tipo: f.tipo,
+        moneda: f.moneda,
+        monto: Number(f.monto),
+        contraparte: f.contraparte.trim().toLowerCase(),
+        detalle: f.detalle,
+        txHash: f.tx_hash ?? null,
+        createdAt: f.created_at.toISOString(),
+      }));
+    },
+
+    /** Registra una compra BRLT con fiat (Stripe Checkout) → estado PENDIENTE. */
+    async crearMovimientoBrlt({ wallet, montoBrlt, montoFiat, fiatMoneda, stripeSession }) {
+      const r = await pool.query(
+        `INSERT INTO movimientos_brlt (wallet, monto_brlt, monto_fiat, fiat_moneda, stripe_session, estado)
+         VALUES ($1, $2, $3, $4, $5, 'PENDIENTE') RETURNING id`,
+        [NORMALIZA_WALLET(wallet), Number(montoBrlt), montoFiat != null ? Number(montoFiat) : null, fiatMoneda ?? 'usd', stripeSession ?? null]
+      );
+      return Number(r.rows[0].id);
+    },
+
+    /** Busca una compra BRLT por sesión de Stripe (para el webhook). */
+    async buscarMovimientoBrltPorSesion(stripeSession) {
+      const r = await pool.query(
+        `SELECT id, wallet, monto_brlt, estado FROM movimientos_brlt WHERE stripe_session = $1 ORDER BY id DESC LIMIT 1`,
+        [stripeSession]
+      );
+      const f = r.rows[0];
+      if (!f) return null;
+      return { id: Number(f.id), wallet: f.wallet.trim().toLowerCase(), montoBrlt: Number(f.monto_brlt), estado: f.estado };
+    },
+
+    /** Marca PAGADO y acredita BRLT (llamado por el webhook de Stripe). */
+    async confirmarMovimientoBrlt(id, { stripePayment }) {
+      const r = await pool.query(
+        `UPDATE movimientos_brlt SET estado='PAGADO', stripe_payment=$2, confirmado_at=now()
+          WHERE id=$1 AND estado='PENDIENTE' RETURNING wallet, monto_brlt`,
+        [Number(id), stripePayment ?? null]
+      );
+      if (r.rowCount === 0) return null;
+      const f = r.rows[0];
+      const wallet = f.wallet.trim().toLowerCase();
+      await this.moverSaldo(wallet, { deltaBrlt: Number(f.monto_brlt) });
+      return { wallet, montoBrlt: Number(f.monto_brlt) };
+    },
+
+    /** Persiste la valoración 1-5 de un trueque (tabla valoraciones — D18/D36). */
+    async registrarValoracion({ truekeId, valorador, valorado, aceptacion, honestidad, seguridad, confiabilidad, compromiso }) {
+      await pool.query(
+        `INSERT INTO valoraciones (trueke_id, valorador, valorado, aceptacion, honestidad, seguridad, confiabilidad, compromiso)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+         ON CONFLICT (trueke_id, valorador) DO UPDATE SET
+           valorado=EXCLUDED.valorado,
+           aceptacion=EXCLUDED.aceptacion, honestidad=EXCLUDED.honestidad,
+           seguridad=EXCLUDED.seguridad, confiabilidad=EXCLUDED.confiabilidad,
+           compromiso=EXCLUDED.compromiso`,
+        [Number(truekeId), NORMALIZA_WALLET(valorador), NORMALIZA_WALLET(valorado),
+         Number(aceptacion), Number(honestidad), Number(seguridad), Number(confiabilidad), Number(compromiso)]
+      );
+      return true;
+    },
+
+    /** Valoraciones que dio una wallet (con títulos del trueke) — para VALOR 4.2. */
+    async listarValoracionesDe(wallet, limite = 10) {
+      const r = await pool.query(
+        `SELECT v.*, t.titulo_a, t.titulo_b, t.updated_at AS trueke_updated
+           FROM valoraciones v JOIN truekes t ON t.id = v.trueke_id
+          WHERE v.valorador = $1
+          ORDER BY v.created_at DESC LIMIT $2`,
+        [NORMALIZA_WALLET(wallet), Number(limite)]
+      );
+      return r.rows.map((f) => ({
+        truekeId: Number(f.trueke_id),
+        valorado: f.valorado.trim().toLowerCase(),
+        aceptacion: Number(f.aceptacion),
+        honestidad: Number(f.honestidad),
+        seguridad: Number(f.seguridad),
+        confiabilidad: Number(f.confiabilidad),
+        compromiso: Number(f.compromiso),
+        promedio: Number(((Number(f.aceptacion) + Number(f.honestidad) + Number(f.seguridad) + Number(f.confiabilidad) + Number(f.compromiso)) / 5).toFixed(2)),
+        tituloA: f.titulo_a ?? null,
+        tituloB: f.titulo_b ?? null,
+        createdAt: f.created_at.toISOString(),
+      }));
+    },
+
+    /** ¿La wallet ya valoró un trueke? */
+    async yaValoro(wallet, truekeId) {
+      const r = await pool.query(
+        `SELECT 1 FROM valoraciones WHERE valorador=$1 AND trueke_id=$2`,
+        [NORMALIZA_WALLET(wallet), Number(truekeId)]
+      );
+      return r.rowCount > 0;
+    },
+
     // ------------------------------------------------------------ disputas (persistido)
     async crearDisputa({ truekeId, solicitante, motivo }) {
       const r = await pool.query(

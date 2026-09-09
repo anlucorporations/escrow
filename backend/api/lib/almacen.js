@@ -193,6 +193,114 @@ export function crearAlmacen() {
       return estado.finanzas.get(id);
     },
 
+    // ------------------------------------------------------------ VALOR (memoria)
+    moverSaldo(wallet, { deltaCripto = {}, deltaBrlt = 0 }) {
+      const f = this.asegurarFinanzas(wallet);
+      if (!f) return null;
+      const criptos = { ...(f.criptos ?? {}) };
+      for (const [moneda, delta] of Object.entries(deltaCripto)) {
+        criptos[moneda] = Math.round(((Number(criptos[moneda] ?? 0) + Number(delta)) + Number.EPSILON) * 1e6) / 1e6;
+        if (criptos[moneda] < 0) throw new Error('saldo_insuficiente');
+      }
+      const brlt = Math.round((Number(f.brlt ?? 0) + Number(deltaBrlt) + Number.EPSILON) * 1e6) / 1e6;
+      if (brlt < 0) throw new Error('saldo_insuficiente');
+      f.criptos = criptos;
+      f.brlt = brlt;
+      f.updatedAt = new Date().toISOString();
+      return { criptos, brlt };
+    },
+    registrarMovimientoValor({ wallet, tipo, moneda, monto, contraparte, detalle, txHash }) {
+      if (!estado.movimientosValor) estado.movimientosValor = [];
+      const m = {
+        id: estado.movimientosValor.length + 1,
+        wallet,
+        tipo, moneda, monto: Number(monto),
+        contraparte: contraparte.toLowerCase(),
+        detalle: detalle ?? null,
+        txHash: txHash ?? null,
+        createdAt: new Date().toISOString(),
+      };
+      estado.movimientosValor.push(m);
+      return m;
+    },
+    listarMovimientosValor(wallet, limite = 50) {
+      return [...(estado.movimientosValor ?? [])]
+        .filter((m) => m.wallet === wallet)
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .slice(0, Number(limite));
+    },
+    crearMovimientoBrlt({ wallet, montoBrlt, montoFiat, fiatMoneda, stripeSession }) {
+      if (!estado.movimientosBrlt) estado.movimientosBrlt = [];
+      const m = {
+        id: estado.movimientosBrlt.length + 1,
+        wallet,
+        montoBrlt: Number(montoBrlt),
+        montoFiat: montoFiat != null ? Number(montoFiat) : null,
+        fiatMoneda: fiatMoneda ?? 'usd',
+        stripeSession: stripeSession ?? null,
+        stripePayment: null,
+        estado: 'PENDIENTE',
+        createdAt: new Date().toISOString(),
+      };
+      estado.movimientosBrlt.push(m);
+      return m;
+    },
+    buscarMovimientoBrltPorSesion(stripeSession) {
+      const m = [...(estado.movimientosBrlt ?? [])]
+        .filter((x) => x.stripeSession === stripeSession)
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+      if (!m) return null;
+      return { id: m.id, wallet: m.wallet, montoBrlt: m.montoBrlt, estado: m.estado };
+    },
+    confirmarMovimientoBrlt(id, { stripePayment }) {
+      const m = (estado.movimientosBrlt ?? []).find((x) => x.id === Number(id) && x.estado === 'PENDIENTE');
+      if (!m) return null;
+      m.estado = 'PAGADO';
+      m.stripePayment = stripePayment ?? null;
+      m.confirmadoAt = new Date().toISOString();
+      this.moverSaldo(m.wallet, { deltaBrlt: m.montoBrlt });
+      return { wallet: m.wallet, montoBrlt: m.montoBrlt };
+    },
+    registrarValoracion({ truekeId, valorador, valorado, aceptacion, honestidad, seguridad, confiabilidad, compromiso }) {
+      if (!estado.valoraciones) estado.valoraciones = [];
+      const existente = estado.valoraciones.find((v) => v.truekeId === Number(truekeId) && v.valorador === valorador);
+      const nueva = {
+        truekeId: Number(truekeId),
+        valorador,
+        valorado: valorado.toLowerCase(),
+        aceptacion: Number(aceptacion), honestidad: Number(honestidad), seguridad: Number(seguridad),
+        confiabilidad: Number(confiabilidad), compromiso: Number(compromiso),
+        createdAt: new Date().toISOString(),
+      };
+      if (existente) Object.assign(existente, nueva);
+      else estado.valoraciones.push(nueva);
+      return true;
+    },
+    listarValoracionesDe(wallet, limite = 10) {
+      const tMap = estado.truekes;
+      return [...(estado.valoraciones ?? [])]
+        .filter((v) => v.valorador === wallet)
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .slice(0, Number(limite))
+        .map((v) => {
+          const t = tMap.get(Number(v.truekeId));
+          const prom = (v.aceptacion + v.honestidad + v.seguridad + v.confiabilidad + v.compromiso) / 5;
+          return {
+            truekeId: v.truekeId,
+            valorado: v.valorado,
+            aceptacion: v.aceptacion, honestidad: v.honestidad, seguridad: v.seguridad,
+            confiabilidad: v.confiabilidad, compromiso: v.compromiso,
+            promedio: Math.round(prom * 100) / 100,
+            tituloA: t?.tituloA ?? null,
+            tituloB: t?.tituloB ?? null,
+            createdAt: v.createdAt,
+          };
+        });
+    },
+    yaValoro(wallet, truekeId) {
+      return Boolean((estado.valoraciones ?? []).some((v) => v.valorador === wallet && v.truekeId === Number(truekeId)));
+    },
+
     // ------------------------------------------------------------ disputas (memoria)
     crearDisputa({ truekeId, solicitante, motivo }) {
       const t = estado.truekes.get(Number(truekeId));

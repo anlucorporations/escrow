@@ -190,6 +190,8 @@ export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow
   });
 
   // POST /truekes/:id/valoracion — marcar valoración (D36: marcador; detalle off-chain)
+  // Persiste en la tabla `valoraciones` (para la sección VALOR 4.2: pendientes y
+  // últimos 10 truekes valorados) cuando el almacén lo soporta.
   r.post('/:id/valoracion', requiereSesion(almacen), requiereFirmaAccion('valorar trueque'), async (req, res, next) => {
     try {
       const t = await almacen.getTrueke(req.params.id);
@@ -199,11 +201,26 @@ export function crearRouterTruekes({ almacen, relayer, escrowAbi, contratoEscrow
       if (vals.some((v) => !Number.isInteger(v) || v < 1 || v > 5)) {
         return res.status(400).json({ error: 'valoraciones_1_a_5', detalle: 'D18' });
       }
+      const esParte = t.usuarioA === req.wallet || (t.usuarioB && t.usuarioB === req.wallet);
+      if (!esParte) return res.status(403).json({ error: 'no_autorizado', detalle: 'solo las partes del trueque valoran' });
+      if (!['CUSTODIADO', 'APERTURA', 'COMPLETADO'].includes(t.estado)) {
+        return res.status(409).json({ error: 'estado_no_valorable', detalle: 'estado actual: ' + t.estado });
+      }
       const actualizado = await almacen.actualizarTrueke(t.id, {
         valoracionDe: req.wallet,
         valorado,
         renglones: vals,
       });
+      try {
+        if (almacen.registrarValoracion) {
+          await almacen.registrarValoracion({
+            truekeId: t.id, valorador: req.wallet, valorado,
+            aceptacion, honestidad, seguridad, confiabilidad, compromiso,
+          });
+        }
+      } catch (e) {
+        console.error('[truekes] persistir valoración:', e.message);
+      }
       res.json({ ok: true, trueke: actualizado });
     } catch (e) { next(e); }
   });

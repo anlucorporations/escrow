@@ -227,7 +227,7 @@ test.describe("Suite de usuario — control de acceso", () => {
     // Un Particular Certificado NO vería estas secciones; el Socio sí:
     await expect(nav.getByRole("link", { name: /Socios/ })).toBeVisible(); // /suite/gobernanza
     await expect(nav.getByRole("link", { name: /Disputas/ })).toBeVisible();
-    await expect(nav.getByRole("link", { name: /Finanzas/ })).toBeVisible();
+    await expect(nav.getByRole("link", { name: /Valor/ })).toBeVisible(); // VALOR (ex Finanzas)
     // Sistemas (RF-13.1) es SOLO del Owner: un Socio común NO la ve en la barra.
     await expect(nav.getByRole("link", { name: /Sistemas/ })).toHaveCount(0);
     // La sección central del bottom (móvil) NO aparece en la barra superior PC.

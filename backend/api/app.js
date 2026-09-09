@@ -24,6 +24,7 @@ import { crearRouterAdmin } from './routes/admin.js';
 import { crearRouterReputacion } from './routes/reputacion.js';
 import { crearRouterSubastas } from './routes/subastas.js';
 import { crearRouterFinanzas } from './routes/finanzas.js';
+import { crearRouterValor } from './routes/valor.js';
 import { crearRouterDisputas } from './routes/disputas.js';
 import { crearRouterNotificaciones } from './routes/notificaciones.js';
 import { crearRouterGobernanza } from './routes/gobernanza.js';
@@ -82,6 +83,7 @@ export function crearApp(deps = {}) {
   app.use('/reputacion', crearRouterReputacion(deps));
   app.use('/subastas', crearRouterSubastas(deps));
   app.use('/finanzas', crearRouterFinanzas(deps));
+  app.use('/valor', crearRouterValor(deps));
   app.use('/disputas', crearRouterDisputas(deps));
   app.use('/notificaciones', crearRouterNotificaciones(deps));
   app.use('/gobernanza', crearRouterGobernanza(deps));

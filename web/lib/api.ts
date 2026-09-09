@@ -200,6 +200,95 @@ export interface FinanzasMi {
   rol: string;
 }
 
+// =============================================================================
+// VALOR (ex "Finanzas" — rediseño del director 2026-09-09)
+// =============================================================================
+
+export interface ValorPendienteValoracion {
+  truekeId: number;
+  tituloA?: string | null;
+  tituloB?: string | null;
+  contraparte: string;
+  completadoEn?: string | null;
+}
+
+export interface ValoracionPrevia {
+  truekeId: number;
+  valorado: string;
+  aceptacion: number;
+  honestidad: number;
+  seguridad: number;
+  confiabilidad: number;
+  compromiso: number;
+  promedio: number;
+  tituloA?: string | null;
+  tituloB?: string | null;
+  createdAt: string;
+}
+
+export interface MovimientoValor {
+  id: number;
+  tipo: string;
+  moneda: string;
+  monto: number;
+  contraparte: string;
+  detalle?: string | null;
+  txHash?: string | null;
+  createdAt: string;
+}
+
+export interface ValorMi {
+  rol: string;
+  saldos: {
+    criptos?: Record<string, number>;
+    brlt?: number;
+    fondoValor?: number;
+  };
+  criptosHabilitado: boolean;
+  brltHabilitado: boolean;
+  tasaEthBrlt: number;
+  reputacion: {
+    puntaje: number;
+    nivel: string;
+    medalla: string;
+    reputacionMedia: number;
+    truequesCompletados: number;
+  };
+  pendientesValoracion: ValorPendienteValoracion[];
+  ultimasValoraciones: ValoracionPrevia[];
+  movimientos: MovimientoValor[];
+}
+
+/** GET /valor/mi — resumen VALOR (criptos + reputación + valoraciones + BRLT). */
+export function valorMi(token: string): Promise<ValorMi> {
+  return pedirAuth<ValorMi>("/valor/mi", token);
+}
+
+/** POST /valor/criptos/recargar — la plataforma acredita ETH al socio. */
+export function recargarCripto(token: string, monto: number): Promise<{ ok: boolean; saldos: { criptos: Record<string, number>; brlt: number }; contraparte: string }> {
+  return pedirAuth<{ ok: boolean; saldos: { criptos: Record<string, number>; brlt: number }; contraparte: string }>("/valor/criptos/recargar", token, { metodo: "POST", body: { monto } });
+}
+
+/** POST /valor/criptos/retirar — el socio retira ETH (lo envía la plataforma). */
+export function retirarCripto(token: string, monto: number): Promise<{ ok: boolean; saldos: { criptos: Record<string, number>; brlt: number }; contraparte: string }> {
+  return pedirAuth<{ ok: boolean; saldos: { criptos: Record<string, number>; brlt: number }; contraparte: string }>("/valor/criptos/retirar", token, { metodo: "POST", body: { monto } });
+}
+
+/** POST /valor/criptos/convertir — ETH ⇄ BRLT a tasa de la plataforma. */
+export function convertirCripto(token: string, desde: "ETH" | "BRLT", monto: number): Promise<{ ok: boolean; desde: string; monto: number; resultado: Record<string, number>; tasa: number }> {
+  return pedirAuth<{ ok: boolean; desde: string; monto: number; resultado: Record<string, number>; tasa: number }>("/valor/criptos/convertir", token, { metodo: "POST", body: { desde, monto } });
+}
+
+/** POST /valor/brlt/checkout — crea una Stripe Checkout Session para comprar BRLT. */
+export function checkoutBrlt(token: string, montoBRLT: number, precioBRLT = 1): Promise<{ ok: boolean; url?: string; sessionId?: string; montoBRLT: number } | { error: string; detalle: string; movimientoId?: number }> {
+  return pedirAuth<{ ok: boolean; url?: string; sessionId?: string; montoBRLT: number } | { error: string; detalle: string; movimientoId?: number }>("/valor/brlt/checkout", token, { metodo: "POST", body: { montoBRLT, precioBRLT } });
+}
+
+/** POST /valor/brlt/retirar — retiro de BRLT (registro; Payouts documentado). */
+export function retirarBrlt(token: string, monto: number): Promise<{ ok: boolean; saldos: { criptos: Record<string, number>; brlt: number }; aviso?: string }> {
+  return pedirAuth<{ ok: boolean; saldos: { criptos: Record<string, number>; brlt: number }; aviso?: string }>("/valor/brlt/retirar", token, { metodo: "POST", body: { monto } });
+}
+
 export interface Disputa {
   id: number;
   truekeId: number;

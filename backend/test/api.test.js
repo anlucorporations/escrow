@@ -409,3 +409,73 @@ test('admin: un Socio del padrón (sin rol OWNER) NO accede a /admin/* (endureci
   assert.equal(o.body.owner, wOwner.toLowerCase());
 });
 
+
+test('VALOR: socio recarga/retira/convierte criptos contra la plataforma; un Particular NO', async () => {
+  // wallet SOCIO existente de un test previo no aplica: creamos uno nuevo
+  const walletSocioV = ethers.Wallet.createRandom();
+  const wSV = walletSocioV.address.toLowerCase();
+  almacen.crearUsuario({ wallet: wSV, tipo: 'SOCIO', nivel: 'SOCIO', medalla: 'ORO', estado: 'CERTIFICADO' });
+  const tok = sesionDe(walletSocioV);
+
+  // Particular NO gestiona criptos (VALOR restringe por rol)
+  const walletPart = ethers.Wallet.createRandom();
+  almacen.crearUsuario({ wallet: walletPart.address.toLowerCase(), tipo: 'PARTICULAR', estado: 'CERTIFICADO' });
+  const tokPart = sesionDe(walletPart);
+  const bloqueado = await request(app).post('/valor/criptos/recargar').set('Authorization', `Bearer ${tokPart}`).send({ monto: 1 });
+  assert.equal(bloqueado.status, 403);
+
+  // recarga ETH (contraparte plataforma)
+  const rec = await request(app).post('/valor/criptos/recargar').set('Authorization', `Bearer ${tok}`).send({ monto: 2 });
+  assert.equal(rec.status, 200, JSON.stringify(rec.body));
+  assert.equal(rec.body.saldos.criptos.ETH, 2);
+  assert.ok(rec.body.contraparte);
+
+  // convertir ETH → BRLT a tasa (por defecto 3000)
+  const conv = await request(app).post('/valor/criptos/convertir').set('Authorization', `Bearer ${tok}`).send({ desde: 'ETH', monto: 0.5 });
+  assert.equal(conv.status, 200, JSON.stringify(conv.body));
+  assert.equal(conv.body.resultado.BRLT, 1500);
+
+  // retirar más de lo que queda → 409 saldo_insuficiente
+  const retMal = await request(app).post('/valor/criptos/retirar').set('Authorization', `Bearer ${tok}`).send({ monto: 99 });
+  assert.equal(retMal.status, 409);
+
+  const ret = await request(app).post('/valor/criptos/retirar').set('Authorization', `Bearer ${tok}`).send({ monto: 1 });
+  assert.equal(ret.status, 200);
+
+  // GET /valor/mi: saldos + movimientos registrados
+  const mi = await request(app).get('/valor/mi').set('Authorization', `Bearer ${tok}`);
+  assert.equal(mi.status, 200);
+  assert.equal(mi.body.rol, 'SOCIO');
+  assert.ok(mi.body.movimientos.length >= 3);
+  assert.ok(Array.isArray(mi.body.ultimasValoraciones));
+});
+
+test('VALOR: BRLT requiere Empresa/SOCIO/Owner; checkout sin clave Stripe registra demo; webhook acredita', async () => {
+  const walletEmp = ethers.Wallet.createRandom();
+  const wEmp = walletEmp.address.toLowerCase();
+  almacen.crearUsuario({ wallet: wEmp, tipo: 'EMPRESA', nivel: 'FRECUENTE', medalla: 'ORO', estado: 'CERTIFICADO' });
+  const tok = sesionDe(walletEmp);
+
+  // Particular no puede comprar BRLT
+  const walletPart = ethers.Wallet.createRandom();
+  almacen.crearUsuario({ wallet: walletPart.address.toLowerCase(), tipo: 'PARTICULAR', estado: 'CERTIFICADO' });
+  const tokPart = sesionDe(walletPart);
+  const bloqueado = await request(app).post('/valor/brlt/checkout').set('Authorization', `Bearer ${tokPart}`).send({ montoBRLT: 100 });
+  assert.equal(bloqueado.status, 403);
+
+  // sin STRIPE_SECRET_KEY en tests → 503 demo con movimiento registrado
+  const chk = await request(app).post('/valor/brlt/checkout').set('Authorization', `Bearer ${tok}`).send({ montoBRLT: 100 });
+  assert.equal(chk.status, 503, JSON.stringify(chk.body));
+  assert.ok(chk.body.movimientoId);
+
+  // simulamos el webhook de Stripe con una sesión PENDIENTE creada por checkout (demo)
+  const miAntes = await request(app).get('/valor/mi').set('Authorization', `Bearer ${tok}`);
+  const brltAntes = miAntes.body.saldos.brlt ?? 0;
+  // crear movimiento pendiente directo (como lo haría checkout con clave)
+  // (almacén en memoria: crearMovimientoBrlt es síncrono)
+  const creado = await almacen.crearMovimientoBrlt({ wallet: wEmp, montoBrlt: 50, montoFiat: 50, fiatMoneda: 'usd', stripeSession: 'cs_test_demo_123' });
+  const confirmado = await almacen.confirmarMovimientoBrlt(creado.id, { stripePayment: 'pi_demo' });
+  assert.ok(confirmado);
+  const miDespues = await request(app).get('/valor/mi').set('Authorization', `Bearer ${tok}`);
+  assert.equal(miDespues.body.saldos.brlt, brltAntes + 50);
+});

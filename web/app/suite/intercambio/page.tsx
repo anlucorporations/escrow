@@ -43,8 +43,10 @@ const MapaWidget = dynamic(
   { ssr: false, loading: () => null }
 );
 
-/** Estados que cuentan como trueque "activo" (RF-14.4, mismo criterio del backend). */
-const ESTADOS_ACTIVOS = ["CREADO", "ACTIVO", "CUSTODIADO", "APERTURA"];
+/** Estados que cuentan como trueque "activo" (en curso). */
+const ESTADOS_ACTIVOS = ["CREADO", "ACTIVO", "CUSTODIADO", "APERTURA", "EN_DISPUTA", "RESOLUCION_SOCIOS"];
+/** Estados terminales que van a la pestaña Histórico (director 2026-09-09). */
+const ESTADOS_HISTORICO = ["COMPLETADO", "ANULADO", "BLOQUEADO"];
 /** Estados en los que se ofrece valorar 1–5 (D18/D36). */
 const ESTADOS_VALORABLES = ["CUSTODIADO", "APERTURA"];
 const MAX_ACTIVOS_VERIFICADO = 3;
@@ -307,6 +309,13 @@ export default function PaginaIntercambio() {
   }, [token, account, truekes]);
 
   const activos = truekes.filter((t) => ESTADOS_ACTIVOS.includes(t.estado)).length;
+  const historicos = truekes.filter((t) => ESTADOS_HISTORICO.includes(t.estado)).length;
+
+  // Pestaña activa: "activos" (en curso) | "historico" (cerrados/completados) — director
+  const [pestana, setPestana] = useState<"activos" | "historico">("activos");
+  const truekesVisibles = pestana === "activos"
+    ? truekes.filter((t) => ESTADOS_ACTIVOS.includes(t.estado))
+    : truekes.filter((t) => ESTADOS_HISTORICO.includes(t.estado));
 
   // ---------------------------------------------------------------- acciones por trueke
   const [ocupado, setOcupado] = useState<{ id: number; accion: string } | null>(null);
@@ -535,7 +544,7 @@ export default function PaginaIntercambio() {
         </p>
       )}
 
-      {/* Lista: mis trueques */}
+      {/* Lista: mis trueques — pestañas Activos / Histórico (decisión del director) */}
       <div>
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-display text-lg font-semibold text-navy-800">Mis trueques</h2>
@@ -548,6 +557,32 @@ export default function PaginaIntercambio() {
             </span>
           )}
         </div>
+
+        {/* Pestañas: solo los activos en curso; los completados/cerrados van a Histórico */}
+        {token && truekes.length > 0 && (
+          <div className="mb-3 flex gap-1 rounded-pill bg-smoke p-1" role="tablist" aria-label="Filtro de trueques">
+            <button
+              role="tab"
+              aria-selected={pestana === "activos"}
+              onClick={() => setPestana("activos")}
+              className={`flex-1 rounded-pill px-3 py-1.5 text-xs font-semibold transition-colors ${
+                pestana === "activos" ? "bg-navy-800 text-white shadow" : "text-navy-800/60 hover:bg-white/60"
+              }`}
+            >
+              🔄 Activos ({activos})
+            </button>
+            <button
+              role="tab"
+              aria-selected={pestana === "historico"}
+              onClick={() => setPestana("historico")}
+              className={`flex-1 rounded-pill px-3 py-1.5 text-xs font-semibold transition-colors ${
+                pestana === "historico" ? "bg-navy-800 text-white shadow" : "text-navy-800/60 hover:bg-white/60"
+              }`}
+            >
+              🕘 Histórico ({historicos})
+            </button>
+          </div>
+        )}
 
         {cargando && (
           <p className="py-8 text-center text-sm text-navy-800/50">Cargando tus trueques…</p>
@@ -566,9 +601,17 @@ export default function PaginaIntercambio() {
           </Card>
         )}
 
-        {token && !cargando && truekes.length > 0 && (
+        {token && !cargando && truekes.length > 0 && truekesVisibles.length === 0 && (
+          <Card className="p-6 text-center text-sm text-navy-800/50">
+            {pestana === "activos"
+              ? "No tenés trueques activos en este momento."
+              : "Todavía no tenés trueques en el histórico."}
+          </Card>
+        )}
+
+        {token && !cargando && truekesVisibles.length > 0 && (
           <div className="grid gap-3 sm:grid-cols-2">
-            {truekes.map((t) => {
+            {truekesVisibles.map((t) => {
               const lado = miLado(t);
               const contraparte = lado ? contraparteDe(t, lado) : null;
               const hora = horaBonita(t.horaPautada);
@@ -781,6 +824,23 @@ export default function PaginaIntercambio() {
                         </>
                       )
                     : null}
+
+                  {/* Resultado del histórico (estados terminales) */}
+                  {ESTADOS_HISTORICO.includes(t.estado) && (
+                    <div
+                      className={`mt-3 rounded-xl px-3 py-2 text-[11px] font-semibold ${
+                        t.estado === "COMPLETADO"
+                          ? "border border-teal-500/30 bg-teal-500/5 text-teal-700"
+                          : "border border-navy-800/10 bg-smoke text-navy-800/60"
+                      }`}
+                    >
+                      {t.estado === "COMPLETADO"
+                        ? "✅ Trueque completado: cada parte recibió su objeto (liberación en cruz)."
+                        : t.estado === "ANULADO"
+                          ? "⛔ Trueque anulado: devolución de los NFTs a sus dueños."
+                          : "🚫 Trueque bloqueado (sanción): pendiente de resolución del Owner."}
+                    </div>
+                  )}
                 </Card>
               );
             })}

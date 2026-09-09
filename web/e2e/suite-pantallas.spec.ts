@@ -85,15 +85,23 @@ async function simularSuite(
         if (url.includes("/valoracion")) {
           return json({ ok: true, trueke: { id: 11, estado: "CUSTODIADO" } });
         }
-        // Finanzas
-        if (url.includes("/finanzas/mi")) {
+        // VALOR (ex Finanzas)
+        if (url.includes("/valor/mi")) {
+          const esGestion = ["SOCIO", "EMPRESA"].includes(usuarioSim.tipo);
           return json({
-            nftsStock: {},
-            criptos: { ETH: 0.5 },
-            brlt: usuarioSim.tipo === "SOCIO" ? 250 : undefined,
-            fondoValor: usuarioSim.tipo === "SOCIO" ? 1000 : undefined,
-            porcentajesConfig: usuarioSim.tipo === "SOCIO" ? { trueque: 1, suscripciones: 10, brlt: 5 } : undefined,
             rol: usuarioSim.tipo,
+            saldos: {
+              criptos: esGestion ? { ETH: 0.5 } : undefined,
+              brlt: esGestion ? 250 : undefined,
+              fondoValor: esGestion ? 1000 : undefined,
+            },
+            criptosHabilitado: esGestion,
+            brltHabilitado: esGestion,
+            tasaEthBrlt: 3000,
+            reputacion: { puntaje: 62, nivel: "FRECUENTE", medalla: "ORO", reputacionMedia: 4.6, truequesCompletados: 3 },
+            pendientesValoracion: [],
+            ultimasValoraciones: [],
+            movimientos: [],
           });
         }
         // Reputación
@@ -181,13 +189,21 @@ test.describe("Pantallas de la suite (integración)", () => {
     await expect(page.getByText("CERTIFICADO").first()).toBeVisible();
   });
 
-  test("Finanzas: un Socio ve BRLT y el fondo", async ({ page }) => {
+  test("VALOR: un Socio gestiona criptos y ve BRLT", async ({ page }) => {
     await simularSuite(page, { tipo: "SOCIO", nivel: "SOCIO", estado: "CERTIFICADO" });
-    await page.goto("/suite/finanzas");
-    await expect(page.getByRole("heading", { name: /Finanzas/ })).toBeVisible();
+    await page.goto("/suite/valor");
+    await expect(page.getByRole("heading", { name: /VALOR/ })).toBeVisible();
     const btnAuth = page.getByRole("button", { name: /Autenticar/ });
     if (await btnAuth.isVisible().catch(() => false)) await btnAuth.click();
-    await expect(page.getByText("BRLT").first()).toBeVisible();
+    await expect(page.getByText(/BRLT/).first()).toBeVisible();
+  });
+
+  test("VALOR: un Particular NO gestiona criptos ni BRLT (contenido restringido)", async ({ page }) => {
+    await simularSuite(page, { tipo: "PARTICULAR", nivel: "INICIADO", estado: "CERTIFICADO" });
+    await page.goto("/suite/valor");
+    const btnAuth = page.getByRole("button", { name: /Autenticar/ });
+    if (await btnAuth.isVisible().catch(() => false)) await btnAuth.click();
+    await expect(page.getByText(/gestión de criptos es de/i)).toBeVisible();
   });
 
   test("Disputas: lista las disputas donde soy parte", async ({ page }) => {

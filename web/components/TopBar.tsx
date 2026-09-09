@@ -253,6 +253,26 @@ export function TopBar() {
                       >
                         👤 Mi perfil
                       </Link>
+                      {/* Acción D28 según el estado (decisión del director 2026-09-09):
+                          INSCRITO → iniciar Verificación; VERIFICADO → Certificar (KYC). */}
+                      {inscrito?.estado === "INSCRITO" && (
+                        <Link
+                          href="/suite/verificacion"
+                          onClick={() => setAbierto(false)}
+                          className="flex items-center gap-2 rounded-pill px-3 py-2 text-sm font-semibold text-teal-600 hover:bg-teal-500/10"
+                        >
+                          🛡️ Iniciar verificación (D28)
+                        </Link>
+                      )}
+                      {inscrito?.estado === "VERIFICADO" && (
+                        <Link
+                          href="/suite/certificacion"
+                          onClick={() => setAbierto(false)}
+                          className="flex items-center gap-2 rounded-pill px-3 py-2 text-sm font-semibold text-gold-600 hover:bg-gold-500/10"
+                        >
+                          🪪 Iniciar certificación (KYC)
+                        </Link>
+                      )}
                       <Link
                         href="/suite/gobernanza"
                         onClick={() => setAbierto(false)}

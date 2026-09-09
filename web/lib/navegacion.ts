@@ -79,11 +79,14 @@ const SECCIONES: (Seccion & { visible: (c: ContextoNav) => boolean })[] = [
     visible: (c) => ES_CERTIFICADO(c) || ES_SOCIO(c),
   },
   {
-    href: "/suite/finanzas",
-    label: "Finanzas",
-    icono: "💰",
-    descripcion: "Saldos propios (Empresa) y finanzas globales (Socio/Owner, RF-14.7/14.8)",
-    visible: (c) => ES_EMPRESA(c) || ES_SOCIO(c),
+    href: "/suite/valor",
+    label: "Valor",
+    icono: "💎",
+    descripcion: "VALOR: criptos, reputación y BRLT (gestión cripto/BRLT Empresa/Socio/Owner)",
+    // VALOR es visible para todo inscrito; el contenido de gestión (criptos y
+    // BRLT con Stripe) se restringe por rol dentro de la página (decisión del
+    // director 2026-09-09: "VALOR visible para todos, contenido restringido").
+    visible: () => true,
   },
   {
     href: "/suite/admin",

@@ -245,13 +245,28 @@ export default function PaginaPerfil() {
             </span>
           </div>
           {idx === 0 && (
-            <p className="mt-2 text-xs text-navy-800/60">
-              Verifica tu correo y teléfono para comenzar a truequear (RF-01.5, D28).
-            </p>
+            <div className="mt-3">
+              <p className="text-xs text-navy-800/60">
+                Verifica tu correo y teléfono para comenzar a truequear (RF-01.5, D28).
+              </p>
+              <Link href="/suite/verificacion" className="mt-3 inline-block">
+                <Button className="!px-4 !py-2 !text-sm">🛡️ Iniciar verificación (D28)</Button>
+              </Link>
+            </div>
           )}
           {idx === 1 && (
-            <p className="mt-2 text-xs text-navy-800/60">
-              Certifica tu identidad (KYC) para desbloquear tu reputación completa (D12/D30).
+            <div className="mt-3">
+              <p className="text-xs text-navy-800/60">
+                Certifica tu identidad (KYC) para desbloquear tu reputación completa (D12/D30).
+              </p>
+              <Link href="/suite/certificacion" className="mt-3 inline-block">
+                <Button className="!px-4 !py-2 !text-sm">🪪 Iniciar certificación (KYC)</Button>
+              </Link>
+            </div>
+          )}
+          {idx === 2 && (
+            <p className="mt-3 rounded-xl bg-teal-500/10 px-4 py-2 text-xs font-semibold text-teal-700">
+              ✓ Identidad certificada: podés truequear con reputación completa.
             </p>
           )}
         </Card>

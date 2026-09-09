@@ -6,6 +6,10 @@
 // y gestiona su catálogo (despublicar). Cada ítem pertenece a una categoría
 // (ARTICULO/SERVICIO/BIEN/CRIPTO — lógica maestra punto 4) que define el tipo de
 // trueque; en producción se mintea como TrueKeateNFT al publicar (punto 1).
+//
+// Ajuste del director (2026-09-09): el alta de un nuevo elemento ocurre en un
+// FLOTANTE (modal) que incluye las imágenes referenciales (1–5) que se muestran
+// en el Mercado.
 // =============================================================================
 import { useCallback, useEffect, useState } from "react";
 import { useEthereum } from "@/lib/ethereum";
@@ -41,12 +45,15 @@ export default function PaginaInventario() {
   const [mensajeUso, setMensajeUso] = useState<string | null>(null);
   const [cargandoLista, setCargandoLista] = useState(false);
 
+  // Flotante de nuevo elemento (decisión del director 2026-09-09)
+  const [flotanteAbierto, setFlotanteAbierto] = useState(false);
   const [titulo, setTitulo] = useState("");
   const [rubro, setRubro] = useState(RUBROS[0]);
   const [categoria, setCategoria] = useState("ARTICULO");
   const [descripcion, setDescripcion] = useState("");
   const [imagenesSel, setImagenesSel] = useState<{ data: string; mime: string; preview: string }[]>([]);
   const [publicando, setPublicando] = useState(false);
+  const [errorPublicar, setErrorPublicar] = useState<string | null>(null);
 
   const inscrito = acceso.fase === "inscrito" ? acceso.usuario : null;
   const puedePublicar = inscrito && (inscrito.estado === "VERIFICADO" || inscrito.estado === "CERTIFICADO");
@@ -68,7 +75,18 @@ export default function PaginaInventario() {
     if (account) void cargar();
   }, [account, cargar]);
 
-  /** Convierte archivos seleccionados a base64 (punto 1: 1..N imágenes). */
+  /** Abre el flotante limpio. */
+  function abrirFlotante() {
+    setTitulo("");
+    setRubro(RUBROS[0]);
+    setCategoria("ARTICULO");
+    setDescripcion("");
+    setImagenesSel([]);
+    setErrorPublicar(null);
+    setFlotanteAbierto(true);
+  }
+
+  /** Convierte archivos seleccionados a base64 (punto 1: 1..N imágenes referenciales). */
   function alSeleccionarImagenes(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []).slice(0, 5);
     if (files.length === 0) return;
@@ -92,17 +110,18 @@ export default function PaginaInventario() {
     e.preventDefault();
     if (!token) return;
     setPublicando(true);
-    setError(null);
+    setErrorPublicar(null);
     try {
       const firma = await firmarAccion("publicar artículo");
       if (!firma) throw new Error("Firma requerida: desbloquea tu billetera para publicar.");
       await publicarArticulo(token, { titulo, rubro, categoria, descripcion: descripcion || undefined, imagenes: imagenesSel.map(({ data, mime }) => ({ data, mime })) }, firma);
+      setFlotanteAbierto(false);
       setTitulo("");
       setDescripcion("");
       setImagenesSel([]);
       await cargar();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "error al publicar");
+    } catch (err) {
+      setErrorPublicar(err instanceof Error ? err.message : "error al publicar");
     } finally {
       setPublicando(false);
     }
@@ -178,102 +197,16 @@ export default function PaginaInventario() {
         </p>
       )}
 
+      {/* Encabezado con botón de nuevo elemento (abre el flotante) */}
       {token && puedePublicar && (
-        <Card className="p-5">
-          <h2 className="text-sm font-bold uppercase tracking-wide text-navy-800/60">
-            Publicar artículo AtoA
-          </h2>
-          <form onSubmit={publicar} className="mt-3 space-y-3">
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div>
-                <label htmlFor="titulo" className="mb-1 block text-xs font-semibold text-navy-800/60">
-                  Título *
-                </label>
-                <input
-                  id="titulo"
-                  required
-                  value={titulo}
-                  onChange={(e) => setTitulo(e.target.value)}
-                  placeholder="Ej: Bicicleta de montaña"
-                  className={inputCls}
-                />
-              </div>
-              <div>
-                <label htmlFor="rubro" className="mb-1 block text-xs font-semibold text-navy-800/60">
-                  Rubro *
-                </label>
-                <select id="rubro" value={rubro} onChange={(e) => setRubro(e.target.value)} className={inputCls}>
-                  {RUBROS.map((r) => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label htmlFor="categoria" className="mb-1 block text-xs font-semibold text-navy-800/60">
-                  Categoría (tipo de trueque) *
-                </label>
-                <select id="categoria" value={categoria} onChange={(e) => setCategoria(e.target.value)} className={inputCls}>
-                  {CATEGORIAS.map((c) => (
-                    <option key={c.valor} value={c.valor}>
-                      {c.icono} {c.nombre}
-                    </option>
-                  ))}
-                </select>
-                <p className="mt-1 text-[10px] text-navy-800/50">
-                  Define el tipo de trueque (Artículo/Servicio/Bien/Cripto — lógica maestra).
-                </p>
-              </div>
-            </div>
-            <div>
-              <label htmlFor="descripcion" className="mb-1 block text-xs font-semibold text-navy-800/60">
-                Descripción
-              </label>
-              <textarea
-                id="descripcion"
-                value={descripcion}
-                onChange={(e) => setDescripcion(e.target.value)}
-                rows={2}
-                placeholder="Estado, detalles, qué buscas a cambio…"
-                className={inputCls}
-              />
-            </div>
-            <div>
-              <label htmlFor="imagenes" className="mb-1 block text-xs font-semibold text-navy-800/60">
-                Imágenes (1–5) — se muestran en el Mercado
-              </label>
-              <input
-                id="imagenes"
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={alSeleccionarImagenes}
-                className="block w-full text-xs text-navy-800/60 file:mr-3 file:rounded-pill file:border-0 file:bg-teal-500/10 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-teal-700"
-              />
-              {imagenesSel.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {imagenesSel.map((im, idx) => (
-                    <div key={idx} className="relative">
-                      <img src={im.preview} alt={`imagen ${idx + 1}`} className="h-16 w-16 rounded-lg border border-navy-800/10 object-cover" />
-                      <button
-                        type="button"
-                        onClick={() => setImagenesSel((prev) => prev.filter((_, i) => i !== idx))}
-                        className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-pill bg-crimson text-[10px] font-bold text-white"
-                        aria-label="Quitar imagen"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            <Button type="submit" disabled={publicando}>
-              {publicando ? "Publicando…" : "📦 Publicar artículo"}
-            </Button>
-          </form>
-        </Card>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-navy-800/60">
+            Cargá un nuevo elemento con sus <strong>imágenes referenciales</strong>.
+          </p>
+          <Button onClick={abrirFlotante} className="!px-4 !py-2 !text-sm">
+            ＋ Nuevo elemento
+          </Button>
+        </div>
       )}
 
       <div>
@@ -285,7 +218,8 @@ export default function PaginaInventario() {
           <Card className="p-8 text-center">
             <p className="text-3xl">🫙</p>
             <p className="mt-2 text-sm text-navy-800/60">
-              Aún no has publicado artículos. Publica uno arriba (requiere Verificado).
+              Aún no has publicado artículos. Publica uno con{" "}
+              <strong>“＋ Nuevo elemento”</strong> (requiere Verificado).
             </p>
           </Card>
         )}
@@ -306,12 +240,14 @@ export default function PaginaInventario() {
                 <StatusBadge estado={a.disponible === false ? "Retirado" : "Activo"} tono={a.disponible === false ? "crimson" : "teal"} />
               </div>
               {a.descripcion && <p className="mt-2 line-clamp-2 text-xs text-navy-800/60">{a.descripcion}</p>}
-              {a.imagenes && a.imagenes.length > 0 && (
+              {a.imagenes && a.imagenes.length > 0 ? (
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {a.imagenes.map((im) => (
-                    <img key={im.id} src={`${API_URL}${im.url}`} alt={a.titulo} className="h-12 w-12 rounded-lg border border-navy-800/10 object-cover" />
+                    <img key={im.id} src={`${API_URL}${im.url}`} alt={a.titulo} className="h-14 w-14 rounded-lg border border-navy-800/10 object-cover" />
                   ))}
                 </div>
+              ) : (
+                <p className="mt-2 text-[10px] text-navy-800/40">Sin imágenes referenciales.</p>
               )}
               {token && a.disponible !== false && (
                 <div className="mt-3 flex flex-wrap justify-end gap-2">
@@ -336,6 +272,150 @@ export default function PaginaInventario() {
           ))}
         </div>
       </div>
+
+      {/* FLOTANTE: nuevo elemento con imágenes referenciales */}
+      {flotanteAbierto && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-navy-900/60 p-4 backdrop-blur-sm"
+          onClick={() => setFlotanteAbierto(false)}
+        >
+          <div
+            className="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Nuevo elemento del inventario"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="font-display text-lg font-bold text-navy-800">＋ Nuevo elemento</h2>
+                <p className="mt-0.5 text-xs text-navy-800/55">
+                  Publicá tu artículo AtoA en el mercado con sus imágenes referenciales (RF-04).
+                </p>
+              </div>
+              <button
+                onClick={() => setFlotanteAbierto(false)}
+                aria-label="Cerrar nuevo elemento"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-navy-800/60 transition-colors hover:bg-navy-800/10 hover:text-navy-800"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={publicar} className="mt-4 space-y-3">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="titulo" className="mb-1 block text-xs font-semibold text-navy-800/60">
+                    Título *
+                  </label>
+                  <input
+                    id="titulo"
+                    required
+                    value={titulo}
+                    onChange={(e) => setTitulo(e.target.value)}
+                    placeholder="Ej: Bicicleta de montaña"
+                    className={inputCls}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="rubro" className="mb-1 block text-xs font-semibold text-navy-800/60">
+                    Rubro *
+                  </label>
+                  <select id="rubro" value={rubro} onChange={(e) => setRubro(e.target.value)} className={inputCls}>
+                    {RUBROS.map((r) => (
+                      <option key={r} value={r}>
+                        {r}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="sm:col-span-2">
+                  <label htmlFor="categoria" className="mb-1 block text-xs font-semibold text-navy-800/60">
+                    Categoría (tipo de trueque) *
+                  </label>
+                  <select id="categoria" value={categoria} onChange={(e) => setCategoria(e.target.value)} className={inputCls}>
+                    {CATEGORIAS.map((c) => (
+                      <option key={c.valor} value={c.valor}>
+                        {c.icono} {c.nombre}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="mt-1 text-[10px] text-navy-800/50">
+                    Define el tipo de trueque (Artículo/Servicio/Bien/Cripto — lógica maestra).
+                  </p>
+                </div>
+              </div>
+              <div>
+                <label htmlFor="descripcion" className="mb-1 block text-xs font-semibold text-navy-800/60">
+                  Descripción
+                </label>
+                <textarea
+                  id="descripcion"
+                  value={descripcion}
+                  onChange={(e) => setDescripcion(e.target.value)}
+                  rows={2}
+                  placeholder="Estado, detalles, qué buscas a cambio…"
+                  className={inputCls}
+                />
+              </div>
+              <div>
+                <label htmlFor="imagenes" className="mb-1 block text-xs font-semibold text-navy-800/60">
+                  🖼️ Imágenes referenciales (1–5) — se muestran en el Mercado
+                </label>
+                <input
+                  id="imagenes"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={alSeleccionarImagenes}
+                  className="block w-full text-xs text-navy-800/60 file:mr-3 file:rounded-pill file:border-0 file:bg-teal-500/10 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-teal-700"
+                />
+                {imagenesSel.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {imagenesSel.map((im, idx) => (
+                      <div key={idx} className="relative">
+                        <img src={im.preview} alt={`imagen ${idx + 1}`} className="h-16 w-16 rounded-lg border border-navy-800/10 object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => setImagenesSel((prev) => prev.filter((_, i) => i !== idx))}
+                          className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-pill bg-crimson text-[10px] font-bold text-white"
+                          aria-label="Quitar imagen"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <p className="mt-1 text-[10px] text-navy-800/40">
+                  {imagenesSel.length === 0
+                    ? "Subí al menos una foto referencial para mostrar en el Mercado."
+                    : `${imagenesSel.length} de 5 imágenes seleccionadas.`}
+                </p>
+              </div>
+
+              {errorPublicar && (
+                <p className="rounded-xl bg-crimson/10 px-3 py-2 text-xs text-crimson">⚠️ {errorPublicar}</p>
+              )}
+
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <Button type="submit" disabled={publicando}>
+                  {publicando ? "Publicando…" : "📦 Publicar artículo"}
+                </Button>
+                <Button
+                  type="button"
+                  variante="outline-navy"
+                  className="!px-3 !py-1.5 !text-xs"
+                  disabled={publicando}
+                  onClick={() => setFlotanteAbierto(false)}
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
