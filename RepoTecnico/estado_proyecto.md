@@ -756,3 +756,31 @@ flotante, notificaciones):
 manuales: rev **truekeate-web-00029-9kh** (release-b450e86); verificado en vivo en
 GCP: temas nuevos visibles, PDF 03-Implementacion-11-seccion-valor.pdf 200 y SVG
 flujo-disputas-v2.svg 200.
+
+## 🔨 Subastas con pantalla propia (director, 2026-09-09) — commit a251a5f
+
+Pendiente "Subastas sin pantalla" cerrado: router /subastas ahora PERSISTE en
+PostgreSQL (tabla `subastas`; antes vivía en un Map local que se perdía al
+reiniciar y no se compartía entre instancias de Cloud Run).
+- Backend: métodos en almacenes (pg + memoria): crearSubasta, getSubasta,
+  listarSubastas, agregarPujaSubasta, cerrarSubasta (D27); cierre AUTOMÁTICO y
+  PEREZOSO de las vencidas al listar/ver (mayor valor; empate → mayor nivel;
+  sin pujas → ANULADA); validaciones (RF-17.1 Empresa con artículo propio y
+  publicado; RF-17.2 solo CERTIFICADO; la Empresa no puja en su propia subasta).
+  Endpoints: GET /subastas, GET /subastas/mis, GET /subastas/:id, POST /subastas,
+  POST /:id/pujas, POST /:id/cerrar.
+- Web: nueva página /suite/subastas (pestañas Abiertas/Cerradas/Las mías, alta
+  en flotante para Empresa, puja inline para Certificado, cierre manual cuando
+  vence, ganador visible); sección 🔨 en la navegación (visible Empresa o
+  Certificado — RF-17); api.ts con tipos y llamadas.
+- Tests backend 28/28 (nuevo: Empresa crea, no-Certificado 403, dos pujas,
+  puja baja 400, cierre lazy adjudica al mayor valor, Empresa no puja propia);
+  E2E suite-pantallas 9/9 (nuevos: Empresa ve listado y puede crear; Particular
+  Certificado ve botón Pujar). tsc y build OK.
+- Desplegado GCP: API rev **truekeate-api-00023-46q**, web rev
+  **truekeate-web-00030-h45** (release-a251a5f), 100 % serving.
+- Verificación en vivo (GCP): catálogo de subastas público; EcoTech (EMPRESA)
+  crea con su artículo → 201 ABIERTA (id 1); Ana (SOCIO CERTIFICADO) puja 150 →
+  200; puja baja 120 → 400; /subastas/mis de EcoTech incluye su subasta; UI:
+  heading, "Crear subasta", subasta con artículo visible y pestaña "Las mías".
+  Captura: `RepoTecnico/pruebas/1ra-prueba/subastas-empresa.png`.
