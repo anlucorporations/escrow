@@ -729,3 +729,27 @@ on-chain del SociosRegistry (`owner()` = 0xf39F…2266 en GCP), no un "tipo".
 - → Ver plan de desarrollo consolidado: `RepoTecnico/plan_desarrollo.md`
 - → Diccionario de datos actualizado: `RepoTecnico/diccionario_datos.md`
 - → Entornos globales actualizados: `RepoTecnico/entornos_globales.md`
+
+## 📚 @manuales actualizado (2026-09-09) — commit 190447b
+
+Regeneración acotada del equipo @manuales (5 roles) para reflejar los ciclos
+recientes (disputas v2, VALOR, Sistemas solo Owner, D28, histórico, inventario
+flotante, notificaciones):
+- Técnicos actualizados: 03-Implementacion/06-backend-api (Disputas v2, VALOR,
+  Notificaciones, regla de encuentro, admin endurecido solo Owner),
+  07-frontend (VALOR, disputas con flotante, pestañas, inventario flotante,
+  botón D28, campana), 03-contratos-finanzas (nota VALOR/Stripe),
+  08-Suite-Sistemas/01-panel-sistemas (solo Owner on-chain), 05-Diccionario y
+  06-Diagrama (tablas nuevas).
+- Temas NUEVOS (técnico + literal espejo): 03-Implementacion/10-disputas-v2 y
+  03-Implementacion/11-seccion-valor.
+- Literales espejo actualizados en docs/Manuales con marcadores GENERAR_IMAGEN.
+- Creativo: 4 infografías nuevas (flujo-disputas-v2, valor-seccion,
+  acceso-sistemas-owner, notificaciones-campana) SVG+PNG 1200px con paleta del
+  proyecto.
+- PDF: 29 PDF A4 regenerados (script generar-pdfs.mjs) + html intermedios.
+- Integrador: biblioteca web/lib/manual-data.ts con las secciones nuevas del
+  tema 07-frontend + los 2 manuales nuevos (ids 10-disputas-v2 y
+  11-seccion-valor) + panel-sistemas reforzado; PDF e imágenes copiados a
+  web/public/manual/. tsc y build web OK; /help/manual verificado en navegador
+  (temas nuevos abren y la imagen valor-seccion carga).
