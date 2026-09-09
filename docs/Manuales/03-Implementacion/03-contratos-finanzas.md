@@ -275,7 +275,41 @@ Al desplegar el sistema, el guion crea las piezas en este orden:
 
 ---
 
-## 8. Qué falta confirmar (resumen)
+## 8. Novedad 2026-09-09: tu BRLT del día a día vive en la sección VALOR
+
+> Decisión del director (2026-09-09): el BRLT de cada persona **ya no se
+> gestiona contra el contrato de la cadena desde la app**. La gestión diaria
+> ocurre en la sección **💎 VALOR** de la plataforma (antes "Finanzas") y es
+> **fuera de la cadena** (off-chain): el saldo se guarda en la base de datos y
+> cada movimiento queda registrado en el historial.
+
+¿Qué significa esto en la práctica?
+
+1. **Comprar BRLT con tarjeta**: lo haces con **Stripe Checkout** (una página
+   de pago alojada por Stripe, no una pasarela propia). Cuando Stripe
+   confirma el pago, la plataforma te acredita el BRLT automáticamente.
+2. **Convertir y retirar**: los movimientos de cripto/BRLT son **siempre con
+   la plataforma** como contraparte (no hay transferencias directas entre
+   personas fuera del trueque). La conversión usa la tasa interna
+   (1 ETH ≈ 3.000 BRLT por defecto).
+3. **Retiro a dinero real**: el retiro BRLT → fiat está **documentado como
+   Stripe Payouts**: en este entorno se registra la salida, y el desembolso
+   real requiere vincular una cuenta Stripe.
+4. **Quién puede**: solo **Empresas, Socios y el Owner** gestionan BRLT. El
+   resto de cuentas ve su VALOR en solo lectura (su reputación y sus cifras).
+
+¿Y qué pasa con el contrato BRLT que explicamos en este manual? Sigue siendo
+la **emisión institucional** de la moneda (el tope de 1.000.000 BRLT y la
+votación de Socios del 2/3), y el vigilante sigue copiando esa emisión a la
+base. Lo que cambió es el **flujo diario de cada persona**, que ya no usa el
+contrato directamente sino la sección VALOR.
+
+> El detalle completo está en el manual **03 · 11-seccion-valor.md** (la
+> guía de usuario de VALOR) y en el manual técnico 06 §14.
+
+---
+
+## 9. Qué falta confirmar (resumen)
 
 1. El **1 %** de los trueques completados hacia el fondo no tiene
    implementación en ningún contrato → **pendiente de confirmar**.
@@ -296,7 +330,7 @@ Al desplegar el sistema, el guion crea las piezas en este orden:
 
 ---
 
-## 9. Glosario de este manual
+## 10. Glosario de este manual
 
 | Palabra | Significado |
 |---|---|

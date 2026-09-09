@@ -1,7 +1,7 @@
 # Manual · Cómo se conectan los datos de TrueKeate
 
 > Versión en lenguaje sencillo del manual técnico 06 — Diagrama Relacional.
-> Aquí contamos cómo se unen las 16 carpetas de datos entre sí, con la
+> Aquí contamos cómo se unen las **21 carpetas** de datos entre sí, con la
 > historia de Ana y Bruno de principio a fin.
 
 ---
@@ -56,10 +56,15 @@ erDiagram
     USUARIOS ||--o{ SUSCRIPCIONES : "empresa paga (empresa_id)"
     USUARIOS ||--o{ CAMPANAS : "organiza"
     USUARIOS ||--o{ SUBASTAS : "empresa subasta (empresa_id)"
+    USUARIOS ||--o{ NOTIFICACIONES : "recibe avisos (por wallet)"
+    USUARIOS ||--o{ MOVIMIENTOS_VALOR : "hace movimientos (por wallet)"
+    USUARIOS ||--o{ MOVIMIENTOS_BRLT : "compra BRLT (por wallet)"
     ARTICULOS ||--o{ TRUEKES : "se ofrece en un trueque"
     ARTICULOS ||--o{ SUBASTAS : "se subasta"
     TRUEKES ||--o{ VALORACIONES : "recibe notas 1-5"
     TRUEKES ||--o{ DISPUTAS : "puede tener conflictos"
+    DISPUTAS ||--o{ EVIDENCIAS_DISPUTA : "fotos de cada parte"
+    DISPUTAS ||--o{ VOTOS_DISPUTA : "votos de los Socios"
     PUNTOS_ENCUENTRO ||--o{ PUNTOS_FAVORITOS : "es marcado como favorito"
     PUNTOS_ENCUENTRO o|--o{ TRUEKES : "punto acordado (sin candado)"
     ARTICULOS o|--o| IMAGENES_CERTIFICADAS : "foto con sello (sin candado)"
@@ -92,11 +97,48 @@ erDiagram
         bigint articulo_b_id "candado a articulos"
         char usuario_a "dirección (sin candado)"
         char usuario_b "dirección (sin candado)"
+        text estado "9 etiquetas"
     }
     VALORACIONES {
         bigint id "llave propia"
         bigint trueke_id "candado a truekes"
         smallint honestidad "nota 1-5"
+    }
+    DISPUTAS {
+        bigint id "llave propia"
+        bigint trueke_id "candado a truekes"
+        char solicitante "reclamante (sin candado)"
+        text estado "REPORTADA→…→RESUELTA"
+        text veredicto "ANULAR o VALIDO"
+    }
+    EVIDENCIAS_DISPUTA {
+        bigint id "llave propia"
+        bigint disputa_id "candado a disputas (se borra con ella)"
+        char autor "quién sube la foto"
+        text tipo "RECLAMO o JUSTIFICATIVO"
+    }
+    VOTOS_DISPUTA {
+        bigint id "llave propia"
+        bigint disputa_id "candado a disputas (se borra con ella)"
+        char socio "Socio votante"
+        text voto "ANULAR o VALIDO"
+    }
+    NOTIFICACIONES {
+        bigint id "llave propia"
+        char wallet "destinatario"
+        text tipo "tipo de aviso"
+        boolean leida "¿leída?"
+    }
+    MOVIMIENTOS_VALOR {
+        bigint id "llave propia"
+        char wallet "quién movió"
+        text tipo "recarga, retiro, conversión"
+        char contraparte "la plataforma"
+    }
+    MOVIMIENTOS_BRLT {
+        bigint id "llave propia"
+        char wallet "comprador"
+        text estado "PENDIENTE → PAGADO"
     }
     FINANZAS {
         bigint usuario_id "llave + candado (1 a 1)"
@@ -129,9 +171,12 @@ En el mapa hay **3 tipos de conexión**:
 Las formas de relacionarse:
 
 - **1 a muchos**: la más común. Una usuaria → muchos artículos; un trueque →
-  varias valoraciones. En 2026-09 se sumaron dos hijas de `usuarios`:
+  varias valoraciones; **una disputa → muchas fotos de evidencia y muchos
+  votos de Socios**. En 2026-09 se sumaron dos hijas de `usuarios`:
   `puntos_favoritos` (tus puntos guardados) y `sesiones` (tus inicios de
-  sesión).
+  sesión); en 2026-09-08/09, además, nacieron las hijas de `disputas`
+  (`evidencias_disputa`, `votos_disputa`), la campana `notificaciones` y los
+  movimientos de VALOR.
 - **1 a 1**: cada persona tiene una sola ficha financiera (comparten la
   llave). También la verificación de identidad (una por persona, aunque la
   base no lo obliga del todo) y la foto con sello de un artículo.
@@ -139,7 +184,8 @@ Las formas de relacionarse:
   del trueque, que guarda 2 artículos y 2 personas (sección 5).
 - **Polimorfismo**: la ficha de la foto con sello apunta a un artículo, a un
   trueque o, desde 2026-09, a tu verificación de identidad, según su tipo
-  (`PUBLICACION`, `RECEPCION`, `KYC_DNI` o `KYC_SELFIE`).
+  (`PUBLICACION`, `RECEPCION`, `KYC_DNI` o `KYC_SELFIE`). La ficha de avisos
+  (`notificaciones`) apunta a un trueke o a una disputa según su referencia.
 
 ---
 
@@ -173,11 +219,26 @@ Desde **truekes** (la pieza central):
 | `valoraciones` | Las notas del trueque |
 | `disputas` | Los conflictos del trueque |
 
+Desde **disputas** (las dos hijas nuevas de 2026-09-08):
+
+| Ficha hija | Qué guarda la conexión |
+|---|---|
+| `evidencias_disputa` | Las fotos de cada parte (reclamo y justificativo); **se borran junto con la disputa** |
+| `votos_disputa` | Los votos ANULAR/VALIDO de los Socios; **se borran junto con la disputa** |
+
 Desde **puntos_encuentro** (cada punto puede ser favorito de muchas personas):
 
 | Ficha hija | Qué guarda la conexión |
 |---|---|
 | `puntos_favoritos` | Quiénes lo guardaron como favorito |
+
+Relaciones **por dirección (sin candado)** para las nuevas piezas:
+
+| Ficha hija | Qué guarda la conexión |
+|---|---|
+| `notificaciones` | Los avisos de cada wallet (campana 🔔) |
+| `movimientos_valor` | Los movimientos de cripto/BRLT de cada wallet (VALOR) |
+| `movimientos_brlt` | Las compras de BRLT con tarjeta de cada wallet (Stripe) |
 
 ---
 
@@ -190,7 +251,9 @@ Desde **puntos_encuentro** (cada punto puede ser favorito de muchas personas):
 | Carné de certificación | `kyc` → la cadena (`via_sbt`, `sbt_contrato`, `sbt_token_id`) | Son datos on-chain: la plataforma los anota al certificar |
 | Punto de encuentro de un trueque | `truekes` → `puntos_encuentro` | Es lógica: se acuerda fuera de la base |
 | Foto polimórfica | `imagenes_certificadas` → `articulos`, `truekes` o `kyc` | Depende del tipo de foto |
-| Direcciones de participantes | `truekes`, `valoraciones`, `disputas` → `usuarios` | **Historia**: guardamos la dirección tal como era |
+| Direcciones de participantes | `truekes`, `valoraciones`, `disputas`, `evidencias_disputa`, `votos_disputa` → `usuarios` | **Historia**: guardamos la dirección tal como era |
+| Avisos de la campana | `notificaciones` → `usuarios` (por `wallet`) y → `disputas`/`truekes` (`ref_tipo` + `ref_id`) | Destinatario y referencia polimórfica sin candado (2026-09-08) |
+| Movimientos de VALOR | `movimientos_valor`/`movimientos_brlt` → `usuarios` (por `wallet`) | Movimientos por dirección, sin candado (2026-09-09) |
 | Número del escrow | `truekes.escrow_id` → la cadena | No apunta a una tabla local: es el puente con la blockchain |
 
 ¿Por qué las **direcciones no llevan candado**? Porque tu dirección puede
@@ -295,16 +358,21 @@ Estas carpetas las llena la propia plataforma, con tu actividad:
 | Carpeta | Contenido | Cómo se relaciona |
 |---|---|---|
 | `articulos` | Tus publicaciones | Candado a `usuarios` |
-| `valoraciones` | Tus notas 1-5 | Candado a `truekes` |
+| `valoraciones` | Tus notas 1-5 (guardadas de verdad desde 2026-09-09) | Candado a `truekes` |
 | `puntos_encuentro` | Tus puntos con mapa | Candado a `usuarios` |
-| `disputas` | Los conflictos | Candado a `truekes` |
+| `disputas` | Los conflictos (flujo v2 2026-09-08) | Candado a `truekes` |
+| `evidencias_disputa` | Las fotos de cada parte de la disputa (2026-09-08) | Candado a `disputas` (se borran con ella) |
+| `votos_disputa` | Los votos de los Socios (2026-09-08) | Candado a `disputas` (se borran con ella) |
+| `notificaciones` | Los avisos de la campana (2026-09-08) | Por `wallet` + referencia a disputa/trueke |
 | `kyc` | Tu verificación de identidad y tu certificación | Candado a `usuarios`; la huella es espejo (§6) y la certificación por carné la escribe la propia plataforma (2026-09) |
 | `imagenes_certificadas` | Las fotos con sello (anuncios, recepciones y, desde 2026-09, documento y selfie del KYC) | Apunte lógico a artículos, trueques o `kyc`; guardan también el archivo (`contenido`/`mime`) |
 | `puntos_favoritos` | Tus puntos guardados como favoritos | Candados a `usuarios` y `puntos_encuentro` |
 | `sesiones` | Tus inicios de sesión con la billetera | Candado a `usuarios` (por la dirección `wallet`) |
 | `campanas` | Ventas masivas y recolectas | Candado a `usuarios` |
 | `subastas` | Subastas de empresa | Candados a `usuarios` y `articulos` |
-| `finanzas` | Saldos | 1 a 1 con `usuarios` (y espejo parcial de BRLT) |
+| `finanzas` | Saldos del socio | 1 a 1 con `usuarios` (y espejo parcial de BRLT) |
+| `movimientos_valor` | Historial de cripto/BRLT de la sección VALOR (2026-09-09) | Por `wallet` (la contraparte es la plataforma) |
+| `movimientos_brlt` | Compras de BRLT con tarjeta (Stripe) (2026-09-09) | Por `wallet`; el webhook de Stripe la confirma |
 
 ---
 
@@ -421,6 +489,9 @@ Y estas son las **preguntas típicas** que la base responde al unir carpetas:
 | ¿Está certificada y con carné o con fotos? | Mira `kyc` (`via_sbt`, `sbt_contrato`, `sbt_token_id`) y sus fotos en `imagenes_certificadas` (`KYC_DNI`/`KYC_SELFIE`); en la cadena pregunta al contrato del carné |
 | ¿Quién participó y con qué? | Lee las 2 direcciones y los 2 artículos de la ficha del trueque |
 | ¿Qué notas recibió Bruno? | Busca las valoraciones del trueque |
+| ¿En qué va la disputa de un trueque? | Lee `disputas` (estado y plazos) → las fotos en `evidencias_disputa` y los votos en `votos_disputa` |
+| ¿Qué avisos tengo sin leer? | Cuenta las `notificaciones` de tu wallet con `leida = no` |
+| ¿Cuánto ETH/BRLT tengo y qué moví? | Lee `finanzas` (saldos) y `movimientos_valor`/`movimientos_brlt` por tu wallet |
 | ¿Qué puntos guardó como favoritos? | Busca en `puntos_favoritos` por su usuario |
 | ¿Hay puntos de encuentro cerca? | Pregunta al mapa de PostGIS (regla de los 10 km) |
 | ¿Pagó la empresa este mes? | Busca sus ciclos en `suscripciones` |
@@ -435,16 +506,21 @@ Y estas son las **preguntas típicas** que la base responde al unir carpetas:
 | `usuarios` | sí | — | la dirección `wallet` y el `@nombre` (`username`) |
 | `kyc` | sí | a `usuarios` | la huella (espejo), quién la revisó, el carné SBT (`via_sbt`/`sbt_contrato`/`sbt_token_id`) y sus fotos (apunte lógico) |
 | `articulos` | sí | a `usuarios` | su foto con sello (sin candado) |
-| `truekes` | sí | a `articulos` (×2) | número del escrow, direcciones, punto de encuentro |
+| `truekes` | sí | a `articulos` (×2) | número del escrow, direcciones, punto de encuentro, cierres |
 | `valoraciones` | sí | a `truekes` | las direcciones de quién valora a quién |
 | `puntos_encuentro` | sí | a `usuarios` | sus coordenadas en el mapa |
 | `puntos_favoritos` | sí | a `usuarios` y a `puntos_encuentro` | el par (usuario, punto) es único |
-| `disputas` | sí | a `truekes` | quien la pide y el registro de votos |
+| `disputas` | sí | a `truekes` | quien la pide (reclamante), plazos y veredicto |
+| `evidencias_disputa` | sí | a `disputas` (se borra con ella) | el autor (dirección) y el tipo de evidencia |
+| `votos_disputa` | sí | a `disputas` (se borra con ella) | el Socio votante; un voto por Socio y disputa |
+| `notificaciones` | sí | — | la wallet destinataria y la referencia (disputa/trueke) |
 | `imagenes_certificadas` | sí | — | apunte polimórfico a artículo, trueque o `kyc` |
 | `suscripciones` | sí | a `usuarios` (empresa) | el recibo de la transacción |
 | `campanas` | sí | a `usuarios` | los artículos de la campaña |
 | `subastas` | sí | a `usuarios` (×2) y `articulos` | el número del escrow y el nivel del ganador |
 | `finanzas` | su llave es la de `usuarios` | a `usuarios` (1 a 1) | saldos, stocks y porcentajes |
+| `movimientos_valor` | sí | — | la wallet y la contraparte (la plataforma) |
+| `movimientos_brlt` | sí | — | la wallet y la sesión de Stripe |
 | `auditoria` | sí | — | la dirección del evento y su triple llave |
 | `indexador_checkpoint` | el nombre del contrato | — | el último bloque leído |
 | `sesiones` | el `token` de sesión | a `usuarios` (por `wallet`) | caduca a las 24 h |

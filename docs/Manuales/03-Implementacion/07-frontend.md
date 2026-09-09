@@ -31,7 +31,10 @@ Para empezar en 5 minutos:
 > verificación y certificación) lo guarda el servidor central, y la app solo
 > lo muestra. Según subas de peldaño se te van desbloqueando secciones:
 > Intercambio e Inventario piden VERIFICADO; Disputas, CERTIFICADO o SOCIO;
-> Finanzas, EMPRESA o SOCIO; y la Gobernanza, SOCIO.
+> **VALOR** (ex Finanzas) lo ve **todo inscrito** (pero solo Empresa/SOCIO/
+> Owner gestionan criptos y BRLT); la Gobernanza, SOCIO; y **Sistemas
+> (el Panel del Owner), solo el Owner real** (el dueño on-chain del registro
+> de Socios, no cualquier Socio).
 
 ---
 
@@ -49,9 +52,10 @@ Hoy la suite tiene estas pantallas, todas **funcionales** (ya no hay páginas
 | **Intercambio** | `/suite/intercambio` | Crear y completar trueques | VERIFICADO o CERTIFICADO |
 | **Inventario** | `/suite/inventario` | Publicar y despublicar tus objetos | VERIFICADO o CERTIFICADO |
 | **Gobernanza / Socios** | `/suite/gobernanza` | Propuestas y votación | SOCIO (y el Owner) |
-| **Disputas** | `/suite/disputas` | Seguir disputas | CERTIFICADO las ve; SOCIO las resuelve |
-| **Finanzas** | `/suite/finanzas` | Saldos propios y globales | EMPRESA o SOCIO |
-| **Panel del Owner** | `/suite/admin` | Administración de la plataforma | El Owner |
+| **Disputas** | `/suite/disputas` | Seguir tu disputa, ver pruebas y (si eres Socio) votar en el flotante | CERTIFICADO las ve; SOCIO las resuelve votando |
+| **VALOR** | `/suite/valor` | 💎 Tus criptos, tu reputación y BRLT (ex "Finanzas") | Todo inscrito (solo lectura); Empresa/SOCIO/Owner gestionan |
+| **Finanzas** *(legado)* | `/suite/finanzas` | La antigua página de saldos | Ya NO está en el menú: la suite usa VALOR |
+| **Sistemas · Panel del Owner** | `/suite/admin` | Administración de la plataforma (cifras, KYC, contratos, infra) | **Solo el Owner real** (dueño on-chain del registro de Socios) |
 | **Mi Perfil** | `/suite/perfil` | Tu @username, tu billetera completa y tu reputación | Inscritos |
 | **Inscripción** | `/suite/inscripcion` | Formulario de inscripción (correo, teléfono, dirección, GDPR) | Con billetera, sin inscribir |
 | **Verificación** | `/suite/verificacion` | Verificar tu correo (escalera, etapa 1) | Inscritos |
@@ -71,8 +75,8 @@ flowchart LR
     G --> M["🛒 Mercado<br/>con billetera"]
     G --> D["Mi Trueke Central<br/>inscritos"]
     G --> I["Intercambio · Inventario<br/>VERIFICADO"]
-    G --> S["Gobernanza · Panel Owner<br/>SOCIO"]
-    G --> F["Disputas · Finanzas<br/>por rol"]
+    G --> S["Gobernanza (SOCIO) ·<br/>Sistemas (solo Owner)"]
+    G --> F["Disputas · VALOR<br/>por rol"]
     G --> P["Perfil · Verificación<br/>· Certificación"]
     style L fill:#d4af37,stroke:#8a6d1f
     style G fill:#1a2b4c,color:#fff,stroke:#0a1128
@@ -347,7 +351,93 @@ TrueKeate tiene su propia identidad visual:
 
 ---
 
-## 9. Qué falta confirmar (resumen)
+## 9. La sección VALOR (antes "Finanzas")
+
+> Guía completa para el público: manual **03 · 11-seccion-valor.md**.
+
+VALOR (`/suite/valor`) es la sección personal de dinero y confianza. En la
+pantalla ves primero **3 tarjetas de saldo**: 🪙 tu ETH, 🏅 tu reputación
+(puntaje · nivel · medalla) y 💎 tu BRLT.
+
+- **4.1 · Criptos**: botones ⬆️ Recargar ETH, ⬇️ Retirar ETH y
+  ⇄ ETH → BRLT / ⇄ BRLT → ETH. Los movimientos son **siempre con la
+  plataforma** (no hay envíos directos entre personas fuera del trueke).
+- **4.2 · Reputación**: tu puntaje D12/D30, la lista de **trueques sin
+  valorar** (botón "⭐ Valorar 1–5": eliges nota 1–5 en las 5 dimensiones y
+  firmas una vez) y los últimos 10 trueques que valoraste.
+- **4.3 · BRLT**: comprar BRLT **con tarjeta** ("💳 Comprar con Stripe",
+  pago alojado por Stripe) y retirar.
+- **Movimientos recientes**: tu historial de operaciones al pie.
+
+Quien **no** es Empresa/SOCIO/Owner ve su VALOR en **solo lectura**: sus
+saldos aparecen como "—" y ve la nota *"La gestión de criptos y BRLT es de
+Empresas, Socios y el Owner"*, pero su reputación y valoraciones siguen
+disponibles.
+
+---
+
+## 10. Disputas rediseñada: ver tu caso y votar como Socio
+
+> Guía completa para el público: manual **03 · 10-disputas-v2.md**.
+
+La página `/suite/disputas` fue rediseñada (2026-09-08) y tiene **dos
+secciones**:
+
+1. **Mis disputas**: tus conflictos con su estado (Reportada / Esperando
+   justificativo / Votación abierta / Resuelta), el motivo y los plazos.
+   Pulsando **"🔍 Ver pruebas de ambas partes"** ves las fotos del reclamo y
+   del justificativo una al lado de la otra.
+   - Si eres la parte **conforme**: botón "📷 Enviar justificativo"
+     (subes fotos, hasta 5).
+   - Si tampoco estás conforme: botón "✗ Declarar mi No Conforme"
+     (motivo + fotos).
+2. **🏛️ Votación de Socios** (solo visible si tu wallet está en el padrón):
+   tarjetas con el conteo `n ANULAR · m VALIDO` y el botón
+   **"📂 Ver caso y votar"**.
+
+El **flotante del caso** (ventana que se abre encima) muestra el motivo, las
+evidencias de **ambas partes** (miniaturas que se amplían con 🔍) y, abajo,
+los botones **"🗳️ ANULAR — devolución total"** y
+**"🗳️ VALIDO — completar trueke"**. Reglas que la propia pantalla te recuerda:
+un voto por Socio, y si eres parte del trueke no puedes votar.
+
+---
+
+## 11. La campana de notificaciones 🔔
+
+La **campana** vive en la zona derecha de la barra superior, junto al botón
+de usuario. Te avisa de lo importante sin tener que ir a buscarlo:
+
+- **Disputa reportada** → te declararon ✗ No Conforme.
+- **Pedido de justificativo** → eres el conforme y debes cargar tus fotos.
+- **Votación abierta** → si eres Socio, hay una disputa esperando tu voto.
+- **Veredicto** → se resolvió una disputa en la que participas.
+
+La campana muestra un **contador rojo** con tus avisos sin leer. Al abrirla
+ves la lista (máx. 12) con un icono por tipo: cada aviso enlaza a la disputa
+o al trueque correspondiente. Puedes marcar **una** como leída (pulsándola)
+o **todas** (botón), y hay un acceso directo "Ir a Disputas →". La app
+consulta los avisos al abrir y **cada 30 segundos**, para que no te pierdas
+los plazos de 3 y 5 días.
+
+<!-- GENERAR_IMAGEN: notificaciones-campana.svg -->
+```mermaid
+flowchart LR
+    MOTOR["Motor de la plataforma<br/>(disputas, cierres)"] -->|"crea aviso"| TABLA["Avisos guardados<br/>por wallet · tipo · leída"]
+    TABLA -->|"la app consulta<br/>al abrir y cada 30 s"| CAMP["🔔 Campana en la barra<br/>contador de no leídas"]
+    CAMP -->|"abres la campana"| LISTA["Lista de avisos (icono por tipo)"]
+    LISTA -->|"pulsas uno"| LINK["Te lleva a la disputa<br/>o al trueque"]
+    LISTA -->|"✓ leída / todas leídas"| TABLA
+    style MOTOR fill:#48cae4,stroke:#1d7fa8
+    style TABLA fill:#2a9d8f,stroke:#1f6f64
+    style CAMP fill:#d4af37,stroke:#8a6d1f
+    style LISTA fill:#1a2b4c,color:#fff,stroke:#0a1128
+    style LINK fill:#f4a261,stroke:#b06a2a
+```
+
+---
+
+## 12. Qué falta confirmar (resumen)
 
 1. La **capa de contratos** (ABIs) está preparada pero **no se activa en
    ninguna pantalla**: no hay todavía lectura on-chain funcional desde el
@@ -366,7 +456,7 @@ TrueKeate tiene su propia identidad visual:
 
 ---
 
-## 10. Glosario de este manual
+## 13. Glosario de este manual
 
 | Palabra | Significado |
 |---|---|
@@ -388,6 +478,13 @@ TrueKeate tiene su propia identidad visual:
 | **Hero** | La primera imagen grande de la portada |
 | **Manifest** | Archivo que permite instalar la PWA |
 | **Service worker** | Programa que permite la app sin conexión (pendiente) |
+| **VALOR** | Sección de criptos, reputación y BRLT (ex Finanzas; `/suite/valor`) |
+| **BRLT** | Moneda interna de TrueKeate (BorloTokens) |
+| **Campana 🔔** | Avisos in-app en la barra superior (disputas, veredictos...) |
+| **Padrón de Socios** | Lista oficial de Socios (quienes votan disputas) |
+| **Votación de disputa** | Los Socios eligen ANULAR o VALIDO (5 días) |
+| **Justificativo** | Fotos que carga la parte conforme de una disputa (3 días) |
+| **Sistemas / Panel del Owner** | Sección `/suite/admin`, solo para el Owner real (on-chain) |
 
 ¡Listo! Ya sabes moverte por la app y conectar tu billetera. El último
 manual de esta sección explica cómo sabemos que todo esto funciona: las

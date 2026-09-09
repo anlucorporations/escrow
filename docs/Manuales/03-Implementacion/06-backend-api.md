@@ -16,7 +16,7 @@ camarero (la app) te toma el pedido, lo pasa a la cocina, y la cocina
 prepara el plato con sus reglas (no se sirve alcohol a menores, el chef
 revisa cada plato...).
 
-Los servicios se agrupan por **familias**. Hoy son **11**:
+Los servicios se agrupan por **familias**. Hoy son **13**:
 
 | Familia | Prefijo | Qué hace |
 |---|---|---|
@@ -24,13 +24,15 @@ Los servicios se agrupan por **familias**. Hoy son **11**:
 | **Verificación y certificación** | `/kyc` | Verificar tu correo y certificar tu identidad |
 | **Catálogo** | `/catalog` | Publicar objetos y ver ofertas |
 | **Trueques** | `/truekes` | Crear y seguir trueques |
-| **Panel del Owner** | `/admin` | Ver usuarios, contratos y salud |
+| **Panel del Owner** | `/admin` | Ver usuarios, contratos y salud (solo el Owner) |
 | **Reputación** | `/reputacion` | Calcular tu puntaje y nivel |
 | **Subastas** | `/subastas` | Subastas de empresas |
-| **Finanzas** | `/finanzas` | Ver saldos propios y globales |
-| **Disputas** | `/disputas` | Abrir y seguir una disputa |
+| **VALOR** | `/valor` | Tu sección de criptos, reputación y BRLT (ex "Finanzas") |
+| **Disputas** | `/disputas` | Resolver un trueque que salió mal (v2) |
+| **Notificaciones** | `/notificaciones` | Los avisos de tu campana 🔔 |
 | **Gobernanza** | `/gobernanza` | Propuestas y votación de socios |
 | **Puntos de encuentro** | `/puntos-encuentro` | Proponer puntos para encontrarte |
+| **Finanzas** *(legado)* | `/finanzas` | La antigua familia de saldos: quedó fuera de la app (la suite usa `/valor`) |
 
 En 5 minutos: la API tiene **3 puertas de entrada** para proteger el
 servicio:
@@ -39,6 +41,12 @@ servicio:
 2. **Sesión**: para lo privado necesitas iniciar sesión con tu firma.
 3. **Estado de verificación**: algunas cosas exigen estar VERIFICADO o
    CERTIFICADO.
+
+> Novedades de 2026-09: la familia **Disputas** fue rediseñada (flujo del
+> director: ✗ No Conforme → justificativo → votación de Socios → veredicto),
+> nació la sección **VALOR** (criptos contra la plataforma, reputación y BRLT
+> con Stripe) y se sumó la **campana de notificaciones** 🔔. Resúmenes en las
+> secciones 10 a 12.
 
 ---
 
@@ -213,28 +221,48 @@ Cuando valoras un trueque, puntúas **5 cosas** (de 1 a 5):
 > empresas), pero **ninguna ruta lo ejecuta todavía**: los trueques se
 > guardan en un almacén de pruebas y custodiar/firmar no comprueban aún el
 > estado real en la cadena. Abrir o anular un trueque desde la app también
-> sigue pendiente. Las **disputas**, en cambio, ya tienen su propia familia
-> de servicios (`/disputas`).
+> sigue pendiente.
+
+### 6.3 El cierre del trueque y el ✗ No Conforme (2026-09)
+
+El trueque termina cuando **ambas partes cierran** (punto 9 del director):
+
+- **✓ Conforme**: firmas que recibiste bien. Cuando ambas están conformes, el
+  trueque se **completa** y los objetos se reasignan **en cruz** (el de A va
+  a B y el de B va a A).
+- **✗ No Conforme**: no estás de acuerdo con lo recibido. La app te pide un
+  **motivo** (obligatorio) y **fotos** de evidencia. Ese gesto **dispara la
+  disputa** (la familia `/disputas`, sección 10).
+
+La **valoración** (5 renglones del 1 al 5) ahora **se guarda de verdad** en
+la base de datos (tabla `valoraciones`, desde 2026-09-09): ya no queda solo
+en el espejo, y alimenta la reputación y la lista de "trueques sin valorar"
+de VALOR (sección 11).
 
 ---
 
 ## 7. Panel del Owner: administración (/admin)
 
-El administrador (Owner) tiene su propio tablero:
+El administrador (Owner) tiene su propio tablero. Desde 2026-09-09 el acceso
+quedó **endurecido**: ya no entra "cualquier Socio".
 
-| Servicio | Qué muestra |
-|---|---|
-| **Usuarios** | Lista de inscritos (solo Owner o Socios) |
-| **Contratos** | Direcciones de los contratos desplegados |
-| **KPIs de disputas** | Total de trueques y disputas abiertas |
-| **Base de datos** | Cuántos usuarios, objetos y trueques hay |
-| **Salud de infraestructura** | Salud y métricas del mensajero y del vigilante |
+| Servicio | Qué muestra | Quién puede |
+|---|---|---|
+| **Usuarios** | Lista de inscritos | Solo el **Owner real** |
+| **Contratos** | Direcciones de los contratos desplegados | Solo el **Owner real** |
+| **KPIs de disputas** | Total de trueques y disputas abiertas | Solo el **Owner real** |
+| **Base de datos** | Cuántos usuarios, objetos y trueques hay | Solo el **Owner real** |
+| **Salud de infraestructura** | Salud y métricas del mensajero y del vigilante | Solo el **Owner real** |
+| **¿Quién es el Owner?** | Devuelve la billetera del Owner resuelta (público, sin datos privados) | Todos (sin sesión) |
 
-> ⚠️ Observación: el servicio de contratos no exige rol de Owner (solo
-> sesión). El de salud responde vacío cuando no hay mensajero ni vigilante
-> conectados (modo de pruebas con almacén en memoria); en **producción**,
-> con el mensajero y el vigilante inyectados, muestra su salud y sus
-> métricas.
+> ¿Quién es el "Owner real"? No es un "tipo de usuario" en la base: es el
+> **dueño on-chain del registro de Socios** (el contrato `SociosRegistry`
+> responde quién es su `owner()`). La app lo comprueba en la cadena. Por
+> eso, aunque Ana o Bruno figuren como SOCIO, **no ven el panel**: solo la
+> billetera dueña del registro (en producción, la cuenta 0 del anvil).
+>
+> El detalle completo del panel está en el manual **08-Suite-Sistemas /
+> 01-panel-sistemas.md**.
 
 ---
 
@@ -307,11 +335,13 @@ flowchart TB
     API --> TRU["/truekes<br/>trueques y valoraciones"]
     API --> REP["/reputacion<br/>puntaje, nivel, medalla"]
     API --> SUB["/subastas<br/>subastas de empresa"]
-    API --> FIN["/finanzas<br/>saldos"]
-    API --> DIS["/disputas<br/>disputas"]
+    API --> VAL["/valor<br/>criptos, reputación y BRLT<br/>(ex Finanzas)"]
+    API --> DIS["/disputas<br/>disputas v2<br/>(✗ No Conforme → veredicto)"]
+    API --> NOT["/notificaciones<br/>la campana 🔔"]
     API --> GOB["/gobernanza<br/>propuestas y votos"]
     API --> PUN["/puntos-encuentro<br/>puntos de encuentro"]
-    API --> ADM["/admin<br/>panel del Owner"]
+    API --> ADM["/admin<br/>panel del Owner<br/>(solo el Owner real)"]
+    API -.-> FIN["/finanzas (legado)<br/>fuera de la navegación:<br/>la suite usa /valor"]
     style APP fill:#48cae4,stroke:#1d7fa8
     style API fill:#1a2b4c,color:#fff,stroke:#0a1128
     style AUTH fill:#2a9d8f,color:#fff,stroke:#1f6f64
@@ -320,16 +350,101 @@ flowchart TB
     style TRU fill:#2a9d8f,color:#fff,stroke:#1f6f64
     style REP fill:#d4af37,stroke:#8a6d1f
     style SUB fill:#d4af37,stroke:#8a6d1f
-    style FIN fill:#48cae4,stroke:#1d7fa8
+    style VAL fill:#2a9d8f,color:#fff,stroke:#1f6f64
     style DIS fill:#f4a261,stroke:#b06a2a
+    style NOT fill:#d4af37,stroke:#8a6d1f
     style GOB fill:#d4af37,stroke:#8a6d1f
     style PUN fill:#48cae4,stroke:#1d7fa8
     style ADM fill:#f4a261,stroke:#b06a2a
+    style FIN fill:#e9e5f0,stroke:#8d86a9,stroke-dasharray: 4 3
 ```
 
 ---
 
-## 10. Los códigos de error (cuando algo sale mal)
+## 10. Disputas v2: resolver un trueque que salió mal (/disputas)
+
+> Guía completa para el público: manual **03 · 10-disputas-v2.md**.
+
+La disputa **nace en el cierre del trueque**: cuando una parte marca
+**✗ No Conforme** con motivo + fotos (`/truekes/:id/cierre`). A partir de ahí
+el flujo tiene 4 estados:
+
+`Reportada → Esperando justificativo → Votación de Socios → Resuelta`
+
+Los **plazos** del director: la parte conforme tiene **3 días** para cargar
+su justificativo con fotos, y la votación de los Socios dura **5 días**.
+
+- **El reclamante** (quien marcó ✗ No Conforme) ve su caso y las pruebas.
+- **La contraparte conforme** carga su justificativo con fotos
+  (`POST /disputas/:id/justificativo`); si no lo hace en 3 días, la disputa
+  se resuelve **ANULAR por defecto** (devolución total).
+- **La contraparte no conforme** declara su propio reclamo con motivo + fotos
+  (`POST /disputas/:id/no-conforme`): ambas partes con pruebas → votación.
+- **Los Socios votan** (`POST /disputas/:id/votar`): 1 voto por Socio, y
+  quien es parte del trueke no vota. Opciones: **ANULAR** (se anula el
+  trueque, devolución total de lo custodiado) o **VALIDO** (se completa y se
+  entrega en cruz). Mayoría simple; **empate → ANULA**; votación vencida sin
+  votos → **ANULA por defecto**.
+
+Cada avance genera **notificaciones** (campana 🔔): `DISPUTA_REPORTADA`,
+`PEDIDO_JUSTIFICATIVO`, `VOTACION_ABIERTA` y `VEREDICTO` (sección 12).
+
+---
+
+## 11. VALOR: criptos, reputación y BRLT (/valor)
+
+> Guía completa para el público: manual **03 · 11-seccion-valor.md**.
+
+VALOR (ex "Finanzas") es la sección personal de dinero y confianza. Tiene
+**3 subsecciones**, y su regla de diseño es: los movimientos de cripto son
+**siempre con la plataforma** como contraparte (no hay transferencias
+directas P2P entre socios fuera del trueke).
+
+1. **4.1 · Criptos (ETH)**: recargar, retirar y convertir ETH ⇄ BRLT
+   (`/valor/criptos/recargar`, `/retirar`, `/convertir`). La conversión usa
+   la **tasa interna** (1 ETH ≈ 3.000 BRLT por defecto).
+2. **4.2 · Reputación**: el mismo puntaje D12/D30 de `/reputacion`, más los
+   **trueques completados sin valorar** (puedes valorar 1–5 aquí mismo) y
+   los últimos 10 trueques que valoraste.
+3. **4.3 · BRLT**: comprar BRLT **con tarjeta** mediante **Stripe Checkout**
+   alojado (`/valor/brlt/checkout`); Stripe confirma el pago por *webhook*
+   (`/valor/brlt/webhook`) y la plataforma acredita el BRLT. El retiro a
+   dinero real queda documentado como **Stripe Payouts** (registra la salida;
+   el desembolso requiere cuenta Stripe vinculada).
+
+La **restricción por rol**: VALOR es visible para todo inscrito, pero
+**gestionar** criptos y BRLT es de **Empresas, Socios y el Owner**
+(el Owner se detecta on-chain). Un Particular ve sus cifras en solo lectura
+y su reputación.
+
+---
+
+## 12. La campana de notificaciones 🔔 y la regla de encuentro
+
+### 12.1 Notificaciones (/notificaciones)
+
+La **campana** de la app reúne los avisos importantes: disputas reportadas,
+pedidos de justificativo, votaciones abiertas (para Socios) y veredictos.
+La API ofrece: `GET /notificaciones` (tus últimos 50 avisos + cuántas sin
+leer), `POST /notificaciones/leer-todas` y
+`POST /notificaciones/:id/leida`. Cada aviso puede enlazar al trueke o a la
+disputa correspondiente.
+
+### 12.2 La regla de encuentro (quién propone)
+
+Cuando dos personas acuerdan un trueque, la regla decide quién propone el
+punto, la fecha y la hora del encuentro:
+
+1. **El de mayor nivel** de reputación propone.
+2. Si empatan, el de **mayor reputación** (más trueques completados).
+3. Si aún empatan, **quien publicó la oferta (A)**.
+
+La contraparte solo **acepta o rechaza**. Al aceptar, ambos objetos quedan
+**custodiados automáticamente** (la "caja fuerte").
+
+---
+
+## 13. Los códigos de error (cuando algo sale mal)
 
 Cuando algo falla, la API responde con un **código claro**, no con un
 "error 500 misterioso". Ejemplos:
@@ -346,12 +461,22 @@ Cuando algo falla, la API responde con un **código claro**, no con un
 | `solo_owner` | Solo el Owner puede hacer esto |
 | `solo_empresa` | Solo las empresas pueden hacer esto |
 | `solo_certificado` | Solo CERTIFICADOS pueden hacer esto |
+| `solo_socio` | Solo los Socios pueden hacer esto (padrón) |
+| `solo_empresa_socio` / `solo_empresa_socio_owner` | Gestión de criptos/BRLT: solo Empresa, Socio u Owner |
+| `socio_involucrado` | Un Socio que es parte del trueke no puede votar su disputa |
+| `ya_voto` | Un voto por Socio (D21) |
+| `no_en_votacion` / `votacion_vencida` | La disputa no está en votación o la votación venció |
+| `estado_no_justificable` | La disputa ya no acepta justificativo en este estado |
+| `motivo_requerido` / `fotos_requeridas` | Falta el motivo o al menos una foto de evidencia |
+| `disputa_inexistente` / `evidencia_inexistente` | La disputa o la evidencia no existe |
+| `monto_invalido` / `saldo_insuficiente` | Monto no válido o saldo insuficiente (VALOR) |
+| `stripe_no_configurado` | Stripe sin clave: el pago se registra como demo |
 | `rate_limit` | Demasiadas peticiones por minuto |
 | `not_found` | Lo que buscas no existe |
 
 ---
 
-## 11. Qué falta confirmar (resumen)
+## 14. Qué falta confirmar (resumen)
 
 1. **En desarrollo**, la cocina guarda todo en **memoria** (se pierde al
    reiniciar). **En producción**, la API se conecta a la **base de datos
@@ -372,18 +497,20 @@ Cuando algo falla, la API responde con un **código claro**, no con un
    confirmar**.
 6. Las **subastas** viven en memoria, se cierran a mano y no tienen
    servicios de detalle ni de listado de pujas → **pendiente de confirmar**.
-7. Muchos servicios del diseño **ya existen**: finanzas, disputas,
-   gobernanza y puntos de encuentro están montados (11 familias) y la
-   verificación/certificación está reescrita. Siguen **pendientes**: las
-   verificaciones separadas de correo y teléfono en `/auth`, las apelaciones
-   de KYC, la cola de revisión del Owner, las campañas y las variantes de
-   abrir/anular un trueque directo en la cadena desde la app.
+7. Muchos servicios del diseño **ya existen**: VALOR, disputas v2,
+   notificaciones, gobernanza y puntos de encuentro están montados
+   (13 familias) y la verificación/certificación está reescrita. Siguen
+   **pendientes**: las verificaciones separadas de correo y teléfono en
+   `/auth`, las apelaciones de KYC, la cola de revisión del Owner, las
+   campañas y las variantes de abrir/anular un trueque directo en la cadena
+   desde la app. El router `/finanzas` quedó como legado (montado pero fuera
+   de la navegación: la suite usa `/valor`).
 8. Los **14 exámenes de la API** están verificados (14/14) con el almacén
    en memoria; el backend completo suma 26/26 (ver manual 08).
 
 ---
 
-## 12. Glosario de este manual
+## 15. Glosario de este manual
 
 | Palabra | Significado |
 |---|---|
@@ -403,6 +530,18 @@ Cuando algo falla, la API responde con un **código claro**, no con un
 | **Nivel / medalla** | Tu rango según el puntaje (INICIADO... SOCIO) |
 | **Apelación** | Recurso contra una decisión (cuenta como disputa) |
 | **JWT** | Formato de ticket firmado (no usado aquí: ticket opaco) |
+| **Owner** | El dueño real (on-chain) del registro de Socios; único que entra a `/admin` |
+| **Padrón de Socios** | La lista oficial de Socios que votan (disputas y propuestas) |
+| **No Conforme** | Declaración de que lo recibido no cumple lo acordado (origina la disputa) |
+| **Justificativo** | Las fotos que carga la parte conforme de una disputa |
+| **Veredicto ANULAR / VALIDO** | Resultado de la votación: se anula el trueque (devolución) o se completa |
+| **VALOR** | La sección de criptos, reputación y BRLT (ex "Finanzas") |
+| **BRLT** | La moneda interna de la plataforma (BorloTokens) |
+| **Contraparte (plataforma)** | El "otro lado" de tus movimientos de cripto/BRLT en VALOR |
+| **Stripe** | Empresa que cobra con tarjeta (Checkout alojado) y paga retiros (Payouts) |
+| **Webhook** | Aviso automático que Stripe manda cuando un pago se confirma |
+| **Campana 🔔** | El centro de avisos in-app (`/notificaciones`) |
+| **Encuentro** | La cita (punto, fecha y hora) que una parte propone y la otra acepta |
 
 ¡Listo! Ya conoces todos los servicios de la plataforma. El siguiente manual
 es la guía de la app: pantallas, conexión con MetaMask y navegación.

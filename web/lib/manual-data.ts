@@ -1939,7 +1939,72 @@ export const manuales: ManualAyuda[] =   [
           "subsecciones": []
         },
         {
-          "titulo": "9. Glosario de este manual",
+          "titulo": "9. La sección VALOR (antes Finanzas)",
+          "parrafos": [
+            "VALOR (ruta /suite/valor) es la sección personal de dinero y confianza de TrueKeate; antes se llamaba Finanzas. Al entrar ves primero 3 tarjetas de saldo: 🪙 tu ETH, 🏅 tu reputación (puntaje · nivel · medalla) y 💎 tu BRLT, y al pie tus Movimientos recientes.",
+            "4.1 Criptos: botones ⬆️ Recargar ETH, ⬇️ Retirar ETH y ⇄ ETH → BRLT / ⇄ BRLT → ETH. Los movimientos son siempre con la plataforma: la contraparte es la plataforma, no otra persona (nada de enviar cripto de mano en mano fuera del trueke).",
+            "4.2 Reputación: tu puntaje (de 0 a 100), la lista de trueques sin valorar con el botón ⭐ Valorar 1–5 (nota del 1 al 5 en 5 dimensiones: Aceptación, Honestidad, Seguridad, Confiabilidad y Compromiso, con una sola firma) y tus últimos 10 trueques valorados con su promedio.",
+            "4.3 BRLT: comprar BRLT con tu tarjeta (botón 💳 Comprar con Stripe: la plataforma abre una página de pago alojada por Stripe en otra pestaña) y retirar BRLT.",
+            "Restricción por rol en la pantalla: quien no es Empresa/SOCIO/Owner ve su VALOR en solo lectura, con sus saldos de cripto y BRLT como — y la nota La gestión de criptos y BRLT es de Empresas, Socios y el Owner; su reputación y sus valoraciones siguen disponibles.",
+            "La guía completa de VALOR está en el manual 03 · 11-seccion-valor."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "10. Disputas rediseñada: ver tu caso y votar como Socio",
+          "parrafos": [
+            "La página /suite/disputas fue rediseñada y tiene dos secciones: Mis disputas y 🏛️ Votación de Socios.",
+            "Mis disputas: tus conflictos con su estado (Reportada / Esperando justificativo / Votación abierta / Resuelta), el motivo y los plazos. Con el botón 🔍 Ver pruebas de ambas partes ves las fotos del reclamo y del justificativo una al lado de la otra.",
+            "Si eres la parte conforme: botón 📷 Enviar justificativo (subes fotos, hasta 5). Si tampoco estás conforme: botón ✗ Declarar mi No Conforme (motivo + fotos).",
+            "🏛️ Votación de Socios (solo visible si tu billetera está en el padrón): tarjetas con el conteo n ANULAR · m VALIDO y el botón 📂 Ver caso y votar.",
+            "El flotante del caso es una ventana que se abre encima de la pantalla: muestra el motivo, las evidencias de ambas partes (miniaturas que se amplían con 🔍) y, abajo, los botones 🗳️ ANULAR — devolución total y 🗳️ VALIDO — completar trueke.",
+            "Reglas que la propia pantalla te recuerda: un voto por Socio, y si eres parte del trueke no puedes votar.",
+            "El flujo completo paso a paso está en el manual 03 · 10-disputas-v2."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "11. Intercambio: las pestañas Activos e Histórico",
+          "parrafos": [
+            "La página de Intercambio (/suite/intercambio) ahora tiene dos pestañas con su contador: 🔄 Activos (n) y 🕘 Histórico (n).",
+            "En Activos viven tus trueques en curso: CREADO, CUSTODIADO, APERTURA, EN_DISPUTA y RESOLUCION_SOCIOS.",
+            "En Histórico van los trueques terminados: COMPLETADO, ANULADO y BLOQUEADO. Ahí ves cómo acabó cada uno.",
+            "El resto del flujo no cambió: proponer el punto de encuentro con el mapa, aceptar o rechazar, el cierre con ✓ Conforme o ✗ No Conforme (el formulario de disputa con motivo y fotos se abre en una ventana encima de la pantalla) y la valoración de 1 a 5."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "12. Inventario: publicar con fotos en una ventana flotante",
+          "parrafos": [
+            "La página de Inventario (/suite/inventario) te deja publicar y despublicar tus objetos (requiere estar VERIFICADO o CERTIFICADO).",
+            "Al publicar un elemento nuevo se abre una ventana flotante con el formulario de alta: nombre, descripción y las imágenes referenciales de tu objeto (de 1 a 5 fotos, con vista previa antes de enviar).",
+            "El envío pide tu firma (una firma de acción) y el servidor valida las imágenes (máximo 5) antes de guardarlas.",
+            "Las tarjetas de tu inventario muestran las fotos de cada objeto, y el Mercado también las exhibe cuando ofreces el artículo."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "13. El botón D28 en tu Perfil y en el menú",
+          "parrafos": [
+            "La escalera D28 (INSCRITO → VERIFICADO → CERTIFICADO) ahora también está a mano en tu Perfil y en el menú de usuario, para que siempre sepas cuál es tu siguiente paso.",
+            "En tu Perfil (/suite/perfil) ves la escalera con tu peldaño actual y una acción según tu estado: si eres INSCRITO, el botón 🛡️ Iniciar verificación (D28); si eres VERIFICADO, el botón 🪪 Iniciar certificación (KYC); y si eres CERTIFICADO, el mensaje de identidad certificada.",
+            "En el menú de usuario de la barra superior aparecen los mismos accesos directos de la escalera según tu estado, y tu botón de usuario muestra tu estado en un emoji: 🟡 INSCRITO · 🟢 VERIFICADO · 🥇 CERTIFICADO."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "14. La campana de notificaciones",
+          "parrafos": [
+            "La campana 🔔 vive en la zona derecha de la barra superior, junto al botón de usuario. Te avisa de lo importante sin tener que ir a buscarlo.",
+            "Qué avisos recibes: Disputa reportada (te declararon ✗ No Conforme), Pedido de justificativo (eres la parte conforme y debes cargar tus fotos), Votación abierta (si eres Socio, hay una disputa esperando tu voto) y Veredicto (se resolvió una disputa en la que participas).",
+            "La campana muestra un contador rojo con tus avisos sin leer. Al abrirla ves la lista (máximo 12) con un icono por tipo: cada aviso enlaza a la disputa o al trueque correspondiente.",
+            "Puedes marcar uno como leído (pulsándolo) o todos con el botón, y hay un acceso directo Ir a Disputas →. La app consulta los avisos al abrir y cada 30 segundos, para que no se te pasen los plazos de 3 y 5 días."
+          ],
+          "imagen": "notificaciones-campana.svg",
+          "subsecciones": []
+        },
+        {
+          "titulo": "15. Glosario de este manual",
           "parrafos": [
             "Frontend = La parte visible de la app (lo que ves) · PWA = App web que se puede instalar como una app del móvil · Wallet o billetera = Programa que guarda tus llaves y firma (MetaMask) · MetaMask = La billetera más conocida (extensión o app móvil) · Conectar = Vincular tu billetera a la app · Suite = La zona privada de la app tras entrar · Dashboard = Panel resumen (Mi Trueke Central) · Escalera D28 = INSCRITO, luego VERIFICADO, luego CERTIFICADO · Placeholder = Pantalla provisional en construcción · Landing = Página de bienvenida pública (portada) · Hero = La primera imagen grande de la portada · Manifest = Archivo que permite instalar la PWA · Service worker = Programa que permite la app sin conexión (pendiente)"
           ],
@@ -3965,6 +4030,99 @@ export const manuales: ManualAyuda[] =   [
       ]
     },
     {
+      "id": "10-disputas-v2",
+      "carpeta": "03-Implementacion",
+      "titulo": "Disputas: el flujo completo paso a paso",
+      "resumen": "Manual en lenguaje sencillo del flujo de disputas v2: qué pasa cuando un trueque sale mal y una parte declara No Conforme. Explica paso a paso cómo se declara el reclamo con motivo y fotos, cómo se defiende la otra parte con su justificativo, cómo votan los Socios con las pruebas de ambas partes y qué significa cada veredicto (ANULAR o VALIDO).",
+      "imagen": "flujo-disputas-v2.svg",
+      "secciones": [
+        {
+          "titulo": "1. Declarar el No Conforme: motivo y fotos",
+          "parrafos": [
+            "Un trueque termina bien cuando ambas partes dicen ✓ Recibido, conforme. Pero si una parte dice ✗ No Conforme (no estoy de acuerdo con lo que recibí), el trueque entra en disputa y se resuelve entre todos.",
+            "Regla de oro: la disputa solo puede nacer en el cierre del trueque, cuando una parte marca ✗ No Conforme y explica por qué con motivo y fotos. No se puede abrir una disputa de la nada sobre un trueque que ya se cerró conforme.",
+            "Pasos del reclamante: 1. En el cierre del trueque, pulsa ✗ No Conforme. 2. Completa el formulario: motivo (obligatorio; por ejemplo: Lo que recibí no coincide con lo acordado: la cámara tiene una raya en el lente que no aparecía en las fotos) y fotos (obligatorias, mínimo 1) de lo que recibiste y del problema. 3. Envías: la disputa queda Reportada, el trueque pasa a EN_DISPUTA y la otra parte recibe un aviso para que declare su postura.",
+            "Desde ⚖️ Disputas (/suite/disputas) puedes seguir el avance y, cuando haya respuestas, pulsar 🔍 Ver pruebas de ambas partes.",
+            "Tú no cargas justificativo: ese paso es de la parte conforme. Tampoco votas: la votación es de los Socios."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "2. El justificativo de la parte conforme",
+          "parrafos": [
+            "La otra parte del trueque (la contraparte) tiene dos caminos, y la pantalla se los muestra con botones.",
+            "Si está conforme con lo recibido: pulsa ✓ Estoy conforme — cargar justificativo y sube fotos que demuestren su versión (mínimo 1, hasta 5): por ejemplo, el objeto tal como lo envió, el embalaje o el envío. Con sus fotos, la disputa pasa a votación de Socios.",
+            "Plazo importante: si la parte conforme no carga nada en 3 días, la disputa se resuelve ANULAR por defecto: el trueque se cancela y se devuelve todo. ¡No hay que dejar pasar el plazo!",
+            "Si tampoco está conforme: pulsa ✗ También No Conforme, escribe su motivo (obligatorio) y sube sus fotos de evidencia. Como ambas partes aportaron pruebas, la disputa pasa directamente a votación de Socios, sin esperar justificativo.",
+            "Detalle: el botón También No Conforme solo aparece si aún no habías firmado tu postura en el cierre; si ya firmaste conforme, tu camino es el justificativo."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "3. La votación de los Socios, con las pruebas",
+          "parrafos": [
+            "Los Socios son los miembros de confianza de la comunidad (buena reputación) que resuelven los desacuerdos. Si eres Socio, en tu sección ⚖️ Disputas verás la pestaña 🏛️ Votación de Socios con las disputas en votación.",
+            "1. Pulsa 📂 Ver caso y votar: se abre la ventana (flotante) con el caso completo. 2. Observa las pruebas de ambas partes: las fotos del reclamo del reclamante y las del justificativo del conforme; pulsa cada foto para ampliarla (🔍). 3. Lee el motivo del reclamo y el conteo de votos actual (n ANULAR · m VALIDO).",
+            "Reglas de la votación: 1 voto por Socio y por disputa; si eres parte del trueque en disputa no puedes votar (estás involucrado); la votación dura 5 días; si vence sin votos se aplica ANULAR por defecto; si vence con votos gana la mayoría simple; si hay empate se aplica ANULAR; y si votan todos los Socios elegibles antes del plazo, el veredicto se aplica en ese momento."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "4. El veredicto: ANULAR o VALIDO",
+          "parrafos": [
+            "ANULAR: el trueque queda ANULADO (se deshace) y hay devolución total: cada parte recupera el objeto que dejó en custodia.",
+            "VALIDO: el trueque queda COMPLETADO y hay entrega en cruz: el objeto de A pasa a B y el de B pasa a A.",
+            "Cuando se resuelve, ambas partes reciben un aviso (campana 🔔) de tipo Veredicto de tu disputa, con el resultado y su explicación. El caso queda cerrado en tu sección de Disputas con su estado Resuelta.",
+            "Ejemplo real: Ana envía su bicicleta y recibe de Bruno un curso que resultó no ser lo prometido. Ana marca ✗ No Conforme con fotos. Bruno estaba conforme → carga su justificativo. Los Socios ven ambas pruebas. Si votan ANULAR, Ana recupera su bici y Bruno su curso; si votan VALIDO, el trueque se completa y ambos se quedan con lo recibido."
+          ],
+          "subsecciones": []
+        }
+      ]
+    },
+    {
+      "id": "11-seccion-valor",
+      "carpeta": "03-Implementacion",
+      "titulo": "VALOR: criptos, reputación y BRLT",
+      "resumen": "Manual en lenguaje sencillo de la sección VALOR de la suite (antes Finanzas): tus criptos (ETH), que se mueven siempre contra la plataforma y sin P2P directo; tu reputación con las valoraciones pendientes; y la moneda BRLT, que se compra con tarjeta a través de Stripe, con la restricción por rol: la gestión es de Empresas, Socios y el Owner.",
+      "imagen": "valor-seccion.svg",
+      "secciones": [
+        {
+          "titulo": "1. 4.1 · Criptos: siempre contra la plataforma (sin P2P)",
+          "parrafos": [
+            "VALOR es tu sección personal de dinero y confianza dentro de TrueKeate (antes Finanzas). La tarjeta 4.1 · Criptos muestra tu saldo de ETH y un botón de estado: Gestionás cripto (verde) o Solo lectura (gris).",
+            "Recargar ETH: escribe el monto (por ejemplo 0,5) y pulsa ⬆️ Recargar ETH. La plataforma te acredita el ETH: la contraparte del movimiento es siempre la plataforma, nunca otra persona. Verás el aviso: ✅ 0,5 ETH recargados (contraparte: la plataforma).",
+            "Retirar ETH: escribe el monto y pulsa ⬇️ Retirar ETH. La plataforma envía el ETH a tu billetera y el movimiento queda registrado como retiro.",
+            "Convertir: pulsa ⇄ ETH → BRLT o ⇄ BRLT → ETH. La conversión usa la tasa interna de la plataforma (por defecto 1 ETH ≈ 3.000 BRLT, configurable). Ejemplo: conviertes 0,5 ETH y recibes 1.500 BRLT.",
+            "Idea central de diseño: tu cripto siempre se mueve contra la plataforma, nunca en transferencias directas entre personas (sin P2P). Entre dos personas, la cripto solo viaja dentro de un trueque, que ya tiene su propia custodia: así los movimientos quedan ordenados, auditables y seguros.",
+            "Si tu saldo no alcanza para retirar o convertir, la app te avisa: Saldo insuficiente."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "2. 4.2 · Reputación y valoraciones pendientes",
+          "parrafos": [
+            "La tarjeta 4.2 · Reputación muestra tu puntaje (D12/D30, de 0 a 100, que mezcla tu reputación, tu volumen de trueques y tu historial sin apelaciones), la media de valoraciones y tus trueques completados.",
+            "De tu puntaje salen tu nivel (INICIADO, COMÚN, FRECUENTE o SOCIO) y tu medalla (🥉 BRONCE, 🥈 PLATA, 🥇 ORO).",
+            "Si completaste un trueque y aún no valoraste a la otra persona, el trueque aparece en Trueques sin valorar con el botón ⭐ Valorar 1–5.",
+            "Al pulsarlo se despliegan las 5 dimensiones: Aceptación, Honestidad, Seguridad, Confiabilidad y Compromiso. En cada una eliges una nota del 1 al 5 y la app te pide una sola firma con tu billetera (valorar trueque).",
+            "Debajo ves la tabla Tus últimos 10 trueques valorados, con el promedio ★ de cada uno."
+          ],
+          "subsecciones": []
+        },
+        {
+          "titulo": "3. 4.3 · BRLT con Stripe y restricción por rol",
+          "parrafos": [
+            "BRLT (BorloTokens) es la moneda interna de TrueKeate. La tarjeta 4.3 · BRLT permite comprarla con tarjeta y retirarla.",
+            "Comprar con tarjeta: escribe cuántos BRLT quieres (por ejemplo 500) y pulsa 💳 Comprar con Stripe. La plataforma crea una página de pago alojada por Stripe (no guarda tus datos de tarjeta): se abre en otra pestaña y pagas con tu tarjeta. Cuando Stripe confirma el pago (su aviso automático, el webhook), la plataforma te acredita los BRLT.",
+            "Retirar BRLT: escribe el monto y pulsa ⬇️ Retirar BRLT. Se debita tu saldo y queda registrado el retiro. El desembolso real a dinero fiat se haría por Stripe Payouts cuando la cuenta esté vinculada; en este entorno se registra la salida y se te avisa.",
+            "Restricción por rol: gestionar criptos y BRLT (recargar, retirar, comprar con tarjeta) es solo de Empresas, Socios y el Owner. Si tu cuenta es Particular, ves tus saldos como — y la nota La gestión de criptos y BRLT es de Empresas, Socios y el Owner; tu reputación y tus valoraciones siguen disponibles siempre.",
+            "Nota de demostración: en el entorno de pruebas, sin la clave secreta de Stripe configurada, el botón no abre el pago real: registra el movimiento como demo y te informa del número de movimiento creado. En producción, con la clave configurada, el pago con tarjeta funciona de verdad."
+          ],
+          "subsecciones": []
+        }
+      ]
+    },
+    {
       "id": "09-conexion-wallet-movil",
       "carpeta": "07-Wallets-y-Cuentas",
       "titulo": "Conecta tu billetera desde el móvil",
@@ -4130,7 +4288,8 @@ export const manuales: ManualAyuda[] =   [
             "3. Mirar la base de datos: cuántas filas hay en las carpetas principales (usuarios, artículos, truekes).",
             "4. Mirar los contratos desplegados: las direcciones de la caja fuerte y demás piezas en la cadena.",
             "5. Comprobar la salud de los servidores: si el relayer (el que firma por ti) y el indexador (el que copia la cadena a la base) están OK.",
-            "Para entrar necesitas ser el Owner (cuenta 0 del anvil, registrada como SOCIO CERTIFICADO) y tener la billetera conectada con sesión iniciada. Cómo prepararlo: manual 04-Despliegue/02-reinicio-y-bootstrap."
+            "Para entrar necesitas ser el Owner (cuenta 0 del anvil, registrada como SOCIO CERTIFICADO) y tener la billetera conectada con sesión iniciada. Cómo prepararlo: manual 04-Despliegue/02-reinicio-y-bootstrap.",
+            "Desde 2026-09-09 el acceso es SOLO del Owner real: la billetera dueña on-chain del registro de Socios (el owner() del SociosRegistry), con sesión iniciada. Ya no basta con ser SOCIO en la base: si tu billetera no es el Owner, el icono 🛠️ Sistemas no aparece en tu menú y escribir /suite/admin no te deja entrar."
           ],
           "subsecciones": []
         },
@@ -4146,16 +4305,19 @@ export const manuales: ManualAyuda[] =   [
               ]
             },
             {
-              "titulo": "2.2 Quién puede usarlo (varias comprobaciones)",
+              "titulo": "2.2 Quién puede usarlo (solo el Owner real)",
               "parrafos": [
-                "El acceso está vigilado en varias capas, todas a la vez:",
-                "Menú y dirección (web): la sección Admin solo aparece si tu tipo de usuario es SOCIO.",
-                "Aviso en la página: si entras sin ser SOCIO, la web te avisa en rojo.",
-                "Servicios /admin: exigen sesión iniciada y ser SOCIO (o rol OWNER).",
-                "Servicios de certificación: exigen ser el Owner on-chain: la cuenta dueña del registro de Socios.",
-                "Registro en la base: el Owner debe estar dado de alta como CERTIFICADO + SOCIO (script de bootstrap).",
-                "Detalle fino: la web se fija en el tipo SOCIO del usuario, y los servicios de certificación verifican además la identidad del Owner en la cadena. Son dos comprobaciones que se complementan."
-              ]
+                "El acceso está vigilado en varias capas, todas a la vez. Desde 2026-09-09 ya no se mira el tipo SOCIO de la base: la verdad del Owner la decide la cadena.",
+                "Menú y dirección (web): el icono 🛠️ Sistemas solo aparece si tu billetera es el Owner real (esOwner: lo calcula el servidor contra el owner() on-chain del registro de Socios). A los demás usuarios, el icono no les aparece.",
+                "Portero de la suite (URL): si escribes /suite/admin sin ser el Owner, el portero te bloquea.",
+                "Aviso en la página: si entras sin ser el Owner, la web te avisa en rojo: el backend rechazará las consultas.",
+                "Servicios /admin: exigen sesión iniciada y ser el Owner on-chain (403 solo_owner).",
+                "Servicios de certificación: exigen ser el mismo Owner on-chain (el dueño del registro de Socios).",
+                "Registro en la base: el Owner debe estar dado de alta como CERTIFICADO + SOCIO (script de bootstrap) para operar el panel.",
+                "Consulta pública: hay un único servicio sin candado, GET /admin/owner, que responde quién es el Owner (solo la billetera, sin datos privados); la web lo usa para mostrar u ocultar el icono.",
+                "Detalle fino: Ana y Bruno figuran como tipo SOCIO en la base, pero no ven Sistemas: solo la wallet que responde al owner() del registro de Socios es el Owner. En producción (GCP) la comprobación es siempre on-chain."
+              ],
+              "imagen": "acceso-sistemas-owner.svg"
             }
           ]
         },
@@ -4235,11 +4397,12 @@ export const manuales: ManualAyuda[] =   [
             {
               "titulo": "5.1 Los servicios /admin",
               "parrafos": [
-                "GET /admin/usuarios: total de usuarios (solo SOCIO/Owner).",
-                "GET /admin/contratos: el mapa de contratos con sus direcciones.",
-                "GET /admin/kpis-disputas: total de trueques y disputas abiertas.",
-                "GET /admin/db: conteos de usuarios, artículos y trueques en la base.",
-                "GET /admin/infra/health: salud del relayer y del indexador."
+                "GET /admin/usuarios: total de usuarios (solo el Owner real).",
+                "GET /admin/contratos: el mapa de contratos con sus direcciones (solo el Owner real).",
+                "GET /admin/kpis-disputas: total de trueques y disputas abiertas (solo el Owner real).",
+                "GET /admin/db: conteos de usuarios, artículos y trueques en la base (solo el Owner real).",
+                "GET /admin/infra/health: salud del relayer y del indexador (solo el Owner real).",
+                "GET /admin/owner: la billetera del Owner resuelta (público, sin sesión): la web lo usa para mostrar u ocultar el icono."
               ]
             },
             {
@@ -4264,14 +4427,14 @@ export const manuales: ManualAyuda[] =   [
               "titulo": "6.1 Preparar el terreno (una sola vez)",
               "parrafos": [
                 "1. Da de alta al Owner (cuenta 0) como CERTIFICADO + SOCIO en la base con el script de bootstrap (manual 04-Despliegue/02-reinicio-y-bootstrap).",
-                "2. Asegúrate de que esa cuenta es el Owner on-chain del registro de Socios (para los servicios de certificación).",
-                "3. Conecta la billetera del Owner en el navegador e inicia sesión (una firma)."
+                "2. Asegúrate de que esa cuenta es el Owner on-chain del registro de Socios (el owner() del SociosRegistry): hoy todas las rutas /admin y los servicios de certificación lo exigen.",
+                "3. Conecta la billetera del Owner en el navegador e inicia sesión (una firma). Si la billetera es el Owner real, verás el icono 🛠️ Sistemas en la barra superior."
               ]
             },
             {
               "titulo": "6.2 Revisar certificaciones pendientes",
               "parrafos": [
-                "1. Entra en /suite/admin (menú de secciones, icono Sistemas, o la URL directa).",
+                "1. Entra en /suite/admin pulsando el icono 🛠️ Sistemas de la barra superior (visible solo para la billetera del Owner; si escribes la URL directa, el portero bloqueará a quien no sea el Owner).",
                 "2. En KYC pendientes de revisión (DNI + selfie) revisa cada solicitud con sus dos fotos.",
                 "3. Pulsa Aprobar (pasa a CERTIFICADO y se emite su SBT) o Rechazar.",
                 "4. Pulsa ↻ Refrescar para recargar cifras y cola."
@@ -4297,9 +4460,9 @@ export const manuales: ManualAyuda[] =   [
         {
           "titulo": "7. Lo que falta por confirmar (resumen)",
           "parrafos": [
-            "1. El servicio que lista los contratos no exige rol de Owner (solo sesión); expone direcciones públicas, pero conviene confirmar si debe restringirse más.",
-            "2. Las cifras de disputas se calculan sobre el espejo de la base, no directamente sobre la cadena.",
-            "3. El aviso de rol OWNER del sistema no existe como columna en la base: la comprobación real es el tipo SOCIO (revisar coherencia con la verificación on-chain)."
+            "1. Resuelto (2026-09-09): todas las rutas /admin/* exigen ser el Owner on-chain. El único servicio público es GET /admin/owner (solo expone la billetera del Owner, sin datos privados), que la web usa para mostrar u ocultar el icono.",
+            "2. Las cifras de disputas se calculan sobre el espejo de la base, no directamente sobre la cadena (la API escribe los estados de disputa en el espejo en el flujo de cierre).",
+            "3. La comprobación del Owner es on-chain (owner() del registro de Socios). Existe un respaldo del código que busca una columna rol OWNER en la base, pero esa columna no existe en el esquema: ese respaldo solo aplica a las pruebas en memoria; en producción siempre gana la comprobación en la cadena."
           ],
           "subsecciones": []
         },

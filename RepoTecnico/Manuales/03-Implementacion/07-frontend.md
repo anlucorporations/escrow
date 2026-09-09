@@ -21,12 +21,13 @@
 | `/suite` | `web/app/suite/layout.tsx` | Layout: `TopBar` + `SuiteGuard` + `BottomNav` |
 | `/suite/dashboard` | `web/app/suite/dashboard/page.tsx` | "Mi Trueke Central": escalera D28 y accesos rápidos |
 | `/suite/mercado` | `web/app/suite/mercado/page.tsx` | Catálogo de ofertas abiertas (observable con wallet) |
-| `/suite/intercambio` | `web/app/suite/intercambio/page.tsx` | Crear/completar trueques (requiere Verificado/Certificado) |
-| `/suite/inventario` | `web/app/suite/inventario/page.tsx` | "💼 Mi Inventario": publicar/despublicar artículos |
+| `/suite/intercambio` | `web/app/suite/intercambio/page.tsx` | Crear/completar trueques (requiere Verificado/Certificado); pestañas **Activos/Histórico** y flujo de encuentro + cierre (ver §12) |
+| `/suite/inventario` | `web/app/suite/inventario/page.tsx` | "💼 Mi Inventario": publicar/despublicar artículos; alta en **flotante** con imágenes referenciales (ver §13) |
 | `/suite/gobernanza` | `web/app/suite/gobernanza/page.tsx` | "🏛️ Gobernanza / Socios": propuestas y votación (Socio/Owner) |
-| `/suite/disputas` | `web/app/suite/disputas/page.tsx` | "⚖️ Disputas" (certificado ve; Socio resuelve) |
-| `/suite/finanzas` | `web/app/suite/finanzas/page.tsx` | "💰 Finanzas": saldos propios/globales (Empresa/Socio) |
-| `/suite/admin` | `web/app/suite/admin/page.tsx` | **Panel del Owner** (RF-13.1) — ver manual 08-Suite-Sistemas |
+| `/suite/disputas` | `web/app/suite/disputas/page.tsx` | "⚖️ Disputas" **rediseñada** (2026-09-08): partes + votación de Socios con flotante de caso (ver §11) |
+| `/suite/valor` | `web/app/suite/valor/page.tsx` | "💎 VALOR" (2026-09-09, ex Finanzas): 3 subsecciones 4.1 criptos / 4.2 reputación / 4.3 BRLT (ver §10) |
+| `/suite/finanzas` | `web/app/suite/finanzas/page.tsx` | **Legado/descatalogado**: la página existe pero ya NO está en la matriz de navegación (SuiteGuard la bloquea); la suite usa `/suite/valor` |
+| `/suite/admin` | `web/app/suite/admin/page.tsx` | **Sistemas · Panel del Owner** (RF-13.1) — ver manual 08-Suite-Sistemas |
 | `/suite/perfil` | `web/app/suite/perfil/page.tsx` | "👤 Mi Perfil": @username, wallet completa, reputación |
 | `/suite/inscripcion` | `web/app/suite/inscripcion/page.tsx` | Inscripción formal (correo/teléfono/dirección/GDPR) |
 | `/suite/verificacion` | `web/app/suite/verificacion/page.tsx` | Verificación de correo (escalera D28, etapa 1) |
@@ -57,15 +58,18 @@
 ### 2.1 Matriz de secciones — `web/lib/navegacion.ts`
 
 - `Seccion = { href, label, icono, central?, descripcion? }` (`navegacion.ts:9-16`); contexto de
-  visibilidad `{ tipo, nivel, estado }` (`navegacion.ts:22-26`) con reglas derivadas
-  (`ES_EMPRESA/SOCIO/CERTIFICADO/VERIFICADO`, `navegacion.ts:28-32`).
+  visibilidad `{ tipo, nivel, estado, esOwner }` (`navegacion.ts:22-28`) con reglas derivadas
+  (`ES_EMPRESA/SOCIO/CERTIFICADO/VERIFICADO`, `navegacion.ts:30-34`).
 - **Fuente única** de qué ve cada usuario: cada sección declara `visible(ctx)`
-  (`SECCIONES`, `navegacion.ts:35-100`). Ejemplos: Dashboard y Mercado siempre; Intercambio e
-  Inventario exigen `ES_VERIFICADO`; Gobernanza y Admin solo `SOCIO`; Disputas `CERTIFICADO|SOCIO`;
-  Finanzas `EMPRESA|SOCIO`.
-- `seccionesPara(ctx)` filtra y ordena (`navegacion.ts:103-105`);
+  (`SECCIONES`, `navegacion.ts:37-107`). Ejemplos: Dashboard y Mercado siempre; Intercambio e
+  Inventario exigen `ES_VERIFICADO`; Gobernanza solo `SOCIO`; Disputas `CERTIFICADO|SOCIO`; **Valor
+  (`/suite/valor`) visible para todo inscrito** (el contenido de gestión se restringe dentro de la
+  página, `navegacion.ts:82-90`); **Sistemas (`/suite/admin`) solo si `esOwner === true`**
+  (dueño on-chain del SociosRegistry; los Socios ya NO lo ven, `navegacion.ts:92-99`). Finanzas ya
+  no forma parte de la matriz.
+- `seccionesPara(ctx)` filtra y ordena (`navegacion.ts:110-112`);
   `seccionesParaMovil(ctx, max=5)` garantiza la **central** (Intercambio) y agrupa el excedente en
-  "Más" (`navegacion.ts:111-127`).
+  "Más" (`navegacion.ts:118-134`).
 
 ### 2.2 PC (≥lg): barra superior ÚNICA — `web/components/TopBar.tsx`
 
@@ -210,8 +214,12 @@ Reglas del director (`SuiteGuard.tsx:3-13`):
 ### 6.2 Navegación y guard
 
 - `TopBar`, `BottomNav`, `SuiteGuard`, `BotonConectarLogin` — descritos en §2-§3.
-- Otros componentes de la suite: `MapaWidget` (puntos de encuentro en Intercambio), `KycPendientesOwner`
-  (ver manual 09), `StatusBadge`.
+- Componentes añadidos 2026-09-08/09: `ImagenProtegida` (imagen con `Authorization: Bearer` via
+  `fetch` + `URL.createObjectURL`; usada en Disputas/evidencias, ver §11),
+  `SubirFotos` (selector de 1..N fotos a base64, usado en disputas y en el flotante del
+  Inventario), `CampanaNotificaciones` (campana in-app en la TopBar, ver §15),
+  `MapaWidget` (puntos de encuentro en Intercambio), `KycPendientesOwner` (ver manual 09),
+  `StatusBadge`.
 
 ---
 
@@ -263,3 +271,143 @@ real) en `RepoTecnico/estado_proyecto.md:442-507`.
    nativa — la accesibilidad por `aria-label` está presente; mejora pendiente de confirmar.
 5. **Service worker/PWA offline**: manifest presente (`web/public/manifest.json`); instalabilidad
    completa (offline) **pendiente de confirmar** (no se observó service worker).
+
+---
+
+## 10. VALOR — página `/suite/valor` (ex Finanzas, 2026-09-09)
+
+### 10.1 Vista general y restricción de rol en la UI
+
+- Archivo `web/app/suite/valor/page.tsx` (553 líneas). Consume `GET /valor/mi` (cliente `valorMi`,
+  `web/lib/api.ts:262-265`). Cabecera con 3 saldos (ETH · Reputación · BRLT); el **rol** y las
+  banderas `criptosHabilitado`/`brltHabilitado` (Empresa/SOCIO/Owner) vienen del backend
+  (`page.tsx:82-83,277-299`).
+- **Restricción de rol en UI**: VALOR es visible para todo inscrito, pero el contenido de gestión
+  (4.1 y 4.3) se muestra **solo** si `gestiona`/`brltHabilitado`; si no, aparece la nota "La gestión
+  de criptos/BRLT es de Empresas, Socios y el Owner" y el saldo se muestra como "—"
+  (`page.tsx:314-319,488-492`).
+
+### 10.2 Subsección 4.1 · Criptos (recargar/retirar/convertir ETH ⇄ BRLT)
+
+- Card "4.1 · Criptos" (`page.tsx:304-360`): botones ⬆️ Recargar ETH, ⬇️ Retirar ETH,
+  ⇄ ETH → BRLT y ⇄ BRLT → ETH (cliente `recargarCripto`/`retirarCripto`/`convertirCripto`,
+  `api.ts:267-290`). Tasa mostrada: `datos.tasaEthBrlt` (1 ETH ≈ N BRLT, `page.tsx:354-357`).
+- Los movimientos son **siempre con la plataforma** como contraparte (texto de cabecera
+  `page.tsx:240-244`; backend `routes/valor.js` — Manual 06 §14).
+
+### 10.3 Subsección 4.2 · Reputación y valoraciones pendientes
+
+- Card "4.2 · Reputación" (`page.tsx:365-478`): puntaje D12/D30, media de valoraciones y trueques
+  completados (`page.tsx:367-380`).
+- **Trueques sin valorar** (`pendientesValoracion`): lista con botón "⭐ Valorar 1–5" que abre un
+  selector inline de las 5 dimensiones (Aceptación/Honestidad/Seguridad/Confiabilidad/Compromiso)
+  y firma la acción "valorar trueque" antes de llamar `valorarTrueke` → `POST /truekes/:id/valoracion`
+  (`page.tsx:193-227,382-440`; backend persiste en `valoraciones` — Manual 06 §17).
+- **Últimos 10 trueques valorados** (`ultimasValoraciones`): tabla con promedio ★
+  (`page.tsx:442-477`).
+- Movimientos recientes (`datos.movimientos`, ≤10) al pie (`page.tsx:534-548`).
+
+### 10.4 Subsección 4.3 · BRLT con Stripe (solo Empresa/Socio/Owner)
+
+- Card "4.3 · BRLT" (`page.tsx:483-531`): botones "💳 Comprar con Stripe" (abre `checkoutBrlt` →
+  `POST /valor/brlt/checkout`, `api.ts:283-287`; si devuelve `url`, abre Stripe Checkout en otra
+  pestaña; si es demo `stripe_no_configurado`, informa el movimiento registrado,
+  `page.tsx:142-168`) y "⬇️ Retirar BRLT" (`retirarBrlt`, `api.ts:288-290`). Nota del desembolso
+  fiat real por **Stripe Payouts** (`page.tsx:525-528`). Quien no gestiona BRLT ve la nota de
+  restricción (`page.tsx:488-492`).
+
+---
+
+## 11. Disputas rediseñada — `/suite/disputas` con flotante de votación (2026-09-08)
+
+- Archivo `web/app/suite/disputas/page.tsx` (837 líneas). Flujo mostrado:
+  `✗ No Conforme (motivo + fotos) → justificativo del conforme → votación de Socios → veredicto
+  (ANULAR o VALIDO)` (`page.tsx:4-13,262-276`). Consume `misDisputas`, `padronDisputas`,
+  `votacionesDisputas`, `detalleDisputa`, `cargarJustificativo`, `declararNoConforme`,
+  `votarDisputa` y `urlEvidenciaDisputa` (`api.ts:541-576`; `page.tsx:17-31`).
+- **Dos secciones**:
+  - **Mis disputas** (`page.tsx:312-540`): rol por wallet (`miRol` → reclamante/contraparte/socio,
+    `page.tsx:84-90`); detalle expandible con evidencias de ambas partes (`abrirDetalle`,
+    `page.tsx:182-201`); formularios: "cargar justificativo" (fotos con `SubirFotos`) y
+    "declarar No Conforme" (motivo + fotos) (`page.tsx:203-234,399-477`).
+  - **Votación de Socios** (`page.tsx:542-615`, visible solo si la wallet está en el padrón):
+    tarjetas con conteo `n ANULAR · m VALIDO`, vencimiento y botón **"📂 Ver caso y votar"**.
+- **Flotante de votación** (`page.tsx:628-807`): modal `casoAbierto` que muestra el motivo del
+  reclamo, las **evidencias de AMBAS partes** (reclamo vs. justificativo, grid de miniaturas con
+  `ImagenProtegida`), estado de votos, y en la barra inferior sticky los botones
+  **"🗳️ ANULAR — devolución total"** (crimson) y **"🗳️ VALIDO — completar trueke"** (teal) →
+  `votar()` (`page.tsx:237-256`). Guardas de la UI: parte del trueke no vota, 1 voto por Socio,
+  estado RESUELTA muestra el veredicto (`page.tsx:758-802`).
+- **Zoom de evidencia** (`evidenciaZoom`, `page.tsx:809-834`): clic en una miniatura abre la imagen
+  a pantalla completa (`ImagenProtegida`, z-[60]).
+- **Componentes**: `ImagenProtegida` (`web/components/ImagenProtegida.tsx`, 55 líneas: descarga con
+  `Bearer` y `objectURL`; el backend solo sirve la imagen a parte o Socio —
+  `routes/disputas.js:197-210`) y `SubirFotos` (`web/components/SubirFotos.tsx`, 108 líneas: hasta
+  `max` fotos convertidas a `{ data, mime }` base64).
+- El aviso de Socios resume las reglas del director (1 voto por Socio, involucrados no votan —
+  punto 4, `page.tsx:303-310`).
+
+---
+
+## 12. Intercambio — pestañas Activos / Histórico (2026-09-09)
+
+- `web/app/suite/intercambio/page.tsx` (929 líneas). Los **estados terminales van a Histórico**:
+  lista `ESTADOS_ACTIVOS = [CREADO, ACTIVO, CUSTODIADO, APERTURA, EN_DISPUTA, RESOLUCION_SOCIOS]`
+  y terminales COMPLETADO/ANULADO/BLOQUEADO (`page.tsx:47-51`).
+- Estado `pestana: "activos" | "historico"` (`page.tsx:315-316`) y **pestañas** "🔄 Activos (n)" /
+  "🕘 Histórico (n)" (`page.tsx:547-585`); la lista muestra las de la pestaña activa
+  (`page.tsx:606-620`).
+- El resto del flujo (sin cambios): propuesta de encuentro con widget flotante de mapa
+  (`page.tsx:88-211`), aceptar/rechazar (`page.tsx:451-463,704-738`), cierre ✓ Conforme / ✗ No
+  Conforme con **formulario de disputa en modal** (motivo + fotos, `page.tsx:372-445,851-…`),
+  valoración inline (`page.tsx:480-…`) y "usar NFT" de lo recibido.
+
+---
+
+## 13. Inventario — alta en flotante con imágenes referenciales (2026-09-09)
+
+- `web/app/suite/inventario/page.tsx` (421 líneas). El alta de un nuevo elemento ocurre en un
+  **flotante (modal)** (`flotanteAbierto`, `page.tsx:48-49,276-…`) que incluye las **imágenes
+  referenciales (1–5)** (`imagenesSel`, `page.tsx:54,89-…`; conversión a `{ data, mime }` y
+  previews `page.tsx:362-393`).
+- El envío llama `publicarArticulo(token, { …, imagenes })` con firma de acción
+  (`page.tsx:117`); el backend valida `imagenes` (≤5, `{ data, mime }`) y guarda cada una con
+  `guardarImagenArticulo` (`backend/api/routes/catalog.js:20-52`; URLs `/catalog/:id/imagen/:imgId`
+  expuestas en `catalog.js:81-99`).
+- Las tarjetas del listado muestran las imágenes referenciales si existen
+  (`page.tsx:243-250`); el Mercado las exhibe también (`web/app/suite/mercado/page.tsx:79-81,229,
+  269`).
+
+---
+
+## 14. Botón D28 en Perfil y menú (TopBar) — 2026-09-09
+
+- **Perfil** (`web/app/suite/perfil/page.tsx`, 367 líneas): escalera D28 con el peldaño actual
+  (`pasosD28`, `page.tsx:19-20,162-164,220-244`) y **acción según el estado**:
+  INSCRITO → botón "🛡️ Iniciar verificación (D28)" (`page.tsx:250-255`); VERIFICADO → botón
+  "🪪 Iniciar certificación (KYC)" (`page.tsx:262-264`); CERTIFICADO → mensaje de identidad
+  certificada (`page.tsx:269`).
+- **TopBar** (`web/components/TopBar.tsx`, 311 líneas): zona derecha con campana +
+  menú de usuario (`TopBar.tsx:160-175`). Dentro del desplegable, accesos directos de la escalera
+  D28 según el estado: "🛡️ Iniciar verificación (D28)" para INSCRITO y "🪪 Iniciar certificación
+  (KYC)" para VERIFICADO (`TopBar.tsx:256-275`); el botón de usuario muestra el emoji del estado
+  (🟡/🟢/🥇, `TopBar.tsx:29-33,184-190`).
+- Las secciones de la barra se calculan con `seccionesPara({ tipo, nivel, estado, esOwner })`
+  (`TopBar.tsx:75-81`): el icono 🛠️ Sistemas **solo aparece si la wallet es el Owner** (ver
+  Manual 08); lo mismo aplica el guard por URL (`web/components/SuiteGuard.tsx:179-194`).
+
+---
+
+## 15. Campana de notificaciones — `CampanaNotificaciones` (2026-09-08)
+
+- Componente `web/components/CampanaNotificaciones.tsx` (178 líneas), montado en la zona derecha de
+  la TopBar (`web/components/TopBar.tsx:173`).
+- Consulta `GET /notificaciones` (`misNotificaciones`, `api.ts:585-588`) **al montar y cada 30 s**
+  (`CampanaNotificaciones.tsx:44-62`); badge de no leídas (`noLeidas`, `:112-116`) y desplegable con
+  los avisos (máx. 12) con icono por tipo (`ICONO_TIPO`, `:12-18`), link según referencia
+  (`rutaDe`: disputa → `/suite/disputas`, trueke → `/suite/intercambio`, `:31-35`), y acciones
+  "marcar una leída" (clic) y "Marcar todas leídas" (`:79-99,143-163`). Pie con acceso directo
+  "Ir a Disputas →" (`:167-173`).
+- Tipos servidos por el backend: `DISPUTA_REPORTADA`, `PEDIDO_JUSTIFICATIVO`, `VOTACION_ABIERTA`,
+  `VEREDICTO`, `SISTEMA` (tabla `notificaciones`, `backend/db/schema.sql:241-251`; ver Manual 06
+  §15).

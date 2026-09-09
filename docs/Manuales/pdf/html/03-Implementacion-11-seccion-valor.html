@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>TrueKeate · Tu sección VALOR: criptos, reputación y BRLT</title>
+<style>
+:root{
+  --navy-900:#0a1128; --navy-800:#1a2b4c; --navy-700:#22345e;
+  --teal:#2a9d8f; --teal-dark:#1f6f64; --cyan:#48cae4; --cyan-dark:#1d7fa8;
+  --gold:#d4af37; --gold-300:#f3e5ab; --gold-600:#c5a065;
+  --smoke:#f8f9fa; --white:#ffffff; --crimson:#e63946; --coral:#f4a261;
+  --line:#d7dfe9; --ink:#1a2b4c;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:'DejaVu Sans','Inter','Roboto','Helvetica',sans-serif;
+  color:var(--ink); background:var(--white);
+  font-size:11.5px; line-height:1.55;
+}
+a{color:var(--teal-dark); text-decoration:none;}
+h1,h2,h3,h4{font-family:'DejaVu Sans','Montserrat','Poppins',sans-serif; line-height:1.2;}
+
+/* ---------- Portada ---------- */
+.portada{
+  background:linear-gradient(155deg,var(--navy-900) 0%, var(--navy-800) 58%, #255e70 130%);
+  color:var(--white); border-radius:16px; overflow:hidden;
+  padding:30px 34px 26px; margin:0 0 22px; height:248mm;
+  display:flex; flex-direction:column; page-break-after:always;
+  border:1px solid rgba(212,175,55,.45);
+  position:relative;
+}
+.portada::before{
+  content:""; position:absolute; inset:0 0 auto 0; height:5px;
+  background:linear-gradient(90deg,var(--gold) 0%, var(--teal) 55%, var(--cyan) 100%);
+}
+.portada .top{display:flex; justify-content:space-between; align-items:center;}
+.portada .brand{
+  font-size:15px; letter-spacing:4px; font-weight:bold; color:var(--gold-300);
+}
+.portada .brand b{color:var(--gold); font-size:17px;}
+.portada .chip-doc{
+  background:rgba(72,202,228,.14); border:1px solid rgba(72,202,228,.55);
+  color:var(--cyan); border-radius:999px; padding:3px 12px; font-size:10px;
+  letter-spacing:1.5px; text-transform:uppercase;
+}
+.portada .hero{margin-top:auto; margin-bottom:auto;}
+.portada .tema-chip{
+  display:inline-block; background:var(--gold); color:var(--navy-900);
+  font-weight:bold; border-radius:6px; padding:4px 12px; font-size:11px;
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;
+}
+.portada h1{
+  font-size:31px; color:var(--white); font-weight:bold; margin:0 0 12px;
+  max-width:150mm;
+}
+.portada .intro{
+  color:#cfe0ee; font-size:13px; line-height:1.6; max-width:150mm;
+  border-left:3px solid var(--teal); padding-left:12px; margin-bottom:16px;
+}
+.portada .meta{color:#8fb3c9; font-size:10px; letter-spacing:.4px;}
+.portada .meta span{margin-right:14px;}
+.portada .meta b{color:var(--cyan); font-weight:normal;}
+.portada .paleta{
+  display:flex; gap:10px; border-top:1px solid rgba(255,255,255,.18);
+  padding-top:14px; margin-top:6px; align-items:center;
+}
+.portada .paleta .p{display:flex; align-items:center; gap:5px; font-size:9px; color:#b9cede;}
+.portada .paleta .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+.portada .copy{margin-left:auto; font-size:9px; color:#6f8fa6;}
+
+/* ---------- Índice ---------- */
+.indice{
+  page-break-after:always; background:var(--smoke); border-radius:12px;
+  padding:22px 26px; border:1px solid var(--line);
+}
+.indice h2{
+  color:var(--navy-800); font-size:19px; margin-bottom:4px;
+  display:flex; align-items:center; gap:8px;
+}
+.indice h2 .k{
+  width:26px;height:26px;border-radius:8px; background:linear-gradient(135deg,var(--navy-800),var(--teal));
+  color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:13px;
+}
+.indice .sub{color:#64809b; font-size:10px; margin-bottom:14px; padding-left:34px;}
+.indice ol{list-style:none;}
+.indice li{margin:0 0 4px;}
+.indice li a{
+  display:flex; align-items:baseline; gap:10px; padding:5px 10px; border-radius:8px;
+  color:var(--navy-800); font-weight:600; font-size:12px;
+}
+.indice li a:hover{background:#e9f3f2;}
+.indice li a .tnum{
+  font-size:9px; color:#ffffff; background:var(--teal); border-radius:5px;
+  font-weight:bold; letter-spacing:.5px; padding:1px 6px; flex:none;
+}
+.indice li a .n{color:#9fb0c2; font-size:9px; margin-left:auto; font-weight:normal;}
+.indice li .subs{margin:1px 0 5px 30px;}
+.indice li .subs a{font-weight:normal; font-size:10.5px; color:#4c6888; padding:1px 6px;}
+.indice li .subs a::before{content:"— "; color:var(--gold-600);}
+
+/* ---------- Contenido ---------- */
+main.content{padding:2px 0 10px;}
+main.content > section.seccion{margin:0 0 20px;}
+h2.seccion{
+  font-size:16.5px; color:var(--navy-800); margin:18px 0 8px; padding:6px 0 6px 12px;
+  border-left:5px solid var(--gold); background:linear-gradient(90deg,#eef4fb 0%, #ffffff 70%);
+  border-radius:0 8px 8px 0; page-break-after:avoid;
+}
+h3.sub{
+  font-size:13.5px; color:var(--teal-dark); margin:13px 0 5px; padding-left:2px;
+  border-bottom:1px solid #cfe5e1; padding-bottom:3px; page-break-after:avoid;
+}
+h4.sub2{font-size:12px; color:var(--cyan-dark); margin:10px 0 4px; page-break-after:avoid;}
+p{margin:0 0 8px; text-align:justify;}
+ul,ol{margin:0 0 9px 20px;}
+li{margin:0 0 3px;}
+li > ul, li > ol{margin-top:3px;}
+ul ul, ol ul, ul ol, ol ol{margin-bottom:2px;}
+strong{color:var(--navy-800);}
+code{
+  font-family:'DejaVu Sans Mono','DejaVu Sans',monospace; font-size:9.8px;
+  background:#eef2f8; border:1px solid #dde5ee; color:#0f2a66;
+  padding:.5px 4px; border-radius:4px;
+}
+pre{
+  background:var(--navy-900); color:#d9ecf2; border-radius:10px; padding:12px 14px;
+  margin:0 0 10px; font-size:9.6px; line-height:1.5; overflow:hidden;
+  border:1px solid #0e1a3a; page-break-inside:avoid;
+  border-left:4px solid var(--teal);
+}
+pre code{background:transparent;border:0;color:inherit;padding:0;font-size:inherit;}
+pre .pre-label{
+  display:block; color:var(--gold-300); font-size:8.5px; letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+hr{border:0; border-top:1px solid var(--line); margin:14px 0;}
+
+/* ---------- Tablas ---------- */
+.table-wrap{overflow:hidden; border-radius:10px; margin:0 0 11px; page-break-inside:auto;}
+table{border-collapse:collapse; width:100%; font-size:10.3px;}
+thead{display:table-header-group;}
+th{
+  background:var(--navy-800); color:#fff; text-align:left; padding:6px 9px;
+  font-size:10.2px; letter-spacing:.3px; border:1px solid #24406e;
+}
+td{border:1px solid var(--line); padding:5px 9px; vertical-align:top;}
+tbody tr:nth-child(even){background:#f2f7fa;}
+tbody tr:nth-child(odd){background:#ffffff;}
+tbody tr:hover{background:#e7f4f2;}
+
+/* ---------- Citas / avisos ---------- */
+blockquote{
+  margin:0 0 11px; padding:9px 12px 9px 14px; border-radius:0 9px 9px 0;
+  border-left:4px solid var(--teal); background:#eef7f5; font-size:11px;
+  page-break-inside:avoid;
+}
+blockquote.info{border-left-color:var(--teal); background:#eef7f5;}
+blockquote.warn{border-left-color:var(--coral); background:#fdf1e6;}
+blockquote.pend{border-left-color:var(--gold); background:#fbf3da;}
+blockquote.importante{border-left-color:var(--crimson); background:#fdeeec;}
+blockquote.ejemplo{border-left-color:var(--cyan); background:#ecf8fc;}
+blockquote .tag{
+  display:inline-block; font-size:8.5px; font-weight:bold; letter-spacing:1.2px;
+  text-transform:uppercase; padding:1px 8px; border-radius:999px; margin-bottom:4px;
+}
+blockquote.info .tag{background:#2a9d8f; color:#fff;}
+blockquote.warn .tag{background:#f4a261; color:#3a230f;}
+blockquote.pend .tag{background:#d4af37; color:#3a2d05;}
+blockquote.importante .tag{background:#e63946; color:#fff;}
+blockquote.ejemplo .tag{background:#48cae4; color:#06364a;}
+blockquote p{margin:0 0 4px; text-align:justify;}
+blockquote ul, blockquote ol{margin:4px 0 2px 18px;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* ---------- Figuras ---------- */
+figure.figura{
+  border:1px solid var(--line); border-radius:12px; background:#fff;
+  padding:12px 12px 8px; margin:12px 0 14px; page-break-inside:avoid;
+  box-shadow:0 1px 4px rgba(10,17,40,.05);
+}
+figure.figura .fig-caption{
+  font-size:9px; color:#6b829c; text-align:center; letter-spacing:.6px;
+  text-transform:uppercase; margin-top:6px;
+}
+figure.figura img{width:100%; height:auto; display:block;}
+.nota-codigo{font-size:9px;color:#8499b3;margin:-4px 0 8px;}
+</style>
+</head>
+<body>
+
+<!-- ============ PORTADA ============ -->
+<header class="portada">
+  <div class="top">
+    <div class="brand">TRUEKEAT<b>☑</b></div>
+    <div class="chip-doc">Manual literal · Lenguaje sencillo</div>
+  </div>
+  <div class="hero">
+    <div class="tema-chip">03 · Implementación</div>
+    <h1>Tu sección VALOR: criptos, reputación y BRLT</h1>
+    <div class="intro">Versión en lenguaje sencillo del manual técnico "Sección VALOR" (<code>RepoTecnico/Manuales/03-Implementacion/11-seccion-valor.md</code>). Aquí contamos qué es la sección <strong>💎 VALOR</strong> de la suite (antes llamada "Finanzas"): tus criptos, tu reputación y la moneda de la plataforma (BRLT). Pensado para público general: con ejemplos de montos y pasos numerados.</div>
+    <div class="meta">
+      <span>Colección: <b>Manuales TrueKeate</b></span>
+      <span>Archivo: <b>03-Implementacion/11-seccion-valor.md</b></span>
+      <span>Edición: <b>9 de septiembre de 2026</b></span>
+    </div>
+  </div>
+  <div class="paleta">
+    <span class="p"><span class="sw" style="background:#1a2b4c"></span>Navy</span>
+    <span class="p"><span class="sw" style="background:#2a9d8f"></span>Teal</span>
+    <span class="p"><span class="sw" style="background:#48cae4"></span>Cyan</span>
+    <span class="p"><span class="sw" style="background:#d4af37"></span>Gold</span>
+    <span class="copy">Bóveda Digital Moderna · docs/Manuales/03-Implementacion/11-seccion-valor</span>
+  </div>
+</header>
+
+<!-- ============ ÍNDICE ============ -->
+<nav class="indice">
+  <h2><span class="k">☰</span> Índice de este manual</h2>
+  <div class="sub">Implementación · Implementacion — Tu sección VALOR: criptos, reputación y BRLT</div>
+  <ol><li><a href="#s1"><span class="tnum">1</span><span>Empezar en 5 minutos</span></a></li><li><a href="#s2"><span class="tnum">2</span><span>El panorama de la sección</span></a></li><li><a href="#s3"><span class="tnum">3</span><span>4.1 · Criptos (ETH): recargar, retirar y convertir</span></a><div class="subs"><a href="#sub1">3.1 Qué ves</a><br><a href="#sub2">3.2 Recargar ETH (paso a paso)</a><br><a href="#sub3">3.3 Retirar ETH</a><br><a href="#sub4">3.4 Convertir ETH ⇄ BRLT</a></div></li><li><a href="#s4"><span class="tnum">4</span><span>4.2 · Reputación y valoraciones pendientes</span></a><div class="subs"><a href="#sub5">4.1 Tus tres números</a><br><a href="#sub6">4.2 Valorar a alguien con quien truequeaste (paso a paso)</a></div></li><li><a href="#s5"><span class="tnum">5</span><span>4.3 · BRLT: la moneda de la plataforma</span></a><div class="subs"><a href="#sub7">5.1 Comprar BRLT con tu tarjeta (paso a paso)</a><br><a href="#sub8">5.2 Retirar BRLT</a><br><a href="#sub9">5.3 Convertir BRLT ⇄ ETH</a></div></li><li><a href="#s6"><span class="tnum">6</span><span>Movimientos recientes (tu historial)</span></a></li><li><a href="#s7"><span class="tnum">7</span><span>Preguntas frecuentes</span></a></li><li><a href="#s8"><span class="tnum">8</span><span>Glosario de este manual</span></a></li></ol>
+</nav>
+
+<!-- ============ CONTENIDO ============ -->
+<main class="content">
+<section class="seccion" id="s1"><h2 class="seccion">1. Empezar en 5 minutos</h2>
+<p><strong>VALOR</strong> es tu sección personal de dinero y confianza dentro de TrueKeate. Tiene <strong>3 subsecciones</strong>:</p>
+<ol><li><strong>4.1 · Criptos</strong>: tu saldo de ETH. Puedes <strong>recargar</strong>, <strong>retirar</strong> o <strong>convertir</strong> a BRLT. Regla importante: los movimientos son <strong>siempre con la plataforma</strong> — entre personas la cripto solo se mueve a través de un Trueke (nada de enviar cripto "de mano en mano").</li><li><strong>4.2 · Reputación</strong>: tu puntaje (de 0 a 100), tu nivel y tu medalla. Aquí también valoras (del 1 al 5) a las personas con las que completaste trueques y aún no valoraste.</li><li><strong>4.3 · BRLT</strong>: la moneda de la plataforma. Puedes <strong>comprarla con tu tarjeta</strong> (pago alojado por Stripe), convertirla y retirarla.</li></ol>
+<blockquote class="info"><span class="tag">Nota</span><p>¿Quién puede usar cada parte? <strong>Todo inscrito</strong> ve su VALOR (sus saldos y su reputación). Pero <strong>gestionar</strong> criptos y BRLT (recargar, retirar, comprar con tarjeta) es de <strong>Empresas, Socios y el Owner</strong>. Si tu cuenta es Particular, verás tus cifras con "—" y un aviso explicándote la regla.</p></blockquote>
+</section>
+<section class="seccion" id="s2"><h2 class="seccion">2. El panorama de la sección</h2>
+<figure class="figura"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAwIDc0MCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiPjxkZWZzPjxtYXJrZXIgaWQ9ImFyck4iIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOC41IiByZWZZPSI1IiBtYXJrZXJXaWR0aD0iNyIgbWFya2VySGVpZ2h0PSI3IiBvcmllbnQ9ImF1dG8tc3RhcnQtcmV2ZXJzZSI+PHBhdGggZD0iTTAsMSBMOSw1IEwwLDkgeiIgZmlsbD0iIzFhMmI0YyIvPjwvbWFya2VyPjwvZGVmcz48cmVjdCB3aWR0aD0iMTIwMCIgaGVpZ2h0PSI3NDAiIGZpbGw9IiNmOGY5ZmEiLz48cmVjdCB3aWR0aD0iMTIwMCIgaGVpZ2h0PSI1OCIgZmlsbD0iIzFhMmI0YyIvPjxyZWN0IHk9IjU0IiB3aWR0aD0iMTIwMCIgaGVpZ2h0PSI0IiBmaWxsPSIjZDRhZjM3Ii8+PHRleHQgeD0iNjAwIiB5PSIzNiIgZm9udC1zaXplPSIyMCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlZBTE9SIMK3IHR1cyAzIHN1YnNlY2Npb25lczogQ3JpcHRvcywgUmVwdXRhY2nDs24geSBCUkxUPC90ZXh0PjxyZWN0IHg9IjcwIiB5PSI5MiIgd2lkdGg9IjEwNjAiIGhlaWdodD0iODQiIHJ4PSIxNiIgZmlsbD0iIzFhMmI0YyIgZGF0YS1jYXJkPSIxIi8+PHRleHQgeD0iNjAwIiB5PSIxMTYiIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRhdGEtaW49IjEiIGRhdGEtbXc9IjYwMCI+wr9RdWnDqW4gZ2VzdGlvbmEgdHUgVkFMT1I/PC90ZXh0PjxyZWN0IHg9IjEyMCIgeT0iMTE2IiB3aWR0aD0iNDYwIiBoZWlnaHQ9IjUyIiByeD0iMjYiIGZpbGw9IiNlOWU1ZjAiIGRhdGEtY2FyZD0iMSIvPjx0ZXh0IHg9IjM1MCIgeT0iMTM3IiBmb250LXNpemU9IjEyLjUiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjMGExMTI4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkYXRhLWluPSIxIiBkYXRhLW13PSI0MjAiPlBBUlRJQ1VMQVI8L3RleHQ+PHRleHQgeD0iMzUwIiB5PSIxNTciIGZvbnQtc2l6ZT0iMTAiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZpbGw9IiMxYTJiNGMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRhdGEtaW49IjEiIGRhdGEtbXc9IjQyMCI+c29sbyBsZWN0dXJhOiB2ZSBzdXMgY2lmcmFzIHkgcmVwdXRhY2nDs24gKOKAlCk8L3RleHQ+PHJlY3QgeD0iNjIwIiB5PSIxMTYiIHdpZHRoPSI0NjAiIGhlaWdodD0iNTIiIHJ4PSIyNiIgZmlsbD0iI2Q0YWYzNyIgZGF0YS1jYXJkPSIxIi8+PHRleHQgeD0iODUwIiB5PSIxMzciIGZvbnQtc2l6ZT0iMTIuNSIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IiMwYTExMjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRhdGEtaW49IjEiIGRhdGEtbXc9IjQyMCI+RU1QUkVTQSDCtyBTT0NJTyDCtyBPV05FUjwvdGV4dD48dGV4dCB4PSI4NTAiIHk9IjE1NyIgZm9udC1zaXplPSIxMCIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZmlsbD0iIzBhMTEyOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZGF0YS1pbj0iMSIgZGF0YS1tdz0iNDIwIj5nZXN0aW9uYW4gY3JpcHRvcyB5IEJSTFQgKHJlY2FyZ2FyLCByZXRpcmFyLCBjb21wcmFyKTwvdGV4dD48bGluZSB4MT0iMjQwIiB5MT0iMTgwIiB4Mj0iMjQwIiB5Mj0iMjE4IiBzdHJva2U9IiM4ZDg2YTkiIHN0cm9rZS13aWR0aD0iMS42IiBzdHJva2UtZGFzaGFycmF5PSIzIDUiLz48bGluZSB4MT0iNjAwIiB5MT0iMTgwIiB4Mj0iNjAwIiB5Mj0iMjE4IiBzdHJva2U9IiM4ZDg2YTkiIHN0cm9rZS13aWR0aD0iMS42IiBzdHJva2UtZGFzaGFycmF5PSIzIDUiLz48bGluZSB4MT0iOTYwIiB5MT0iMTgwIiB4Mj0iOTYwIiB5Mj0iMjE4IiBzdHJva2U9IiM4ZDg2YTkiIHN0cm9rZS13aWR0aD0iMS42IiBzdHJva2UtZGFzaGFycmF5PSIzIDUiLz48cmVjdCB4PSI3MCIgeT0iMjIwIiB3aWR0aD0iMzQwIiBoZWlnaHQ9IjMxNiIgcng9IjE2IiBmaWxsPSIjMmE5ZDhmIiBzdHJva2U9IiMxZjZmNjQiIHN0cm9rZS13aWR0aD0iMS41IiBkYXRhLWNhcmQ9IjEiLz48dGV4dCB4PSIyNDAiIHk9IjI2MCIgZm9udC1zaXplPSIxNiIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRhdGEtaW49IjEiIGRhdGEtbXc9IjMxNCI+NC4xIMK3IENyaXB0b3MgKEVUSCk8L3RleHQ+PHRleHQgeD0iMjQwIiB5PSIyOTkuNiIgZm9udC1zaXplPSIxMS41IiBmb250LXdlaWdodD0ibm9ybWFsIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkYXRhLWluPSIxIiBkYXRhLW13PSIzMTQiPlR1IHNhbGRvIGRlIEVUSDwvdGV4dD48dGV4dCB4PSIyNDAiIHk9IjMzOS4yIiBmb250LXNpemU9IjExLjUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRhdGEtaW49IjEiIGRhdGEtbXc9IjMxNCI+4oaRIFJlY2FyZ2FyIEVUSDwvdGV4dD48dGV4dCB4PSIyNDAiIHk9IjM3OC44IiBmb250LXNpemU9IjExLjUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRhdGEtaW49IjEiIGRhdGEtbXc9IjMxNCI+4oaTIFJldGlyYXIgYSB0dSBiaWxsZXRlcmE8L3RleHQ+PHRleHQgeD0iMjQwIiB5PSI0MTguNCIgZm9udC1zaXplPSIxMS41IiBmb250LXdlaWdodD0ibm9ybWFsIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkYXRhLWluPSIxIiBkYXRhLW13PSIzMTQiPuKGlCBDb252ZXJ0aXIgRVRIIOKGlCBCUkxUPC90ZXh0Pjx0ZXh0IHg9IjI0MCIgeT0iNDU4IiBmb250LXNpemU9IjEwLjUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRhdGEtaW49IjEiIGRhdGEtbXc9IjMxNCI+VGFzYSBpbnRlcm5hOiAxIEVUSCDiiYggMy4wMDAgQlJMVDwvdGV4dD48cmVjdCB4PSIxMjguOTc3NTAwMDAwMDAwMDIiIHk9IjQ5NCIgd2lkdGg9IjIyMi4wNDUiIGhlaWdodD0iMjgiIHJ4PSIxNCIgZmlsbD0iIzFmNmY2NCIvPjx0ZXh0IHg9IjI0MCIgeT0iNDk4IiBmb250LXNpemU9IjEwLjUiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkYXRhLWluPSIxIiBkYXRhLW13PSIyMTAiPmFjY2VzbzogRW1wcmVzYSDCtyBTb2NpbyDCtyBPd25lcjwvdGV4dD48cmVjdCB4PSI0MzAiIHk9IjIyMCIgd2lkdGg9IjM0MCIgaGVpZ2h0PSIzMTYiIHJ4PSIxNiIgZmlsbD0iI2Y0YTI2MSIgc3Ryb2tlPSIjYjA2YTJhIiBzdHJva2Utd2lkdGg9IjEuNSIgZGF0YS1jYXJkPSIxIi8+PHRleHQgeD0iNjAwIiB5PSIyNjAiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjMGExMTI4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkYXRhLWluPSIxIiBkYXRhLW13PSIzMTQiPjQuMiDCtyBSZXB1dGFjacOzbjwvdGV4dD48dGV4dCB4PSI2MDAiIHk9IjI5OS42IiBmb250LXNpemU9IjExLjUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZpbGw9IiMwYTExMjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRhdGEtaW49IjEiIGRhdGEtbXc9IjMxNCI+UHVudGFqZSAw4oCTMTAwIChEMTIvRDMwKTwvdGV4dD48dGV4dCB4PSI2MDAiIHk9IjMzOS4yIiBmb250LXNpemU9IjExLjUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZpbGw9IiMwYTExMjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRhdGEtaW49IjEiIGRhdGEtbXc9IjMxNCI+Tml2ZWwgeSBtZWRhbGxhIChoYXN0YSBTT0NJTyk8L3RleHQ+PHRleHQgeD0iNjAwIiB5PSIzNzguOCIgZm9udC1zaXplPSIxMS41IiBmb250LXdlaWdodD0ibm9ybWFsIiBmaWxsPSIjMGExMTI4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkYXRhLWluPSIxIiBkYXRhLW13PSIzMTQiPuKYhSBWYWxvcmFyIDHigJM1IGEgcXVpZW4gdHJ1ZXF1ZWFzdGU8L3RleHQ+PHRleHQgeD0iNjAwIiB5PSI0MTguNCIgZm9udC1zaXplPSIxMS41IiBmb250LXdlaWdodD0ibm9ybWFsIiBmaWxsPSIjMGExMTI4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkYXRhLWluPSIxIiBkYXRhLW13PSIzMTQiPjUgZGltZW5zaW9uZXMgcG9yIHZhbG9yYXI8L3RleHQ+PHRleHQgeD0iNjAwIiB5PSI0NTgiIGZvbnQtc2l6ZT0iMTAuNSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZmlsbD0iIzBhMTEyOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZGF0YS1pbj0iMSIgZGF0YS1tdz0iMzE0Ij5Mb3Mgc2luIHZhbG9yYXIgcXVlZGFuIGVuIHR1IGxpc3RhPC90ZXh0PjxyZWN0IHg9IjUyMy4zNjUiIHk9IjQ5NCIgd2lkdGg9IjE1My4yNjk5OTk5OTk5OTk5OCIgaGVpZ2h0PSIyOCIgcng9IjE0IiBmaWxsPSIjYjA2YTJhIi8+PHRleHQgeD0iNjAwIiB5PSI0OTgiIGZvbnQtc2l6ZT0iMTAuNSIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRhdGEtaW49IjEiIGRhdGEtbXc9IjE0MS4zIj5hY2Nlc286IHRvZG8gaW5zY3JpdG88L3RleHQ+PHJlY3QgeD0iNzkwIiB5PSIyMjAiIHdpZHRoPSIzNDAiIGhlaWdodD0iMzE2IiByeD0iMTYiIGZpbGw9IiMxYTJiNGMiIHN0cm9rZT0iIzBhMTEyOCIgc3Ryb2tlLXdpZHRoPSIxLjUiIGRhdGEtY2FyZD0iMSIvPjx0ZXh0IHg9Ijk2MCIgeT0iMjYwIiBmb250LXNpemU9IjE2IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZGF0YS1pbj0iMSIgZGF0YS1tdz0iMzE0Ij40LjMgwrcgQlJMVCAoQm9ybG9Ub2tlbnMpPC90ZXh0Pjx0ZXh0IHg9Ijk2MCIgeT0iMjk5LjYiIGZvbnQtc2l6ZT0iMTEuNSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZGF0YS1pbj0iMSIgZGF0YS1tdz0iMzE0Ij5MYSBtb25lZGEgaW50ZXJuYSBkZSBsYSBwbGF0YWZvcm1hPC90ZXh0Pjx0ZXh0IHg9Ijk2MCIgeT0iMzM5LjIiIGZvbnQtc2l6ZT0iMTEuNSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZGF0YS1pbj0iMSIgZGF0YS1tdz0iMzE0Ij5Db21wcmFyIGNvbiB0YXJqZXRhOiBTdHJpcGU8L3RleHQ+PHRleHQgeD0iOTYwIiB5PSIzNzguOCIgZm9udC1zaXplPSIxMC41IiBmb250LXdlaWdodD0ibm9ybWFsIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkYXRhLWluPSIxIiBkYXRhLW13PSIzMTQiPihwYWdvIGFsb2phZG8gwrcgc2luIGd1YXJkYXIgdHVzIGRhdG9zKTwvdGV4dD48dGV4dCB4PSI5NjAiIHk9IjQxOC40IiBmb250LXNpemU9IjExLjUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRhdGEtaW49IjEiIGRhdGEtbXc9IjMxNCI+4oaTIFJldGlyYXIgwrcg4oaUIENvbnZlcnRpciBhIEVUSDwvdGV4dD48dGV4dCB4PSI5NjAiIHk9IjQ1OCIgZm9udC1zaXplPSIxMC41IiBmb250LXdlaWdodD0ibm9ybWFsIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkYXRhLWluPSIxIiBkYXRhLW13PSIzMTQiPjEgQlJMVCBzZSBtdWV2ZSBzaWVtcHJlIGNvbnRyYSBsYSBwbGF0YWZvcm1hPC90ZXh0PjxyZWN0IHg9Ijg0OC45Nzc1IiB5PSI0OTQiIHdpZHRoPSIyMjIuMDQ1IiBoZWlnaHQ9IjI4IiByeD0iMTQiIGZpbGw9IiNkNGFmMzciLz48dGV4dCB4PSI5NjAiIHk9IjQ5OCIgZm9udC1zaXplPSIxMC41IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iIzBhMTEyOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZGF0YS1pbj0iMSIgZGF0YS1tdz0iMjEwIj5hY2Nlc286IEVtcHJlc2EgwrcgU29jaW8gwrcgT3duZXI8L3RleHQ+PHJlY3QgeD0iMTIwIiB5PSI2MDQiIHdpZHRoPSI5NjAiIGhlaWdodD0iOTYiIHJ4PSIxNiIgZmlsbD0iI2U5ZTVmMCIgZGF0YS1jYXJkPSIxIi8+PHRleHQgeD0iNjAwIiB5PSI2MjgiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjMWEyYjRjIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkYXRhLWluPSIxIiBkYXRhLW13PSI5MDAiPk1vdmltaWVudG9zIHJlZ2lzdHJhZG9zIHVubyBwb3IgdW5vIChhdWRpdG9yw61hKTwvdGV4dD48dGV4dCB4PSI2MDAiIHk9IjY1MSIgZm9udC1zaXplPSIxMC41IiBmb250LXdlaWdodD0ibm9ybWFsIiBmaWxsPSIjMWEyYjRjIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkYXRhLWluPSIxIiBkYXRhLW13PSI5MjAiPjQuMSBDcmlwdG9zIOKGkiBsYSBjb250cmFwYXJ0ZSBlcyBzaWVtcHJlIGxhIFBMQVRBRk9STUEgKG5vIGhheSBlbnbDrW9zIFAyUCBlbnRyZSBwZXJzb25hcyk8L3RleHQ+PHRleHQgeD0iNjAwIiB5PSI2NjkiIGZvbnQtc2l6ZT0iMTAuNSIgZm9udC13ZWlnaHQ9Im5vcm1hbCIgZmlsbD0iIzFhMmI0YyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZGF0YS1pbj0iMSIgZGF0YS1tdz0iOTIwIj40LjMgQlJMVCDihpIgU3RyaXBlIGNvbmZpcm1hIGVsIHBhZ28gY29uIHRhcmpldGEgcG9yIHdlYmhvb2sgeSBsYSBwbGF0YWZvcm1hIGFjcmVkaXRhIGVsIHNhbGRvPC90ZXh0Pjx0ZXh0IHg9IjYwMCIgeT0iNjg3IiBmb250LXNpemU9IjEwLjUiIGZvbnQtd2VpZ2h0PSJub3JtYWwiIGZpbGw9IiMxYTJiNGMiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRhdGEtaW49IjEiIGRhdGEtbXc9IjkyMCI+NC4yIFJlcHV0YWNpw7NuIOKGkiBsYXMgdmFsb3JhY2lvbmVzIGFsaW1lbnRhbiBsYSByZXB1dGFjacOzbiBkZSBsYSBjb211bmlkYWQ8L3RleHQ+PHBhdGggZD0iTSAyNDAgNTM2IEwgMjQwIDYwNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMWEyYjRjIiBzdHJva2Utd2lkdGg9IjIuNCIgbWFya2VyLWVuZD0idXJsKCNhcnJOKSIvPjxwYXRoIGQ9Ik0gOTYwIDUzNiBMIDk2MCA2MDQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzFhMmI0YyIgc3Ryb2tlLXdpZHRoPSIyLjQiIG1hcmtlci1lbmQ9InVybCgjYXJyTikiLz48L3N2Zz4=" alt="Valor Seccion"/><figcaption class="fig-caption">Figura · Valor Seccion</figcaption></figure>
+<blockquote class="info"><span class="tag">Nota</span><p>La idea central de diseño (decisión del director): <strong>tu cripto siempre se mueve contra la plataforma</strong>, nunca en transferencias directas entre usuarios. Entre dos personas, la cripto solo viaja dentro de un trueque (que ya tiene su propia custodia). Esto hace los movimientos ordenados, auditables y seguros.</p></blockquote>
+</section>
+<section class="seccion" id="s3"><h2 class="seccion">3. 4.1 · Criptos (ETH): recargar, retirar y convertir</h2>
+<h3 class="sub" id="sub1">3.1 Qué ves</h3>
+<p>Una tarjeta "4.1 · Criptos" con tu saldo de <strong>ETH</strong> (por ejemplo <code>0,5 ETH</code>) y el botón de estado: "Gestionás cripto" (verde) o "Solo lectura" (gris).</p>
+<h3 class="sub" id="sub2">3.2 Recargar ETH (paso a paso)</h3>
+<ol><li>Escribe el <strong>monto</strong> en el campo (por ejemplo <code>0,5</code>).</li><li>Pulsa <strong>"⬆ Recargar ETH"</strong>.</li><li>La plataforma te acredita el ETH (la contraparte del movimiento es la plataforma). Verás el aviso: <em>"✅ 0,5 ETH recargados (contraparte: la plataforma)"</em>.</li></ol>
+<h3 class="sub" id="sub3">3.3 Retirar ETH</h3>
+<ol><li>Escribe el <strong>monto</strong>.</li><li>Pulsa <strong>"⬇ Retirar ETH"</strong>.</li><li>La plataforma envía el ETH <strong>a tu billetera</strong>. El movimiento queda registrado como retiro.</li></ol>
+<h3 class="sub" id="sub4">3.4 Convertir ETH ⇄ BRLT</h3>
+<ol><li>Escribe la <strong>cantidad</strong>.</li><li>Pulsa <strong>"⇄ ETH → BRLT"</strong> (o <strong>"⇄ BRLT → ETH"</strong>).</li><li>La conversión usa la <strong>tasa interna de la plataforma</strong> (1 ETH ≈ 3.000 BRLT, configurable). Ejemplo: conviertes <code>0,5 ETH</code> → recibes <code>1.500 BRLT</code>. Si conviertes <code>1.500 BRLT</code> → recibes <code>0,5 ETH</code>.</li></ol>
+<blockquote class="info"><span class="tag">Nota</span><p>Si tu saldo no alcanza para retirar o convertir, la app te avisa: <strong>"Saldo insuficiente"</strong>.</p></blockquote>
+</section>
+<section class="seccion" id="s4"><h2 class="seccion">4. 4.2 · Reputación y valoraciones pendientes</h2>
+<h3 class="sub" id="sub5">4.1 Tus tres números</h3>
+<p>En la tarjeta "4.2 · Reputación" ves:</p>
+<ul><li><strong>Puntaje (D12/D30)</strong>: un número de 0 a 100 que mezcla tu reputación (50 %), tu volumen de trueques (30 %) y tu historial sin apelaciones (20 %).</li><li><strong>Media de valoraciones</strong>: el promedio de las notas (1–5) que te pusieron.</li><li><strong>Trueques completados</strong>: cuántos trueques cerraste con éxito.</li></ul>
+<p>De tu puntaje salen tu <strong>nivel</strong> (INICIADO, COMÚN, FRECUENTE, SOCIO) y tu <strong>medalla</strong> (🥉 BRONCE, 🥈 PLATA, 🥇 ORO).</p>
+<h3 class="sub" id="sub6">4.2 Valorar a alguien con quien truequeaste (paso a paso)</h3>
+<p>Después de un trueque completado, TrueKeate te invita a valorar a la otra persona. Si no lo hiciste, el trueque aparece en <strong>"Trueques sin valorar"</strong>:</p>
+<ol><li>Localiza el trueque pendiente (por ejemplo: <em>"Bicicleta ⇄ Curso, con 0x1234…abcd, completado el 05/09/2026"</em>).</li><li>Pulsa <strong>"⭐ Valorar 1–5"</strong>.</li><li>Se despliegan las <strong>5 dimensiones</strong>: Aceptación, Honestidad, Seguridad, Confiabilidad y Compromiso. En cada una eliges un número del 1 al 5. Ejemplo: aceptación 5, honestidad 4, seguridad 5, confiabilidad 5, compromiso 4.</li><li>La app te pide <strong>una firma</strong> con tu billetera ("valorar trueque").</li><li>Pulsa <strong>"Enviar valoración"</strong>. Verás: <em>"✅ Valoración enviada (D18)"</em>.</li></ol>
+<p>Debajo verás la tabla <strong>"Tus últimos 10 trueques valorados"</strong> con el promedio ★ de cada uno.</p>
+</section>
+<section class="seccion" id="s5"><h2 class="seccion">5. 4.3 · BRLT: la moneda de la plataforma</h2>
+<p><strong>BRLT</strong> (BorloTokens) es la moneda interna de TrueKeate. Gestionarla es de <strong>Empresas, Socios y el Owner</strong>; quien no la gestiona ve el aviso y su saldo como "—".</p>
+<h3 class="sub" id="sub7">5.1 Comprar BRLT con tu tarjeta (paso a paso)</h3>
+<ol><li>Escribe cuántos <strong>BRLT</strong> quieres comprar (por ejemplo <code>500</code>).</li><li>Pulsa <strong>"💳 Comprar con Stripe"</strong>.</li><li>La plataforma crea una página de pago <strong>alojada por Stripe</strong> (no guarda tus datos de tarjeta): se abre en otra pestaña y pagas con tu tarjeta (fiat, por ejemplo dólares).</li><li>Cuando Stripe <strong>confirma el pago</strong>, la plataforma te <strong>acredita los BRLT</strong> (lo confirma automáticamente por su <em>webhook</em>).</li><li>Vuelves a VALOR con el aviso <em>"✅ Abriendo Stripe Checkout..."</em> y tu saldo BRLT actualizado.</li></ol>
+<blockquote class="warn"><span class="tag">Aviso</span><p><svg viewBox="0 0 16 16" width="13" height="13" style="vertical-align:-2px;margin-right:3px" aria-hidden="true"><g fill="#f4a261"><path d="M8 1.6 15.4 14H0.6z"/><path d="M8 6.2v4.2" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="8" cy="12.1" r="0.9" fill="#fff"/></g></svg> En el entorno de pruebas/demostración (sin la clave secreta de Stripe configurada), el botón no abre el pago real: registra el movimiento como <strong>demo</strong> y te informa del número de movimiento creado. En producción, con la clave configurada, el pago con tarjeta funciona de verdad.</p></blockquote>
+<h3 class="sub" id="sub8">5.2 Retirar BRLT</h3>
+<ol><li>Escribe el <strong>monto</strong>.</li><li>Pulsa <strong>"⬇ Retirar BRLT"</strong>.</li><li>Se debita tu saldo y queda registrado el retiro. El <strong>desembolso real a dinero fiat</strong> se haría por <strong>Stripe Payouts</strong> cuando la cuenta Stripe esté vinculada; en este entorno se registra la salida y se te avisa.</li></ol>
+<h3 class="sub" id="sub9">5.3 Convertir BRLT ⇄ ETH</h3>
+<p>Usa los botones de la subsección 4.1 (⇄ ETH → BRLT o ⇄ BRLT → ETH) a la tasa interna (1 ETH ≈ 3.000 BRLT).</p>
+</section>
+<section class="seccion" id="s6"><h2 class="seccion">6. Movimientos recientes (tu historial)</h2>
+<p>Al pie de la sección verás <strong>"Movimientos recientes"</strong>: las últimas 10 operaciones de tu VALOR, una por línea, con su tipo, moneda y monto. Ejemplos de lo que verás:</p>
+<div class="table-wrap"><table><thead><tr><th>Tipo</th><th>Moneda</th><th>Monto</th><th>Qué fue</th></tr></thead><tbody><tr><td><code>RECARGA_CRIPTO</code></td><td>ETH</td><td>0,5</td><td>Recargaste ETH</td></tr><tr><td><code>CONVERSION</code></td><td>ETH→BRLT</td><td>0,5</td><td>Convertiste 0,5 ETH a BRLT</td></tr><tr><td><code>RETIRO_BRLT</code></td><td>BRLT</td><td>300</td><td>Retiraste BRLT</td></tr><tr><td><code>RETIRO_CRIPTO</code></td><td>ETH</td><td>0,2</td><td>Retiraste ETH a tu billetera</td></tr></tbody></table></div>
+</section>
+<section class="seccion" id="s7"><h2 class="seccion">7. Preguntas frecuentes</h2>
+<p><strong>¿Puedo enviar ETH directamente a otro usuario?</strong> No por VALOR: los movimientos de cripto son <strong>siempre con la plataforma</strong> como contraparte. Si quieres intercambiar cripto con otra persona, hazlo a través de un <strong>Trueke</strong> (el flujo de trueque custodia y libera).</p>
+<p><strong>¿Por qué mi saldo aparece como "—"?</strong> Porque tu cuenta es <strong>PARTICULAR</strong>: la gestión de criptos y BRLT es de <strong>Empresas, Socios y el Owner</strong>. Tu reputación y tus valoraciones sí están disponibles siempre.</p>
+<p><strong>¿Cuál es la tasa ETH ⇄ BRLT?</strong> La define la plataforma: por defecto <strong>1 ETH ≈ 3.000 BRLT</strong> (configurable por variables de entorno). La app siempre te muestra la tasa vigente.</p>
+<p><strong>¿Cómo sé que un pago con tarjeta se acreditó?</strong> Stripe confirma el pago y la plataforma lo procesa automáticamente (webhook): tu saldo BRLT sube y el movimiento aparece en tu historial. En demostración (sin Stripe configurado) el movimiento se registra como demo y se te avisa.</p>
+<p><strong>¿Qué pasa con mis trueques completados sin valorar?</strong> Quedan en la lista "Trueques sin valorar" de 4.2 hasta que valores (1–5 en las 5 dimensiones) o desaparezcan de la lista. Valorar ayuda a toda la comunidad: alimenta la reputación de la otra persona.</p>
+<p><strong>¿Retirar BRLT me da dinero en mi banco?</strong> En este entorno el retiro <strong>se registra</strong> y se te avisa; el desembolso real a fiat requiere <strong>Stripe Payouts</strong> con la cuenta vinculada (pendiente de configurar en producción).</p>
+</section>
+<section class="seccion" id="s8"><h2 class="seccion">8. Glosario de este manual</h2>
+<div class="table-wrap"><table><thead><tr><th>Palabra</th><th>Significado</th></tr></thead><tbody><tr><td><strong>VALOR</strong></td><td>Tu sección de criptos, reputación y BRLT (antes "Finanzas")</td></tr><tr><td><strong>ETH</strong></td><td>La cripto (ether) que puedes recargar, retirar y convertir</td></tr><tr><td><strong>BRLT</strong></td><td>La moneda interna de TrueKeate (BorloTokens)</td></tr><tr><td><strong>Contraparte</strong></td><td>El "otro lado" del movimiento: en VALOR siempre es la plataforma</td></tr><tr><td><strong>P2P</strong></td><td>Enviar cripto directamente entre personas (no se usa en VALOR)</td></tr><tr><td><strong>Tasa de conversión</strong></td><td>Cuántos BRLT vale 1 ETH (por defecto 3.000)</td></tr><tr><td><strong>Reputación</strong></td><td>Tu puntaje 0–100 con nivel y medalla (D12/D30)</td></tr><tr><td><strong>Valoración</strong></td><td>Nota del 1 al 5 en 5 dimensiones que dejas al cerrar un trueque</td></tr><tr><td><strong>Stripe</strong></td><td>Empresa que cobra con tarjeta; aloja la página de pago</td></tr><tr><td><strong>Webhook</strong></td><td>Aviso automático de Stripe que confirma el pago</td></tr><tr><td><strong>Stripe Payouts</strong></td><td>El mecanismo para pagarte en fiat cuando retiras (pendiente)</td></tr><tr><td><strong>Fondo de Valor</strong></td><td>La hucha común de la plataforma (ver manual de finanzas)</td></tr></tbody></table></div>
+<p>¡Listo! Ya conoces tu sección VALOR. El manual de disputas (anterior) te explica cómo se resuelve un trueque problemático.</p>
+</section>
+</main>
+
+</body>
+</html>

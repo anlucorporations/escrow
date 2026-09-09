@@ -10,9 +10,10 @@
 ## 1. Empezar en 5 minutos
 
 Cada vez que usas TrueKeate, la plataforma guarda información en una base de
-datos (PostgreSQL). Esa información se organiza en **16 carpetas** (los
+datos (PostgreSQL). Esa información se organiza en **21 carpetas** (los
 técnicos las llaman "tablas"). Cada carpeta guarda un tema: tu identidad, tus
-artículos, tus trueques, tus notas, tus puntos de encuentro...
+artículos, tus trueques, tus notas, tus puntos de encuentro, tus disputas,
+tus avisos, tus movimientos de dinero...
 
 Para leer este manual solo necesitas 6 palabras:
 
@@ -45,23 +46,26 @@ viaja a la cadena una "huella" (hash); el documento nunca sale de la base.
 
 ---
 
-## 2. Las 16 carpetas y quién las llena
+## 2. Las 21 carpetas y quién las llena
 
-### 2.1 Tres clases de carpetas
+### 2.1 Cuatro clases de carpetas
 
-El esquema separa quién puede escribir cada carpeta. Hay 3 clases:
+El esquema separa quién puede escribir cada carpeta. Hay **4 clases**:
 
 | Clase | Carpetas | Quién las escribe | Fuente de verdad |
 |---|---|---|---|
-| **Espejo de la cadena** | `truekes` y parte de `kyc`, `usuarios`, `finanzas`, `suscripciones` | **Solo el vigilante** (indexador) | La blockchain (sus eventos) |
-| **Negocio fuera de la cadena** | `articulos`, `valoraciones`, `puntos_encuentro`, `puntos_favoritos`, `disputas`, `imagenes_certificadas`, `campanas`, `subastas`, `sesiones` | La plataforma (su API) | La propia base + evidencias (fotos, firmas) |
+| **Espejo de la cadena** | `truekes` y parte de `kyc`, `usuarios`, `finanzas`, `suscripciones` | El **vigilante** (indexador) con los eventos; ⚠️ desde 2026-09 la propia plataforma también actualiza `truekes` en el cierre y las disputas | La blockchain (sus eventos) |
+| **Negocio fuera de la cadena** | `articulos`, `valoraciones`, `puntos_encuentro`, `puntos_favoritos`, `disputas`, `evidencias_disputa`, `votos_disputa`, `notificaciones`, `imagenes_certificadas`, `campanas`, `subastas`, `sesiones` | La plataforma (su API) | La propia base + evidencias (fotos, votos, avisos) |
+| **Finanzas del socio (VALOR)** | `finanzas` (saldos), `movimientos_valor`, `movimientos_brlt` | La plataforma (sección VALOR) y Stripe (webhook) | La propia base + Stripe |
 | **Cocina interna del vigilante** | `auditoria`, `indexador_checkpoint` | El vigilante | El registro de eventos procesados |
 
 La regla más importante: **la blockchain es la única fuente de verdad para
 los estados del escrow**. El vigilante solo copia (nunca escribe en la
-cadena), y nadie edita el espejo a mano.
+cadena), y nadie edita el espejo a mano: son los **programas** (vigilante y,
+desde 2026-09, la propia plataforma en el flujo de cierre/disputa) quienes
+escriben.
 
-### 2.2 El inventario de las 16 carpetas
+### 2.2 El inventario de las 21 carpetas
 
 | Carpeta | Para qué sirve | Ejemplo |
 |---|---|---|
@@ -69,15 +73,20 @@ cadena), y nadie edita el espejo a mano.
 | `kyc` | Tu verificación de identidad (documento y selfie), cifrada; desde 2026-09 guarda también la certificación con carné SBT | El trámite de Bruno para ser CERTIFICADO |
 | `articulos` | Lo que la gente ofrece al trueque | La bicicleta de Ana |
 | `truekes` | Cada trueque y su estado (espejo del escrow) | El trueque bici ↔ curso |
-| `valoraciones` | Las notas 1-5 al cierre | Bruno puntúa a Ana |
+| `valoraciones` | Las notas 1-5 al cierre (se guardan de verdad desde 2026-09-09) | Bruno puntúa a Ana |
 | `puntos_encuentro` | Lugares físicos de encuentro (con mapa) | El parque a 3 km |
 | `puntos_favoritos` | Los últimos puntos de encuentro que cada persona usa (favoritos) | Bruno guarda el parque como favorito |
-| `disputas` | Conflictos, votación de Socios y sanciones | Bruno dice que el curso no era lo prometido |
+| `disputas` | Conflictos del trueque (flujo v2 2026-09-08) con plazos y veredicto | Bruno declara ✗ No Conforme |
+| `evidencias_disputa` | **Nueva (2026-09-08)**: las fotos de cada parte de la disputa | Las fotos del reclamo de Bruno y del justificativo de Ana |
+| `votos_disputa` | **Nueva (2026-09-08)**: los votos ANULAR/VALIDO de los Socios | 3 votos: 2 ANULAR, 1 VALIDO |
+| `notificaciones` | **Nueva (2026-09-08)**: los avisos de tu campana 🔔 | "Veredicto de tu disputa" |
 | `imagenes_certificadas` | Fotos con "sello" (huella + firma): anuncios, recepciones y, desde 2026-09, documento y selfie del KYC | La foto certificada de la bici o el DNI de Bruno |
 | `suscripciones` | El pago mensual de las empresas | La empresa de Ana paga su mes |
 | `campanas` | Ventas masivas o recolectas solidarias | Recolecta de juguetes |
 | `subastas` | Subastas de empresas | Subasta del último NFT |
-| `finanzas` | Saldos, moneda BRLT y el Fondo de Valor | El saldo de Bruno |
+| `finanzas` | Saldos del socio: criptos, BRLT y el Fondo de Valor | El saldo de Bruno |
+| `movimientos_valor` | **Nueva (2026-09-09)**: tu historial de movimientos de cripto/BRLT (uno por uno, sin borrar) | "Recarga 0,5 ETH · contraparte: la plataforma" |
+| `movimientos_brlt` | **Nueva (2026-09-09)**: tus compras de BRLT con tarjeta (Stripe) y su estado | "500 BRLT · PENDIENTE → PAGADO" |
 | `auditoria` | Bitácora: cada evento procesado, sin borrar nada | "Evento CustodiaA, 12:03" |
 | `indexador_checkpoint` | Marcapáginas del vigilante | "Contrato Escrow: leído hasta el bloque 1.024" |
 | `sesiones` | Tus inicios de sesión con la billetera (tokens de sesión) | "Bruno entró el martes a las 10:03" |
@@ -85,7 +94,7 @@ cadena), y nadie edita el espejo a mano.
 <!-- GENERAR_IMAGEN: glosario-datos.svg -->
 ```mermaid
 flowchart TB
-    subgraph espejo["Espejo de la cadena<br/>(solo el vigilante escribe)"]
+    subgraph espejo["Espejo de la cadena<br/>(el vigilante escribe; la API ajusta truekes en cierres/disputas)"]
         T1[truekes<br/>estado del trueque]
         T2[kyc · huella merkle]
         T3[usuarios · parte]
@@ -96,12 +105,17 @@ flowchart TB
         N1[articulos]
         N2[valoraciones]
         N3[puntos_encuentro]
-        N4[disputas]
-        N5[imagenes_certificadas]
-        N6[campanas]
-        N7[subastas]
-        N8[puntos_favoritos]
-        N9[sesiones]
+        N4[disputas + evidencias_disputa<br/>+ votos_disputa]
+        N5[notificaciones · campana]
+        N6[imagenes_certificadas]
+        N7[campanas]
+        N8[subastas]
+        N9[puntos_favoritos]
+        N10[sesiones]
+    end
+    subgraph valor["Finanzas del socio · VALOR<br/>(plataforma + Stripe)"]
+        V1[movimientos_valor<br/>cripto/BRLT, uno por uno]
+        V2[movimientos_brlt<br/>compras con tarjeta (Stripe)]
     end
     subgraph cocina["Cocina interna del vigilante"]
         C1[auditoria · bitácora]
@@ -111,11 +125,15 @@ flowchart TB
     VIGILANTE --> espejo
     VIGILANTE --> cocina
     PLATAFORMA["Plataforma<br/>(API)"] --> negocio
+    PLATAFORMA --> valor
+    STRIPE["Stripe<br/>(webhook de pago)"] --> valor
     style CADENA fill:#e63946,stroke:#a8232d
     style VIGILANTE fill:#48cae4,stroke:#1d7fa8
     style espejo fill:#2a9d8f,stroke:#1f6f64
     style negocio fill:#f4a261,stroke:#b06a2a
+    style valor fill:#d4af37,stroke:#8a6d1f
     style cocina fill:#e9e5f0,stroke:#8d86a9
+    style STRIPE fill:#1a2b4c,color:#fff,stroke:#0a1128
 ```
 
 ### 2.3 Carpetas que el diseño prometió y aún no existen
@@ -147,15 +165,19 @@ uno de los 9 valores de la lista, nunca "completadooo".
 | `ACTIVO` | Nombre antiguo de CREADO, solo para leer | ⚠️ Pendiente de confirmar: ningún evento la escribe hoy |
 | `CUSTODIADO` | Al menos uno de los dos ya depositó su objeto | El vigilante (eventos de custodia) |
 | `APERTURA` | Ambos abrieron en su ventana de tiempo | El vigilante (eventos de apertura) |
-| `EN_DISPUTA` | Alguien pidió anular el trueque | ⚠️ Pendiente de confirmar (ciclo C8) |
-| `RESOLUCION_SOCIOS` | Los Socios están votando | ⚠️ Pendiente de confirmar (ciclo C8) |
-| `COMPLETADO` | Firmas dobles + valoraciones; todo entregado | El vigilante (evento de completado) |
-| `ANULADO` | Anulado por votación o por vencimiento de plazo | El vigilante (evento de cancelación) |
+| `EN_DISPUTA` | Hay una disputa abierta en el trueque | ⚠️ Desde 2026-09-08 la escribe **la plataforma** al abrir la disputa (antes pendiente) |
+| `RESOLUCION_SOCIOS` | Los Socios están votando la disputa | ⚠️ Desde 2026-09-08 la escribe **la plataforma** al abrir la votación (antes pendiente) |
+| `COMPLETADO` | Firmas dobles + valoraciones; todo entregado | El vigilante (evento de completado) y, en el flujo nuevo, **la plataforma** cuando el veredicto es VALIDO |
+| `ANULADO` | Anulado por votación o por vencimiento de plazo | El vigilante (evento de cancelación) y, en el flujo nuevo, **la plataforma** cuando el veredicto es ANULAR |
 | `BLOQUEADO` | Violación de norma; objetos congelados | El vigilante (evento de bloqueo) |
 
-> ⚠️ Pendiente de confirmar: hoy el vigilante solo escribe 6 de las 9
-> etiquetas (`ACTIVO`, `EN_DISPUTA` y `RESOLUCION_SOCIOS` quedan para un
-> ciclo posterior de ajuste fino).
+> ⚠️ Pendiente de confirmar: el vigilante solo escribe 6 de las 9 etiquetas
+> (`ACTIVO` queda sin escritor). Desde el **flujo afinado 2026-09-08/09**,
+> los estados `EN_DISPUTA`, `RESOLUCION_SOCIOS` y los `COMPLETADO`/`ANULADO`
+> por veredicto los escribe **la plataforma misma** en el espejo al cerrar o
+> disputar un trueque del flujo abierto-acordado (además, `PROPUESTO` es 100 %
+> fuera de la cadena, para las ofertas del Mercado). La sincronización de
+> esos estados con el contrato en la cadena queda **pendiente de confirmar**.
 
 ### 3.3 La escalera de verificación (D28)
 
@@ -319,11 +341,15 @@ Publicar algo (un objeto, un NFT, una cripto, un servicio) crea una ficha en
 Cada trueque es una fila que guarda:
 
 - `escrow_id`: el número del trueque **en la cadena** (es único: un escrow =
-  una fila).
+  una fila). Para las **ofertas abiertas del Mercado** (estado `PROPUESTO`,
+  100 % fuera de la cadena) usa un número sintético.
 - **Los 2 artículos** (el tuyo y el de la otra persona).
 - **Las 2 direcciones** (`usuario_a` y `usuario_b`).
 - Su **etiqueta** (los 9 estados de la sección 3.2).
-- La **hora pautada** del encuentro y **cuándo abrió cada parte** su ventana.
+- La **hora pautada** del encuentro, quién lo propuso y si fue aceptado o
+  rechazado (`encuentro_propuesto_por`, `encuentro_estado`).
+- Tu postura en el **cierre**: `cierre_a`/`cierre_b` (`CONFORME` /
+  `NO_CONFORME`, punto 9 del director).
 - El **punto de encuentro** elegido.
 - El recibo de la cadena: hash de la transacción y bloque.
 
@@ -331,8 +357,13 @@ Cada trueque es una fila que guarda:
 la caja fuerte digital, la cadena emite un evento y el vigilante cambia la
 etiqueta a `CUSTODIADO`: "al menos uno de los dos ya entregó su objeto".
 
-**Solo el vigilante escribe en `truekes`.** Nadie más puede cambiar el estado
-a mano.
+**¿Quién escribe en `truekes`?** El **vigilante** copia los estados de la
+cadena (custodia, apertura, completado...). ⚠️ Desde el **flujo afinado
+2026-09-08/09** la **plataforma misma** también escribe en el espejo: al
+acordar una oferta, proponer/aceptar el encuentro, cerrar ✓/✗ y pasar el
+trueque a disputa (estados `EN_DISPUTA`, `RESOLUCION_SOCIOS`,
+`COMPLETADO`/`ANULADO` por veredicto). Ninguna persona edita a mano: son los
+programas (vigilante y API) quienes lo hacen.
 
 <!-- GENERAR_IMAGEN: origen-de-los-datos.svg -->
 ```mermaid
@@ -391,22 +422,52 @@ contenido de la nota no viaja a la cadena: la cadena solo recibe la marca de
 "ya valoró". ⚠️ Pendiente de confirmar: si esa marca se sincronizará en la
 base en un ciclo posterior.
 
-### 6.2 `disputas`: cuando algo sale mal
+> ✅ Desde 2026-09-09 la valoración **se guarda de verdad** en la base: al
+> valorar (desde el cierre o desde la sección VALOR 4.2), la plataforma
+> escribe la fila en `valoraciones` (5 renglones 1–5, una por persona y
+> trueque). Esa persistencia alimenta la lista de "trueques sin valorar" y
+> los últimos 10 valorados de tu VALOR.
 
-Si un trueque falla, la ficha de disputa guarda:
+### 6.2 `disputas` v2: cuando algo sale mal (2026-09-08)
 
-- **Quién** la pidió y **por qué** (el motivo).
-- Su estado (`ABIERTA`, ...), la **resolución** y la posible **sanción**.
-- El **timelock de 6 horas**: una sanción no se ejecuta de inmediato; se
-  espera 6 horas para que nadie actúe por impulso.
-- El **registro de votos** de los Socios: hace falta quórum de **2/3** y cada
-  Socio vota una sola vez.
-- La regla del plazo: si pasan **5 días** sin alcanzar quórum, el trueque se
-  anula **por defecto** y cada uno recupera sus NFTs.
+Desde 2026-09-08 la disputa sigue el **flujo del director** y guarda en la
+base **4 carpetas** que trabajan juntas:
 
-> ⚠️ Pendiente de confirmar: la decisión final (votos y resolución) ocurre en
-> la cadena; la base aún no sincroniza automáticamente el registro de votos
-> ni el estado de disputa en este ciclo.
+**`disputas`** — la ficha del conflicto:
+- **Quién** lo pidió (el reclamante) y **por qué** (el motivo).
+- Su **estado** (texto, no etiqueta fija): `REPORTADA → ESPERA_JUSTIFICATIVO
+  → EN_VOTACION → RESUELTA`.
+- Los **plazos**: `justificativo_vence_at` (**3 días** para el conforme) y
+  `votacion_vence_at` (**5 días** de la votación).
+- El **veredicto** (`ANULAR` o `VALIDO`), cuándo se resolvió
+  (`resuelta_en`) y el **detalle** de la resolución.
+
+**`evidencias_disputa`** — las **fotos** de cada parte (nueva 2026-09-08):
+- El **reclamo** del reclamante (tipo `RECLAMO`) y el **justificativo** del
+  conforme (tipo `JUSTIFICATIVO`). La base guarda el archivo y su tipo.
+
+**`votos_disputa`** — los **votos de los Socios** (nueva 2026-09-08):
+- Cada voto es `ANULAR` o `VALIDO`, **un voto por Socio y por disputa**
+  (la base lo impide con una llave compuesta). Los Socios involucrados en el
+  trueke no votan.
+
+**`notificaciones`** — los **avisos de la campana** (nueva 2026-09-08):
+- Disputa reportada, pedido de justificativo, votación abierta (para los
+  Socios) y veredicto: cada aviso apunta al trueke o a la disputa.
+
+Reglas del flujo (ver manual 03 · 10-disputas-v2.md):
+
+- Si el conforme **no carga su justificativo en 3 días** → la disputa se
+  resuelve **ANULAR por defecto** (devolución total).
+- Si la votación **vence (5 días) sin votos** → **ANULA por defecto**.
+- Si vence **con votos** → gana la **mayoría simple**; **empate → ANULA**.
+- **ANULAR** → trueque anulado, cada parte recupera lo suyo.
+  **VALIDO** → trueque completado y entrega **en cruz** (lo de A va a B y lo
+  de B va a A).
+
+> ⚠️ Pendiente de confirmar: la plataforma escribe estos estados y votos en
+> la base (flujo fuera de la cadena); la sincronización con los eventos de
+> disputa del contrato en la cadena sigue pendiente en este ciclo.
 
 ---
 
@@ -460,22 +521,34 @@ mínimo** y el historial de pujas. Al cerrar, la ficha guarda al **ganador**,
 el **valor de su puja** y su **nivel de reputación**, porque si dos personas
 ofrecen lo mismo, **gana la de mayor nivel** (regla de desempate D27).
 
-### 8.4 `finanzas`: saldos y el Fondo de Valor
+### 8.4 `finanzas`, `movimientos_valor` y `movimientos_brlt`: la sección VALOR (2026-09-09)
 
 Cada persona tiene **una** ficha financiera (relación 1 a 1 con su identidad)
-que guarda:
+en `finanzas`, que guarda:
 
-- Su stock declarado de **NFTs** y **criptos**.
-- Su saldo de **BRLT** (la moneda de la comunidad). Cuando se emite BRLT en
-  la cadena, el vigilante suma el saldo en la base (el tope de emisión de
-  1.000.000 BRLT vive en el contrato, no en la base).
-- El **Fondo de Valor**: el fondo común de la plataforma. La base guarda los
-  **porcentajes** que el Owner puede configurar (por defecto: 1% de cada
-  trueque, 10% de suscripciones y 5% de BRLT).
+- Su stock declarado de **NFTs** y **criptos** (p. ej. `{ETH: n}`).
+- Su saldo de **BRLT**. Dos vías reales: cuando se emite BRLT en la cadena,
+  el vigilante suma el saldo en la base; y desde **2026-09-09**, la sección
+  **VALOR** de la app lo opera directamente (recargas con tarjeta,
+  conversiones y retiros).
+- El **Fondo de Valor**: la base guarda los **porcentajes** que el Owner
+  puede configurar (por defecto: 1% de cada trueque, 10% de suscripciones y
+  5% de BRLT).
+
+Junto a esa ficha viven dos carpetas **nuevas (2026-09-09)** que registran
+**cada movimiento**, como un recibo que no se borra:
+
+- **`movimientos_valor`**: cada recarga, retiro o conversión de cripto/BRLT,
+  con la **contraparte** (siempre la **plataforma**) y su detalle.
+- **`movimientos_brlt`**: cada compra de BRLT **con tarjeta** (Stripe):
+  guarda la sesión de pago y su estado (`PENDIENTE` → `PAGADO` cuando Stripe
+  confirma por *webhook*).
 
 > ⚠️ Pendiente de confirmar: los eventos del contrato del Fondo de Valor
 > (contribuciones, cambios de porcentaje, retiros) no están mapeados en el
-> vigilante; el mantenimiento automático del fondo queda pendiente.
+> vigilante; el mantenimiento automático del fondo queda pendiente. El
+> desembolso fiat real de un retiro BRLT requiere Stripe Payouts (ver manual
+> 03 · 11-seccion-valor.md).
 
 ---
 
@@ -505,19 +578,28 @@ donde estaba, y puede incluso reprocesar desde cualquier bloque anterior.
 ## 10. Reglas de oro de los datos
 
 1. **La cadena manda**: los estados del escrow viven en la blockchain; la
-   base solo los copia y nadie los edita a mano.
+   base solo los copia y nadie los edita a mano. (⚠️ Desde 2026-09, la
+   propia plataforma también escribe en el espejo del trueque en el flujo de
+   cierre/disputa, siempre con la cadena como verdad final.)
 2. **Nada se procesa dos veces**: cada evento tiene su triple llave única.
 3. **Un escrow = una fila**: cada trueque de la cadena tiene una sola ficha.
 4. **Un voto por persona y por trueque**, y las notas van de **1 a 5**.
-5. **Nadie está a más de 10 km**: PostGIS vigila la cercanía.
-6. **Tus datos personales van cifrados y con tu consentimiento** (D17/GDPR).
-7. **Búsquedas rápidas**: la base pone "índices de libro" en las búsquedas
-   frecuentes (estado del trueque, direcciones, rubros, eventos...).
-   ⚠️ Pendiente de confirmar: falta un índice sobre la cuenta inteligente,
-   que el vigilante consulta con frecuencia.
+5. **Un voto por Socio y por disputa**, con voto `ANULAR` o `VALIDO` (votos
+   de disputas, 2026-09-08).
+6. **Las fotos de disputa están etiquetadas**: solo `RECLAMO` o
+   `JUSTIFICATIVO` (la base rechaza otros tipos).
+7. **Nadie está a más de 10 km**: PostGIS vigila la cercanía.
+8. **Tus datos personales van cifrados y con tu consentimiento** (D17/GDPR).
+9. **Búsquedas rápidas**: la base pone "índices de libro" en las búsquedas
+   frecuentes (estado del trueque, direcciones, rubros, eventos, avisos por
+   wallet, movimientos por wallet...). ⚠️ Pendiente de confirmar: falta un
+   índice sobre la cuenta inteligente, que el vigilante consulta con
+   frecuencia.
 
 > ⚠️ Resumen de lo pendiente de confirmar: carpetas prometidas sin tabla
-> (`encargos`, guardianes, marcador de valoración), tres etiquetas del
-> trueque aún sin escritor (`ACTIVO`, `EN_DISPUTA`, `RESOLUCION_SOCIOS`),
-> anclaje de fotos en la cadena, mapeos de eventos de disputas, del Fondo de
-> Valor y de suscripciones, y el borrado automático por inactividad.
+> (`encargos`, guardianes, marcador de valoración), la etiqueta `ACTIVO`
+> aún sin escritor (las otras dos, `EN_DISPUTA` y `RESOLUCION_SOCIOS`, ya
+> las escribe la plataforma en el flujo 2026-09), anclaje de fotos en la
+> cadena, mapeos de eventos de disputas, del Fondo de Valor y de
+> suscripciones, el desembolso fiat por Stripe Payouts y el borrado
+> automático por inactividad.

@@ -334,3 +334,34 @@ ejecuta en este script (ver manual 01-contratos-escrow §10.1).
 7. Suite: `sc/test/Ciclo3.t.sol` cubre admisión por quórum 2/3 (CU-03), emisión BRLT con tope y
    5 % al fondo (CU-31), suscripción con 10 % al fondo (CU-24) y porcentajes configurables del
    fondo (CU-30) (cabecera `Ciclo3.t.sol:10-19`).
+
+---
+
+## 8. Nota 2026-09-09: el BRLT del socio ya NO se gestiona contra el contrato `BRLT` desde la UI
+
+> Decisión del director (2026-09-09): la gestión de BRLT de cada socio vive hoy en la sección
+> **VALOR** de la plataforma (`/suite/valor` → subsección 4.3) y es **off-chain**: el saldo se
+> mantiene en la tabla `finanzas.brlt` y cada movimiento se registra en `movimientos_valor` /
+> `movimientos_brlt` (auditoría append-only). La **compra de BRLT con fiat usa Stripe Checkout**
+> alojado (no el contrato `BRLT` directamente): `POST /valor/brlt/checkout` crea la sesión de
+> Stripe y `POST /valor/brlt/webhook` confirma el pago y acredita BRLT al socio
+> (`backend/api/routes/valor.js:184-264`; tablas en `backend/db/migracion_valor.sql:23-48`).
+>
+> Implicancias respecto a este manual (que documenta la capa on-chain Ciclo 3):
+>
+> 1. El contrato `BRLT` (`emitir`/`subirTope` con quórum ≥2/3 de Socios, §3) sigue siendo la
+>    **emisión institucional** (tope 1.000.000, D32) y el espejo `finanzas.brlt` que alimenta el
+>    indexador con `BRLT.EmisionRegistrada` (§7.4 del Manual 05); pero el **flujo diario del socio**
+>    (recargar con tarjeta, convertir ETH⇄BRLT contra la plataforma, retirar) ocurre por la API de
+>    VALOR contra las tablas off-chain, no con transacciones directas al token.
+> 2. Los movimientos de cripto/BRLT son **siempre contra la PLATAFORMA** como contraparte (no hay
+>    P2P directo de cripto fuera del trueque); la conversión interna usa `TASA_ETH_BRLT` (env,
+>    default 3000, `routes/valor.js:27`).
+> 3. El retiro BRLT→fiat queda **documentado como Stripe Payouts** (se registra la salida; el
+>    desembolso real requiere cuenta Stripe vinculada, `routes/valor.js:267-288`).
+> 4. Solo **Empresa/SOCIO/Owner** gestionan BRLT (403 `solo_empresa_socio_owner`,
+>    `routes/valor.js:48,186-188,269-271`).
+>
+> Detalle completo de endpoints y persistencia: **Manual 03 · 06-backend-api.md §14** (VALOR) y
+> **Manual 05** (diccionario: `finanzas`, `movimientos_valor`, `movimientos_brlt`). El router
+> `/finanzas` (legado) sigue montado en `app.js` pero quedó fuera de la navegación de la suite.
