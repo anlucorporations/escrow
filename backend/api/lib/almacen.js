@@ -566,6 +566,58 @@ export function crearAlmacen() {
     listarTruekes() { return [...estado.truekes.values()]; },
     listarEncargos() { return [...estado.encargos.values()]; },
 
+    // ------------------------------------------------------------ subastas (memoria — RF-17, CU-25/26, D27)
+    crearSubasta({ empresaWallet, articuloId, pujaInicial, incrementoMinimo = 0, duracionHoras = 24 }) {
+      if (!estado.subastas) estado.subastas = new Map();
+      const id = estado.subastas.size + 1;
+      const ahora = new Date();
+      const art = estado.articulos.get(Number(articuloId)) ?? null;
+      const s = {
+        id,
+        empresa: (empresaWallet || '').toLowerCase(),
+        empresaUsername: null,
+        articuloId: articuloId != null ? Number(articuloId) : null,
+        articuloTitulo: art?.titulo ?? null,
+        articuloRubro: art?.rubro ?? null,
+        articuloCategoria: art?.categoria ?? null,
+        pujaInicial: Number(pujaInicial),
+        incrementoMinimo: Number(incrementoMinimo),
+        duracionHoras: Number(duracionHoras),
+        estado: 'ABIERTA',
+        pujas: [],
+        ganador: null,
+        cierraEn: new Date(ahora.getTime() + Number(duracionHoras) * 3_600_000).toISOString(),
+        createdAt: ahora.toISOString(),
+      };
+      estado.subastas.set(id, s);
+      return s;
+    },
+    getSubasta(id) {
+      return estado.subastas?.get(Number(id)) ?? null;
+    },
+    listarSubastas({ estado: filtro } = {}) {
+      const todas = [...(estado.subastas?.values() ?? [])].sort((a, b) => b.id - a.id);
+      return filtro ? todas.filter((s) => s.estado === filtro) : todas;
+    },
+    agregarPujaSubasta(id, { wallet, valor, nivel }) {
+      const s = estado.subastas?.get(Number(id));
+      if (!s || s.estado !== 'ABIERTA') return null;
+      s.pujas.push({ wallet: (wallet || '').toLowerCase(), valor: Number(valor), nivel: nivel ?? 'INICIADO', en: new Date().toISOString() });
+      return s;
+    },
+    cerrarSubasta(id, { ganadorWallet = null, valor = null, nivel = null } = {}) {
+      const s = estado.subastas?.get(Number(id));
+      if (!s || s.estado !== 'ABIERTA') return null;
+      if (ganadorWallet) {
+        s.estado = 'CERRADA';
+        s.ganador = { wallet: ganadorWallet.toLowerCase(), valor: valor != null ? Number(valor) : null, nivel };
+      } else {
+        s.estado = 'ANULADA';
+        s.ganador = null;
+      }
+      return s;
+    },
+
     // ------------------------------------------------------------ sesiones
     guardarSesion(token, wallet) {
       estado.sesiones.set(token, { wallet, createdAt: new Date().toISOString() });

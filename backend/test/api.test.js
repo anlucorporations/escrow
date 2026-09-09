@@ -479,3 +479,65 @@ test('VALOR: BRLT requiere Empresa/SOCIO/Owner; checkout sin clave Stripe regist
   const miDespues = await request(app).get('/valor/mi').set('Authorization', `Bearer ${tok}`);
   assert.equal(miDespues.body.saldos.brlt, brltAntes + 50);
 });
+
+test('subastas: Empresa crea, Certificado puja, vencida se adjudica al mayor valor (D27)', async () => {
+  // Empresa (puede publicar y crear subastas RF-17.1)
+  const walletEmp = ethers.Wallet.createRandom();
+  const wEmp = walletEmp.address.toLowerCase();
+  almacen.crearUsuario({ wallet: wEmp, tipo: 'EMPRESA', nivel: 'FRECUENTE', medalla: 'ORO', estado: 'CERTIFICADO' });
+  const tokEmp = sesionDe(walletEmp);
+  // publicar un artículo de la empresa
+  const pub = await request(app).post('/catalog/articulos').set('Authorization', `Bearer ${tokEmp}`)
+    .send({ titulo: 'Lote de campaña', rubro: 'Otros', ...(await firmaAccionDe(walletEmp, 'publicar artículo')) });
+  assert.equal(pub.status, 201, JSON.stringify(pub.body));
+  const artId = pub.body.articulo.id;
+
+  // crear subasta
+  const crear = await request(app).post('/subastas').set('Authorization', `Bearer ${tokEmp}`)
+    .send({ articuloId: artId, pujaInicial: 100, incrementoMinimo: 10, duracionHoras: 1 });
+  assert.equal(crear.status, 201, JSON.stringify(crear.body));
+  assert.equal(crear.body.subasta.estado, 'ABIERTA');
+  const subId = crear.body.subasta.id;
+
+  // un no-Certificado no puede pujar
+  const walletPart = ethers.Wallet.createRandom();
+  almacen.crearUsuario({ wallet: walletPart.address.toLowerCase(), tipo: 'PARTICULAR', estado: 'VERIFICADO' });
+  const tokPart = sesionDe(walletPart);
+  const noPuja = await request(app).post(`/subastas/${subId}/pujas`).set('Authorization', `Bearer ${tokPart}`).send({ valor: 150 });
+  assert.equal(noPuja.status, 403);
+
+  // dos Certificados pujan (B puja más alto)
+  const b = ethers.Wallet.createRandom();
+  almacen.crearUsuario({ wallet: b.address.toLowerCase(), tipo: 'PARTICULAR', estado: 'CERTIFICADO' });
+  const tokB = sesionDe(b);
+  const p1 = await request(app).post(`/subastas/${subId}/pujas`).set('Authorization', `Bearer ${tokB}`).send({ valor: 150 });
+  assert.equal(p1.status, 200, JSON.stringify(p1.body));
+  const c = ethers.Wallet.createRandom();
+  almacen.crearUsuario({ wallet: c.address.toLowerCase(), tipo: 'PARTICULAR', estado: 'CERTIFICADO' });
+  const tokC = sesionDe(c);
+  const p2 = await request(app).post(`/subastas/${subId}/pujas`).set('Authorization', `Bearer ${tokC}`).send({ valor: 180 });
+  assert.equal(p2.status, 200, JSON.stringify(p2.body));
+
+  // puja menor que la última + incremento → 400
+  const pBaja = await request(app).post(`/subastas/${subId}/pujas`).set('Authorization', `Bearer ${tokB}`).send({ valor: 170 });
+  assert.equal(pBaja.status, 400);
+
+  // forzar vencimiento → GET dispara la adjudicación automática (mayor valor = 180 de C)
+  await almacen.getSubasta(subId) && (() => {
+    // en memoria: acortar cierraEn directamente
+    const s = almacen.getSubasta(subId);
+    if (s) s.cierraEn = new Date(Date.now() - 1000).toISOString();
+  })();
+  const detalle = await request(app).get(`/subastas/${subId}`);
+  assert.equal(detalle.status, 200);
+  assert.equal(detalle.body.subasta.estado, 'CERRADA');
+  assert.ok(detalle.body.subasta.ganador);
+  assert.equal(detalle.body.subasta.ganador.wallet, c.address.toLowerCase());
+  assert.equal(detalle.body.subasta.ganador.valor, 180);
+
+  // la Empresa creadora NO puede pujar en su propia subasta (nueva subasta)
+  const crear2 = await request(app).post('/subastas').set('Authorization', `Bearer ${tokEmp}`)
+    .send({ articuloId: artId, pujaInicial: 50 });
+  const auto = await request(app).post(`/subastas/${crear2.body.subasta.id}/pujas`).set('Authorization', `Bearer ${tokEmp}`).send({ valor: 80 });
+  assert.equal(auto.status, 403);
+});

@@ -980,6 +980,92 @@ export async function crearAlmacenPg(pool) {
       }));
     },
 
+    // ------------------------------------------------------------ subastas (persistido — RF-17, CU-25/26, D27)
+    async crearSubasta({ empresaWallet, articuloId, pujaInicial, incrementoMinimo = 0, duracionHoras = 24 }) {
+      const r = await pool.query(
+        `INSERT INTO subastas (empresa_id, articulo_id, duracion, puja_inicial, incremento_minimo, pujas, estado)
+         VALUES ((SELECT id FROM usuarios WHERE wallet = $1), $2, make_interval(hours => $3), $4, $5, '[]'::jsonb, 'ABIERTA')
+         RETURNING *`,
+        [NORMALIZA_WALLET(empresaWallet), articuloId != null ? Number(articuloId) : null,
+         Number(duracionHoras), Number(pujaInicial), Number(incrementoMinimo)]
+      );
+      return this.getSubasta(Number(r.rows[0].id));
+    },
+
+    async getSubasta(id) {
+      const r = await pool.query(
+        `SELECT s.*, s.created_at + s.duracion AS cierra_en,
+                ue.wallet AS empresa_wallet, ue.username AS empresa_username,
+                a.titulo AS articulo_titulo, a.rubro AS articulo_rubro, a.categoria AS articulo_categoria,
+                ug.wallet AS ganador_wallet
+           FROM subastas s
+           JOIN usuarios ue ON ue.id = s.empresa_id
+           LEFT JOIN articulos a ON a.id = s.articulo_id
+           LEFT JOIN usuarios ug ON ug.id = s.ganador_id
+          WHERE s.id = $1`,
+        [Number(id)]
+      );
+      return filaASubasta(r.rows[0] ?? null);
+    },
+
+    async listarSubastas({ estado } = {}) {
+      const q = estado
+        ? `SELECT s.*, s.created_at + s.duracion AS cierra_en,
+                  ue.wallet AS empresa_wallet, ue.username AS empresa_username,
+                  a.titulo AS articulo_titulo, a.rubro AS articulo_rubro, a.categoria AS articulo_categoria,
+                  ug.wallet AS ganador_wallet
+             FROM subastas s
+             JOIN usuarios ue ON ue.id = s.empresa_id
+             LEFT JOIN articulos a ON a.id = s.articulo_id
+             LEFT JOIN usuarios ug ON ug.id = s.ganador_id
+            WHERE s.estado = $1
+            ORDER BY s.id DESC`
+        : `SELECT s.*, s.created_at + s.duracion AS cierra_en,
+                  ue.wallet AS empresa_wallet, ue.username AS empresa_username,
+                  a.titulo AS articulo_titulo, a.rubro AS articulo_rubro, a.categoria AS articulo_categoria,
+                  ug.wallet AS ganador_wallet
+             FROM subastas s
+             JOIN usuarios ue ON ue.id = s.empresa_id
+             LEFT JOIN articulos a ON a.id = s.articulo_id
+             LEFT JOIN usuarios ug ON ug.id = s.ganador_id
+            ORDER BY s.id DESC`;
+      const r = estado ? await pool.query(q, [estado]) : await pool.query(q);
+      return r.rows.map(filaASubasta);
+    },
+
+    /** Agrega una puja al JSONB (atómico; solo si sigue ABIERTA). */
+    async agregarPujaSubasta(id, { wallet, valor, nivel }) {
+      const puja = { wallet: NORMALIZA_WALLET(wallet), valor: Number(valor), nivel: nivel ?? 'INICIADO', en: new Date().toISOString() };
+      const r = await pool.query(
+        `UPDATE subastas
+            SET pujas = COALESCE(pujas, '[]'::jsonb) || $2::jsonb, updated_at = now()
+          WHERE id = $1 AND estado = 'ABIERTA'
+          RETURNING id`,
+        [Number(id), JSON.stringify([puja])]
+      );
+      if (r.rowCount === 0) return null;
+      return this.getSubasta(Number(id));
+    },
+
+    /** Cierra la subasta adjudicando al ganador (D27). ganadorWallet=null → ANULADA. */
+    async cerrarSubasta(id, { ganadorWallet = null, valor = null, nivel = null } = {}) {
+      const estadoFinal = ganadorWallet ? 'CERRADA' : 'ANULADA';
+      const r = await pool.query(
+        `UPDATE subastas
+            SET estado = $2::estado_subasta,
+                ganador_id = (SELECT id FROM usuarios WHERE wallet = $3),
+                valor_ganador = $4,
+                nivel_ganador = $5::nivel_usuario,
+                updated_at = now()
+          WHERE id = $1 AND estado = 'ABIERTA'
+          RETURNING id`,
+        [Number(id), estadoFinal, ganadorWallet ? NORMALIZA_WALLET(ganadorWallet) : null,
+         valor != null ? Number(valor) : null, nivel]
+      );
+      if (r.rowCount === 0) return null;
+      return this.getSubasta(Number(id));
+    },
+
     // ------------------------------------------------------------ sesiones (persistidas)
     async guardarSesion(token, wallet) {
       await pool.query(
@@ -999,6 +1085,33 @@ export async function crearAlmacenPg(pool) {
     },
     crearEncargo: base.crearEncargo,
     listarEncargos: base.listarEncargos,
+  };
+}
+
+/** Convierte una fila de subastas (con joins) al objeto del router. */
+function filaASubasta(f) {
+  if (!f) return null;
+  const creada = f.created_at ? new Date(f.created_at) : null;
+  const cierra = f.cierra_en ? new Date(f.cierra_en) : null;
+  const duracionHoras = creada && cierra
+    ? Math.round(((cierra - creada) / 3_600_000) * 10) / 10
+    : 24;
+  return {
+    id: Number(f.id),
+    empresa: f.empresa_wallet.trim().toLowerCase(),
+    empresaUsername: f.empresa_username ?? null,
+    articuloId: f.articulo_id !== null ? Number(f.articulo_id) : null,
+    articuloTitulo: f.articulo_titulo ?? null,
+    articuloRubro: f.articulo_rubro ?? null,
+    articuloCategoria: f.articulo_categoria ?? null,
+    pujaInicial: Number(f.puja_inicial ?? 0),
+    incrementoMinimo: Number(f.incremento_minimo ?? 0),
+    duracionHoras,
+    estado: f.estado,
+    pujas: Array.isArray(f.pujas) ? f.pujas.map((p) => ({ ...p, wallet: (p.wallet || '').toLowerCase() })) : [],
+    ganador: f.ganador_wallet ? { wallet: f.ganador_wallet.trim().toLowerCase(), valor: f.valor_ganador !== null ? Number(f.valor_ganador) : null, nivel: f.nivel_ganador ?? null } : null,
+    cierraEn: cierra ? cierra.toISOString() : null,
+    createdAt: creada ? creada.toISOString() : null,
   };
 }
 

@@ -733,3 +733,65 @@ export function revisarKyc(token: string, wallet: string, aprobar: boolean): Pro
     body: { wallet, aprobar },
   });
 }
+
+// =============================================================================
+// Subastas (RF-17, CU-25/26, D27)
+// =============================================================================
+
+export interface PujaSubasta {
+  wallet: string;
+  valor: number;
+  nivel: string;
+  en: string;
+}
+
+export interface Subasta {
+  id: number;
+  empresa: string;
+  empresaUsername?: string | null;
+  articuloId: number | null;
+  articuloTitulo?: string | null;
+  articuloRubro?: string | null;
+  articuloCategoria?: string | null;
+  pujaInicial: number;
+  incrementoMinimo: number;
+  duracionHoras: number;
+  estado: "ABIERTA" | "CERRADA" | "ANULADA";
+  pujas: PujaSubasta[];
+  ganador?: { wallet: string; valor: number | null; nivel: string | null } | null;
+  cierraEn?: string | null;
+  createdAt?: string | null;
+}
+
+/** GET /subastas — lista (ABIERTAS y cerradas recientes, con cierre automático de vencidas). */
+export function listarSubastas(token?: string | null, estado?: string): Promise<{ subastas: Subasta[] }> {
+  const q = estado ? `?estado=${estado}` : "";
+  if (!token) return pedir<{ subastas: Subasta[] }>(`/subastas${q}`);
+  return pedirAuth<{ subastas: Subasta[] }>(`/subastas${q}`, token);
+}
+
+/** GET /subastas/mis — las que creé y las donde pujé (con sesión). */
+export function misSubastas(token: string): Promise<{ creadas: Subasta[]; pujadas: Subasta[] }> {
+  return pedirAuth<{ creadas: Subasta[]; pujadas: Subasta[] }>("/subastas/mis", token);
+}
+
+/** GET /subastas/:id — detalle con pujas. */
+export function detalleSubasta(id: number, token?: string | null): Promise<{ subasta: Subasta }> {
+  if (!token) return pedir<{ subasta: Subasta }>(`/subastas/${id}`);
+  return pedirAuth<{ subasta: Subasta }>(`/subastas/${id}`, token);
+}
+
+/** POST /subastas — crear (solo Empresa, RF-17.1). */
+export function crearSubasta(token: string, datos: { articuloId: number; pujaInicial: number; incrementoMinimo?: number; duracionHoras?: number }): Promise<{ subasta: Subasta }> {
+  return pedirAuth<{ subasta: Subasta }>("/subastas", token, { metodo: "POST", body: datos });
+}
+
+/** POST /subastas/:id/pujas — pujar (solo Certificado, RF-17.2). */
+export function pujarSubasta(token: string, id: number, valor: number): Promise<{ subasta: Subasta }> {
+  return pedirAuth<{ subasta: Subasta }>(`/subastas/${id}/pujas`, token, { metodo: "POST", body: { valor } });
+}
+
+/** POST /subastas/:id/cerrar — adjudicación manual tras vencimiento (Empresa). */
+export function cerrarSubasta(token: string, id: number): Promise<{ subasta: Subasta; ganador: Subasta["ganador"] }> {
+  return pedirAuth<{ subasta: Subasta; ganador: Subasta["ganador"] }>(`/subastas/${id}/cerrar`, token, { metodo: "POST", body: {} });
+}

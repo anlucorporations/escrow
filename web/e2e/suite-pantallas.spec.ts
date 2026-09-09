@@ -104,6 +104,33 @@ async function simularSuite(
             movimientos: [],
           });
         }
+        // Subastas (RF-17)
+        if (url.includes("/subastas/mis")) {
+          return json({ creadas: [], pujadas: [] });
+        }
+        if (url.includes("/subastas") && (!init?.method || init?.method === "GET")) {
+          const s = {
+            id: 1,
+            empresa: "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc".toLowerCase(),
+            empresaUsername: "ecotech",
+            articuloId: 3,
+            articuloTitulo: "Lote de notebooks reacondicionadas",
+            articuloRubro: "Electronica",
+            pujaInicial: 100,
+            incrementoMinimo: 10,
+            duracionHoras: 24,
+            estado: "ABIERTA",
+            pujas: [],
+            cierraEn: new Date(Date.now() + 3_600_000).toISOString(),
+          };
+          if (url.includes("estado=")) {
+            return json({ subastas: url.includes("ABIERTA") ? [s] : [] });
+          }
+          return json({ subastas: [s] });
+        }
+        if (url.includes("/subastas") && init?.method === "POST") {
+          return json({ subasta: { id: 2, estado: "ABIERTA", pujaInicial: 100, pujas: [] } }, 201);
+        }
         // Reputación
         if (url.includes("/reputacion/mi")) {
           return json({
@@ -223,4 +250,23 @@ test.describe("Pantallas de la suite (integración)", () => {
     if (await btnAuth.isVisible().catch(() => false)) await btnAuth.click();
     await expect(page.getByText("Emitir 10.000 BRLT")).toBeVisible();
   });
+
+  test("Subastas: la Empresa ve el listado y puede crear", async ({ page }) => {
+    await simularSuite(page, { tipo: "EMPRESA", nivel: "FRECUENTE", estado: "CERTIFICADO" });
+    await page.goto("/suite/subastas");
+    await expect(page.getByRole("heading", { name: /Subastas/ })).toBeVisible();
+    const btnAuth = page.getByRole("button", { name: /Autenticar/ });
+    if (await btnAuth.isVisible().catch(() => false)) await btnAuth.click();
+    await expect(page.getByRole("button", { name: /Crear subasta/ })).toBeVisible();
+    await expect(page.getByText(/Lote de notebooks/)).toBeVisible();
+  });
+
+  test("Subastas: un Particular Certificado puja (botón Pujar)", async ({ page }) => {
+    await simularSuite(page, { tipo: "PARTICULAR", nivel: "INICIADO", estado: "CERTIFICADO" });
+    await page.goto("/suite/subastas");
+    const btnAuth = page.getByRole("button", { name: /Autenticar/ });
+    if (await btnAuth.isVisible().catch(() => false)) await btnAuth.click();
+    await expect(page.getByRole("button", { name: /Pujar \(100\)/ })).toBeVisible();
+  });
+
 });

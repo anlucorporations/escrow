@@ -65,6 +65,14 @@ const SECCIONES: (Seccion & { visible: (c: ContextoNav) => boolean })[] = [
     visible: (c) => ES_VERIFICADO(c) || ES_EMPRESA(c),
   },
   {
+    href: "/suite/subastas",
+    label: "Subastas",
+    icono: "🔨",
+    descripcion: "Subastas de Empresas; puja el Certificado (RF-17, CU-25/26)",
+    // RF-17: la Empresa crea; el Certificado puja; el catálogo abierto es observable.
+    visible: (c) => ES_EMPRESA(c) || ES_CERTIFICADO(c),
+  },
+  {
     href: "/suite/gobernanza",
     label: "Socios",
     icono: "🏛️",
