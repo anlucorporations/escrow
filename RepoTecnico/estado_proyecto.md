@@ -4,10 +4,28 @@
 |---|---|
 | Proyecto | **TrueKeate** (DApp Web3 de trueques con escrow) |
 | Archivo | `RepoTecnico/estado_proyecto.md` |
-| Fase actual | **ENTREGADO + DESPLEGADO en GCP** + login wallet único + escudo D28 + Verificar/Certificar |
-| Última actualización | Login único con la billetera; escudo de estado D28 en la barra; procesos Verificación (código correo) y Certificación (KYC) con UI |
+| Fase actual | **ENTREGADO + DESPLEGADO en GCP** + mejora continua del director activa (login wallet único, escalera D28, Verificar/Certificar/SBT, disputas v2, VALOR con Stripe…) — corte **2026-09-09** |
+| Última actualización | **VALOR + ajustes de suite (2026-09-09)**: API rev `00022-s24` · web rev `00028-mwk` (release-e6c61f7); HEAD `a717efb` pusheado a los 3 remotos |
 
 ---
+
+## 📌 Estado general al 2026-09-09 (resumen de corte)
+
+- **Fases 1–5 completas** (Concepto/Requerimientos, Auditoría, Desarrollo, Pruebas, Manuales):
+  entregado y confirmado por el director; decisiones D1–D41 registradas.
+- **Ciclos C1–C11 implementados**: C1–C8 verticales (2026-09-02) · C9 entrega/operación y
+  trueque abierto F1–F4 + P1–P3 · C10 siete ajustes del director (`efa8425`) · **C11 = mejora
+  continua 2026-09-08/09** (BaseOperaciones + inyección, 1.ª prueba en GCP, ajustes UI,
+  certificación SBT, wallet móvil, manuales ×27, regla del punto de encuentro, disputas v2,
+  Sistemas solo Owner, VALOR + suite). Todo desplegado en GCP y verificado en vivo.
+- **Despliegue GCP al corte**: API Cloud Run `truekeate-api` rev **00022-s24** · web Cloud Run
+  `truekeate-web` rev **00028-mwk** (release-e6c61f7), 100 % serving (europe-west1).
+- **Tests verdes**: Foundry **~80/80** (74 de C10 + 6 SBT) · backend **27/27** · E2E Playwright
+  **verdes** (últimas reportadas: suite.spec 11/11 · suite-pantallas 7/7 · suite-escalera 3/3).
+- **Push en los 3 remotos** (`gitlab`, `github`, `codecrypto`) — rama `escrow-dsh-GCP`,
+  **HEAD `a717efb`** (72 commits, 2026-09-02 → 2026-09-09).
+- Detalle por bloque en las secciones ✅ de este documento; el plan consolidado con cronología vive
+  en `RepoTecnico/plan_desarrollo.md` (corte 2026-09-09). Pendientes reales: sección "Pendientes".
 
 ## Hitos completados
 
@@ -258,7 +276,42 @@ criterios Gherkin/EARS alineados), `arquitectura_tecnica.md` (secciones 1–10, 
 
 ## Pendientes
 
-- [ ] Acceso SSH a `gitlab.codecrypto.academy` (D11 — pospuesto)
+### ⏳ Pendientes reales al 2026-09-09 (abiertos)
+
+- [ ] **Acceso SSH a `gitlab.codecrypto.academy`** (D11 — pospuesto): los pushes a codecrypto
+  funcionan por token HTTPS (credential helper global, resuelto); el acceso por **SSH** sigue sin
+  configurarse.
+- [ ] **Escrow nuevo con `vincularTrueKeateNft`**: el Escrow desplegado en GCP es el anterior, sin
+  la función de F1; requiere redesplegar un Escrow nuevo coordinando los trueques existentes para no
+  romperlos (ver `RepoTecnico/logica_trueke.md`).
+- [ ] **Votación de disputas on-chain**: el flujo de disputas v2 (2026-09-09) resuelve el veredicto
+  off-chain (backend; tablas `votos_disputa`/`evidencias_disputa`); falta ejecutar la votación de
+  Socios/anulación on-chain sobre el escrow (D13, CU-18).
+- [ ] **Comisión del 1 % de los trueques al FondoDeValor** (D7): el 1 % por trueque completado no
+  está integrado (marcado "pendiente de confirmar" en los manuales).
+- [ ] **Stripe: Payouts reales + webhook firmado + live**: el retiro a fiat hoy solo se registra
+  (desembolso real por Stripe Payouts documentado, no ejecutado); configurar `STRIPE_WEBHOOK_SECRET`
+  en Secret Manager (sin él el webhook de `valor.js` cae al modo demo, sin `constructEvent`) y pasar
+  las claves de test a live.
+- [ ] **Subastas / encargos / campañas sin pantalla**: la lógica backend existe (router `/subastas`
+  del C8, encargos CU-07 en catálogo) pero no hay UI en la suite.
+- [ ] **WalletConnect universal**: requiere projectId de cloud.walletconnect.com (hoy deep link
+  MetaMask + navegador interno, validado en móvil real 2026-09-08).
+- [ ] **APK nativa** (D40 — mejora futura, fuera de alcance).
+- [ ] **Auditoría externa de seguridad** previa a producción (D24).
+- [ ] **Root merkle real del KYC** para la escalera on-chain de la SmartAccount del Owner (D28).
+- [ ] **Favoritos de puntos de encuentro en el dashboard** (🟡): el widget de mapa con favoritos
+  vive en la ficha del trueque (A6/P2); falta la UI de favoritos en el dashboard (tabla
+  `puntos_favoritos` ya creada — ver `logica_trueke.md` punto 7).
+
+### ✔️ Registro histórico — pendientes ya resueltos (trazabilidad conservada)
+
+> Los ciclos C1–C8 y los cierres posteriores (F4, F5, migración F1–F4, P1–P3, C10 y la mejora
+> continua 2026-09-08/09) están **completos y verificados**; se conservan abajo como registro.
+> Los ítems que quedaron abiertos dentro de este registro se resolvieron después (ver "Hitos
+> completados" arriba). Commits de la migración F1–F4/P1–P3 ya publicados: `cd16666`, `6750c84`,
+> `b672df7`, `e14157b`, `4132790`, `aa8bcf7`, `a702434`, `b1c9734`.
+
 - [x] **Ciclo 1 — Setup Foundry + Escrow base** ✅
   - [x] Instalar Foundry (forge/anvil 1.8.1)
   - [x] Proyecto Foundry en `sc/` + OpenZeppelin v5.0.2 + forge-std
@@ -282,7 +335,10 @@ criterios Gherkin/EARS alineados), `arquitectura_tecnica.md` (secciones 1–10, 
   - [x] `backend/indexador.js`: listener Node.js propio (D25) — idempotencia (tx_hash/log_index/entidad), checkpoints por contrato, reconciliación, métricas de lag
   - [x] `backend/indexador-cli.js`: barrido único / modo servicio --watch
   - [x] Tests: 5/5 (node:test, pool en memoria): mapeo TruekeCreado→truekes, custodia→CUSTODIADO, idempotencia, barrerDesde+checkpoint, contrato desconocido
-  - [ ] Integración con `mcc-postgres` real (pendiente de entorno GCP — D25)
+  - [x] Integración con PostgreSQL real en GCP (D25): **resuelta en el despliegue 2026-09-03** —
+    BD off-chain en Cloud SQL `truekeate-db-dev` (PG15 + PostGIS, southamerica-east1) con el
+    esquema TrueKeate aplicado; indexador activo sobre ella (no se reutilizó `mcc-postgres`: se
+    creó BD propia del proyecto).
 - [x] **Ciclo 5 — Relayer EIP-712** ✅
   - [x] `backend/relayer.js`: relayer que envía meta-tx asumiendo el gas (RF-09.2) desde la cuenta 1 (RF-15.2); 4 protecciones D16 (nonce+chainId, allowlist de verificados con chequeo on-chain D28, límite diario 20/día D29, endpoint autenticado — rate-limit en C6); bloqueo 1h tras 3 fallos/10 min (D29); health-check SLA (D15)
   - [x] Tests: 7/7 (node:test con provider mock): intent verificado, rechazo no-verificado, nonce repetido, chainId, límite diario, bloqueo por fallos, health
@@ -346,11 +402,30 @@ criterios Gherkin/EARS alineados), `arquitectura_tecnica.md` (secciones 1–10, 
 
 ## Próximos pasos
 
-1. **✅ Proyecto ENTREGADO** — Fases 1–5 completadas y publicadas en los 3 repos (rama `escrow-dsh-GCP`).
-2. Operación (solo por orden del director): `backend/scripts/reiniciar-plataforma.sh --confirmar` (reset BD off-chain sin tocar anvil) y `backend/scripts/bootstrap-owner.sh --confirmar` (Owner CERTIFICADO/SOCIO) — ver `RepoTecnico/Manuales/04-Despliegue/02-reinicio-y-bootstrap.md`.
-3. **✅ Migración trueque abierto F1–F4 implementada y pendientes P1–P3 desplegados en GCP** (commits locales `cd16666`, `6750c84`, `b672df7`, `e14157b`, `4132790`, `aa8bcf7`, `a702434`, `b1c9734` en `escrow-dsh-GCP`). Siguiente por decisión del director: push de los nuevos commits y, opcionalmente, redesplegar el Escrow nuevo con `vincularTrueKeateNft` (coordinando trueques existentes).
-4. Mejoras futuras opcionales (fuera de alcance): APK nativa (D40), integración con `mcc-postgres` real en GCP (D25), auditoría externa de seguridad previa a producción (D24), integración del 1 % de trueques al FondoDeValor (D7, marcado "pendiente de confirmar" en manuales), root merkle real del KYC para la escalera on-chain del Owner (D28).
-5. Los commits se crean localmente en `escrow-dsh-GCP`; el push a GitHub/GitLab se hace solo por orden del director (`/push`).
+Estado al 2026-09-09: proyecto **ENTREGADO + DESPLEGADO en GCP** (ver "Estado general" arriba).
+El **plan completo, consolidado y con cronología vive en `RepoTecnico/plan_desarrollo.md`**
+(corte 2026-09-09). Prioridad sugerida para el desarrollo restante (pendientes detallados con
+trazabilidad en la sección "Pendientes"):
+
+1. **Subastas (UI)** — el backend `/subastas` del C8 (solo Empresa crea, solo Certificado puja,
+   desempate D27) ya existe; falta la pantalla de la suite. De paso, encargos (CU-07) y campañas
+   siguen sin pantalla.
+2. **Veredicto on-chain + Escrow nuevo** — redesplegar el Escrow con `vincularTrueKeateNft` (hoy el
+   desplegado es el anterior) y llevar la votación de disputas/anulación de Socios a on-chain (D13,
+   CU-18): el flujo v2 (2026-09-09) resuelve el veredicto off-chain.
+3. **Payouts / Stripe live** — desembolso real de retiros por Stripe Payouts (hoy solo registro),
+   configuración de `STRIPE_WEBHOOK_SECRET` (verificación de firma real del webhook) y paso de
+   claves de test a live.
+4. Resto de pendientes (sin prioridad asignada): WalletConnect universal (projectId), APK nativa
+   (D40), auditoría externa de seguridad (D24), root merkle real del KYC (D28), favoritos de puntos
+   de encuentro en el dashboard (🟡), acceso SSH a codecrypto (D11).
+5. Operación (solo por orden del director): `backend/scripts/reiniciar-plataforma.sh --confirmar`
+   (reset BD off-chain sin tocar anvil), `backend/scripts/bootstrap-owner.sh --confirmar` (Owner
+   CERTIFICADO/SOCIO) e inyección de datos operativos (script listo, **no ejecutada en
+   producción**) — ver `RepoTecnico/Manuales/04-Despliegue/02-reinicio-y-bootstrap.md` y
+   `RepoTecnico/BaseOperaciones/`.
+6. Los commits se crean localmente en `escrow-dsh-GCP`; el push a GitHub/GitLab/codecrypto se hace
+   solo por orden del director (`/push`).
 
 ## Bug fix — Desconectar billetera y reconectar con OTRA wallet (reporte del director)
 
@@ -646,3 +721,11 @@ on-chain del SociosRegistry (`owner()` = 0xf39F…2266 en GCP), no un "tipo".
   BRLT→ETH, checkout Stripe devuelve URL checkout.stripe.com real, retira BRLT;
   Carlos (PARTICULAR) → 403 y UI solo lectura. Capturas:
   `RepoTecnico/pruebas/1ra-prueba/valor-owner.png` y `valor-particular.png`.
+
+---
+
+## Índice / enlaces de referencia (2026-09-09)
+
+- → Ver plan de desarrollo consolidado: `RepoTecnico/plan_desarrollo.md`
+- → Diccionario de datos actualizado: `RepoTecnico/diccionario_datos.md`
+- → Entornos globales actualizados: `RepoTecnico/entornos_globales.md`

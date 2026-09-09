@@ -9,6 +9,7 @@
 | Fuentes | `requerimientos.md` (RF-01…RF-19, RNF-01…RNF-08, RT-01…RT-05, R1–R13, D1–D41) · `diccionario_datos.md` · `casos_uso.md` (CU-01…CU-31) · `entornos_globales.md` · `escrow_estados.puml` · `PROPUESTA_ENTORNO_VISUAL_TRUEKEAT.md` (RNF-08) · `TrueKeate/` (RF-19) · `INFORME_OPTIMIZACION_V1.md` (referencia de no repetición de errores) |
 | Rama de trabajo | `escrow-dsh-GCP` (D8) — GitHub y GitLab.com (`anlucorporations/escrow`) |
 | Estado | Documento de arquitectura **válido al 100 %** — base para planificar los ciclos C1–C8 de la Fase 3 (pendientes D32–D40 resueltos; ver §10) |
+| Última actualización | **2026-09-09** — estado real de los módulos nuevos de la suite/backend: **Disputas (flujo v2 del director)**, **Sistemas solo Owner (lib/es-owner.js)**, **VALOR (ex Finanzas)** y **Notificaciones in-app** (ver §§11–14); fuentes de esta actualización: `backend/api/app.js`, `backend/api/routes/*.js`, `backend/api/lib/{es-owner,flujo-disputas,nft-minter}.js`, `backend/db/schema.sql` + migraciones, `web/lib/navegacion.ts`, `web/lib/api.ts` |
 
 > Convención de trazabilidad: cada elemento se cita con su ID de origen, p. ej. "(RF-09.6, D29)".
 > Toda alternativa de diseño que **no** esté cerrada por un RF/RNF/RT/D existente se marca
@@ -55,7 +56,7 @@ flowchart TB
     end
 
     subgraph BACK["Capa Backend (Node.js propio — D22/D25)"]
-        API["Backend API REST/JSON<br/>(auth, KYC 2 etapas, publicaciones,<br/>trueques, disputas, subastas, campañas)"]
+        API["Backend API REST/JSON<br/>(auth, KYC 2 etapas, publicaciones,<br/>trueques, disputas v2, valor (ex finanzas),<br/>notificaciones, subastas)"]
         REL1["Relayer EIP-712 — instancia 1"]
         REL2["Relayer EIP-712 — instancia 2"]
         COL["Cola de reintentos + health-check<br/>(SLA ≥ 99% — D15)"]
@@ -270,10 +271,15 @@ marca **[PII†]** = cifrado en reposo (§9). Extensiones: `postgis` (RT-02.5) y
 | `usuarios` | Registro e identidad (CU-01/02) | `id BIGINT PK`, `wallet CHAR(42) UNIQUE`, `correo [PII†]`, `telefono [PII†]`, `direccion_inscripcion [PII†] TEXT`, `geog GEOGRAPHY(Point,4326)`, `tipo ENUM(PARTICULAR,EMPRESA,SOCIO)`, `nivel ENUM(INICIADO,COMUN,FRECUENTE,SOCIO)`, `medalla ENUM(BRONCE,PLATA,ORO)`, `estado ENUM(INSCRITO,VERIFICADO,CERTIFICADO)` (D28), `smart_account CHAR(42)`, `consentimiento_gdpr BOOL`, `consentimiento_fecha TIMESTAMPTZ`, `actividad_ultima TIMESTAMPTZ`, `created_at` | 1—N: `kyc`, `articulos`, `valoraciones`, `suscripciones`, `finanzas` |
 | `kyc` | Metadata KYC cifrada (RF-01.7, D17) | `usuario_id FK`, `documento_identidad [PII†] BYTEA`, `selfie_ref [PII†]`, `selfie_hash BYTEA`, `merkle_root BYTEA`, `estado ENUM(PENDIENTE,APROBADO,RECHAZADO,APELACION)`, `revisado_por`, `fechas` | N—1: `usuarios`; espejo del estado on-chain del Smart Account |
 | `articulos` | Publicaciones AtoA (CU-06) | `id`, `usuario_id FK`, `titulo`, `descripcion`, `rubro`, `imagen_certificacion_id FK`, `nft_token_id`, `disponible BOOL`, `alta_disponibilidad BOOL`, `created_at` | N—1: `usuarios`; 1—1: `imagenes_certificadas` |
-| `truekes` | **Espejo del estado on-chain** del escrow | `id`, `escrow_id UNIQUE`, `articulo_a FK`, `articulo_b FK`, `usuario_a FK`, `usuario_b FK`, `estado ENUM(CREADO,ACTIVO,CUSTODIADO,APERTURA,EN_DISPUTA,RESOLUCION_SOCIOS,COMPLETADO,ANULADO,BLOQUEADO)`, `hora_pautada`, `punto_encuentro_id FK`, `tx_hash`, `bloque` | N—1: `usuarios`; 1—N: `valoraciones`, `disputas` |
+| `truekes` | **Espejo del estado on-chain** del escrow + ofertas abiertas del Mercado (PROPUESTO, off-chain) | `id`, `escrow_id UNIQUE` (sintético negativo en ofertas), `articulo_a FK`, `articulo_b FK` (NULL en PROPUESTO), `usuario_a FK`, `usuario_b FK` (NULL en PROPUESTO), `estado ENUM(PROPUESTO,CREADO,ACTIVO,CUSTODIADO,APERTURA,EN_DISPUTA,RESOLUCION_SOCIOS,COMPLETADO,ANULADO,BLOQUEADO)`, `descripcion_requerida`, `tipo_requerido`, `hora_pautada`, `punto_encuentro_id FK`, `encuentro_propuesto_por` (quienProponeEncuentro), `encuentro_estado` (PROPUESTO/ACEPTADO/RECHAZADO), `cierre_a`/`cierre_b` (CONFORME/NO_CONFORME), `tx_hash`, `bloque` | N—1: `usuarios`; 1—N: `valoraciones`, `disputas` |
 | `valoraciones` | Detalle off-chain de valoración (RF-07.2, D18) | `id`, `trueke_id FK`, `valorador FK`, `valorado FK`, 5 columnas `SMALLINT CHECK (1..5)` (aceptacion, honestidad, seguridad, confiabilidad, compromiso) | N—1: `truekes`, `usuarios` |
 | `puntos_encuentro` | Zonas registradas (CU-16) | `id`, `usuario_id FK`, `direccion [PII†]`, `geog GEOGRAPHY(Point,4326)`, `radio_km NUMERIC`, `aprobado_socios BOOL` (retiros, CU-22) | N—1: `usuarios`; 1—N: `truekes` |
-| `disputas` | Conflictos y apelaciones (CU-18/19) | `id`, `trueke_id FK`, `solicitante FK`, `motivo`, `estado`, `resolucion`, `sancion`, `timelock_ejecuta_at`, `registro_votos JSONB` (espejo de votos on-chain) | N—1: `truekes` |
+| `disputas` | Conflictos — **flujo v2 del director** (CU-18/19, §11) | `id`, `trueke_id FK`, `solicitante FK` (reclamante ✗ No Conforme), `motivo`, `estado ENUM(REPORTADA,ESPERA_JUSTIFICATIVO,EN_VOTACION,RESUELTA)`, `justificativo_vence_at` (plazo 3 días), `votacion_vence_at` (plazo 5 días — D13/D21), `veredicto` (ANULAR/VALIDO), `resuelta_en`, `resolucion`, `sancion`, `timelock_ejecuta_at`, `registro_votos JSONB` | N—1: `truekes`; 1—N: `evidencias_disputa`, `votos_disputa` |
+| `evidencias_disputa` | Fotos de evidencia de cada parte (flujo v2) | `id`, `disputa_id FK (ON DELETE CASCADE)`, `autor`, `tipo ENUM(RECLAMO,JUSTIFICATIVO)`, `contenido BYTEA`, `mime` | N—1: `disputas` |
+| `votos_disputa` | Votos de Socios en la disputa (1 voto por Socio — D21) | `id`, `disputa_id FK`, `socio CHAR(42)`, `voto ENUM(ANULAR,VALIDO)`, `UNIQUE (disputa_id, socio)` | N—1: `disputas` |
+| `notificaciones` | Campana in-app (decisión del director, §14) | `id`, `wallet CHAR(42)` (destinatario), `tipo` (DISPUTA_REPORTADA/PEDIDO_JUSTIFICATIVO/VOTACION_ABIERTA/VEREDICTO/SISTEMA), `titulo`, `cuerpo`, `ref_tipo` (disputa/trueke), `ref_id`, `leida BOOL`, `created_at` | N—1: `usuarios` (por wallet) |
+| `movimientos_valor` | Auditoría append-only de VALOR 4.1/4.3 (§13) | `id`, `wallet`, `tipo` (RECARGA_CRIPTO/RETIRO_CRIPTO/CONVERSION/RECARGA_BRLT/RETIRO_BRLT), `moneda` (ETH/BRLT), `monto NUMERIC`, `contraparte CHAR(42)` (la PLATAFORMA), `detalle`, `tx_hash`, `created_at` | N—1: `usuarios` (por wallet) |
+| `movimientos_brlt` | Pagos BRLT por fiat (Stripe Checkout, §13) | `id`, `wallet`, `monto_brlt NUMERIC`, `monto_fiat NUMERIC`, `fiat_moneda`, `stripe_session`, `stripe_payment`, `estado ENUM(PENDIENTE,PAGADO,FALLIDO)`, `confirmado_at` | N—1: `usuarios` (por wallet) |
 | `imagenes_certificadas` | Evidencia (RF-11, CU-06/14/27) | `id`, `tipo ENUM(PUBLICACION,RECEPCION)`, `ref_id`, `hash_sha256 BYTEA`, `ipfs_cid TEXT`, `wallet CHAR(42)`, `firma_ecdsa BYTEA`, `metadata JSONB`, `root_merkle_anclada BYTEA` | N—1: `articulos`/`truekes` por `ref_id` |
 | `suscripciones` | Cobros empresa (CU-24) | `id`, `empresa_id FK`, `plan`, `monto NUMERIC`, `ciclo_inicio`, `ciclo_fin`, `fecha`, `tx_hash`, `estado ENUM(ACTIVA,IRREGULAR,CANCELADA)` | N—1: `usuarios` |
 | `campanas` | Venta masiva / recolecta (CU-09/10) | `id`, `tipo ENUM(VENTA,RECOLECTA)`, `usuario_id FK`, `estado`, `aprobada_socios BOOL`, `articulos JSONB`, `causa`, `plazo_fin` | N—1: `usuarios` |
@@ -537,3 +543,61 @@ trimestrales (RNF-07.3) a partir de C4.
 - D40: **PWA instalable** en Fase 3; APK nativa como mejora futura ✓
 
 **Documento de arquitectura listo al 100 %** para iniciar la Fase 3 (ciclos C1–C8 de §10).
+
+---
+
+## 11. Disputas — flujo v2 del director (2026-09-09)
+
+**Contexto**: la disputa nace SOLO desde el cierre ✗ No Conforme con formulario
+(motivo + fotos de evidencia) → `REPORTADA` → `ESPERA_JUSTIFICATIVO` →
+`EN_VOTACION` → `RESUELTA`.
+
+| Aspecto | Diseño |
+|---|---|
+| Motor | `backend/api/lib/flujo-disputas.js` (`crearMotorDisputas`): plazos (justificativo 3 días, votación 5 días), padrón on-chain `SociosRegistry` (fallback usuarios `tipo=SOCIO` sin red), veredicto por mayoría simple de votantes (empate o sin votos → ANULA por defecto) |
+| Veredicto | `ANULAR` → trueke `ANULADO` (devolución total de NFTs en custodia); `VALIDO` → trueke `COMPLETADO` con liberación en cruz (A⇄B) |
+| Evidencias | Tabla `evidencias_disputa` (`RECLAMO` / `JUSTIFICATIVO`, binario BYTEA + mime); servidas por `GET /disputas/:id/evidencia/:evId` con sesión |
+| Votos | Tabla `votos_disputa` (1 voto por Socio, `UNIQUE (disputa_id, socio)`); un Socio que es PARTE del trueke NO vota (403 `socio_involucrado`) |
+| Endpoints | `/disputas` (parte), `/disputas/padron`, `/disputas/votaciones`, `/:id/justificativo`, `/:id/no-conforme`, `/:id/votar`, `/:id`, `/:id/evidencia/:evId` |
+| UI | `/suite/disputas`: listado por rol (reclamante/contraparte/socio) + **flotante del caso** con evidencias de ambas partes (zoom) y votación ANULAR/VALIDO; botón ✗ No Conforme en `/suite/intercambio` abre el formulario con fotos |
+| Trazabilidad | CU-18/19 · RF-06.1, RF-14.8 · D13/D21/D26 |
+
+## 12. Sistemas solo Owner — lib/es-owner.js (2026-09-09)
+
+**Problema**: el icono Sistemas (`/suite/admin`) se mostraba a todo `tipo=SOCIO`
+(Ana/Bruno también lo son) y el backend admitía SOCIO en `/admin/usuarios`.
+
+| Aspecto | Diseño |
+|---|---|
+| Fuente de verdad del Owner | Dueño **on-chain** del `SociosRegistry` (`owner()` = `0xf39F…2266` en GCP), no el "tipo de usuario" |
+| Módulo | `backend/api/lib/es-owner.js`: `crearDetectorOwner` (resolución on-chain con caché 30 s; sin red → env `OWNER_WALLET` o usuario BD `rol='OWNER'`) + middleware `requiereOwner` |
+| Rutas endurecidas | TODAS `/admin/*` (`usuarios`, `contratos`, `kpis-disputas`, `db`, `infra/health`) exigen sesión + Owner → 403 `solo_owner` |
+| Exposición | `GET /admin/owner` (público) y `esOwner` en `/auth/estado` y `/auth/session` |
+| UI | `web/lib/navegacion.ts`: Sistemas `visible: (c) => c.esOwner === true`; `TopBar`, `BottomNav` y `SuiteGuard` reciben `esOwner` del contexto de sesión (`web/lib/sesion.tsx`) |
+| Trazabilidad | RF-13.1 · RF-18.4 |
+
+## 13. VALOR (ex Finanzas) — 4.1/4.2/4.3 (2026-09-09)
+
+| Subsección | Diseño |
+|---|---|
+| 4.1 Criptos del socio | `POST /valor/criptos/{recargar,retirar,convertir}` — movimientos SIEMPRE contra la **plataforma** como contraparte (`walletPlataforma()`); sin P2P directo (entre socios la cripto solo se mueve vía Trueke). Tasa interna 1 ETH ≈ `TASA_ETH_BRLT` (env, 3000). Saldo en `finanzas.criptos` + auditoría en `movimientos_valor` |
+| 4.2 Reputación y valoraciones | `GET /valor/mi`: puntaje D12/D30 + trueques COMPLETADOS sin valorar (valoración inline 1–5) + últimos 10 valorados. Las valoraciones ahora **se persisten** en la tabla `valoraciones` (`registrarValoracion`) |
+| 4.3 BRLT con Stripe | `POST /valor/brlt/checkout` crea una **Stripe Checkout Session alojada** (no pasarela propia); `POST /valor/brlt/webhook` (raw) acredita BRLT al confirmar (`movimientos_brlt` PENDIENTE→PAGADO); retiro = registro + aviso (desembolso real por **Stripe Payouts** documentado). Acceso: Empresa/SOCIO/Owner |
+| Rol | `rolValor(req)`: el Owner on-chain cuenta como SOCIO; `Particular` NO gestiona (403/UI solo lectura) |
+| UI | `/suite/valor` (3 cards + subsecciones); navegación `Finanzas → Valor`; `/suite/finanzas` redirige |
+| Trazabilidad | RF-14.7/14.8 · D5/D6/D7 · D18/D36 · Stripe (Checkout/Payouts, claves test en Secret Manager) |
+
+## 14. Notificaciones in-app (2026-09-09)
+
+| Aspecto | Diseño |
+|---|---|
+| BD | Tabla `notificaciones` (`wallet`, `tipo`, `titulo`, `cuerpo`, `ref_tipo`, `ref_id`, `leida`) |
+| Endpoints | `GET /notificaciones` (mías + no leídas), `POST /notificaciones/leer-todas`, `POST /notificaciones/:id/leida` |
+| Emisores | Motor de disputas (`DISPUTA_REPORTADA`, `PEDIDO_JUSTIFICATIVO`, `VOTACION_ABIERTA` a socios del padrón, `VEREDICTO` a las partes) |
+| UI | Campana 🔔 en `TopBar` (`web/components/CampanaNotificaciones.tsx`) con badge de no leídas y polling 30 s |
+| Trazabilidad | Decisión del director (centro de avisos in-app); complementa D13/D21 |
+
+> Nota de corte: la API/BD de esta actualización se despliega en Cloud Run
+> `truekeate-api` rev **00022-s24** y `truekeate-web` rev **00028-mwk**
+> (release-e6c61f7, rama `escrow-dsh-GCP`). El plan consolidado de ciclos
+> (C1–C11 + mejora continua) vive en `RepoTecnico/plan_desarrollo.md`.
