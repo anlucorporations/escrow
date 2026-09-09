@@ -47,6 +47,9 @@ export interface Sesion {
   acceso: EstadoAcceso;
   /** Token Bearer global (login único con la billetera); null si aún no firmó. */
   token: string | null;
+  /** La wallet conectada es el OWNER (dueño on-chain del SociosRegistry): es la
+   *  única con acceso a la sección Sistemas (/suite/admin, RF-13.1). */
+  esOwner: boolean;
   /** Autentica (firma EIP-191) y guarda el token global. */
   autenticar: () => Promise<boolean>;
   /** Cierra la sesión (borra el token). */
@@ -76,6 +79,8 @@ const CLAVE_TOKEN_WALLET = "truekeate.token.wallet";
 export function SesionProvider({ children }: { children: ReactNode }) {
   const { account, conectado, signer } = useEthereum();
   const [acceso, setAcceso] = useState<EstadoAcceso>({ fase: "sinWallet" });
+  // ¿La cuenta conectada es el Owner? (lo devuelve /auth/estado y /auth/session)
+  const [esOwner, setEsOwner] = useState(false);
   // Token restaurado de forma síncrona desde localStorage (login persistente:
   // evita el parpadeo de "Iniciar sesión" y la re-firma en cada recarga/sección).
   const [token, setToken] = useState<string | null>(() => {
@@ -113,6 +118,7 @@ export function SesionProvider({ children }: { children: ReactNode }) {
       if (!wallet && cuentaRef.current !== cuentaConsultada) {
         return { fase: "sinWallet" };
       }
+      setEsOwner(Boolean(estado.esOwner));
       const nuevo: EstadoAcceso =
         estado.inscrito && estado.usuario
           ? { fase: "inscrito", usuario: estado.usuario }
@@ -159,6 +165,7 @@ export function SesionProvider({ children }: { children: ReactNode }) {
       const firma = await signerFresco.signMessage("TrueKeate: iniciar sesión");
       const sesion = await iniciarSesion(firma);
       setToken(sesion.token);
+      setEsOwner(Boolean(sesion.esOwner));
       localStorage.setItem(CLAVE_TOKEN, sesion.token);
       localStorage.setItem(CLAVE_TOKEN_WALLET, walletFirmante);
       return true;
@@ -180,6 +187,7 @@ export function SesionProvider({ children }: { children: ReactNode }) {
 
   const cerrarSesion = useCallback(() => {
     setToken(null);
+    setEsOwner(false);
     localStorage.removeItem(CLAVE_TOKEN);
     localStorage.removeItem(CLAVE_TOKEN_WALLET);
   }, []);
@@ -199,8 +207,8 @@ export function SesionProvider({ children }: { children: ReactNode }) {
   );
 
   const valor = useMemo<Sesion>(
-    () => ({ acceso, token, autenticar, cerrarSesion, refrescar, inscribir, autenticando, firmarAccion }),
-    [acceso, token, autenticar, cerrarSesion, refrescar, inscribir, autenticando, firmarAccion]
+    () => ({ acceso, token, esOwner, autenticar, cerrarSesion, refrescar, inscribir, autenticando, firmarAccion }),
+    [acceso, token, esOwner, autenticar, cerrarSesion, refrescar, inscribir, autenticando, firmarAccion]
   );
 
   return <SesionContext.Provider value={valor}>{children}</SesionContext.Provider>;

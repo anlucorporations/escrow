@@ -150,7 +150,7 @@ function PantallaRequiereInscripcion() {
 
 export function SuiteGuard({ children }: { children: ReactNode }) {
   const { conectado } = useEthereum();
-  const { acceso, token } = useSesion();
+  const { acceso, token, esOwner } = useSesion();
   const pathname = usePathname() ?? "";
 
   // 1) Sin wallet conectada → no se accede al contenido de la suite.
@@ -177,11 +177,13 @@ export function SuiteGuard({ children }: { children: ReactNode }) {
     if (!token) return <PantallaIniciarSesion />;
 
     // Protección por URL: si la sección no está permitida para este usuario
-    // (RF-14/D14), se muestra un aviso en vez del contenido.
+    // (RF-14/D14), se muestra un aviso en vez del contenido. /suite/admin
+    // (Sistemas) solo aparece si esOwner (dueño on-chain del SociosRegistry).
     const permitidas = seccionesPara({
       tipo: acceso.usuario.tipo,
       nivel: acceso.usuario.nivel,
       estado: acceso.usuario.estado,
+      esOwner,
     });
     // Rutas de proceso de la escalera D28 (Verificación/Certificación): accesibles
     // para cualquier usuario inscrito (el contenido valida el estado y redirige).

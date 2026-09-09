@@ -47,7 +47,7 @@ function walletCorta(account: string) {
 export function TopBar() {
   const pathname = usePathname() ?? "";
   const { account, conectado, desconectar } = useEthereum();
-  const { acceso, cerrarSesion, token: tokenSesion } = useSesion();
+  const { acceso, cerrarSesion, token: tokenSesion, esOwner } = useSesion();
   const [abierto, setAbierto] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -77,6 +77,7 @@ export function TopBar() {
     tipo: inscrito?.tipo,
     nivel: inscrito?.nivel,
     estado: inscrito?.estado,
+    esOwner,
   });
   const seccionActiva = (href: string) =>
     href === "/suite/dashboard" ? pathname === href : pathname.startsWith(href);

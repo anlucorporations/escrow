@@ -10,6 +10,7 @@
 // =============================================================================
 import { Router } from 'express';
 import { recuperarFirmante, nuevoToken } from '../lib/auth.js';
+import { crearDetectorOwner } from '../lib/es-owner.js';
 
 const RE_WALLET = /^0x[0-9a-fA-F]{40}$/;
 const MENSAJE = 'TrueKeate: iniciar sesión';
@@ -36,8 +37,9 @@ function vistaPublica(u) {
   };
 }
 
-export function crearRouterAuth({ almacen }) {
+export function crearRouterAuth({ almacen, proveedor, registryAddress, ownerWallet }) {
   const r = Router();
+  const owner = crearDetectorOwner({ almacen, proveedor, registryAddress, ownerWallet });
 
   // GET /auth/estado?wallet=0x… — ¿está inscrita esta wallet? (guarda de acceso)
   r.get('/estado', async (req, res) => {
@@ -47,9 +49,9 @@ export function crearRouterAuth({ almacen }) {
     }
     const u = await almacen.getUsuario(wallet);
     if (!u) {
-      return res.json({ inscrito: false, usuario: null });
+      return res.json({ inscrito: false, usuario: null, esOwner: await owner.esOwner(wallet) });
     }
-    res.json({ inscrito: true, usuario: vistaPublica(u) });
+    res.json({ inscrito: true, usuario: vistaPublica(u), esOwner: await owner.esOwner(wallet) });
   });
 
   // POST /auth/connect — la wallet se conectó (frontend). NO inscribe (inscripción
@@ -62,7 +64,7 @@ export function crearRouterAuth({ almacen }) {
     const u = await almacen.getUsuario(wallet);
     if (u) {
       await almacen.actualizarUsuario(wallet, { actividadUltima: new Date().toISOString() });
-      return res.json({ inscrito: true, usuario: vistaPublica(u) });
+      return res.json({ inscrito: true, usuario: vistaPublica(u), esOwner: await owner.esOwner(wallet) });
     }
     res.json({ inscrito: false, usuario: null, aviso: 'wallet conectada pero no inscrita (RF-01.3)' });
   });
@@ -111,7 +113,7 @@ export function crearRouterAuth({ almacen }) {
     if (!u) return res.status(404).json({ error: 'usuario_inexistente' });
     const token = nuevoToken();
     almacen.guardarSesion(token, wallet);
-    res.json({ token, usuario: vistaPublica(u) });
+    res.json({ token, usuario: vistaPublica(u), esOwner: await owner.esOwner(wallet) });
   });
 
   return r;

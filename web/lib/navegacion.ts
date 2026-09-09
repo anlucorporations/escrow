@@ -23,6 +23,8 @@ export interface ContextoNav {
   tipo?: Tipo;
   nivel?: UsuarioPublico["nivel"];
   estado?: Estado;
+  /** La wallet conectada es el OWNER (dueño on-chain del SociosRegistry). */
+  esOwner?: boolean;
 }
 
 const ES_EMPRESA = (c: ContextoNav) => c.tipo === "EMPRESA";
@@ -88,7 +90,9 @@ const SECCIONES: (Seccion & { visible: (c: ContextoNav) => boolean })[] = [
     label: "Sistemas",
     icono: "🛠️",
     descripcion: "Suite Sistemas: Panel del Owner y Biblioteca de Sistemas (RF-13.1)",
-    visible: ES_SOCIO,
+    // SOLO el Owner (dueño on-chain del SociosRegistry) ve Sistemas; los Socios
+    // (Ana/Bruno, tipo SOCIO) NO: la sección es del Owner, no del rol Socio.
+    visible: (c) => c.esOwner === true,
   },
   {
     href: "/suite/perfil",

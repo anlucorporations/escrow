@@ -45,7 +45,7 @@ async function simularEscalera(page: Page, usuario: UsuarioSim, codigo: string) 
           new Response(JSON.stringify(b), { status, headers: { "Content-Type": "application/json" } });
 
         if (url.includes("/auth/estado")) {
-          return json({ inscrito: true, usuario: { wallet: cuenta, correo: "usuario@truekeate.test", ...usuarioSim, estado: estadoActual } });
+          return json({ inscrito: true, esOwner: false, usuario: { wallet: cuenta, correo: "usuario@truekeate.test", ...usuarioSim, estado: estadoActual } });
         }
         if (url.includes("/auth/session")) {
           return json({ token: "tok-d28", usuario: { wallet: cuenta, ...usuarioSim, estado: estadoActual } });

@@ -389,3 +389,23 @@ test('disputa: ambas partes No Conformes → EN_VOTACION directo; mayoría ANULA
   assert.ok(resuelta.evidencias.some((e) => e.tipo === 'RECLAMO'));
   assert.ok(resuelta.miVoto === 'ANULAR');
 });
+
+test('admin: un Socio del padrón (sin rol OWNER) NO accede a /admin/* (endurecimiento Sistemas)', async () => {
+  // Ana es SOCIO pero NO el Owner → 403 en TODAS las rutas admin (RF-13.1)
+  const walletSocio = ethers.Wallet.createRandom();
+  const wSocio = walletSocio.address.toLowerCase();
+  almacen.crearUsuario({ wallet: wSocio, tipo: 'SOCIO', nivel: 'SOCIO', medalla: 'ORO', estado: 'CERTIFICADO' });
+  const token = sesionDe(walletSocio);
+
+  for (const ruta of ['/admin/db', '/admin/contratos', '/admin/kpis-disputas', '/admin/usuarios', '/admin/infra/health']) {
+    const r = await request(app).get(ruta).set('Authorization', `Bearer ${token}`);
+    assert.equal(r.status, 403, `${ruta} debe rechazar a un Socio no-Owner`);
+    assert.equal(r.body.error, 'solo_owner', ruta);
+  }
+
+  // GET /admin/owner es público: devuelve la wallet del Owner (sin exponer PII)
+  const o = await request(app).get('/admin/owner');
+  assert.equal(o.status, 200);
+  assert.equal(o.body.owner, wOwner.toLowerCase());
+});
+

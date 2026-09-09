@@ -17,7 +17,7 @@ import { seccionesParaMovil, type Seccion } from "@/lib/navegacion";
 export function BottomNav() {
   const pathname = usePathname() ?? "";
   const { conectado } = useEthereum();
-  const { acceso } = useSesion();
+  const { acceso, esOwner } = useSesion();
   const [masAbierto, setMasAbierto] = useState(false);
 
   const inscrito = acceso.fase === "inscrito" ? acceso.usuario : null;
@@ -26,7 +26,7 @@ export function BottomNav() {
   // Si no hay wallet o está sin inscribir, solo se muestra Mercado (y nada más
   // que pueda inducir a error); el guard ya bloquea el contenido.
   const ctx = inscrito
-    ? { tipo: inscrito.tipo, nivel: inscrito.nivel, estado: inscrito.estado }
+    ? { tipo: inscrito.tipo, nivel: inscrito.nivel, estado: inscrito.estado, esOwner }
     : undefined;
 
   const { visibles, mas } = seccionesParaMovil(ctx ?? {});

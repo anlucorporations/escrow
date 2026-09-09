@@ -118,7 +118,7 @@ function BibliotecaSistemas() {
 
 export default function PaginaAdmin() {
   const { account, conectado, conectar, conectando } = useEthereum();
-  const { acceso, token } = useSesion();
+  const { acceso, token, esOwner } = useSesion();
 
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
@@ -128,8 +128,9 @@ export default function PaginaAdmin() {
   const [kpis, setKpis] = useState<AdminKpis | null>(null);
   const [infra, setInfra] = useState<AdminInfra | null>(null);
 
-  const esOwner =
-    acceso.fase === "inscrito" && acceso.usuario.tipo === "SOCIO";
+  // Solo el OWNER real (dueño on-chain del SociosRegistry) entra a Sistemas
+  // (RF-13.1); ser tipo SOCIO NO alcanza (Ana/Bruno no ven el panel).
+  const esOwnerReal = acceso.fase === "inscrito" && esOwner;
 
   const cargar = useCallback(async () => {
     if (!token) return;
@@ -190,15 +191,15 @@ export default function PaginaAdmin() {
         </Button>
       </div>
 
-      {token && !esOwner && (
+      {token && !esOwnerReal && (
         <p className="rounded-xl bg-crimson/10 px-4 py-2 text-sm text-crimson">
-          Tu usuario no tiene rol Owner/Socio: el backend rechazará las consultas.
+          Tu wallet no es el Owner de TrueKeate: el backend rechazará las consultas.
         </p>
       )}
       {error && <p className="rounded-xl bg-crimson/10 px-4 py-2 text-xs text-crimson">⚠️ {error}</p>}
 
       {/* 📚 Biblioteca de Sistemas (solo Owner) — estática, no depende de la API */}
-      {esOwner ? <BibliotecaSistemas /> : null}
+      {esOwnerReal ? <BibliotecaSistemas /> : null}
 
       {activo && (
         <>

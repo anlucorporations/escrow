@@ -16,16 +16,20 @@ interface UsuarioSim {
   estado: "INSCRITO" | "VERIFICADO" | "CERTIFICADO";
 }
 
-/** Inyecta una wallet simulada (MetaMask mock) y el estado de inscripción. */
+/** Inyecta una wallet simulada (MetaMask mock) y el estado de inscripción.
+ *  `esOwnerSim`: la wallet simulada es el Owner (dueño on-chain) — la única que
+ *  ve la sección Sistemas (/suite/admin). */
 async function simularWallet(
   page: Page,
   inscrito: boolean,
-  usuario: UsuarioSim = { tipo: "PARTICULAR", nivel: "INICIADO", estado: "INSCRITO" }
+  usuario: UsuarioSim = { tipo: "PARTICULAR", nivel: "INICIADO", estado: "INSCRITO" },
+  esOwnerSim = false
 ) {
   await page.addInitScript(
-    ([cuenta, est, usr]) => {
+    ([cuenta, est, usr, esOwn]) => {
       let estaInscrito = Boolean(est);
       const usuarioSim = usr as unknown as UsuarioSim;
+      const esOwnerSim = Boolean(esOwn);
 
       // Wallet simulada (RF-16): expone eth_requestAccounts / accountsChanged.
       (window as unknown as Record<string, unknown>).ethereum = {
@@ -58,8 +62,9 @@ async function simularWallet(
                 ? {
                     inscrito: true,
                     usuario: { wallet: cuenta, ...usuarioSim },
+                    esOwner: esOwnerSim,
                   }
-                : { inscrito: false, usuario: null }
+                : { inscrito: false, usuario: null, esOwner: esOwnerSim }
             ),
             { status: 200, headers: { "Content-Type": "application/json" } }
           );
@@ -70,6 +75,7 @@ async function simularWallet(
             JSON.stringify({
               inscrito: true,
               usuario: { wallet: cuenta, ...usuarioSim },
+              esOwner: esOwnerSim,
             }),
             { status: 200, headers: { "Content-Type": "application/json" } }
           );
@@ -80,6 +86,7 @@ async function simularWallet(
             JSON.stringify({
               token: "tok-e2e-suite",
               usuario: { wallet: cuenta, ...usuarioSim },
+              esOwner: esOwnerSim,
             }),
             { status: 200, headers: { "Content-Type": "application/json" } }
           );
@@ -120,7 +127,7 @@ async function simularWallet(
         return origFetch(input, init);
       };
     },
-    [CUENTA, inscrito ? true : null, usuario] as unknown as string[]
+    [CUENTA, inscrito ? true : null, usuario, esOwnerSim] as unknown as string[]
   );
 }
 
@@ -211,22 +218,32 @@ test.describe("Suite de usuario — control de acceso", () => {
     await expect(page.locator("nav[aria-label='Navegación principal']")).toBeHidden();
   });
 
-  test("PC: el menú filtra secciones según el tipo de usuario (Socio ve gobernanza)", async ({ page }, testInfo) => {
+  test("PC: el menú filtra secciones según el tipo de usuario (Socio ve gobernanza, NO Sistemas)", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "chromium", "solo escritorio");
-    await simularWallet(page, true, { tipo: "SOCIO", nivel: "SOCIO", estado: "CERTIFICADO" });
+    // Socio del padrón PERO no el Owner → Sistemas NO se muestra (decisión del director)
+    await simularWallet(page, true, { tipo: "SOCIO", nivel: "SOCIO", estado: "CERTIFICADO" }, false);
     await page.goto("/suite/dashboard");
     const nav = page.getByRole("navigation", { name: "Secciones de la suite" });
     // Un Particular Certificado NO vería estas secciones; el Socio sí:
     await expect(nav.getByRole("link", { name: /Socios/ })).toBeVisible(); // /suite/gobernanza
     await expect(nav.getByRole("link", { name: /Disputas/ })).toBeVisible();
     await expect(nav.getByRole("link", { name: /Finanzas/ })).toBeVisible();
-    await expect(nav.getByRole("link", { name: /Sistemas/ })).toBeVisible(); // /suite/admin
+    // Sistemas (RF-13.1) es SOLO del Owner: un Socio común NO la ve en la barra.
+    await expect(nav.getByRole("link", { name: /Sistemas/ })).toHaveCount(0);
     // La sección central del bottom (móvil) NO aparece en la barra superior PC.
     await expect(page.locator("nav[aria-label='Navegación principal']")).toBeHidden();
   });
 
+  test("PC: el icono Sistemas SOLO aparece para el Owner (dueño on-chain)", async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "solo escritorio");
+    await simularWallet(page, true, { tipo: "SOCIO", nivel: "SOCIO", estado: "CERTIFICADO" }, true);
+    await page.goto("/suite/dashboard");
+    const nav = page.getByRole("navigation", { name: "Secciones de la suite" });
+    await expect(nav.getByRole("link", { name: /Sistemas/ })).toBeVisible(); // solo Owner
+  });
+
   test("panel Admin (RF-13.1): el Owner ve el dashboard (login único ya hecho)", async ({ page }) => {
-    await simularWallet(page, true, { tipo: "SOCIO", nivel: "SOCIO", estado: "CERTIFICADO" });
+    await simularWallet(page, true, { tipo: "SOCIO", nivel: "SOCIO", estado: "CERTIFICADO" }, true);
     await page.goto("/suite/admin");
     await expect(page.getByRole("heading", { name: /Panel del Owner/ })).toBeVisible();
     // El login único se hizo al conectar: NO se vuelve a pedir firma por página.
@@ -235,6 +252,12 @@ test.describe("Suite de usuario — control de acceso", () => {
 
   test("protección por URL: un Particular Certificado NO entra a /suite/admin", async ({ page }) => {
     await simularWallet(page, true, { tipo: "PARTICULAR", nivel: "INICIADO", estado: "CERTIFICADO" });
+    await page.goto("/suite/admin");
+    await expect(page.getByText("No tienes acceso a esta sección")).toBeVisible();
+  });
+
+  test("protección por URL: un Socio del padrón (NO Owner) NO entra a /suite/admin", async ({ page }) => {
+    await simularWallet(page, true, { tipo: "SOCIO", nivel: "SOCIO", estado: "CERTIFICADO" }, false);
     await page.goto("/suite/admin");
     await expect(page.getByText("No tienes acceso a esta sección")).toBeVisible();
   });

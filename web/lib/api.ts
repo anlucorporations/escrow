@@ -24,6 +24,8 @@ export interface UsuarioPublico {
 export interface EstadoInscripcion {
   inscrito: boolean;
   usuario: UsuarioPublico | null;
+  /** La wallet consultada es el Owner (dueño on-chain del SociosRegistry). */
+  esOwner?: boolean;
 }
 
 export interface FirmaAccion {
@@ -94,9 +96,9 @@ export async function obtenerCatalogo(): Promise<ArticuloCatalogo[]> {
 
 const MENSAJE_SESION = "TrueKeate: iniciar sesión";
 
-/** POST /auth/session — firma EIP-191 → token Bearer + usuario. */
-export async function iniciarSesion(firma: string, mensaje = MENSAJE_SESION): Promise<{ token: string; usuario: UsuarioPublico }> {
-  return await pedir<{ token: string; usuario: UsuarioPublico }>("/auth/session", {
+/** POST /auth/session — firma EIP-191 → token Bearer + usuario (+ esOwner). */
+export async function iniciarSesion(firma: string, mensaje = MENSAJE_SESION): Promise<{ token: string; usuario: UsuarioPublico; esOwner?: boolean }> {
+  return await pedir<{ token: string; usuario: UsuarioPublico; esOwner?: boolean }>("/auth/session", {
     method: "POST",
     body: JSON.stringify({ mensaje, firma }),
   });

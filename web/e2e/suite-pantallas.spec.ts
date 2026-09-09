@@ -47,7 +47,7 @@ async function simularSuite(
           new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
 
         if (url.includes("/auth/estado")) {
-          return json({ inscrito: true, usuario: { wallet: cuenta, ...usuarioSim } });
+          return json({ inscrito: true, esOwner: false, usuario: { wallet: cuenta, ...usuarioSim } });
         }
         if (url.includes("/auth/session")) {
           return json({ token: "tok-e2e", usuario: { wallet: cuenta, ...usuarioSim } });
