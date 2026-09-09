@@ -730,7 +730,7 @@ on-chain del SociosRegistry (`owner()` = 0xf39F…2266 en GCP), no un "tipo".
 - → Diccionario de datos actualizado: `RepoTecnico/diccionario_datos.md`
 - → Entornos globales actualizados: `RepoTecnico/entornos_globales.md`
 
-## 📚 @manuales actualizado (2026-09-09) — commit 190447b
+## 📚 @manuales actualizado (2026-09-09) — commit b450e86
 
 Regeneración acotada del equipo @manuales (5 roles) para reflejar los ciclos
 recientes (disputas v2, VALOR, Sistemas solo Owner, D28, histórico, inventario
