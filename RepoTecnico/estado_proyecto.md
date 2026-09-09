@@ -752,4 +752,7 @@ flotante, notificaciones):
   tema 07-frontend + los 2 manuales nuevos (ids 10-disputas-v2 y
   11-seccion-valor) + panel-sistemas reforzado; PDF e imágenes copiados a
   web/public/manual/. tsc y build web OK; /help/manual verificado en navegador
-  (temas nuevos abren y la imagen valor-seccion carga).
+  (temas nuevos abren y la imagen valor-seccion carga). Web redeployada con los
+manuales: rev **truekeate-web-00029-9kh** (release-b450e86); verificado en vivo en
+GCP: temas nuevos visibles, PDF 03-Implementacion-11-seccion-valor.pdf 200 y SVG
+flujo-disputas-v2.svg 200.
