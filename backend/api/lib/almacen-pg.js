@@ -614,8 +614,11 @@ export async function crearAlmacenPg(pool) {
     /** Valoraciones que dio una wallet (con títulos del trueke) — para VALOR 4.2. */
     async listarValoracionesDe(wallet, limite = 10) {
       const r = await pool.query(
-        `SELECT v.*, t.titulo_a, t.titulo_b, t.updated_at AS trueke_updated
-           FROM valoraciones v JOIN truekes t ON t.id = v.trueke_id
+        `SELECT v.*, aa.titulo AS titulo_a, ab.titulo AS titulo_b, t.updated_at AS trueke_updated
+           FROM valoraciones v
+           JOIN truekes t ON t.id = v.trueke_id
+           LEFT JOIN articulos aa ON aa.id = t.articulo_a_id
+           LEFT JOIN articulos ab ON ab.id = t.articulo_b_id
           WHERE v.valorador = $1
           ORDER BY v.created_at DESC LIMIT $2`,
         [NORMALIZA_WALLET(wallet), Number(limite)]
