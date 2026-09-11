@@ -16,7 +16,7 @@ En consecuencia, la comparación tiene tres lecturas que dan resultados muy dist
 
 | Lectura | Qué mide | Resultado |
 |---|---|---|
-| **Global ponderada** | La rúbrica completa de la §1 (capacidades + estructura + stack + fases + mejoras + calidad) | **67 %** |
+| **Global ponderada** | La rúbrica completa de la §1 (capacidades + estructura + stack + fases + mejoras + calidad) | **63 %** |
 | **Literal** | Que los 22 artefactos nombrados en el enunciado (archivos, componentes, funciones y eventos) existan **con ese nombre exacto** | **27 %** (6 de 22) |
 | **Mejoras opcionales** | Los 10 "siguientes pasos" que el enunciado listaba como deseables | **45 %** |
 
@@ -109,7 +109,7 @@ El enunciado pedía 5 funciones. La tabla compara la exigencia literal con lo qu
 | 12 | `deploy.sh` | ⚠️ | Nombre distinto: `deploy-local.sh` / `.py` / `.ps1` + `sc/script/Deploy.s.sol` |
 | 13 | `README_ESTUDIANTE.md` | ✅ | Presente en `RepoTecnico/` |
 
-**Puntuación del bloque B: 8,5 / 13 = 65 %** (se cuentan ✅ = 1, ⚠️ = 0,5).
+**Puntuación del bloque B: 7 / 13 = 54 %** (se cuentan ✅ = 1, ⚠️ = 0,5: seis cumplidos y dos parciales).
 
 ---
 
@@ -185,7 +185,7 @@ El enunciado cerraba con una lista de 10 mejoras deseables. El proyecto las abor
 | 7 | Documentación técnica y de usuario | ✅ Excedido | 15.372 líneas en `RepoTecnico/`, 8 temas de manuales, 29 PDF y una biblioteca de ayuda navegable en `/help/manual` |
 | 8 | Evidencia de funcionamiento real | ✅ | Servicios desplegados en Cloud Run (`truekeate-web` rev. `00028-mwk`, `truekeate-api` rev. `00022-s24`, `mcc-foundry-anvil`, `mcc-pgadmin`) y contratos con ABI en `backend/contratos.json`. **Evidencia documental del propio repositorio**: no se comprobó en vivo durante esta auditoría |
 
-**Puntuación del bloque F: 6 / 8 = 75 %.**
+**Puntuación del bloque F: 5,5 / 8 = 69 %.**
 
 > **Límite de verificación:** este informe es una auditoría **estática** sobre los contratos, el frontend y la documentación; **no** se ejecutaron `forge test`, `npm test` ni `npx playwright test`. La única suite que sí se ejecutó durante la revisión fue la del backend (`node --test`), y su resultado real es el que figura en el criterio 3. Las cifras verdes que cita la documentación del proyecto ("backend 28/28", "62/62", "80/80") **no** fueron reproducidas en su totalidad y en el caso del backend están desactualizadas.
 
@@ -404,22 +404,22 @@ El proyecto documenta su propio alcance con un detalle que excede cualquier expe
 | Bloque | Peso | Puntos | Porcentaje | Lectura |
 |---|---:|---:|---:|---|
 | A. Funcionalidades principales | 25 % | 16 / 25 | **64 %** | 3 de 5 capacidades cumplidas y superadas; 2 ausentes |
-| B. Estructura de archivos | 20 % | 8,5 / 13 | **65 %** | Los archivos de contratos y librerías existen; los 5 componentes no |
+| B. Estructura de archivos | 20 % | 7 / 13 | **54 %** | Los archivos de contratos y librerías existen; los 5 componentes no |
 | C. Stack tecnológico | 15 % | 8 / 8 | **100 %** | Todo el stack pedido está presente y actualizado |
 | D. Fases 1–12 | 15 % | 5,5 / 12 | **46 %** | Las fases de infraestructura sí; las de componentes y despliegue literal, no |
 | E. Mejoras posibles | 10 % | 4,5 / 10 | **45 %** | 3 implementadas, 3 parciales, 4 ausentes |
-| F. Calidad y verificación | 15 % | 6 / 8 | **75 %** | Pruebas de contrato y documentación muy por encima de lo pedido; despliegue y frontend, por debajo |
-| **TOTAL PONDERADO** | **100 %** | — | **≈ 67 %** | |
+| F. Calidad y verificación | 15 % | 5,5 / 8 | **69 %** | Pruebas de contrato y documentación muy por encima de lo pedido; despliegue y frontend, por debajo |
+| **TOTAL PONDERADO** | **100 %** | — | **≈ 63 %** | |
 
 ### 14.2 Las tres cifras que resumen el proyecto
 
-- **67 %** de cumplimiento global ponderado frente al enunciado.
+- **63 %** de cumplimiento global ponderado frente al enunciado.
 - **27 %** de coincidencia literal en nombres (6 de 22 artefactos nombrados).
 - **100 %** del stack tecnológico exigido y **más de 15 tecnologías adicionales**.
 
 El desglose revela un patrón claro: **el proyecto brilla donde el enunciado pedía poco** (stack tecnológico, pruebas, documentación, despliegue en nube) y **falla donde el enunciado pedía algo literal o de fontanería** (nombres de componentes, allowlist de tokens, script de despliegue de un paso, inyección de direcciones).
 
-### 14.3 Por qué el número es 67 % y no 100 %
+### 14.3 Por qué el número es 63 % y no 100 %
 
 El proyecto no suspendió por falta de trabajo, sino por **cambio de alcance**: se construyó un producto real en lugar de la práctica guiada. Además, la capa de despliegue quedó **desincronizada del código**: los scripts siguen apuntando a una generación anterior de contratos, de modo que la reproducibilidad —que el enunciado pedía explícitamente— hoy no se sostiene.
 
@@ -454,7 +454,18 @@ Las carencias que explican la diferencia son concretas y acotadas:
 
 > **Fecha:** 11 de septiembre de 2026. Este apartado documenta los cambios hechos **después** del corte auditado (`1ea7085`); el resto del informe describe ese commit y no se modifica.
 
-Se atacó primero el hallazgo crítico (§13, riesgo 1): la cadena de despliegue desincronizada.
+### 15.0 Corrección aritmética del propio informe
+
+Al proyectar el plan de mejora se detectaron **dos errores de suma** en este documento, ya corregidos:
+
+| Bloque | Estaba publicado | Correcto | Motivo |
+|---|---|---|---|
+| B. Estructura de archivos | 8,5 / 13 = 65 % | **7 / 13 = 54 %** | Son 6 artefactos cumplidos (1,0 cada uno) y 2 parciales (0,5 cada uno): 7,0 |
+| F. Calidad y verificación | 6 / 8 = 75 % | **5,5 / 8 = 69 %** | 1 + 1 + 0,5 + 0 + 0,5 + 0,5 + 1 + 1 = 5,5 |
+
+El **cumplimiento global del commit auditado es 63 %** (no 67 %). Con las reparaciones de esta sección sube a **64 %**, porque el registro de direcciones pasa de parcial a cumplido (bloque F: 6/8 = 75 %). Los porcentajes del resto del documento ya reflejan la corrección.
+
+### 15.1 Reparación de la cadena de despliegue
 
 | Archivo | Cambio | Verificación |
 |---|---|---|
