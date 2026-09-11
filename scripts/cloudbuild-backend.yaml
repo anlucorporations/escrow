@@ -6,9 +6,10 @@
 #
 # Uso (desde la raíz del repositorio):
 #   gcloud builds submit --config scripts/cloudbuild-backend.yaml \
-#     --substitutions=_TAG=release-<sha> .
+#     --substitutions=_TAG=release-<sha> backend/
 #
-# Contexto de build: backend/  (su Dockerfile copia package.json, db, api, …)
+# Contexto de build: backend/ (se sube solo esa carpeta, que tiene su propio
+# .gcloudignore), y su Dockerfile copia package.json, db, api, contratos.json…
 # Los secretos NO se hornean: se inyectan en runtime con --set-secrets.
 # ============================================================================
 steps:
@@ -16,10 +17,11 @@ steps:
     args:
       - 'build'
       - '-f'
-      - 'backend/Dockerfile'
+      - 'Dockerfile'
       - '-t'
       - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/truekeate-repo/backend:$_TAG'
-      - 'backend'
+      # El contexto subido ya ES backend/, así que el contexto de docker es '.'
+      - '.'
 
 images:
   - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/truekeate-repo/backend:$_TAG'
