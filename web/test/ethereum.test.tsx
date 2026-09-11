@@ -15,14 +15,19 @@ const CLAVE = "truekeate.account";
 type Oyente = (args: unknown[]) => void;
 
 /** Simula window.ethereum (EIP-1193) y permite emitir eventos de la wallet. */
-function instalarWallet(cuentas: string[] = [CUENTA]) {
+function instalarWallet(cuentas: string[] = [CUENTA], chainIdHex = "0x7a69") {
   const oyentes: Record<string, Oyente[]> = {};
   const metodos: string[] = [];
+  let red = chainIdHex;
   const eth = {
-    request: vi.fn(async ({ method }: { method: string }) => {
+    request: vi.fn(async ({ method, params }: { method: string; params?: unknown[] }) => {
       metodos.push(method);
       if (method === "eth_requestAccounts" || method === "eth_accounts") return cuentas;
-      if (method === "eth_chainId") return "0x7a69";
+      if (method === "eth_chainId") return red;
+      if (method === "wallet_switchEthereumChain") {
+        red = (params?.[0] as { chainId: string }).chainId;
+        return null;
+      }
       return null;
     }),
     on: (ev: string, cb: Oyente) => {
@@ -50,8 +55,11 @@ function Sonda() {
       <span data-testid="conectado">{String(e.conectado)}</span>
       <span data-testid="error">{e.errorConexion ?? "ninguno"}</span>
       <span data-testid="signer">{e.signer ? "si" : "no"}</span>
+      <span data-testid="aviso">{e.aviso ?? "ninguno"}</span>
+      <span data-testid="red">{e.redActual ?? "desconocida"}</span>
       <button onClick={() => void e.conectar()}>conectar</button>
       <button onClick={() => e.desconectar()}>desconectar</button>
+      <button onClick={() => void e.cambiarDeRed()}>cambiar-red</button>
     </div>
   );
 }
@@ -146,7 +154,99 @@ describe("conectar", () => {
       screen.getByText("conectar").click();
     });
     await waitFor(() => expect(leer("conectado")).toBe("false"));
-    expect(errores).toHaveBeenCalled();
+    expect(leer("aviso")).toBe("rechazado");
+    // Un rechazo del usuario es una acción legítima: no se registra como error.
+    expect(errores).not.toHaveBeenCalled();
+  });
+});
+
+describe("red de la wallet (chainChanged)", () => {
+  test("conectar en la red correcta no genera aviso y expone el chainId", async () => {
+    instalarWallet([CUENTA], "0x7a69");
+    montar();
+    await act(async () => {
+      screen.getByText("conectar").click();
+    });
+    await waitFor(() => expect(leer("account")).toBe(CUENTA));
+    expect(leer("aviso")).toBe("ninguno");
+    expect(leer("red")).toBe("31337");
+  });
+
+  test("conectar en otra red avisa al usuario", async () => {
+    instalarWallet([CUENTA], "0x1");
+    montar();
+    await act(async () => {
+      screen.getByText("conectar").click();
+    });
+    await waitFor(() => expect(leer("aviso")).toBe("red_incorrecta"));
+    expect(leer("red")).toBe("1");
+  });
+
+  test("cambiar de red en MetaMask actualiza el aviso sin recargar la página", async () => {
+    const wallet = instalarWallet([CUENTA], "0x1");
+    localStorage.setItem(CLAVE, CUENTA);
+    montar();
+    await waitFor(() => expect(leer("aviso")).toBe("red_incorrecta"));
+
+    await act(async () => {
+      wallet.emitir("chainChanged", ["0x7a69"]);
+    });
+    await waitFor(() => expect(leer("aviso")).toBe("ninguno"));
+    expect(leer("red")).toBe("31337");
+  });
+
+  test("cambiarDeRed pide la red esperada a la wallet y limpia el aviso", async () => {
+    const wallet = instalarWallet([CUENTA], "0x1");
+    montar();
+    await act(async () => {
+      screen.getByText("conectar").click();
+    });
+    await waitFor(() => expect(leer("aviso")).toBe("red_incorrecta"));
+
+    await act(async () => {
+      screen.getByText("cambiar-red").click();
+    });
+    await waitFor(() => expect(leer("aviso")).toBe("ninguno"));
+    expect(wallet.metodos).toContain("wallet_switchEthereumChain");
+    const llamada = wallet.eth.request.mock.calls.find((c) => c[0].method === "wallet_switchEthereumChain");
+    expect((llamada?.[0].params?.[0] as { chainId: string }).chainId).toBe("0x7a69");
+  });
+
+  test("si la wallet no conoce la red (4902) la agrega y reintenta", async () => {
+    const oyentes: Record<string, Oyente[]> = {};
+    let agregada = false;
+    const eth = {
+      request: vi.fn(async ({ method, params }: { method: string; params?: unknown[] }) => {
+        if (method === "eth_chainId") return agregada ? "0x7a69" : "0x1";
+        if (method === "eth_requestAccounts" || method === "eth_accounts") return [CUENTA];
+        if (method === "wallet_switchEthereumChain") {
+          if (!agregada) throw Object.assign(new Error("Unrecognized chain ID"), { code: 4902 });
+          return null;
+        }
+        if (method === "wallet_addEthereumChain") {
+          agregada = true;
+          expect((params?.[0] as { chainId: string }).chainId).toBe("0x7a69");
+          return null;
+        }
+        return null;
+      }),
+      on: (ev: string, cb: Oyente) => {
+        (oyentes[ev] ||= []).push(cb);
+      },
+      removeListener: () => {},
+    };
+    (window as unknown as { ethereum: unknown }).ethereum = eth;
+    montar();
+    await act(async () => {
+      screen.getByText("conectar").click();
+    });
+    await waitFor(() => expect(leer("aviso")).toBe("red_incorrecta"));
+
+    await act(async () => {
+      screen.getByText("cambiar-red").click();
+    });
+    await waitFor(() => expect(agregada).toBe(true));
+    await waitFor(() => expect(leer("aviso")).toBe("ninguno"));
   });
 });
 

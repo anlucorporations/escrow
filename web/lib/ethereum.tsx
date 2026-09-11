@@ -33,6 +33,12 @@ declare global {
 
 export type MotivoSinProveedor = "sin_wallet" | "app_movil" | null;
 
+/** Avisos accionables que dependen de la wallet, no de su ausencia. */
+export type AvisoConexion = "rechazado" | "red_incorrecta" | null;
+
+/** Red en la que opera la plataforma (31337 = Anvil por defecto). */
+export const RED_ESPERADA = Number(process.env.NEXT_PUBLIC_CHAIN_ID ?? 31337);
+
 export interface EstadoEthereum {
   account: string | null;
   provider: BrowserProvider | null;
@@ -43,6 +49,14 @@ export interface EstadoEthereum {
   desconectar: () => void;
   /** Por qué no hay provider (móvil sin extensión / escritorio sin extensión). */
   errorConexion: MotivoSinProveedor;
+  /** Aviso mostrable al usuario: rechazo del usuario o red equivocada. */
+  aviso: AvisoConexion;
+  /** chainId actual de la wallet (null si no se pudo leer). */
+  redActual: number | null;
+  /** Red que espera la plataforma. */
+  redEsperada: number;
+  /** Pide a la wallet cambiar a la red esperada (la agrega si no la conoce). */
+  cambiarDeRed: () => Promise<boolean>;
   /** Abre la dApp en la app de MetaMask (deep link) desde el navegador móvil. */
   abrirEnAppWallet: () => void;
   /** true si el dispositivo parece un móvil/tableta (sin extensiones de wallet). */
@@ -84,6 +98,24 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
   const [signer, setSigner] = useState<JsonRpcSigner | null>(null);
   const [conectando, setConectando] = useState(false);
   const [errorConexion, setErrorConexion] = useState<MotivoSinProveedor>(null);
+  const [aviso, setAviso] = useState<AvisoConexion>(null);
+  const [redActual, setRedActual] = useState<number | null>(null);
+
+  /** Lee el chainId de la wallet y marca aviso si no es la red esperada. */
+  const revisarRed = useCallback(async (eth?: Eip1193Provider | null): Promise<number | null> => {
+    const w = eth ?? (typeof window !== "undefined" ? window.ethereum : null);
+    if (!w?.request) return null;
+    try {
+      const hex = (await w.request({ method: "eth_chainId" })) as string;
+      const id = Number.parseInt(String(hex), 16);
+      setRedActual(id);
+      // Un rechazo del usuario no se pisa con el resultado de esta comprobación.
+      setAviso((prev) => (prev === "rechazado" ? prev : id === RED_ESPERADA ? null : "red_incorrecta"));
+      return id;
+    } catch {
+      return null;
+    }
+  }, []);
 
   /** Fija la cuenta activa con un provider/signer SIEMPRE frescos.
    *  - Desde conectar(): se pasa el BrowserProvider recién creado (bp).
@@ -140,6 +172,10 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
   // Auto-reconexión al refrescar (RF-16.2)
   useEffect(() => {
     const previa = localStorage.getItem(CLAVE_ACCOUNT);
+    if (typeof window !== "undefined" && window.ethereum) {
+      // Detectar de entrada si la wallet está en otra red (aviso temprano).
+      void revisarRed(window.ethereum);
+    }
     if (previa && typeof window !== "undefined" && window.ethereum) {
       const bp = new BrowserProvider(window.ethereum);
       setProvider(bp);
@@ -151,7 +187,7 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
         setAccount(previa);
       });
     }
-  }, []);
+  }, [revisarRed]);
 
   // Escuchar cambios de cuenta/red de MetaMask
   useEffect(() => {
@@ -162,6 +198,29 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
       window.ethereum?.removeListener?.("accountsChanged", handleAccounts);
     };
   }, [fijarCuenta]);
+
+  // Cambio de red en la wallet: el provider anterior queda inservible, así que
+  // se reconstruye y se avisa si la red no es la de la plataforma.
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.ethereum?.on) return;
+    const handleChain = (hex: unknown) => {
+      const id = Number.parseInt(String(hex), 16);
+      setRedActual(id);
+      setAviso(id === RED_ESPERADA ? null : "red_incorrecta");
+      const eth = window.ethereum;
+      if (eth) {
+        const bp = new BrowserProvider(eth);
+        setProvider(bp);
+        setSigner(null);
+        void bp.getSigner().then(setSigner).catch(() => setSigner(null));
+        if (account) void fijarCuenta([account], bp);
+      }
+    };
+    window.ethereum.on("chainChanged", handleChain);
+    return () => {
+      window.ethereum?.removeListener?.("chainChanged", handleChain);
+    };
+  }, [account, fijarCuenta]);
 
   const conectar = useCallback(async (): Promise<string | null> => {
     if (typeof window === "undefined") return null;
@@ -180,6 +239,7 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
       }
     }
     setConectando(true);
+    setAviso(null);
     try {
       // Provider FRESCO: nunca reutilizar el de la cuenta anterior (el signer
       // debe corresponder a la wallet que el usuario elija ahora).
@@ -189,14 +249,55 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
       })) as string[];
       if (!cuentas || cuentas.length === 0) return null;
       await fijarCuenta(cuentas, bp);
+      await revisarRed(eth);
       return cuentas[0]?.toLowerCase() ?? null;
     } catch (e) {
+      // 4001 = el usuario canceló el popup de la wallet: es una acción legítima,
+      // no un fallo; se le informa sin ruido en consola.
+      if ((e as { code?: number })?.code === 4001) {
+        setAviso("rechazado");
+        return null;
+      }
       console.error("[ethereum] error al conectar:", e);
+      setAviso(null);
       return null;
     } finally {
       setConectando(false);
     }
-  }, [fijarCuenta]);
+  }, [fijarCuenta, revisarRed]);
+
+  /** Pide a la wallet cambiar a la red esperada; si no la conoce, la agrega. */
+  const cambiarDeRed = useCallback(async (): Promise<boolean> => {
+    const eth = typeof window !== "undefined" ? window.ethereum : null;
+    if (!eth?.request) return false;
+    const hex = `0x${RED_ESPERADA.toString(16)}`;
+    try {
+      await eth.request({ method: "wallet_switchEthereumChain", params: [{ chainId: hex }] });
+      await revisarRed(eth);
+      return true;
+    } catch (e) {
+      const code = (e as { code?: number })?.code;
+      // 4902 = la wallet no conoce esa red: se agrega y se reintenta.
+      if (code === 4902) {
+        try {
+          await eth.request({
+            method: "wallet_addEthereumChain",
+            params: [{
+              chainId: hex,
+              chainName: RED_ESPERADA === 31337 ? "Anvil (TrueKeate local)" : `Red ${RED_ESPERADA}`,
+              nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+              rpcUrls: [process.env.NEXT_PUBLIC_RPC_URL ?? "http://127.0.0.1:8545"],
+            }],
+          });
+          await revisarRed(eth);
+          return true;
+        } catch {
+          return false;
+        }
+      }
+      return false;
+    }
+  }, [revisarRed]);
 
   /** Deep link a la app de MetaMask (móvil): abre esta misma dApp en su navegador interno. */
   const abrirEnAppWallet = useCallback(() => {
@@ -239,10 +340,14 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
       conectar,
       desconectar,
       errorConexion,
+      aviso,
+      redActual,
+      redEsperada: RED_ESPERADA,
+      cambiarDeRed,
       abrirEnAppWallet,
       esMovil: esDispositivoMovil(),
     }),
-    [account, provider, signer, conectando, conectar, desconectar, errorConexion, abrirEnAppWallet]
+    [account, provider, signer, conectando, conectar, desconectar, errorConexion, aviso, redActual, cambiarDeRed, abrirEnAppWallet]
   );
 
   return <EthereumContext.Provider value={valor}>{children}</EthereumContext.Provider>;
