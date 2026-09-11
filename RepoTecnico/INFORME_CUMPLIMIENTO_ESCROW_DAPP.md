@@ -450,4 +450,29 @@ Las carencias que explican la diferencia son concretas y acotadas:
 
 ---
 
-*Informe generado por auditoría estática de solo lectura sobre el commit `1ea7085` (rama `main`). No se ejecutaron compilaciones ni suites de pruebas. Todos los conteos son verificables con los comandos citados en cada sección; las afirmaciones que provienen de la documentación del proyecto se distinguen de las verificadas en el código.*
+## 15. Reparaciones aplicadas después de la auditoría
+
+> **Fecha:** 11 de septiembre de 2026. Este apartado documenta los cambios hechos **después** del corte auditado (`1ea7085`); el resto del informe describe ese commit y no se modifica.
+
+Se atacó primero el hallazgo crítico (§13, riesgo 1): la cadena de despliegue desincronizada.
+
+| Archivo | Cambio | Verificación |
+|---|---|---|
+| `deploy-local.sh` | **Reescrito** sobre la arquitectura real. Ahora invoca `sc/script/Deploy.s.sol` como única fuente de verdad del despliegue y del cableado, lee las direcciones del broadcast de Foundry con `jq`, despliega el `TrueKeateSBT` con su minter, concede el rol de minter del NFT y del SBT a la cuenta del relayer, vincula el padrón de socios al Escrow, mintea 1000 TKA y 1000 TKB a las 10 cuentas, y escribe `web/.env.local` y `deployment-info.txt` con los **nombres de variable correctos**. Elimina las llamadas a `addToken`/`setArbiter`/`setUserRegistry` (inexistentes) y la matriz de roles on-chain (hoy vive en el backend). Añade `~/.foundry/bin` al `PATH` y verifica cada dirección antes de continuar. | ✅ **Ejecutado de extremo a extremo** contra un Anvil temporal aislado (puerto 8546): exit 0, 9 contratos con bytecode verificado con `cast code`, `owner()`, `trueKeateNft()`, `sociosRegistry()`, `minter()` del NFT y del SBT, y saldo de 1000e18 TKA comprobados on-chain |
+| `verify-setup.sh` | **Reescrito**: consultaba `getAllowedTokensCount()` y `arbiter()`, que no existen. Ahora comprueba `owner()`, `trueKeateNft()`, `sociosRegistry()`, `siguienteId()`, los minters y el saldo de un token, acumula fallos y devuelve código de salida coherente. Acepta el nombre nuevo y el antiguo de la variable del Escrow. | ✅ Ejecutado contra el Anvil temporal: salida correcta, exit 0 |
+| `web/Dockerfile` | Las 5 direcciones pasan de `ENV` fijo a `ARG` + `ENV`, de modo que los `--build-arg` del build **sí** llegan al bundle. Se añaden `NEXT_PUBLIC_CHAIN_ID` y `NEXT_PUBLIC_RPC_URL` con los mismos nombres que genera `deploy-local.sh`. | ⚠️ Validado por inspección; **no** se construyó la imagen (no hay Docker en el entorno de auditoría) |
+| `scripts/cloudbuild.yaml` | Los `--build-arg` usaban `NEXT_PUBLIC_*_ADDRESS`, que no correspondían a ningún `ARG` del `Dockerfile` (solo producían avisos y el valor se perdía). Se alinean los 8 nombres con el `Dockerfile` y se añade el bloque `substitutions:` con los valores por defecto del despliegue vigente. | ✅ YAML validado con `yaml.safe_load` |
+| `deploy-local.py` | Marcado como **obsoleto**: guarda al inicio que explica por qué no puede ejecutarse y remite al camino vigente. Se conserva como referencia histórica. | ✅ Ejecutado: mensaje correcto y salida 1 |
+| `deploy-local.ps1` | Igual que el anterior. **No se reescribió** porque no hay PowerShell en este entorno y no se debe publicar código no verificable. | ⚠️ Solo revisión por inspección |
+
+**Pendiente de la misma familia de fallos** (§13, riesgos 2 a 6), no abordado en esta ronda:
+
+1. **`scripts/deploy-contracts-gcp.sh` sigue con la lista obsoleta** (líneas 124-137: `UserRegistry`, `Exchange`, `MockERC20`, `Subscription`, `Governance`, `TruekeSBT`, `SBTRegistry`, `TruekeRWA`, `TruekeService`) y con las llamadas a `addToken`. Es el camino de despliegue **de producción**, así que la reparación es la misma que en `deploy-local.sh` y conviene verificarla contra un nodo real o un Anvil temporal.
+2. **Archivos que `deploy-gcp.sh` necesita y no existen**: `web/Dockerfile.indexer` (referenciado por `scripts/cloudbuild-indexer.yaml`), `web/.env.gcp.example` y el script de esquema/PostGIS (la referencia a `web/scripts/setup-gcp-db.mjs` es hoy solo un mensaje informativo; el esquema real es `backend/db/schema.sql`).
+3. **`start-services.ps1` arranca `web/scripts/indexer.mjs`**, que no existe: el indexador vive en `backend/indexador-cli.js`.
+4. **`verify-setup.sh` sigue sin cubrir el backend** (PostgreSQL, API y relayer), que es donde vive la lógica de negocio.
+5. La **suite de backend con 4 pruebas en rojo** y la **ausencia de pruebas unitarias de frontend** no se tocaron.
+
+---
+
+*Informe generado por auditoría estática sobre el commit `1ea7085` (rama `main`); la §15 documenta las reparaciones posteriores. Todos los conteos son verificables con los comandos citados en cada sección; las afirmaciones que provienen de la documentación del proyecto se distinguen de las verificadas en el código. Las reparaciones ejecutadas y verificadas se indican como tales; las que solo se revisaron por inspección se marcan como no verificadas.*
