@@ -95,8 +95,11 @@ describe("BalanceDebug", () => {
     await act(async () => {
       screen.getByRole("button", { name: /Refrescar/ }).click();
     });
-    await waitFor(() =>
-      expect(metodos.filter((m) => m === "eth_getBalance").length).toBeGreaterThan(antes)
+    // La lectura es asíncrona: con la carga de jsdom puede superar el segundo
+    // que waitFor espera por defecto (la prueba era intermitente).
+    await waitFor(
+      () => expect(metodos.filter((m) => m === "eth_getBalance").length).toBeGreaterThan(antes),
+      { timeout: 5000 }
     );
   });
 });
