@@ -4,7 +4,7 @@
 // contrato no responden, muestra lo que pueda y sigue.
 // =============================================================================
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { render, screen, waitFor, act } from "@testing-library/react";
+import { render, screen, waitFor, act, fireEvent } from "@testing-library/react";
 import { EthereumProvider } from "../lib/ethereum";
 import { BalanceDebug } from "../components/BalanceDebug";
 
@@ -79,26 +79,29 @@ describe("BalanceDebug", () => {
     expect(screen.getByText(/Actualizado a las/)).toBeInTheDocument();
   });
 
-  test("el botón de refresco vuelve a leer la cadena", async () => {
-    const { metodos } = instalarWallet((method) => {
+  test("el botón de refresco vuelve a leer la cadena y refleja el valor nuevo", async () => {
+    let wei = "0xde0b6b3a7640000"; // 1 ETH
+    instalarWallet((method) => {
       if (method === "eth_chainId") return "0x7a69";
       if (method === "eth_accounts" || method === "eth_requestAccounts") return [CUENTA];
-      if (method === "eth_getBalance") return "0x0";
+      if (method === "eth_getBalance") return wei;
       throw new Error("método no soportado");
     });
     montar();
-    // «Actualizado a las» solo aparece cuando la primera lectura terminó.
-    await waitFor(() => expect(screen.getByText(/Actualizado a las/)).toBeInTheDocument());
-    const antes = metodos.filter((m) => m === "eth_getBalance").length;
-    expect(antes).toBeGreaterThan(0);
+    await waitFor(() => expect(screen.getByText("1.0 ETH")).toBeInTheDocument());
 
+    // La cadena cambia y el usuario pulsa Refrescar.
+    wei = "0x1bc16d674ec80000"; // 2 ETH
+    // ethers agrupa internamente peticiones idénticas durante un instante, así
+    // que se deja pasar ese margen antes de refrescar (medir el número de
+    // llamadas RPC hacía la prueba intermitente).
+    await new Promise((r) => setTimeout(r, 300));
     await act(async () => {
-      screen.getByRole("button", { name: /Refrescar/ }).click();
+      fireEvent.click(screen.getByRole("button", { name: /Refrescar/ }));
     });
-    // La lectura es asíncrona: con la carga de jsdom puede superar el segundo
-    // que waitFor espera por defecto (la prueba era intermitente).
+
     await waitFor(
-      () => expect(metodos.filter((m) => m === "eth_getBalance").length).toBeGreaterThan(antes),
+      () => expect(screen.getAllByText("2.0 ETH").length).toBeGreaterThan(0),
       { timeout: 5000 }
     );
   });

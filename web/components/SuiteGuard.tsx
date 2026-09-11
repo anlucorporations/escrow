@@ -18,7 +18,7 @@ import { useEthereum } from "@/lib/ethereum";
 import { useSesion } from "@/lib/sesion";
 import { seccionesPara } from "@/lib/navegacion";
 import { Button } from "@/components/Button";
-import { BotonConectarLogin } from "@/components/BotonConectarLogin";
+import { ConnectButton } from "@/components/ConnectButton";
 
 const RUTA_CATALOGO = "/suite/mercado";
 const RUTA_INSCRIPCION = "/suite/inscripcion";
@@ -42,7 +42,7 @@ function PantallaConectar() {
           solo tiene acceso a la página de inicio.
         </p>
         <div className="mt-6 flex justify-center">
-          <BotonConectarLogin />
+          <ConnectButton />
         </div>
 
         {/* Ayuda contextual si no hay wallet inyectada (RF-16.1 / móvil) */}

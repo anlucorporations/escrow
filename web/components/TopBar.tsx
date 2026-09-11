@@ -17,7 +17,7 @@ import { useEthereum } from "@/lib/ethereum";
 import { useSesion } from "@/lib/sesion";
 import { seccionesPara } from "@/lib/navegacion";
 import { Button } from "@/components/Button";
-import { BotonConectarLogin } from "@/components/BotonConectarLogin";
+import { ConnectButton } from "@/components/ConnectButton";
 import { CampanaNotificaciones } from "@/components/CampanaNotificaciones";
 
 const ETIQUETA_ESTADO: Record<string, string> = {
@@ -165,7 +165,7 @@ export function TopBar() {
                 Sin billetera
               </span>
               <div className="hidden lg:block">
-                <BotonConectarLogin className="!px-3 !py-1.5 !text-xs" />
+                <ConnectButton className="!px-3 !py-1.5 !text-xs" />
               </div>
             </>
           ) : (
