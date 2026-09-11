@@ -29,6 +29,7 @@ import {
   type TopicoSistemas,
 } from "@/lib/sistemas-data";
 import { Card } from "@/components/Card";
+import { BalanceDebug } from "@/components/BalanceDebug";
 import { KycPendientesOwner } from "@/components/KycPendientesOwner";
 import { Button } from "@/components/Button";
 
@@ -243,6 +244,9 @@ export default function PaginaAdmin() {
                 ))}
             </ul>
           </Card>
+
+          {/* Balances on-chain (lectura directa de la cadena con ethers) */}
+          <BalanceDebug />
 
           {/* Infraestructura */}
           <Card className="p-5">
