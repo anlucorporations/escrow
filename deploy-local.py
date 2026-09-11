@@ -14,6 +14,31 @@ import subprocess
 import os
 import sys
 
+# ---------------------------------------------------------------------------
+# OBSOLETO — no ejecutar.
+# Este script pertenece a una generación de contratos ya eliminada: despliega
+# UserRegistry, Exchange, MockERC20, Subscription, Governance, TruekeSBT,
+# SBTRegistry, TruekeRWA y TruekeService (contratos que ya no existen) y llama a
+# funciones inexistentes (addToken, setArbiter, setUserRegistry), por lo que
+# aborta en el segundo despliegue. Además, los roles y la identidad de los
+# usuarios ya no se gestionan on-chain: viven en el backend sobre PostgreSQL.
+#
+# Camino vigente:
+#   ./deploy-local.sh                             (Linux / macOS / WSL)
+#   node scripts/inyectar_datos_operativos.mjs    (usuarios y datos operativos)
+#
+# Se conserva como referencia histórica.
+# ---------------------------------------------------------------------------
+sys.stderr.write(
+    "❌ deploy-local.py está OBSOLETO y no se ejecuta.\n"
+    "   Referencia contratos que ya no existen (UserRegistry, MockERC20, Exchange,\n"
+    "   Subscription, Governance, TruekeSBT, SBTRegistry, TruekeRWA, TruekeService).\n\n"
+    "   Usa en su lugar:\n"
+    "     ./deploy-local.sh                            (Linux / macOS / WSL)\n"
+    "     node scripts/inyectar_datos_operativos.mjs   (usuarios y datos operativos)\n"
+)
+sys.exit(1)
+
 if sys.stdout.encoding != 'utf-8':
     try:
         sys.stdout.reconfigure(encoding='utf-8')

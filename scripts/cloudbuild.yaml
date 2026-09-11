@@ -5,46 +5,47 @@
 #     --substitutions=_ESCROW=0x...,_REGISTRY=0x...,... web/
 # Las direcciones NEXT_PUBLIC_* se hornean en el bundle del cliente.
 # Los secretos NO: se inyectan en runtime con --set-secrets.
+#
+# IMPORTANTE: los nombres de las variables deben coincidir EXACTAMENTE con los
+# `ARG` declarados en web/Dockerfile y con los que lee web/lib/contracts.ts.
+# Un --build-arg sin ARG correspondiente solo produce un aviso y el valor nunca
+# llega al bundle (era el fallo de la versión anterior de este archivo).
 # ============================================================================
 steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
       - '--build-arg'
-      - 'NEXT_PUBLIC_ESCROW_ADDRESS=$_ESCROW'
+      - 'NEXT_PUBLIC_ESCROW=$_ESCROW'
       - '--build-arg'
-      - 'NEXT_PUBLIC_USER_REGISTRY_ADDRESS=$_REGISTRY'
+      - 'NEXT_PUBLIC_FACTORY=$_FACTORY'
       - '--build-arg'
-      - 'NEXT_PUBLIC_EXCHANGE_ADDRESS=$_EXCHANGE'
+      - 'NEXT_PUBLIC_BRLT=$_BRLT'
       - '--build-arg'
-      - 'NEXT_PUBLIC_GOVERNANCE_ADDRESS=$_GOVERNANCE'
+      - 'NEXT_PUBLIC_REGISTRY=$_REGISTRY'
       - '--build-arg'
-      - 'NEXT_PUBLIC_SUBSCRIPTION_ADDRESS=$_SUBSCRIPTION'
-      - '--build-arg'
-      - 'NEXT_PUBLIC_TOKEN_A_ADDRESS=$_TKA'
-      - '--build-arg'
-      - 'NEXT_PUBLIC_TOKEN_B_ADDRESS=$_TKB'
-      - '--build-arg'
-      - 'NEXT_PUBLIC_USDT_ADDRESS=$_USDT'
-      - '--build-arg'
-      - 'NEXT_PUBLIC_DELIVERY_ADDRESS=$_DELIVERY'
-      - '--build-arg'
-      - 'NEXT_PUBLIC_BRLT_ADDRESS=$_BRLT'
-      - '--build-arg'
-      - 'NEXT_PUBLIC_SBT_REGISTRY_ADDRESS=$_SBT_REGISTRY'
-      - '--build-arg'
-      - 'NEXT_PUBLIC_TRUEKE_SBT_ADDRESS=$_TRUEKE_SBT'
-      - '--build-arg'
-      - 'NEXT_PUBLIC_TRUEKE_RWA_ADDRESS=$_TRUEKE_RWA'
-      - '--build-arg'
-      - 'NEXT_PUBLIC_TRUEKE_SERVICE_ADDRESS=$_TRUEKE_SERVICE'
+      - 'NEXT_PUBLIC_SUSCRIPCION=$_SUSCRIPCION'
       - '--build-arg'
       - 'NEXT_PUBLIC_CHAIN_ID=$_CHAIN_ID'
       - '--build-arg'
       - 'NEXT_PUBLIC_RPC_URL=$_RPC_URL'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_API_URL=$_API_URL'
       - '-t'
       - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/truekeate-repo/truekeate-web'
       - '.'
+
+# Valores por defecto = despliegue GCP vigente. Se pueden sobrescribir con
+# --substitutions al lanzar el build.
+substitutions:
+  _ESCROW: '0x8a93d247134d91e0de6f96547cb0204e5be8e5d8'
+  _FACTORY: '0x40918ba7f132e0acba2ce4de4c4baf9bd2d7d849'
+  _BRLT: '0x6f6f570f45833e249e27022648a26f4076f48f78'
+  _REGISTRY: '0xb0f05d25e41fbc2b52013099ed9616f1206ae21b'
+  _SUSCRIPCION: '0x5feaebfb4439f3516c74939a9d04e95afe82c4ae'
+  _CHAIN_ID: '31337'
+  _RPC_URL: 'https://mcc-foundry-anvil-slzlptbcla-ew.a.run.app'
+  _API_URL: 'https://truekeate-api-593453426217.europe-west1.run.app'
 
 images:
   - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/truekeate-repo/truekeate-web'

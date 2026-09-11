@@ -1,7 +1,31 @@
-﻿# deploy-local.ps1 — Despliegue local con matriz de roles completa (PowerShell)
+# deploy-local.ps1 — Despliegue local con matriz de roles completa (PowerShell)
 param (
     [string]$RpcUrl = "http://127.0.0.1:8545"
 )
+
+# ---------------------------------------------------------------------------
+# OBSOLETO — no ejecutar.
+# Este script pertenece a una generación de contratos ya eliminada: despliega
+# UserRegistry, Exchange, MockERC20, Subscription, Governance, TruekeSBT,
+# SBTRegistry, TruekeRWA y TruekeService (contratos que ya no existen) y llama a
+# funciones inexistentes (addToken, setArbiter, setUserRegistry), por lo que
+# aborta en el segundo despliegue. Además, los roles y la identidad de los
+# usuarios ya no se gestionan on-chain: viven en el backend sobre PostgreSQL.
+#
+# Camino vigente:
+#   bash deploy-local.sh                          (Git Bash / WSL sobre Windows)
+#   node scripts/inyectar_datos_operativos.mjs    (usuarios y datos operativos)
+#
+# Se conserva como referencia histórica.
+# ---------------------------------------------------------------------------
+Write-Host "❌ deploy-local.ps1 está OBSOLETO y no se ejecuta." -ForegroundColor Red
+Write-Host "   Referencia contratos que ya no existen (UserRegistry, MockERC20, Exchange," -ForegroundColor Red
+Write-Host "   Subscription, Governance, TruekeSBT, SBTRegistry, TruekeRWA, TruekeService)." -ForegroundColor Red
+Write-Host ""
+Write-Host "   Usa en su lugar:" -ForegroundColor Yellow
+Write-Host "     bash deploy-local.sh                          (Git Bash / WSL)"
+Write-Host "     node scripts/inyectar_datos_operativos.mjs    (usuarios y datos operativos)"
+exit 1
 
 # "Continue" tolera warnings/errores en stderr de comandos nativos (forge/cast) en
 # Windows PowerShell 5.1 (con "Stop", cualquier línea en stderr aborta el script).
