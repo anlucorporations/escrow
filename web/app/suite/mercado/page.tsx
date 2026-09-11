@@ -22,6 +22,7 @@ import {
   type Trueke,
   type ArticuloCatalogo,
 } from "@/lib/api";
+import { CATEGORIAS_FILTRO, filtrarOfertas, type CategoriaFiltro } from "@/lib/mercado";
 import { Card } from "@/components/Card";
 import { Button } from "@/components/Button";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -92,6 +93,8 @@ export default function PaginaMercado() {
   const [miArticulo, setMiArticulo] = useState("");
   const [acordando, setAcordando] = useState(false);
   const [mensaje, setMensaje] = useState<{ tipo: "ok" | "err"; texto: string } | null>(null);
+  const [busqueda, setBusqueda] = useState("");
+  const [categoriaFiltro, setCategoriaFiltro] = useState<CategoriaFiltro>("TODAS");
 
   useEffect(() => {
     let vivo = true;
@@ -122,6 +125,12 @@ export default function PaginaMercado() {
       ),
     [articulos, account]
   );
+  // Ofertas visibles tras aplicar la búsqueda y el filtro de categoría.
+  const ofertasFiltradas = useMemo(
+    () => filtrarOfertas(ofertas, articulos, { q: busqueda, categoria: categoriaFiltro }),
+    [ofertas, articulos, busqueda, categoriaFiltro]
+  );
+
   // mis ofertas activas (para el cupo de 3 del Verificado)
   const misOfertasActivas = useMemo(
     () => ofertas.filter((t) => t.usuarioA.toLowerCase() === (account ?? "").toLowerCase()).length,
@@ -200,6 +209,62 @@ export default function PaginaMercado() {
         </Card>
       )}
 
+      {!cargando && !error && ofertas.length > 0 && (
+        <Card className="flex flex-col gap-3 p-3 sm:flex-row sm:items-center">
+          <label className="flex flex-1 items-center gap-2">
+            <span className="text-lg" aria-hidden>🔍</span>
+            <span className="sr-only">Buscar en el mercado</span>
+            <input
+              type="search"
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              placeholder="Buscar por artículo, rubro o lo que se pide…"
+              className="w-full rounded-xl border border-navy-800/15 bg-white px-3 py-2 text-sm text-navy-800 outline-none focus:border-teal-500"
+            />
+          </label>
+          <label className="flex items-center gap-2 text-xs text-navy-800/70">
+            <span>Categoría</span>
+            <select
+              value={categoriaFiltro}
+              onChange={(e) => setCategoriaFiltro(e.target.value as CategoriaFiltro)}
+              className="rounded-xl border border-navy-800/15 bg-white px-3 py-2 text-sm text-navy-800 outline-none focus:border-teal-500"
+            >
+              <option value="TODAS">Todas</option>
+              {CATEGORIAS_FILTRO.map((c) => (
+                <option key={c} value={c}>{CATEGORIAS[c]?.nombre ?? c}</option>
+              ))}
+            </select>
+          </label>
+          {(busqueda || categoriaFiltro !== "TODAS") && (
+            <div className="flex items-center gap-2">
+              <span className="whitespace-nowrap text-xs text-navy-800/60">
+                {ofertasFiltradas.length} de {ofertas.length}
+              </span>
+              <Button
+                variante="outline-navy"
+                className="!px-3 !py-1.5 text-xs"
+                onClick={() => { setBusqueda(""); setCategoriaFiltro("TODAS"); }}
+              >
+                Limpiar
+              </Button>
+            </div>
+          )}
+        </Card>
+      )}
+
+      {!cargando && !error && ofertas.length > 0 && ofertasFiltradas.length === 0 && (
+        <Card className="p-8 text-center">
+          <p className="text-3xl">🔍</p>
+          <h2 className="mt-2 font-display text-lg font-semibold text-navy-800">
+            Sin resultados para tu búsqueda
+          </h2>
+          <p className="mx-auto mt-1 max-w-sm text-sm text-navy-800/60">
+            No hay ofertas que coincidan con «{busqueda}»{categoriaFiltro !== "TODAS" ? ` en la categoría ${categoriaFiltro}` : ""}.
+            Prueba con otro término o quita los filtros.
+          </p>
+        </Card>
+      )}
+
       {!cargando && !error && ofertas.length === 0 && (
         <Card className="p-8 text-center">
           <p className="text-3xl">🫙</p>
@@ -213,9 +278,9 @@ export default function PaginaMercado() {
         </Card>
       )}
 
-      {!cargando && ofertas.length > 0 && (
+      {!cargando && ofertasFiltradas.length > 0 && (
         <div className="grid gap-3 sm:grid-cols-2">
-          {ofertas.map((t) => {
+          {ofertasFiltradas.map((t) => {
             const catA = categoriaDeArticulo(articulos, t.articuloAId) ?? "ARTICULO";
             const tipo = CATEGORIAS[catA] ?? CATEGORIAS.ARTICULO;
             return (
