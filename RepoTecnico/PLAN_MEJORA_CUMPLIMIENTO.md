@@ -39,7 +39,7 @@ Ninguna tarea de este plan consiste en crear artefactos vacíos para cumplir con
 
 ---
 
-## 2. Fase 1 — Cimientos: 64 % → ~82 % (mayor retorno)
+## 2. Fase 1 — Cimientos: 64 % → 82 % ✅ COMPLETA (mayor retorno)
 
 Seis tareas de coste bajo o medio que no dependen de decisiones de producto.
 
@@ -70,28 +70,30 @@ Seis tareas de coste bajo o medio que no dependen de decisiones de producto.
 
 ### 2.1 Estado de avance de la Fase 1
 
-> **Actualizado el 11 de septiembre de 2026.** Cinco de las seis tareas están cerradas y verificadas; falta la 1.4.
+> **Actualizado el 11 de septiembre de 2026.** **La Fase 1 está completa**: las seis tareas cerradas y verificadas.
 
 | # | Tarea | Estado | Verificación |
 |---|---|---|---|
 | 1.1 | Pruebas de backend en verde | ✅ **Hecha** | Los 4 fallos **no eran bugs del producto**, sino pruebas desactualizadas (la subasta exige que el artículo sea de la Empresa; el No Conforme exige motivo y foto; `POST /disputas` ya no existe). `npm test` pasa de 3 archivos a la suite completa: **52/52**. Se corrigieron además las cifras del README del backend |
 | 1.2 | Pruebas unitarias de frontend | ✅ **Hecha** | vitest + jsdom + testing-library; **61 pruebas** en 6 archivos (ethereum, api, navegación, mercado, StatusBadge, BalanceDebug). `@types/node` alineado a la 22 del runtime real |
 | 1.3 | `BalanceDebug` real | ✅ **Hecha** | Componente que lee la cadena con ethers (ETH, tokens, SBT, estado del Escrow) y degrada con elegancia si el RPC no responde; cableado en `/suite/admin` |
-| 1.4 | Componentes del enunciado + auto-refresh 5 s | ⏳ **Pendiente** | Es la tarea más grande de la fase (+10,5 puntos) |
+| 1.4 | Componentes del enunciado + auto-refresh 5 s | ✅ **Hecha** | `ConnectButton` (renombrado, con sus importadores), `CreateOperation` (extraído del dashboard: 311→191 líneas) y `OperationsList` con refresco automático cada 5 s, cableado en el dashboard con las operaciones reales. 9 pruebas nuevas |
 | 1.5 | Filtros y búsqueda por token | ✅ **Hecha** | Buscador y filtro por categoría en `/suite/mercado`, con lógica pura testeada (ignora acentos y mayúsculas) |
 | 1.6 | Rechazo de MetaMask y cambio de red | ✅ **Hecha** | Aviso de rechazo (4001) en pantalla, escucha de `chainChanged` y botón para cambiar de red (incluye el caso 4902 de red desconocida) |
 
-**Puntuación real tras lo hecho: 75,6 %** (desde 64,4 %). Al cerrar la 1.4 la fase queda en **82,1 %**.
+**Puntuación real con la Fase 1 cerrada: 82,1 %** (desde 64,4 % al empezar).
 
-| Bloque | Antes | Ahora | Al cerrar la 1.4 |
-|---|---:|---:|---:|
-| A | 64 % | **80 %** | 80 % |
-| B | 54 % | **62 %** | 85 % |
-| C | 100 % | 100 % | 100 % |
-| D | 46 % | **58 %** | 71 % |
-| E | 45 % | **55 %** | 55 % |
-| F | 69 % | **94 %** | 94 % |
-| **GLOBAL** | **64 %** | **76 %** | **82 %** |
+| Bloque | Antes | Con la Fase 1 cerrada |
+|---|---:|---:|
+| A | 64 % | **80 %** |
+| B | 54 % | **85 %** |
+| C | 100 % | 100 % |
+| D | 46 % | **71 %** |
+| E | 45 % | **55 %** |
+| F | 69 % | **94 %** |
+| **GLOBAL** | **64 %** | **82 %** |
+
+Verificación de la fase: type-check limpio, build de producción correcto (19 rutas), **70 pruebas unitarias** de frontend estables en 4 corridas seguidas y **52/52** en el backend. Los E2E de Playwright no se pudieron ejecutar en el entorno de trabajo (a Chromium le falta `libnspr4.so` y no hay root para instalarlo); los textos que usan como selector se revisaron uno a uno y siguen intactos.
 
 ## 3. Fase 2 — Cumplimiento literal: 82 % → ~95 %
 
