@@ -9,17 +9,23 @@ Frontend **Next.js 16.3.4** (App Router) + **TypeScript** + **Tailwind v4** + **
 web/
 ├─ app/
 │  ├─ layout.tsx · page.tsx     # Root (EthereumProvider) + Landing pública (RF-14.1)
-│  └─ suite/                    # Suite por estado/rol (RF-14.2–14.8)
-│     ├─ dashboard/             # Escalera D28 + módulos según estado
-│     ├─ inventario/ · intercambio/ · gobernanza/ · perfil/
+│  ├─ help/manual/              # Biblioteca de manuales (PDF + infografías)
+│  └─ suite/                    # Suite por estado/rol (RF-14.2–14.8) — 14 pantallas
+│     ├─ dashboard/ · mercado/ · intercambio/ · inventario/ · subastas/
+│     ├─ disputas/ · gobernanza/ · valor/ · perfil/ · admin/
+│     ├─ inscripcion/ · verificacion/ · certificacion/
 ├─ lib/
 │  ├─ ethereum.tsx              # Context provider MetaMask (RT-04.4): provider/signer/
 │  │                            #   account + auto-reconexión al refrescar (RF-16.2)
 │  ├─ contracts.ts              # ABIs + direcciones (RT-04.5)
 │  ├─ abis/*.json               # ABIs copiados de forge (sc/out)
-│  └─ tipos.ts
-├─ components/                  # Button (pill/outline/gold), Card (premium RWA),
-│  │                            #   BottomNav (flotante, botón central hexagonal), StatusBadge
+│  ├─ tipos.ts · navegacion.ts  # Matriz única de secciones por rol (RF-14)
+│  └─ sesion.tsx · firma.ts     # Sesión por firma EIP-191 + firma por acción
+├─ components/                  # TopBar (PC) · BottomNav (móvil) · SuiteGuard ·
+│  │                            #   Button/Card/StatusBadge (RNF-08) · MapaWidget ·
+│  │                            #   SubirFotos · CampanaNotificaciones
+├─ e2e/                         # Pruebas E2E de Playwright (Chromium + Pixel 5)
+├─ test/                        # Pruebas unitarias (vitest + testing-library)
 ├─ public/
 │  ├─ brand/                    # TrueKeate_logo/titulo (SVG/PNG/ICO) — RF-19
 │  ├─ hero/                     # Imágenes hero de la landing — RF-19
@@ -30,8 +36,10 @@ web/
 
 ```bash
 npm run dev      # http://localhost:3000
-npm run build    # build de producción (verificado: 9 páginas estáticas)
+npm run build    # build de producción (Next.js standalone)
 npm start        # servir el build
+npm test         # pruebas unitarias (vitest + testing-library)
+npx playwright test   # pruebas E2E (requiere el backend y la app levantados)
 ```
 
 ## Sistema de diseño (RNF-08)
