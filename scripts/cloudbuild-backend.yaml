@@ -1,0 +1,33 @@
+# ============================================================================
+# TrueKeate — Cloud Build (Cloud Run, imagen del backend/API)
+# ============================================================================
+# Faltaba: la API se desplegaba a mano con una config en /tmp que no quedó en el
+# repositorio. Este archivo la hace reproducible.
+#
+# Uso (desde la raíz del repositorio):
+#   gcloud builds submit --config scripts/cloudbuild-backend.yaml \
+#     --substitutions=_TAG=release-<sha> .
+#
+# Contexto de build: backend/  (su Dockerfile copia package.json, db, api, …)
+# Los secretos NO se hornean: se inyectan en runtime con --set-secrets.
+# ============================================================================
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-f'
+      - 'backend/Dockerfile'
+      - '-t'
+      - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/truekeate-repo/backend:$_TAG'
+      - 'backend'
+
+images:
+  - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/truekeate-repo/backend:$_TAG'
+
+substitutions:
+  # Etiqueta de la imagen: se pasa el commit corto (convención release-<sha>).
+  _TAG: 'latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'

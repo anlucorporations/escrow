@@ -31,8 +31,12 @@ steps:
       - 'NEXT_PUBLIC_RPC_URL=$_RPC_URL'
       - '--build-arg'
       - 'NEXT_PUBLIC_API_URL=$_API_URL'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_TRUEKE_NFT=$_TRUEKE_NFT'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_TRUEKE_SBT=$_TRUEKE_SBT'
       - '-t'
-      - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/truekeate-repo/truekeate-web'
+      - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/truekeate-repo/web:$_TAG'
       - '.'
 
 # Valores por defecto = despliegue GCP vigente. Se pueden sobrescribir con
@@ -46,9 +50,13 @@ substitutions:
   _CHAIN_ID: '31337'
   _RPC_URL: 'https://mcc-foundry-anvil-slzlptbcla-ew.a.run.app'
   _API_URL: 'https://truekeate-api-593453426217.europe-west1.run.app'
+  _TRUEKE_NFT: '0x6C2d83262fF84cBaDb3e416D527403135D757892'
+  _TRUEKE_SBT: '0x870526b7973b56163a6997bB7C886F5E4EA53638'
+  # Etiqueta de la imagen: se pasa el commit corto (convención release-<sha>).
+  _TAG: 'latest'
 
 images:
-  - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/truekeate-repo/truekeate-web'
+  - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/truekeate-repo/web:$_TAG'
 
 options:
   logging: CLOUD_LOGGING_ONLY
