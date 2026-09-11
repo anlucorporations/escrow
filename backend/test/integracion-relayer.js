@@ -18,6 +18,15 @@ const scRoot = join(__dirname, '../../sc');
 const FACTORY = process.argv[2];
 const RPC = process.argv[3] || 'http://127.0.0.1:8545';
 
+// Este archivo es un script E2E MANUAL, no una suite: `node --test` lo descubre
+// y lo ejecuta sin argumentos. Sin dirección de la factory no hay nada que
+// verificar, así que se omite con un aviso en vez de romper la suite.
+if (!FACTORY) {
+  console.log('⏭️  integracion-relayer: omitido (script manual, no suite).');
+  console.log('   Uso: node test/integracion-relayer.js <factoryAddr> [rpcUrl]');
+  process.exit(0);
+}
+
 // cuentas de anvil: (0)=owner/deployer, (1)=relayer (RF-15.2)
 const PK0 = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
 const PK1 = '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d';

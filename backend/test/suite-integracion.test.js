@@ -2,7 +2,9 @@
 // TrueKeate — Tests de la integración de la suite (finanzas, disputas)
 // Cubren los endpoints REST nuevos persistidos (Ciclos faltantes):
 //   - finanzas: GET /finanzas/mi (rol: BRLT solo Socio/Owner — D5/RF-14.7)
-//   - disputas: POST /disputas (solicitar anulación → EN_DISPUTA) y GET /disputas
+//   - disputas: cierre No Conforme → REPORTADA + EN_DISPUTA, y GET /disputas
+//     (disputas v2: el endpoint POST /disputas se sustituyó por el formulario de
+//      No Conforme de POST /truekes/:id/cierre, con motivo y fotos obligatorios)
 //   - truekes: GET /truekes (mis trueques) ya cubierto en api.test.js
 // =============================================================================
 import { test, before, after } from 'node:test';
@@ -88,11 +90,17 @@ test('finanzas: un Socio (Owner) SÍ ve BRLT y el fondo', async () => {
   assert.ok('brlt' in r.body, 'Socio/Owner ve BRLT');
 });
 
-test('disputas: solicitar anulación de un trueque propio → EN_DISPUTA y aparece en GET /disputas', async () => {
+test('disputas: el No Conforme de una parte abre la disputa → EN_DISPUTA y aparece en GET /disputas', async () => {
   const { tokA, truekeId } = await escenarioTrueque();
-  const d = await request(app).post('/disputas').set('Authorization', `Bearer ${tokA}`).send({ truekeId, motivo: 'el otro lado no entrega' });
-  assert.equal(d.status, 201, JSON.stringify(d.body));
-  assert.equal(d.body.disputa.estado, 'ABIERTA');
+  const d = await request(app).post(`/truekes/${truekeId}/cierre`).set('Authorization', `Bearer ${tokA}`).send({
+    lado: 'A', conforme: false,
+    motivo: 'el otro lado no entrega lo acordado',
+    fotos: [{ data: 'ZGVtbw==', mime: 'image/jpeg' }],
+    ...(await firmaAccionDe(walletA, 'cerrar trueque')),
+  });
+  assert.equal(d.status, 200, JSON.stringify(d.body));
+  assert.ok(d.body.disputa, 'se abre la disputa');
+  assert.equal(d.body.disputa.estado, 'REPORTADA');
 
   // el trueque pasó a EN_DISPUTA
   const detalle = await request(app).get(`/truekes/${truekeId}`).set('Authorization', `Bearer ${tokA}`);
@@ -103,10 +111,30 @@ test('disputas: solicitar anulación de un trueque propio → EN_DISPUTA y apare
   assert.ok(mías.body.disputas.some((x) => x.truekeId === truekeId));
 });
 
-test('disputas: un tercero NO puede solicitar ni ver la disputa', async () => {
-  const wC = ethers.Wallet.createRandom().address.toLowerCase();
+test('disputas: un tercero NO puede abrir la disputa ni verla', async () => {
+  const walletC = ethers.Wallet.createRandom();
+  const wC = walletC.address.toLowerCase();
   const tokC = await certificar(wC);
-  const { truekeId } = await escenarioTrueque();
-  const d = await request(app).post('/disputas').set('Authorization', `Bearer ${tokC}`).send({ truekeId, motivo: 'intruso' });
-  assert.equal(d.status, 403);
+  const { tokA, truekeId } = await escenarioTrueque();
+
+  // un tercero intenta cerrar No Conforme el trueke de otros (firma válida, pero no es parte)
+  const intruso = await request(app).post(`/truekes/${truekeId}/cierre`).set('Authorization', `Bearer ${tokC}`).send({
+    lado: 'A', conforme: false, motivo: 'intruso',
+    fotos: [{ data: 'ZGVtbw==', mime: 'image/jpeg' }],
+    ...(await firmaAccionDe(walletC, 'cerrar trueque')),
+  });
+  assert.equal(intruso.status, 403, JSON.stringify(intruso.body));
+
+  // la parte legítima sí abre la disputa
+  const parte = await request(app).post(`/truekes/${truekeId}/cierre`).set('Authorization', `Bearer ${tokA}`).send({
+    lado: 'A', conforme: false, motivo: 'no entregó lo acordado',
+    fotos: [{ data: 'ZGVtbw==', mime: 'image/jpeg' }],
+    ...(await firmaAccionDe(walletA, 'cerrar trueque')),
+  });
+  assert.equal(parte.status, 200, JSON.stringify(parte.body));
+
+  // y el tercero no la ve
+  const suyas = await request(app).get('/disputas').set('Authorization', `Bearer ${tokC}`);
+  assert.equal(suyas.status, 200);
+  assert.ok(!suyas.body.disputas.some((x) => x.truekeId === truekeId), 'un tercero no ve la disputa');
 });

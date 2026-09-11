@@ -148,7 +148,13 @@ test('trueke abierto: cierre No Conforme abre disputa (EN_DISPUTA)', async () =>
   await request(app).post(`/truekes/${ofertaId}/custodiar`).set('Authorization', `Bearer ${tokB}`).send({ lado: 'B', ...(await firmaAccionDe(walletB, 'custodiar trueque')) });
 
   // B recibe algo que no esperaba → No Conforme
-  const nc = await request(app).post(`/truekes/${ofertaId}/cierre`).set('Authorization', `Bearer ${tokB}`).send({ lado: 'B', conforme: false, ...(await firmaAccionDe(walletB, 'cerrar trueque')) });
+  // El No Conforme abre el formulario de disputa: exige motivo + al menos una foto
+  const nc = await request(app).post(`/truekes/${ofertaId}/cierre`).set('Authorization', `Bearer ${tokB}`).send({
+    lado: 'B', conforme: false,
+    motivo: 'Recibí un artículo distinto al ofertado',
+    fotos: [{ data: 'ZGVtbw==', mime: 'image/jpeg' }],
+    ...(await firmaAccionDe(walletB, 'cerrar trueque')),
+  });
   assert.equal(nc.status, 200, JSON.stringify(nc.body));
   assert.equal(nc.body.trueke.estado, 'EN_DISPUTA');
   assert.ok(nc.body.disputa, 'se abre la disputa');

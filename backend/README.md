@@ -7,7 +7,8 @@ Backend off-chain del proyecto: base de datos PostgreSQL (lectura impulsada por 
 
 ```
 backend/
-├─ db/schema.sql          # Esquema PostgreSQL completo (14 tablas + PostGIS + constraints)
+├─ db/schema.sql          # Esquema PostgreSQL completo (19 tablas + PostGIS + constraints)
+├─ db/migracion_*.sql     # Migraciones incrementales (6 tablas más: 21 en total)
 ├─ indexador.js           # Indexador: escucha eventos on-chain → actualiza PostgreSQL (D25)
 ├─ indexador-cli.js       # Punto de entrada (barrido único o modo servicio --watch)
 ├─ contratos.json         # Mapa contrato → {direccion, abi} (actualizar tras cada deploy)
@@ -16,9 +17,13 @@ backend/
 
 ## Esquema SQL (`db/schema.sql`)
 
-- **14 tablas**: `usuarios`, `kyc`, `articulos`, `truekes` (espejo), `valoraciones`,
-  `puntos_encuentro`, `disputas`, `imagenes_certificadas`, `suscripciones`, `campanas`,
-  `subastas`, `finanzas`, `auditoria`, `indexador_checkpoint`.
+- **19 tablas** en `schema.sql`: `usuarios`, `kyc`, `articulos`, `truekes` (espejo),
+  `valoraciones`, `puntos_encuentro`, `disputas`, `imagenes_certificadas`, `suscripciones`,
+  `campanas`, `subastas`, `finanzas`, `auditoria`, `indexador_checkpoint`, `sesiones` y las
+  que añaden las migraciones.
+- **21 tablas** una vez aplicadas las 5 migraciones de `db/migracion_*.sql`
+  (añaden `evidencias_disputa`, `votos_disputa`, `notificaciones`, `puntos_favoritos`,
+  `movimientos_valor` y `movimientos_brlt`).
 - **PostGIS** (`geog GEOGRAPHY(Point,4326)`) para la regla **≤ 10 km** entre partes (RF-08.3).
 - Enum canónico de 9 estados del escrow (diccionario de datos); escalera D28
   (INSCRITO/VERIFICADO/CERTIFICADO); cifrado en reposo de PII (D17).
@@ -49,8 +54,7 @@ Garantías implementadas (RNF-07.4 / H-16):
 ## Tests
 
 ```bash
-node --test test/           # 5/5: mapeo TruekeCreado→truekes, custodia→CUSTODIADO,
-                            # idempotencia, barrerDesde+checkpoint, contrato desconocido
+npm test                    # suite completa (52/52 en verde)
 ```
 
 > Los tests usan un pool en memoria (sin PostgreSQL): validan la lógica de mapeo de eventos e
@@ -83,7 +87,8 @@ la cuenta 1 con nonce incrementado ✅ (`test/integracion-relayer.js`).
 
 ## Backend API REST (`api/` — Ciclo 6)
 
-Express con rate-limiting global y por usuario (D16/RF-09.6). Módulos:
+Express con rate-limiting **global** (120 req/min por IP — D16/RF-09.6); el límite
+por usuario lo aplica el relayer (20 meta-tx/día + bloqueo tras 3 fallos). Módulos:
 
 | Router | Endpoints | Función / CU |
 |---|---|---|
@@ -95,7 +100,10 @@ Express con rate-limiting global y por usuario (D16/RF-09.6). Módulos:
 
 ```bash
 npm run api        # arranca en http://127.0.0.1:4000 (PORT configurable)
-npm test           # 19/19 tests (indexador + relayer + API)
+npm test           # 52/52: indexador, relayer, API, trueke abierto, disputas,
+                   # subastas, reputación, puntos de encuentro y minteo de NFT
+                   # (incluye el script manual test/integracion-relayer.js, que se
+                   #  omite solo si no se le pasa la dirección de la factory)
 ```
 
 > Los datos viven en un almacén en memoria (puente a PostgreSQL en C8). La autenticación por

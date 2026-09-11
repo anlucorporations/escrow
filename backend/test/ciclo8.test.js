@@ -113,8 +113,14 @@ test('subastas: solo Empresa crea (RF-17.1); solo Certificado puja (RF-17.2); ma
   const noEmpresa = await request(app).post('/subastas').set('Authorization', `Bearer ${tokP1}`).send({ articuloId: 1, pujaInicial: 100 });
   assert.equal(noEmpresa.status, 403);
 
-  // Empresa crea
-  const crear = await request(app).post('/subastas').set('Authorization', `Bearer ${tokEmpresa}`).send({ articuloId: 1, pujaInicial: 100, incrementoMinimo: 10, duracionHoras: 1 });
+  // Empresa crea (RF-17.1 exige además que el artículo sea suyo y esté publicado;
+  // se siembra directamente porque estas cuentas aleatorias no pueden firmar la
+  // acción `publicar artículo` que exige el endpoint de catálogo).
+  const artEmpresa = almacen.crearArticulo({
+    wallet: wEmpresa, titulo: 'Bicicleta de montaña', rubro: 'Deportes',
+    categoria: 'ARTICULO', disponible: true,
+  });
+  const crear = await request(app).post('/subastas').set('Authorization', `Bearer ${tokEmpresa}`).send({ articuloId: artEmpresa.id, pujaInicial: 100, incrementoMinimo: 10, duracionHoras: 1 });
   assert.equal(crear.status, 201);
   const id = crear.body.subasta.id;
 

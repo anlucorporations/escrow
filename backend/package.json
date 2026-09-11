@@ -4,7 +4,7 @@
   "description": "TrueKeate backend: indexador + relayer EIP-712",
   "main": "index.js",
   "scripts": {
-    "test": "node --test test/indexador.test.js test/relayer.test.js test/api.test.js",
+    "test": "node --test",
     "api": "node api/index-api.js"
   },
   "keywords": [],
