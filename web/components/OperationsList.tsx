@@ -51,8 +51,12 @@ export function OperationsList({
   const [refrescando, setRefrescando] = useState(false);
   // El callback puede cambiar de identidad en cada render de la pantalla; se
   // guarda en una ref para que el intervalo no se reinicie constantemente.
+  // La ref se actualiza en un efecto, no durante el render (escribir refs en el
+  // render rompe la pureza del componente).
   const refrescarRef = useRef(onRefrescar);
-  refrescarRef.current = onRefrescar;
+  useEffect(() => {
+    refrescarRef.current = onRefrescar;
+  }, [onRefrescar]);
 
   useEffect(() => {
     if (!intervaloMs || intervaloMs <= 0 || !refrescarRef.current) return;

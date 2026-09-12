@@ -57,10 +57,39 @@ async function leer<T>(fn: () => Promise<T>, porDefecto: T): Promise<T> {
   }
 }
 
+// Sub-tabla del panel. Fuera del componente a propósito: definida dentro del
+// render, React la trataría como un componente nuevo en cada actualización.
+function Tabla({ titulo, filas, icono }: { titulo: string; filas: Fila[]; icono: string }) {
+  return (
+    <div>
+      <h3 className="text-xs font-bold uppercase tracking-wide text-navy-800/60">
+        {icono} {titulo}
+      </h3>
+      {filas.length === 0 ? (
+        <p className="mt-2 text-xs text-navy-800/50">Sin datos que mostrar todavía.</p>
+      ) : (
+        <ul className="mt-2 divide-y divide-navy-800/5">
+          {filas.map((f) => (
+            <li key={f.etiqueta} className="flex items-start justify-between gap-3 py-1.5">
+              <span className="text-xs font-semibold text-navy-800/80">{f.etiqueta}</span>
+              <span className="text-right">
+                <code className="block font-mono text-[11px] text-navy-800">{f.valor}</code>
+                {f.detalle && (
+                  <code className="block font-mono text-[10px] text-navy-800/45">{f.detalle}</code>
+                )}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 export function BalanceDebug({ className }: { className?: string }) {
   const { provider, account } = useEthereum();
   const [datos, setDatos] = useState<Datos | null>(null);
-  const [cargando, setCargando] = useState(false);
+  const [refrescando, setRefrescando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [actualizado, setActualizado] = useState<string | null>(null);
 
@@ -70,17 +99,18 @@ export function BalanceDebug({ className }: { className?: string }) {
   const sbtDir = dir(process.env.NEXT_PUBLIC_TRUEKE_SBT);
 
   const cargar = useCallback(async () => {
-    if (!provider) return;
-    setCargando(true);
-    setError(null);
+    const prov = provider;
+    if (!prov) return;
     try {
+      const ethCuenta = account ? await leer(() => prov.getBalance(account), BigInt(0)) : null;
+      const ethEscrow = escrowDir ? await leer(() => prov.getBalance(escrowDir), BigInt(0)) : null;
+
       const cuenta: Fila[] = [];
       const escrow: Fila[] = [];
 
       // --- Mi billetera -----------------------------------------------------
       if (account) {
-        const eth = await leer(() => provider.getBalance(account), BigInt(0));
-        cuenta.push({ etiqueta: "ETH", valor: `${formatEther(eth)} ETH` });
+        cuenta.push({ etiqueta: "ETH", valor: `${formatEther(ethCuenta ?? BigInt(0))} ETH` });
 
         const tokens: [string, string | null][] = [
           ["TKA", tkaDir],
@@ -106,14 +136,13 @@ export function BalanceDebug({ className }: { className?: string }) {
 
       // --- Contrato Escrow --------------------------------------------------
       if (escrowDir) {
-        const esc = new Contract(escrowDir, ESCROW_ABI, provider);
-        const ethEscrow = await leer(() => provider.getBalance(escrowDir), BigInt(0));
+        const esc = new Contract(escrowDir, ESCROW_ABI, prov);
         const owner = await leer(() => esc.owner() as Promise<string>, "");
         const siguienteId = await leer(() => esc.siguienteId() as Promise<bigint>, BigInt(0));
         const nft = await leer(() => esc.trueKeateNft() as Promise<string>, "");
         const registro = await leer(() => esc.sociosRegistry() as Promise<string>, "");
 
-        escrow.push({ etiqueta: "ETH", valor: `${formatEther(ethEscrow)} ETH` });
+        escrow.push({ etiqueta: "ETH", valor: `${formatEther(ethEscrow ?? BigInt(0))} ETH` });
         escrow.push({ etiqueta: "Owner", valor: owner || "—", detalle: owner ? undefined : "no responde" });
         escrow.push({ etiqueta: "Truekes creados", valor: siguienteId.toString() });
         escrow.push({
@@ -136,43 +165,32 @@ export function BalanceDebug({ className }: { className?: string }) {
       }
 
       setDatos({ cuenta, escrow });
+      setError(null);
       setActualizado(new Date().toLocaleTimeString("es"));
     } catch (e) {
       setError(e instanceof Error ? e.message : "no se pudieron leer los balances");
-    } finally {
-      setCargando(false);
     }
   }, [provider, account, escrowDir, tkaDir, tkbDir, sbtDir]);
 
+  // Derivado: hay carga pendiente mientras haya billetera y aún no haya datos.
+  const cargando = Boolean(provider) && !datos && !error;
+
   useEffect(() => {
+    // Carga inicial: es una lectura asíncrona de la cadena. La regla
+    // set-state-in-effect no distingue este caso (datos externos al montar) del
+    // patrón que advierte, y el mismo aviso existe en el resto de la app.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void cargar();
   }, [cargar]);
 
-  function Tabla({ titulo, filas, icono }: { titulo: string; filas: Fila[]; icono: string }) {
-    return (
-      <div>
-        <h3 className="text-xs font-bold uppercase tracking-wide text-navy-800/60">
-          {icono} {titulo}
-        </h3>
-        {filas.length === 0 ? (
-          <p className="mt-2 text-xs text-navy-800/50">Sin datos que mostrar todavía.</p>
-        ) : (
-          <ul className="mt-2 divide-y divide-navy-800/5">
-            {filas.map((f) => (
-              <li key={f.etiqueta} className="flex items-start justify-between gap-3 py-1.5">
-                <span className="text-xs font-semibold text-navy-800/80">{f.etiqueta}</span>
-                <span className="text-right">
-                  <code className="block font-mono text-[11px] text-navy-800">{f.valor}</code>
-                  {f.detalle && (
-                    <code className="block font-mono text-[10px] text-navy-800/45">{f.detalle}</code>
-                  )}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    );
+  /** Refresco manual: indicador propio para no reescribir el de carga inicial. */
+  async function refrescar() {
+    setRefrescando(true);
+    try {
+      await cargar();
+    } finally {
+      setRefrescando(false);
+    }
   }
 
   return (
@@ -184,10 +202,10 @@ export function BalanceDebug({ className }: { className?: string }) {
         <Button
           variante="outline-navy"
           className="!px-3 !py-1.5 text-xs"
-          onClick={() => void cargar()}
-          disabled={cargando || !provider}
+          onClick={() => void refrescar()}
+          disabled={refrescando || !provider}
         >
-          {cargando ? "Leyendo…" : "↻ Refrescar"}
+          {refrescando ? "Leyendo…" : "↻ Refrescar"}
         </Button>
       </div>
 
