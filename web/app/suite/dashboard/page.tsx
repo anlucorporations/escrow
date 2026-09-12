@@ -60,31 +60,26 @@ function MisTruekesResumen() {
   );
   const cerrados = mios.filter((t) => t.estado === "COMPLETADO");
 
+  // Sin tarjeta ni título propios: el módulo del dashboard ya los aporta.
   return (
-    <Card className="h-full p-5 transition hover:shadow-md">
-      <div className="flex items-center justify-between gap-2">
-        <h3 className="font-semibold text-navy-800">Mis truekes</h3>
-        <Link href="/suite/intercambio" className="text-[11px] font-semibold text-teal-600 underline">
-          Ver todos →
-        </Link>
-      </div>
-      <div className="mt-1">
+    <>
+      <div className="mt-2">
         <StatusBadge estado={activos.length > 0 ? "Activo" : "Sin activos"} tono={activos.length > 0 ? "teal" : "gold"} />
       </div>
-        <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-          <div className="rounded-xl bg-gold-500/10 px-2 py-2">
-            <p className="font-display text-xl font-bold text-gold-600">{ofertados.length}</p>
-            <p className="text-[10px] font-semibold uppercase text-navy-800/60">Ofertados</p>
-          </div>
-          <div className="rounded-xl bg-teal-500/10 px-2 py-2">
-            <p className="font-display text-xl font-bold text-teal-600">{activos.length}</p>
-            <p className="text-[10px] font-semibold uppercase text-navy-800/60">Activos</p>
-          </div>
-          <div className="rounded-xl bg-navy-800/5 px-2 py-2">
-            <p className="font-display text-xl font-bold text-navy-800">{cerrados.length}</p>
-            <p className="text-[10px] font-semibold uppercase text-navy-800/60">Cerrados</p>
-          </div>
+      <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+        <div className="rounded-xl bg-gold-500/10 px-2 py-2">
+          <p className="font-display text-xl font-bold text-gold-600">{ofertados.length}</p>
+          <p className="text-[10px] font-semibold uppercase text-navy-800/60">Ofertados</p>
         </div>
+        <div className="rounded-xl bg-teal-500/10 px-2 py-2">
+          <p className="font-display text-xl font-bold text-teal-600">{activos.length}</p>
+          <p className="text-[10px] font-semibold uppercase text-navy-800/60">Activos</p>
+        </div>
+        <div className="rounded-xl bg-navy-800/5 px-2 py-2">
+          <p className="font-display text-xl font-bold text-navy-800">{cerrados.length}</p>
+          <p className="text-[10px] font-semibold uppercase text-navy-800/60">Cerrados</p>
+        </div>
+      </div>
       <div className="mt-3">
         <OperationsList
           truekes={[...ofertados, ...activos, ...cerrados]}
@@ -95,7 +90,7 @@ function MisTruekesResumen() {
           vacio="Publica un trueke en el Mercado y sigue aquí tus operaciones."
         />
       </div>
-    </Card>
+    </>
   );
 }
 
@@ -169,7 +164,14 @@ export default function Dashboard() {
           </Card>
         </Link>
         <Card className={`p-5 ${idx >= 1 ? "" : "opacity-50"}`}>
-          <h3 className="font-semibold text-navy-800">Mis truekes</h3>
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="font-semibold text-navy-800">Mis truekes</h3>
+            {idx >= 1 && (
+              <Link href="/suite/intercambio" className="text-[11px] font-semibold text-teal-600 underline">
+                Ver todos →
+              </Link>
+            )}
+          </div>
           <p className="mt-1 text-sm text-navy-800/70">
             {idx >= 1 ? "Crea y completa trueques (máx. 3 activos — RF-14.4)." : "Requiere estado Verificado."}
           </p>
