@@ -73,7 +73,13 @@ export function crearApp(deps = {}) {
     })
   );
 
-  app.get('/healthz', (_req, res) => res.json({ ok: true, servicio: 'truekeate-api' }));
+  // Salud del servicio. /health es la ruta canónica: Cloud Run (el frontend de
+  // Google) INTERCEPTA /healthz y responde su propio 404 antes de que la
+  // petición llegue al contenedor, así que ese nombre no sirve en producción.
+  // Se conserva como alias para no romper scripts ni hábitos locales.
+  const salud = (_req, res) => res.json({ ok: true, servicio: 'truekeate-api' });
+  app.get('/health', salud);
+  app.get('/healthz', salud);
 
   app.use('/auth', crearRouterAuth(deps));
   app.use('/kyc', crearRouterKyc(deps));

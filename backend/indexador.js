@@ -12,7 +12,8 @@
 //     `auditoria`; los eventos ya procesados no se re-aplican.
 //   - Checkpoints por contrato (`indexador_checkpoint`) → reproceso desde bloque N.
 //   - Reconciliación periódica del estado espejo contra la cadena.
-//   - Métricas de lag y endpoint /healthz (D15/RF-18.1, H-17).
+//   - Métricas de lag y endpoint /health (D15/RF-18.1, H-17). En Cloud Run,
+//     /healthz lo intercepta el frontend de Google: la ruta válida es /health.
 // =============================================================================
 import { ethers } from 'ethers';
 

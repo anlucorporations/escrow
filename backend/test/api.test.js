@@ -196,7 +196,14 @@ test('admin: dashboard requiere rol Owner y expone KPIs', async () => {
   assert.ok('totalTruekes' in k.body);
 });
 
-test('healthz responde', async () => {
+test('health responde (ruta canónica en Cloud Run)', async () => {
+  const r = await request(app).get('/health');
+  assert.equal(r.status, 200);
+  assert.equal(r.body.ok, true);
+  assert.equal(r.body.servicio, 'truekeate-api');
+});
+
+test('healthz sigue respondiendo como alias (uso local)', async () => {
   const r = await request(app).get('/healthz');
   assert.equal(r.status, 200);
   assert.equal(r.body.ok, true);
