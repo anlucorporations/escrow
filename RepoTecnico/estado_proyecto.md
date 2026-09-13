@@ -866,3 +866,26 @@ Tres incrementos implementados, probados y **desplegados en `truekeate-web`**:
   Trabajo vigente de esta mejora: rama `escrow-dsh-GCP`.
 - **Pendiente:** validación interactiva del director con sus wallets reales (MetaMask, Rabby,
   Backpack y la extensión) en la URL pública.
+
+---
+
+## 🧩 Nuevo sub-proyecto: Wallet Nativa (chrome-extension) — 2026-09-13
+
+Instrucción del director: **mejorar la chrome-extension nativa de la plataforma**, extrayendo
+los requerimientos de `RepoTecnico/mejoras_chrome-extension.md` e **incorporando una wallet
+nativa** al proyecto.
+
+- **Fase actual:** Fase 1 (Concepto) — **extracción completa**.
+- **Entregable:** `RepoTecnico/requerimientos_wallet_nativa.md` — 27 RF (`RF-WN-*`), 7 RNF
+  (`RNF-WN-*`), 5 RT (`RT-WN-*`), matriz de trazabilidad fuente→requerimiento, análisis de
+  brecha (v1.1.0 actual → requerido) y plan propuesto por ciclos (C0–C6).
+- **Áreas:** (A) identidad visual total, (B) popup/index con fichas contraíbles, cuentas,
+  balance multi-token, recibir/enviar/comprar/cambiar/contactos, red, pestañas
+  Tokens/DeFi/NFT/Actividad y pie de desconexión, (C) páginas de firma con cabecera y EIP-712
+  estructurado, (D) modos pestaña/panel/flotante, (E) Configuración con notificaciones, redes,
+  ayuda y perfil, (F) **nativa**: instalación desde la barra de navegación del proyecto.
+- **Regla:** no se modifica la lógica (firma, RPC, bóveda, EIP-1193/6963/712); solo UI e
+  integración.
+- **Bloqueante:** bloque de preguntas (§7 del requerimiento) antes de codificar C0/C1.
+- **Sin cambios de código de la extensión todavía**; el código vive hoy en
+  `/home/dsh/workspace/chrome-wallet` (repo aparte) — decisión de ubicación pendiente (pregunta 1).
