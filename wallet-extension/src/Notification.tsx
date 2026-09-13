@@ -158,7 +158,8 @@ function Notification() {
   const tx = isTransaction ? (data.params[0] as TransactionRequest | undefined) : undefined
   const chain = findChain(chains, data.chainId)
   // M4: descripción estructurada de lo que se firma y cuándo.
-  const metaEip712 = isTransaction ? null : describirEip712(data.params[1])
+  const esEip712 = data.method === 'eth_signTypedData_v4'
+  const metaEip712 = isTransaction || !esEip712 ? null : describirEip712(data.params[1])
   const fechaFirma = new Date().toLocaleString('es', { dateStyle: 'medium', timeStyle: 'short' })
 
   return (
@@ -171,7 +172,11 @@ function Notification() {
         />
         <h1>CodeCrypto Wallet</h1>
         <p>
-          {isTransaction ? 'Solicitud de firma de transacción' : 'Solicitud de firma · EIP-712'}
+          {isTransaction
+            ? 'Solicitud de firma de transacción'
+            : esEip712
+              ? 'Solicitud de firma · EIP-712'
+              : 'Solicitud de firma · EIP-191'}
         </p>
       </div>
 
@@ -206,7 +211,7 @@ function Notification() {
           </>
         ) : (
           <>
-            <h2>✍️ Firmar Mensaje EIP-712</h2>
+            <h2>{esEip712 ? '✍️ Firmar Mensaje EIP-712' : '✍️ Firmar mensaje (EIP-191)'}</h2>
             <div className="tx-details">
               <div className="detail-item">
                 <div className="detail-label">Billetera firmante</div>
@@ -217,7 +222,9 @@ function Notification() {
               <div className="detail-item">
                 <div className="detail-label">Qué se firma</div>
                 <div className="detail-value">
-                  {metaEip712?.dominio} · {metaEip712?.tipo}
+                  {esEip712
+                    ? `${metaEip712?.dominio} · ${metaEip712?.tipo}`
+                    : 'Mensaje de texto firmado (EIP-191)'}
                 </div>
               </div>
               {metaEip712?.valor && (

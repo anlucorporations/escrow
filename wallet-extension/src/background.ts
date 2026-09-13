@@ -1011,7 +1011,13 @@ async function handleRPCRequest(method: string, params: unknown[], sender: chrom
   // Los métodos propios de la wallet solo se atienden a sus propias páginas: si
   // vinieran de una dApp (sender.tab), se rechazan. Sin esta comprobación, una
   // web podría intentar fuerza bruta contra la contraseña de la bóveda.
-  if (METODOS_SOLO_EXTENSION.has(method) && sender.tab) {
+  // Los métodos de bóveda solo los puede invocar una página de la PROPIA
+  // extensión (popup, pestaña, panel lateral, iframe flotante). Se comprueba por
+  // origen y no por `sender.tab`: la página de la extensión también puede vivir
+  // en una pestaña, mientras que una dApp (content script) tiene origen http(s).
+  const origenRemitente = sender.origin || sender.url || '';
+  const esPaginaExtension = origenRemitente.startsWith(`chrome-extension://${chrome.runtime.id}`);
+  if (METODOS_SOLO_EXTENSION.has(method) && !esPaginaExtension) {
     throw new AppError(
       RPC_ERROR_CODES.unauthorized,
       `${method} solo puede invocarse desde la propia wallet`

@@ -13,10 +13,14 @@
 Convención: `TC-WN-nn` = caso de prueba. **Tipo**: `A` automático / `M` manual.
 **Resultado**: ✅ pasa · ❌ falla · ⚠️ parcial. Registrar en la tabla final.
 
-> **Cobertura automatizada**: el spec `web/e2e-wallet/wallet-nativa.spec.ts`
-> (`npm run test:wallet` desde `web/`, requiere `wallet-extension/dist` construido)
-> automatiza **TC-WN-01, 02, 04, 05, 06, 07, 09, 13, 39 y 40**. El resto son manuales
-> (firma, KYC, datos con contratos reales, cambio de clave…).
+> **Cobertura automatizada** (specs en `web/e2e-wallet/`, `npm run test:wallet` desde `web/`):
+> - `wallet-nativa.spec.ts` → **TC-WN-01, 02, 04, 05, 06, 07, 09, 13** (popup), **39, 40**.
+> - `wallet-popup.spec.ts` → **TC-WN-18..36, 38, 41..48** (todas las funciones del popup).
+> - `wallet-firmas.spec.ts` → **TC-WN-10, 11, 12, 14, 15, 16** (dApp: conexión y firmas).
+>
+> Quedan como **manuales**: TC-WN-03 (carga real en Chrome), 08 (recuerdo de elección en
+> el popup real), 17 (forma de los botones), 37 (panel lateral del navegador), 43 (permiso
+> de host al añadir red), 49/50/51 (no interferencia a fondo y autobloqueo).
 
 ---
 

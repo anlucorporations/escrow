@@ -938,8 +938,13 @@ nativa** al proyecto.
   - **Pruebas (Fase 4):** checklist E2E de **51 casos** y plantilla de informe en
     `RepoTecnico/pruebas/checklist_wallet_nativa.md` e
     `RepoTecnico/pruebas/INFORME_WALLET_NATIVA.md`. Suite **automatizada** en
-    `web/e2e-wallet/wallet-nativa.spec.ts` (`npm run test:wallet`): **8 tests** que cubren
-    TC-WN-01/02/04/05/06/07/09/13/39/40 → **8/8 en verde**.
-  - **Pendiente:** ejecutar los casos manuales con wallets reales y registrar el informe.
+    `web/e2e-wallet/` (`npm run test:wallet`): **32 tests** en 3 specs
+    (`wallet-nativa` web/instalación/detección/modos, `wallet-popup` todas las funciones
+    del popup y `wallet-firmas` conexión + EIP-191 + EIP-712 + rechazo) que cubren
+    **~43 de los 51 casos** → **32/32 en verde**. Se corrigió además el guard «solo
+    extensión» (se distingue por origen, no por `sender.tab`) y la etiqueta EIP-191 vs
+    EIP-712 en la ventana de firma.
+  - **Pendiente manual:** TC-WN-03, 08, 17, 37, 43, 49, 50 y 51 (panel lateral del
+    navegador, permisos de host, autobloqueo…).
 - **Decisión (D-NW-5):** se **mantiene «CodeCrypto Wallet»** como nombre de producto; la
   identidad visual es la de TrueKeate y manifest/EIP-6963 quedan intactos.
