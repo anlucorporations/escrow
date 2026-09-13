@@ -1,10 +1,10 @@
 /**
- * Perfil (M6 · RF-WN-24/25): información de la cuenta, modo oscuro y respaldo
- * de la frase de recuperación.
+ * Perfil (M6 · RF-WN-24/25): cuenta, apariencia, respaldo de la frase, cambio de
+ * clave de bloqueo y backup exportable/restaurable de la bóveda.
  *
- * El respaldo exige la bóveda DESBLOQUEADA (método `wallet_revealMnemonic`,
- * solo extensión). El cambio de clave de bloqueo y el backup exportable quedan
- * para el cierre de M6.
+ * Todo pasa por métodos de la bóveda (solo extensión). El respaldo de la frase
+ * y el cambio de clave exigen la bóveda desbloqueada; el backup exporta la
+ * bóveda CIFRADA (nunca la frase en claro).
  */
 import { useEffect, useState } from 'react'
 import { sendRPCToBackground } from '../utils/rpc'
@@ -14,8 +14,13 @@ const CLAVE_TEMA = 'codecrypto_theme'
 export function Perfil({ account }: { account: string }) {
   const [oscuro, setOscuro] = useState(false)
   const [frase, setFrase] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
   const [cargando, setCargando] = useState(false)
+  const [aviso, setAviso] = useState<string | null>(null)
+
+  const [actual, setActual] = useState('')
+  const [nueva, setNueva] = useState('')
+  const [repetir, setRepetir] = useState('')
+  const [passBackup, setPassBackup] = useState('')
 
   useEffect(() => {
     void chrome.storage.local.get(CLAVE_TEMA).then((s) => {
@@ -33,14 +38,67 @@ export function Perfil({ account }: { account: string }) {
   }
 
   const revelar = async () => {
-    setError(null)
+    setAviso(null)
     setCargando(true)
     try {
       setFrase(await sendRPCToBackground<string>('wallet_revealMnemonic'))
     } catch (e) {
-      setError((e as Error).message)
+      setAviso((e as Error).message)
     } finally {
       setCargando(false)
+    }
+  }
+
+  const cambiarClave = async () => {
+    setAviso(null)
+    if (nueva.length < 8) {
+      setAviso('La nueva contraseña debe tener al menos 8 caracteres.')
+      return
+    }
+    if (nueva !== repetir) {
+      setAviso('Las contraseñas nuevas no coinciden.')
+      return
+    }
+    setCargando(true)
+    try {
+      await sendRPCToBackground('wallet_changeVaultPassword', [actual, nueva])
+      setAviso('✅ Clave de bloqueo actualizada.')
+      setActual('')
+      setNueva('')
+      setRepetir('')
+    } catch (e) {
+      setAviso((e as Error).message)
+    } finally {
+      setCargando(false)
+    }
+  }
+
+  const descargarBackup = async () => {
+    setAviso(null)
+    try {
+      const boveda = await sendRPCToBackground<Record<string, unknown>>('wallet_exportVault')
+      const blob = new Blob([JSON.stringify(boveda, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const enlace = document.createElement('a')
+      enlace.href = url
+      enlace.download = 'TrueKeateWallet-backup.json'
+      enlace.click()
+      URL.revokeObjectURL(url)
+      setAviso('✅ Backup descargado (bóveda cifrada).')
+    } catch (e) {
+      setAviso((e as Error).message)
+    }
+  }
+
+  const restaurar = async (archivo: File) => {
+    setAviso(null)
+    try {
+      const boveda = JSON.parse(await archivo.text())
+      await sendRPCToBackground('wallet_importVault', [boveda, passBackup])
+      setAviso('✅ Bóveda restaurada desde el backup.')
+      setPassBackup('')
+    } catch (e) {
+      setAviso(`No se pudo restaurar: ${(e as Error).message}`)
     }
   }
 
@@ -69,26 +127,69 @@ export function Perfil({ account }: { account: string }) {
           </button>
         </>
       ) : (
-        <>
-          <button className="tk-btn" onClick={() => void revelar()} disabled={cargando}>
-            {cargando ? '⏳ Verificando…' : '👁️ Mostrar frase de recuperación'}
-          </button>
-          <p className="tk-muted" style={{ fontSize: 10, marginTop: 6 }}>
-            Requiere la bóveda desbloqueada. Sirve para respaldar la wallet.
-          </p>
-        </>
-      )}
-      {error && (
-        <p className="tk-contactos__error" role="alert">
-          {error}
-        </p>
+        <button className="tk-btn" onClick={() => void revelar()} disabled={cargando}>
+          {cargando ? '⏳ Verificando…' : '👁️ Mostrar frase de recuperación'}
+        </button>
       )}
 
-      <h4 className="tk-config__area">Seguridad</h4>
-      <p className="tk-muted" style={{ fontSize: 11, margin: 0 }}>
-        El cambio de clave de bloqueo y el backup exportable de la bóveda llegan en el cierre de
-        M6; hoy la frase se guarda cifrada (AES-256) y se bloquea sola a los 15 minutos.
+      <h4 className="tk-config__area">Cambiar clave de bloqueo</h4>
+      <input
+        className="tk-input"
+        type="password"
+        placeholder="Contraseña actual"
+        value={actual}
+        onChange={(e) => setActual(e.target.value)}
+      />
+      <input
+        className="tk-input"
+        type="password"
+        placeholder="Nueva contraseña (mín. 8)"
+        value={nueva}
+        onChange={(e) => setNueva(e.target.value)}
+      />
+      <input
+        className="tk-input"
+        type="password"
+        placeholder="Repite la nueva"
+        value={repetir}
+        onChange={(e) => setRepetir(e.target.value)}
+      />
+      <button className="tk-btn tk-config__enlace" onClick={() => void cambiarClave()} disabled={cargando}>
+        🔑 Cambiar clave
+      </button>
+
+      <h4 className="tk-config__area">Backup de la bóveda</h4>
+      <button className="tk-btn tk-config__enlace" onClick={() => void descargarBackup()}>
+        ⬇️ Descargar backup (cifrado)
+      </button>
+      <input
+        className="tk-input"
+        type="password"
+        placeholder="Contraseña del backup"
+        value={passBackup}
+        onChange={(e) => setPassBackup(e.target.value)}
+      />
+      <label className="tk-backup">
+        <span>⬆️ Restaurar backup (.json)</span>
+        <input
+          type="file"
+          accept="application/json"
+          onChange={(e) => {
+            const f = e.target.files?.[0]
+            if (f) void restaurar(f)
+          }}
+        />
+      </label>
+      <p className="tk-muted" style={{ fontSize: 10, margin: 0 }}>
+        El backup contiene la bóveda <strong>cifrada</strong>: para restaurarla hace falta tu
+        contraseña.
       </p>
+
+      {aviso && (
+        <p className="tk-contactos__error" role="alert">
+          {aviso}
+        </p>
+      )}
     </div>
   )
 }

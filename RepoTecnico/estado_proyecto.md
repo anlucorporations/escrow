@@ -923,13 +923,14 @@ nativa** al proyecto.
     y sección **Configuración** que elige y recuerda el modo (panel lateral / pestaña /
     flotante) en `codecrypto_view_mode`; base de M6 (red/ayuda/perfil ya esbozados).
     Verificado: manifiesto correcto y overlay flotante inyectado/retirado en Chromium real.
-  - **M6 ✅** — **Configuración** hub con las cinco áreas: **notificaciones** deslizables (desde
-    el bus de actividad), **modo de vista**, **red** con sub-página **Redes**
-    (Públicas/Prueba/Personalizadas: Ethereum, Base, Polygon, Arbitrum, Optimism, Sepolia y
-    Base Sepolia; Bitcoin solo informativo), **ayuda** y **perfil** con **modo oscuro** y
-    **respaldo de la frase** (`wallet_revealMnemonic`, solo extensión y con bóveda desbloqueada).
-    Quedan para el cierre: cambio de clave de bloqueo y backup exportable de la bóveda.
-  - **Pendiente:** **Comprar/Cambiar** (placeholder D-NW-2) y el cierre de M6 (cambio de clave
-    y backup exportable).
+  - **M6 ✅ (cerrado)** — **Configuración** hub con las cinco áreas: **notificaciones**
+    deslizables (desde el bus de actividad), **modo de vista**, **red** con sub-página
+    **Redes** (Públicas/Prueba/Personalizadas: Ethereum, Base, Polygon, Arbitrum, Optimism,
+    Sepolia y Base Sepolia; Bitcoin solo informativo), **ayuda** y **perfil** con **modo
+    oscuro**, **respaldo de la frase** (`wallet_revealMnemonic`, bóveda desbloqueada),
+    **cambio de clave de bloqueo** (`wallet_changeVaultPassword`) y **backup exportable/
+    restaurable** de la bóveda cifrada (`wallet_exportVault`/`wallet_importVault`); todos los
+    métodos de bóveda son solo-extensión.
+  - **Pendiente:** **Comprar/Cambiar** (placeholder D-NW-2).
 - **Decisión (D-NW-5):** se **mantiene «CodeCrypto Wallet»** como nombre de producto; la
   identidad visual es la de TrueKeate y manifest/EIP-6963 quedan intactos.

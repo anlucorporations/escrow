@@ -945,6 +945,26 @@ code, .tk-mono {
 }
 
 /* Perfil (M6 · RF-WN-25) */
+.tk-perfil {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tk-backup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--teal-500);
+  cursor: pointer;
+}
+
+.tk-backup input {
+  display: none;
+}
+
 .tk-switch {
   display: flex;
   align-items: center;

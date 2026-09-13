@@ -32,11 +32,14 @@ import { log as writeLog } from './utils/logs';
 import {
   bloquear,
   crearBoveda,
+  descifrarBoveda,
   desbloquear,
   estadoBoveda,
   guardarBoveda,
+  leerBoveda,
   MINUTOS_AUTOBLOQUEO,
   mnemonicDesbloqueado,
+  type Boveda,
 } from './vault';
 import {
   CHAINS_KEY,
@@ -905,6 +908,9 @@ const METODOS_SOLO_EXTENSION = new Set([
   'wallet_unlock',
   'wallet_lock',
   'wallet_revealMnemonic',
+  'wallet_changeVaultPassword',
+  'wallet_exportVault',
+  'wallet_importVault',
   'wallet_getConnectedSites',
   'wallet_disconnectSite',
 ]);
@@ -1394,6 +1400,62 @@ async function handleRPCRequest(method: string, params: unknown[], sender: chrom
       }
       logActivity('event', 'Frase de recuperación mostrada (respaldo)', 'wallet');
       return frase;
+    }
+
+    case 'wallet_changeVaultPassword': {
+      // Solo el popup (M6): re-cifra la bóveda con una clave nueva. Exige la
+      // clave ACTUAL correcta y deja la sesión desbloqueada con la nueva.
+      const actual = String(params[0] ?? '');
+      const nueva = String(params[1] ?? '');
+      if (nueva.length < 8) {
+        throw new AppError(
+          RPC_ERROR_CODES.invalidParams,
+          'La nueva contraseña debe tener al menos 8 caracteres'
+        );
+      }
+      const boveda = await leerBoveda();
+      if (!boveda) {
+        throw new AppError(RPC_ERROR_CODES.unauthorized, 'No hay bóveda que actualizar');
+      }
+      let mnemonic: string;
+      try {
+        mnemonic = await descifrarBoveda(boveda, actual);
+      } catch {
+        throw new AppError(RPC_ERROR_CODES.unauthorized, 'La contraseña actual no es correcta');
+      }
+      await guardarBoveda(await crearBoveda(mnemonic, nueva));
+      await desbloquear(nueva);
+      logActivity('event', 'Clave de bloqueo actualizada', 'wallet');
+      return { ok: true };
+    }
+
+    case 'wallet_exportVault': {
+      // Solo el popup (M6): devuelve la bóveda CIFRADA para respaldarla.
+      const boveda = await leerBoveda();
+      if (!boveda) {
+        throw new AppError(RPC_ERROR_CODES.internal, 'No hay bóveda que exportar');
+      }
+      logActivity('event', 'Backup de la bóveda exportado', 'wallet');
+      return boveda;
+    }
+
+    case 'wallet_importVault': {
+      // Solo el popup (M6): restaura una bóveda desde un backup, validando que
+      // la contraseña la descifra antes de sustituir la actual.
+      const backup = params[0] as Boveda;
+      const password = String(params[1] ?? '');
+      if (!backup || typeof backup !== 'object' || !backup.cifrado || !backup.salt) {
+        throw new AppError(RPC_ERROR_CODES.invalidParams, 'Backup inválido');
+      }
+      try {
+        await descifrarBoveda(backup, password);
+      } catch {
+        throw new AppError(RPC_ERROR_CODES.unauthorized, 'La contraseña no descifra este backup');
+      }
+      await guardarBoveda(backup);
+      await desbloquear(password);
+      logActivity('event', 'Bóveda restaurada desde backup', 'wallet');
+      return { ok: true };
     }
 
     case 'wallet_getConnectedSites':
