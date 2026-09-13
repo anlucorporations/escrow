@@ -37,6 +37,31 @@ function prettyJson(value: unknown): string {
   }
 }
 
+/** Abrevia una dirección para mostrarla en la firma (0x1234…abcd). */
+function acortarDireccion(address: string): string {
+  return address.length > 12 ? `${address.slice(0, 6)}…${address.slice(-4)}` : address
+}
+
+/** Extrae los datos legibles del mensaje EIP-712 (M4: descripción estructurada). */
+function describirEip712(value: unknown): { dominio: string; tipo: string; valor: string | null } {
+  try {
+    const obj = typeof value === 'string' ? JSON.parse(value) : value
+    const o = obj as {
+      domain?: { name?: string }
+      primaryType?: string
+      message?: Record<string, unknown>
+    }
+    const valorRaw = o?.message?.value ?? o?.message?.valor ?? o?.message?.amount
+    return {
+      dominio: o?.domain?.name ? String(o.domain.name) : 'Contrato de la dApp',
+      tipo: o?.primaryType ? String(o.primaryType) : 'Mensaje',
+      valor: valorRaw === undefined || valorRaw === null ? null : String(valorRaw),
+    }
+  } catch {
+    return { dominio: 'Contrato de la dApp', tipo: 'Mensaje', valor: null }
+  }
+}
+
 function Notification() {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<PendingRequestData | null>(null)
@@ -132,12 +157,22 @@ function Notification() {
   const isTransaction = data.method === 'eth_sendTransaction'
   const tx = isTransaction ? (data.params[0] as TransactionRequest | undefined) : undefined
   const chain = findChain(chains, data.chainId)
+  // M4: descripción estructurada de lo que se firma y cuándo.
+  const metaEip712 = isTransaction ? null : describirEip712(data.params[1])
+  const fechaFirma = new Date().toLocaleString('es', { dateStyle: 'medium', timeStyle: 'short' })
 
   return (
     <div className="notification-container">
       <div className="notification-header">
-        <h1>🔐 CodeCrypto Wallet</h1>
-        <p>Solicitud de Firma</p>
+        <img
+          className="tk-brand__logo"
+          src="/brand/TrueKeate_logoIntegral.svg"
+          alt="TrueKeate"
+        />
+        <h1>TrueKeate Wallet</h1>
+        <p>
+          {isTransaction ? 'Solicitud de firma de transacción' : 'Solicitud de firma · EIP-712'}
+        </p>
       </div>
 
       <div className="notification-content">
@@ -174,19 +209,37 @@ function Notification() {
             <h2>✍️ Firmar Mensaje EIP-712</h2>
             <div className="tx-details">
               <div className="detail-item">
-                <div className="detail-label">Dirección:</div>
-                <div className="detail-value code">{String(data.params[0] ?? '')}</div>
-              </div>
-              <div className="json-container">
-                <div className="json-label">Datos del Mensaje:</div>
-                <pre className="json-display">{prettyJson(data.params[1])}</pre>
+                <div className="detail-label">Billetera firmante</div>
+                <div className="detail-value code">
+                  {acortarDireccion(String(data.params[0] ?? ''))}
+                </div>
               </div>
               <div className="detail-item">
-                <div className="detail-label">Red:</div>
+                <div className="detail-label">Qué se firma</div>
+                <div className="detail-value">
+                  {metaEip712?.dominio} · {metaEip712?.tipo}
+                </div>
+              </div>
+              {metaEip712?.valor && (
+                <div className="detail-item">
+                  <div className="detail-label">Valor</div>
+                  <div className="detail-value">{metaEip712.valor}</div>
+                </div>
+              )}
+              <div className="detail-item">
+                <div className="detail-label">Red</div>
                 <div className="detail-value">
                   {chain ? formatChainLabel(chain) : `Chain ${data.chainId}`}
                 </div>
               </div>
+              <div className="detail-item">
+                <div className="detail-label">Fecha y hora</div>
+                <div className="detail-value">{fechaFirma}</div>
+              </div>
+              <details className="json-container">
+                <summary className="json-label">Datos completos del mensaje</summary>
+                <pre className="json-display">{prettyJson(data.params[1])}</pre>
+              </details>
             </div>
           </>
         )}

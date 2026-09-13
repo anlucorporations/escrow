@@ -886,6 +886,18 @@ nativa** al proyecto.
   ayuda y perfil, (F) **nativa**: instalación desde la barra de navegación del proyecto.
 - **Regla:** no se modifica la lógica (firma, RPC, bóveda, EIP-1193/6963/712); solo UI e
   integración.
-- **Bloqueante:** bloque de preguntas (§7 del requerimiento) antes de codificar C0/C1.
-- **Sin cambios de código de la extensión todavía**; el código vive hoy en
-  `/home/dsh/workspace/chrome-wallet` (repo aparte) — decisión de ubicación pendiente (pregunta 1).
+- **Decisiones (D-NW-1..4):** extensión **nativa dentro del repo** (`wallet-extension/`, paquete
+  desempaquetado/firmado); **Tokens/Actividad/NFT reales** y DeFi/Comprar placeholder; modos
+  **panel lateral (chrome.sidePanel) + pestaña + flotante**; **Bitcoin solo listado**; activos
+  `TrueKeate_logoIntegral.{ico,svg,webp}`; ayuda reutiliza `/help/manual`.
+- **Ejecución:**
+  - **C0 ✅** — código incorporado a `wallet-extension/` (66 archivos) en `escrow-dsh-GCP`;
+    build verificado (`tsc + vite build`).
+  - **C1 en curso** — identidad visual: cabecera de marca (logo `logoIntegral` + «TrueKeate
+    Wallet») en el popup, y cabeceras de firma/conexión con logo + título de acción + dApp;
+    descripción EIP-712 estructurada (firmante, qué se firma, valor, red, fecha/hora); botones
+    de aceptar/rechazar en forma de píldora. Verificado por render real del popup (sin cambios
+    de lógica). **Pendiente C1:** fichas contraíbles, gestión de cuentas, balance multi-token,
+    recibir/enviar/comprar/cambiar/contactos, red y pie de desconexión.
+- **Pendiente de decisión:** nombre visible del producto (¿renombrar «CodeCrypto Wallet» →
+  «TrueKeate Wallet» también en manifest/EIP-6963 y textos de la web? hoy solo cambió la UI).

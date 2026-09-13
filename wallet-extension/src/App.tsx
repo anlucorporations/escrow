@@ -347,7 +347,17 @@ function App() {
   // ── Render ──────────────────────────────────────────────────────────
   return (
     <div className="app">
-      <h1>CodeCrypto Wallet</h1>
+      <header className="tk-brand">
+        <img
+          className="tk-brand__logo"
+          src="/brand/TrueKeate_logoIntegral.svg"
+          alt="TrueKeate"
+        />
+        <div className="tk-brand__text">
+          <span className="tk-brand__title">TrueKeate Wallet</span>
+          <span className="tk-brand__sub">Wallet nativa de la plataforma</span>
+        </div>
+      </header>
 
       {boveda?.migracionPendiente && isWalletLoaded && !pendienteCifrar && (
         <div className="tk-warning" style={{ margin: '0 0 12px' }}>

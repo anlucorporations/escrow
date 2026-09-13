@@ -109,6 +109,21 @@ code, .tk-mono {
   color: rgba(255, 255, 255, 0.55);
 }
 
+/* Columna título + subtítulo de la cabecera de marca. */
+.tk-brand__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  min-width: 0;
+}
+
+/* Cabeceras de las ventanas de firma/conexión: logo sobre el título. */
+.notification-header .tk-brand__logo {
+  height: 40px;
+  margin: 0 auto 8px;
+  display: block;
+}
+
 /* --- Tarjetas -------------------------------------------------------------- */
 .tk-card {
   background: var(--white);

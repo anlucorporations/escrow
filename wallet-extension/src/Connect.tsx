@@ -167,15 +167,20 @@ function Connect() {
   return (
     <div className="notification-container">
       <div className="notification-header">
-        <h1>🔐 CodeCrypto Wallet</h1>
-        <p>Solicitud de Conexión</p>
+        <img
+          className="tk-brand__logo"
+          src="/brand/TrueKeate_logoIntegral.svg"
+          alt="TrueKeate"
+        />
+        <h1>TrueKeate Wallet</h1>
+        <p>Solicitud de autorización</p>
       </div>
 
       <div className="notification-content">
         <h2>🌐 Conectar a dApp</h2>
 
         <div className="connect-origin">
-          <div className="origin-label">Origen:</div>
+          <div className="origin-label">dApp solicitante</div>
           <div className="origin-value">{data.origin || 'Aplicación Web'}</div>
         </div>
 
