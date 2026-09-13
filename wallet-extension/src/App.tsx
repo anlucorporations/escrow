@@ -8,6 +8,8 @@ import WalletSetup from './components/WalletSetup'
 import { Ficha } from './components/Ficha'
 import { RecibirQR } from './components/RecibirQR'
 import { Contactos } from './components/Contactos'
+import { Comprar } from './components/Comprar'
+import { Cambiar } from './components/Cambiar'
 import { Caracteristicas } from './components/Caracteristicas'
 import { Configuracion } from './components/Configuracion'
 import { VaultPassword } from './components/VaultPassword'
@@ -45,8 +47,10 @@ function App() {
   const [isLoading, setIsLoading] = useState(true)
   /** dApps autorizadas (origen → cuenta) para el pie y la ficha Conexiones. */
   const [sitiosConectados, setSitiosConectados] = useState<Record<string, string>>({})
-  /** Panel de gestión de saldo abierto: recibir o contactos (M2.1.4). */
-  const [panelSaldo, setPanelSaldo] = useState<'recibir' | 'contactos' | null>(null)
+  /** Panel de gestión de saldo abierto (M2.1.4). */
+  const [panelSaldo, setPanelSaldo] = useState<
+    'recibir' | 'enviar' | 'comprar' | 'cambiar' | 'contactos' | null
+  >(null)
   /** Estado de la bóveda cifrada: si existe y si está abierta. */
   const [boveda, setBoveda] = useState<{
     existe: boolean
@@ -497,10 +501,18 @@ function App() {
                 >
                   <span className="tk-action__icono">📤</span>Enviar
                 </button>
-                <button className="tk-action" disabled title="Próximamente (D-NW-2)">
+                <button
+                  className={`tk-action${panelSaldo === 'comprar' ? ' tk-action--activa' : ''}`}
+                  onClick={() => setPanelSaldo(panelSaldo === 'comprar' ? null : 'comprar')}
+                  title="Comprar cripto o recibir desde un exchange"
+                >
                   <span className="tk-action__icono">🛒</span>Comprar
                 </button>
-                <button className="tk-action" disabled title="Próximamente (D-NW-2)">
+                <button
+                  className={`tk-action${panelSaldo === 'cambiar' ? ' tk-action--activa' : ''}`}
+                  onClick={() => setPanelSaldo(panelSaldo === 'cambiar' ? null : 'cambiar')}
+                  title="Intercambiar tokens ERC-20"
+                >
                   <span className="tk-action__icono">🔄</span>Cambiar
                 </button>
                 <button
@@ -513,6 +525,12 @@ function App() {
               </div>
               {panelSaldo === 'recibir' && accounts[currentAccountIndex] && (
                 <RecibirQR address={accounts[currentAccountIndex]} />
+              )}
+              {panelSaldo === 'comprar' && accounts[currentAccountIndex] && (
+                <Comprar account={accounts[currentAccountIndex]} />
+              )}
+              {panelSaldo === 'cambiar' && accounts[currentAccountIndex] && (
+                <Cambiar account={accounts[currentAccountIndex]} chainId={chainId} />
               )}
               {panelSaldo === 'contactos' && <Contactos />}
             </Ficha>

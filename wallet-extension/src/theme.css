@@ -984,6 +984,42 @@ code, .tk-mono {
   word-spacing: 4px;
 }
 
+/* Comprar / Cambiar (M2.1.4) */
+.tk-comprar,
+.tk-cambiar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+}
+
+.tk-cambiar__fila {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 6px;
+  align-items: center;
+}
+
+.tk-cambiar__fila + .tk-cambiar__fila {
+  grid-template-columns: 1fr 1fr;
+}
+
+.tk-cambiar__flecha {
+  color: var(--teal-500);
+  font-weight: 700;
+}
+
+.tk-cambiar__acciones {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tk-cambiar__acciones .tk-btn {
+  font-size: 11px;
+  padding: 8px 12px;
+}
+
 /* Modo oscuro (M6 · RF-WN-25) */
 :root[data-theme='dark'] body {
   background: #0b1220;

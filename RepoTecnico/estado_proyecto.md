@@ -931,6 +931,10 @@ nativa** al proyecto.
     **cambio de clave de bloqueo** (`wallet_changeVaultPassword`) y **backup exportable/
     restaurable** de la bóveda cifrada (`wallet_exportVault`/`wallet_importVault`); todos los
     métodos de bóveda son solo-extensión.
-  - **Pendiente:** **Comprar/Cambiar** (placeholder D-NW-2).
+  - **Comprar / Cambiar ✅** — **Comprar** guiado (enlace a la sección VALOR de la plataforma
+    + QR de recepción; sin proveedor on-ramp, D-NW-2). **Cambiar**: swap ERC-20→ERC-20 contra
+    un router compatible **Uniswap V2** indicado por el usuario, con **cotización**
+    (`getAmountsOut`) y flujo **aprobar → intercambiar** (`eth_sendTransaction`).
+  - **Pendiente:** prueba interactiva del director con sus wallets reales.
 - **Decisión (D-NW-5):** se **mantiene «CodeCrypto Wallet»** como nombre de producto; la
   identidad visual es la de TrueKeate y manifest/EIP-6963 quedan intactos.
