@@ -784,3 +784,52 @@ reiniciar y no se compartía entre instancias de Cloud Run).
   200; puja baja 120 → 400; /subastas/mis de EcoTech incluye su subasta; UI:
   heading, "Crear subasta", subasta con artículo visible y pestaña "Las mías".
   Captura: `RepoTecnico/pruebas/1ra-prueba/subastas-empresa.png`.
+
+---
+
+## Wallet Chrome propia (CodeCrypto Wallet) — propuesta de integración (2026-09-12)
+
+- Se analizó **solo** el entregable `codecrypto_wallet_entrega.zip` (MV3, Vite+React 19+
+  ethers 6, con `dist/` compilado), a petición del director, para estudiar su uso
+  **sustituyendo a MetaMask** sin romper el funcionamiento actual.
+- **Propuesta completa:** `RepoTecnico/PROPUESTA_WALLET_CHROME_EXTENSION.md`.
+- **Hallazgo principal:** la extensión se inyecta como `window.codecrypto` y se anuncia por
+  **EIP-6963** (que el proyecto ya soporta: `web/lib/ethereum.tsx:60-75,126-138`), y su
+  cadena por defecto es **31337**; pero **no implementa `personal_sign`**, del que dependen
+  el login (`web/lib/sesion.tsx:165`) y la firma por acción (`web/lib/firma.ts:29`),
+  verificadas en el backend con `ethers.verifyMessage` (`backend/api/lib/auth.js:15`).
+  → Hoy **no puede sustituir a MetaMask**; el hueco está localizado en un método.
+- También faltan `eth_call` (deja sin datos el panel de balances, que ya degrada solo),
+  `wallet_revokePermissions` y los métodos de recibo de transacción. **Sí firma EIP-712**
+  (`eth_signTypedData_v4`), lo que abre una vía estratégica: migrar la firma del proyecto
+  a EIP-712 funcionaría con ambas wallets.
+- **Plan propuesto:** Fase 0 (doble de pruebas con la superficie RPC de la extensión, sin
+  tocar nada) → Fase 1 (ampliar la extensión con `personal_sign`, sin tocar el proyecto)
+  → Fase 2 (convivencia con MetaMask y selección de proveedor) → Fase 3 opcional (EIP-712)
+  → Fase 4 (cifrado del mnemonic antes de cualquier uso real).
+- **Riesgo declarado:** el mnemonic se guarda **sin cifrar** y la wallet no pide contraseña
+  (el propio README lo advierte): no debe usarse con datos reales ni en producción.
+- **Decisiones del director (2026-09-12):** (1) la wallet **convive** con MetaMask;
+  (2) **se puede modificar** el código de la extensión; (3) el objetivo es
+  **producción en GCP** con esta wallet.
+- **Impacto de las decisiones:** la convivencia deja de ser opcional — hoy es imposible
+  usar CodeCrypto con MetaMask instalada, porque el listener de EIP-6963 aborta si ya
+  existe `window.ethereum` (`web/lib/ethereum.tsx:159`) y `conectar()` toma
+  `window.ethereum` (`:227`); hace falta un **selector de proveedores EIP-6963**. Y el
+  **cifrado del mnemonic** pasa de mejora futura a **requisito bloqueante de producción**
+  (hoy está en claro y sin contraseña).
+- **Plan revisado (52–82 h):** Fase 0 medición → Fase 1 extensión v1.1 (`personal_sign`,
+  `wallet_revokePermissions`, `eth_call`, recibos) → **Fase 1.5 bóveda cifrada** →
+  Fase 2 selector de proveedor → Fase 3 integración real en GCP → Fase 4 endurecimiento y
+  distribución → Fase 5 opcional EIP-712. Ver §8 de la propuesta.
+- **Pendiente de decisión:** cifrado/desbloqueo, canal de distribución y **cadena de
+  producción** (hoy la "producción" corre sobre un anvil remoto en Cloud Run, 31337).
+- **Estado:** análisis y plan entregados. **Sin cambios en el código, sin push y sin
+  despliegue**, a la espera del siguiente bloque de 3 preguntas (§8.6 de la propuesta).
+
+- **Cambio de alcance (2026-09-13):** la extensión **no se distribuye**; es un artefacto
+  **académico** que se carga desempaquetada. Se eliminan del plan el canal de distribución
+  (P4), la decisión de cadena de producción (P5) y la revisión de datos (P9); la plataforma
+  en GCP mantiene MetaMask como wallet y la propia queda como artefacto paralelo de
+  prácticas. La bóveda cifrada se conserva como calidad didáctica, ya no como requisito
+  bloqueante. Ver §10 de `PROPUESTA_WALLET_CHROME_EXTENSION.md`.
