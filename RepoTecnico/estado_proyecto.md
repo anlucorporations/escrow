@@ -857,5 +857,8 @@ Tres incrementos implementados, probados y **desplegados en `truekeate-web`**:
   intacto, `personal_sign`/`eth_requestAccounts` dirigidos a la wallet elegida).
 - **Despliegue actual:** `truekeate-web` rev **00036-c9n** (imagen `web:release-0487af8-popup2`),
   100 % del tráfico. Ver §§10–14 de `PROPUESTA_WALLET_CHROME_EXTENSION.md`.
-- **Pendiente:** commit/push (requiere orden `/push`) y validación interactiva del director
-  con sus wallets reales (MetaMask, Rabby, Backpack y la extensión) en la URL pública.
+- **Repositorios:** cambios **subidos el 2026-09-13 a los 3 remotos** (`gitlab`, `github`,
+  `codecrypto`) **solo en la rama `escrow-dsh-GCP`** (commit `e44020c`). `main` no se tocó.
+  Trabajo vigente de esta mejora: rama `escrow-dsh-GCP`.
+- **Pendiente:** validación interactiva del director con sus wallets reales (MetaMask, Rabby,
+  Backpack y la extensión) en la URL pública.
