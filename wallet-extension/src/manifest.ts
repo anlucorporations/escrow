@@ -32,6 +32,10 @@ interface ManifestV3 {
     service_worker: string;
     type: string;
   };
+  /** Panel lateral (M5): la misma UI del popup, abierta junto a la dApp. */
+  side_panel: {
+    default_path: string;
+  };
   icons: {
     [key: string]: string;
   };
@@ -56,7 +60,9 @@ const manifest: ManifestV3 = {
     'storage',
     'activeTab',
     'tabs',
-    'notifications'
+    'notifications',
+    // M5: panel lateral (chrome.sidePanel)
+    'sidePanel'
   ],
   host_permissions: [
     'http://localhost:8545/*',
@@ -81,6 +87,10 @@ const manifest: ManifestV3 = {
     service_worker: 'background.js',
     type: 'module'
   },
+  // M5: ver la wallet como panel lateral (misma UI que el popup).
+  side_panel: {
+    default_path: 'index.html'
+  },
   icons: {
     '16': 'icon-16.png',
     '48': 'icon-48.png',
@@ -92,11 +102,23 @@ const manifest: ManifestV3 = {
       js: ['content-script.js'],
       run_at: 'document_start',
       all_frames: true
+    },
+    {
+      // M5: overlay flotante (solo se muestra si el modo elegido es "flotante").
+      matches: ['<all_urls>'],
+      js: ['floating.js'],
+      run_at: 'document_idle',
+      all_frames: false
     }
   ],
   web_accessible_resources: [
     {
       resources: ['inject.js'],
+      matches: ['<all_urls>']
+    },
+    {
+      // Recursos del panel flotante (iframe con la UI de la wallet).
+      resources: ['index.html', 'assets/*', 'brand/*', 'vite.svg'],
       matches: ['<all_urls>']
     }
   ]

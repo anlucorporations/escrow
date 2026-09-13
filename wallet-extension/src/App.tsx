@@ -9,6 +9,7 @@ import { Ficha } from './components/Ficha'
 import { RecibirQR } from './components/RecibirQR'
 import { Contactos } from './components/Contactos'
 import { Caracteristicas } from './components/Caracteristicas'
+import { Configuracion } from './components/Configuracion'
 import { VaultPassword } from './components/VaultPassword'
 import { VaultUnlock } from './components/VaultUnlock'
 import { formatWeiToEth, parseEthToWei } from './utils/amount'
@@ -541,6 +542,11 @@ function App() {
               {accounts[currentAccountIndex] && (
                 <Caracteristicas account={accounts[currentAccountIndex]} chainId={chainId} />
               )}
+            </Ficha>
+
+            {/* M6 · Configuración (M5: modo de vista) */}
+            <Ficha id="configuracion" titulo="Configuración" icono="⚙️" abierta={false}>
+              <Configuracion chainId={chainId} />
             </Ficha>
 
             {/* M2.1.7 · Conexiones: dApps autorizadas con desconexión individual */}

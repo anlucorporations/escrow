@@ -761,3 +761,65 @@ code, .tk-mono {
   font-size: 9px;
   color: rgba(26, 43, 76, 0.55);
 }
+
+/* Configuración (M5/M6) */
+.tk-config {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 10px;
+}
+
+.tk-config__area {
+  margin: 10px 0 2px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(26, 43, 76, 0.55);
+}
+
+.tk-modos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.tk-modo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 4px;
+  border: 1px solid rgba(26, 43, 76, 0.12);
+  border-radius: 12px;
+  background: var(--white);
+  cursor: pointer;
+  text-align: center;
+}
+
+.tk-modo--activo {
+  border-color: var(--teal-500);
+  background: rgba(42, 157, 143, 0.08);
+}
+
+.tk-modo__icono {
+  font-size: 18px;
+}
+
+.tk-modo__titulo {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--navy-800);
+}
+
+.tk-modo__texto {
+  font-size: 9px;
+  color: rgba(26, 43, 76, 0.55);
+  line-height: 1.2;
+}
+
+.tk-config__enlace {
+  align-self: flex-start;
+  font-size: 11px;
+  padding: 8px 14px;
+}

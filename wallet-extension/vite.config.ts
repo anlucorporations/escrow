@@ -37,12 +37,18 @@ export default defineConfig({
         test: './test.html',
         background: resolve(__dirname, 'src/background.ts'),
         'content-script': resolve(__dirname, 'src/content-script.ts'),
+        floating: resolve(__dirname, 'src/floating.ts'),
         inject: resolve(__dirname, 'src/inject.ts'),
       },
       output: {
         entryFileNames: (chunkInfo) => {
           // Los archivos de extensión deben estar en la raíz de dist, no en assets
-          if (chunkInfo.name === 'background' || chunkInfo.name === 'content-script' || chunkInfo.name === 'inject') {
+          if (
+            chunkInfo.name === 'background' ||
+            chunkInfo.name === 'content-script' ||
+            chunkInfo.name === 'floating' ||
+            chunkInfo.name === 'inject'
+          ) {
             return '[name].js'
           }
           return 'assets/[name]-[hash].js'

@@ -918,7 +918,12 @@ nativa** al proyecto.
     `wallet-extension/scripts/package-web.py`), componente `InstalarWallet` con **detección
     EIP-6963** (instalada / no instalada), popup de descarga + pasos y guía en
     `/instalar-wallet`; botón en la portada y en la barra de la suite.
-  - **Pendiente C1/C2:** **Comprar/Cambiar** (placeholder D-NW-2) y **M5** (modos
-    pestaña/panel/flotante).
+  - **M5 (modos de vista) ✅** — permisos `sidePanel` + `side_panel` en el manifest, content
+    script `floating.ts` (overlay con Shadow DOM + iframe de la UI, solo en modo «flotante»)
+    y sección **Configuración** que elige y recuerda el modo (panel lateral / pestaña /
+    flotante) en `codecrypto_view_mode`; base de M6 (red/ayuda/perfil ya esbozados).
+    Verificado: manifiesto correcto y overlay flotante inyectado/retirado en Chromium real.
+  - **Pendiente:** **Comprar/Cambiar** (placeholder D-NW-2) y el resto de **M6**
+    (notificaciones, redes completas, perfil).
 - **Decisión (D-NW-5):** se **mantiene «CodeCrypto Wallet»** como nombre de producto; la
   identidad visual es la de TrueKeate y manifest/EIP-6963 quedan intactos.
