@@ -913,7 +913,12 @@ nativa** al proyecto.
   - **C2 (NFT) ✅** — pestaña **NFT real**: colecciones ERC-721 que el usuario añade, con
     `balanceOf` + `tokenOfOwnerByIndex` (Enumerable) + `tokenURI` y metadata (JSON/imagen,
     `ipfs://` → pasarela); aviso para colecciones sin Enumerable.
-  - **Pendiente C1/C2:** **Comprar/Cambiar** (placeholder D-NW-2); luego M5 (modos de vista)
-    y M7 (instalación nativa desde la web).
+  - **M7 (nativa) ✅** — instalación desde la barra de navegación: paquete servido por la
+    plataforma (`web/public/wallet/TrueKeateWallet.zip`, generado con
+    `wallet-extension/scripts/package-web.py`), componente `InstalarWallet` con **detección
+    EIP-6963** (instalada / no instalada), popup de descarga + pasos y guía en
+    `/instalar-wallet`; botón en la portada y en la barra de la suite.
+  - **Pendiente C1/C2:** **Comprar/Cambiar** (placeholder D-NW-2) y **M5** (modos
+    pestaña/panel/flotante).
 - **Decisión (D-NW-5):** se **mantiene «CodeCrypto Wallet»** como nombre de producto; la
   identidad visual es la de TrueKeate y manifest/EIP-6963 quedan intactos.

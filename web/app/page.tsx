@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
+import { InstalarWallet } from "@/components/InstalarWallet";
 
 const ventajas = [
   { icono: "🛡️", titulo: "Custodia atómica", texto: "Los activos quedan en custodia del escrow hasta que ambas partes firmen la recepción correcta." },
@@ -51,6 +52,10 @@ export default function Landing() {
                   Conocer la filosofía
                 </Button>
               </Link>
+              <InstalarWallet
+                variante="outline-navy"
+                className="border-white text-white hover:bg-white/10"
+              />
             </div>
           </div>
           <div className="flex-1">

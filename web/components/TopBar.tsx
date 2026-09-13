@@ -18,6 +18,7 @@ import { useSesion } from "@/lib/sesion";
 import { seccionesPara } from "@/lib/navegacion";
 import { Button } from "@/components/Button";
 import { ConnectButton } from "@/components/ConnectButton";
+import { InstalarWallet } from "@/components/InstalarWallet";
 import { CampanaNotificaciones } from "@/components/CampanaNotificaciones";
 
 const ETIQUETA_ESTADO: Record<string, string> = {
@@ -159,6 +160,10 @@ export function TopBar() {
 
         {/* ---- Zona derecha: estado D28 + sesión/usuario ---- */}
         <div className="flex shrink-0 items-center gap-2">
+          {/* Wallet nativa (M7): instalar/detectar desde la barra de navegación */}
+          <div className="hidden lg:block">
+            <InstalarWallet className="!px-3 !py-1.5 !text-xs" />
+          </div>
           {!conectado ? (
             <>
               <span className="rounded-pill border border-white/20 px-2 py-0.5 text-[11px] text-white/60 lg:hidden">
