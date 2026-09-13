@@ -400,3 +400,133 @@ code, .tk-mono {
 .tk-footer__acciones button:hover {
   background: rgba(255, 255, 255, 0.22);
 }
+
+/* Lista de dApps conectadas (ficha Conexiones) */
+.tk-sitios {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tk-sitio {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(26, 43, 76, 0.1);
+  border-radius: 12px;
+  background: var(--white);
+}
+
+.tk-sitio__info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tk-sitio__origen {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--navy-800);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tk-sitio__cuenta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: rgba(26, 43, 76, 0.55);
+}
+
+.tk-sitio__desconectar {
+  border: 0;
+  background: rgba(230, 57, 70, 0.1);
+  border-radius: 10px;
+  padding: 6px 9px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.tk-sitio__desconectar:hover {
+  background: rgba(230, 57, 70, 0.2);
+}
+
+/* Acción de saldo activa (Recibir / Contactos) */
+.tk-action--activa {
+  border-color: var(--teal-500);
+  background: rgba(42, 157, 143, 0.08);
+}
+
+/* Panel Recibir (QR + copiar) */
+.tk-recibir {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-top: 12px;
+}
+
+.tk-recibir__qr {
+  padding: 10px;
+  background: var(--white);
+  border: 1px solid rgba(26, 43, 76, 0.1);
+  border-radius: 12px;
+  line-height: 0;
+}
+
+.tk-recibir__direccion {
+  font-size: 10px;
+  color: var(--navy-800);
+  word-break: break-all;
+  text-align: center;
+  margin: 0;
+}
+
+.tk-recibir__copiar {
+  font-size: 12px;
+  padding: 8px 14px;
+}
+
+/* Formulario de contactos */
+.tk-contactos {
+  padding-top: 12px;
+}
+
+.tk-contactos__form {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr auto;
+  gap: 6px;
+  align-items: center;
+}
+
+.tk-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid rgba(26, 43, 76, 0.15);
+  border-radius: 10px;
+  font-size: 11px;
+  color: var(--navy-800);
+  background: var(--white);
+}
+
+.tk-input:focus {
+  outline: none;
+  border-color: var(--teal-500);
+}
+
+.tk-contactos .tk-btn {
+  font-size: 11px;
+  padding: 8px 10px;
+  white-space: nowrap;
+}
+
+.tk-contactos__error {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--crimson);
+}

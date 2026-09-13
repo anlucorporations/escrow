@@ -904,6 +904,8 @@ const METODOS_SOLO_EXTENSION = new Set([
   'wallet_createVault',
   'wallet_unlock',
   'wallet_lock',
+  'wallet_getConnectedSites',
+  'wallet_disconnectSite',
 ]);
 
 /**
@@ -1359,6 +1361,37 @@ async function handleRPCRequest(method: string, params: unknown[], sender: chrom
       await bloquear();
       logActivity('event', 'Wallet bloqueada', 'wallet');
       return { ok: true };
+
+    case 'wallet_getConnectedSites':
+      // Solo el popup (M2.1.7): lista las dApp autorizadas (origen → cuenta).
+      return await loadConnectedSites();
+
+    case 'wallet_disconnectSite': {
+      // Solo el popup (M2.1.7): revoca la autorización de UNA dApp concreta y
+      // avisa a sus pestañas (accountsChanged vacío). No afecta a las demás.
+      const dominio = String(params[0] ?? '');
+      const sitios = await loadConnectedSites();
+      if (dominio && sitios[dominio]) {
+        delete sitios[dominio];
+        await saveConnectedSites(sitios);
+        const tabs = await chrome.tabs.query({});
+        tabs.forEach((tab: chrome.tabs.Tab) => {
+          if (!tab.id || !tab.url) return;
+          if (normalizeOrigin(tab.url) !== dominio) return;
+          chrome.tabs
+            .sendMessage(tab.id, {
+              type: 'CODECRYPTO_EVENT',
+              eventName: 'accountsChanged',
+              data: []
+            })
+            .catch(() => {
+              // Pestaña sin content script: se ignora
+            });
+        });
+        logActivity('event', `Desconectada dApp ${dominio}`, 'wallet');
+      }
+      return sitios;
+    }
 
     default: {
       const err = new AppError(RPC_ERROR_CODES.unsupportedMethod, `Method not implemented: ${method}`);

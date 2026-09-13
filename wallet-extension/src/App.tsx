@@ -6,6 +6,8 @@ import LogsPanel from './components/LogsPanel'
 import TransferSection from './components/TransferSection'
 import WalletSetup from './components/WalletSetup'
 import { Ficha } from './components/Ficha'
+import { RecibirQR } from './components/RecibirQR'
+import { Contactos } from './components/Contactos'
 import { VaultPassword } from './components/VaultPassword'
 import { VaultUnlock } from './components/VaultUnlock'
 import { formatWeiToEth, parseEthToWei } from './utils/amount'
@@ -39,6 +41,10 @@ function App() {
   const [chains, setChains] = useState<ChainConfig[]>(() => mergeChains([]))
   const [logs, setLogs] = useState<LogEntry[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  /** dApps autorizadas (origen → cuenta) para el pie y la ficha Conexiones. */
+  const [sitiosConectados, setSitiosConectados] = useState<Record<string, string>>({})
+  /** Panel de gestión de saldo abierto: recibir o contactos (M2.1.4). */
+  const [panelSaldo, setPanelSaldo] = useState<'recibir' | 'contactos' | null>(null)
   /** Estado de la bóveda cifrada: si existe y si está abierta. */
   const [boveda, setBoveda] = useState<{
     existe: boolean
@@ -251,6 +257,48 @@ function App() {
     return () => clearInterval(interval)
   }, [isWalletLoaded, accounts, currentAccountIndex, chainId, updateBalance])
 
+  // ── dApps conectadas (M2.1.7) ───────────────────────────────────────
+  useEffect(() => {
+    if (!isWalletLoaded) return
+    const cargarSitios = async () => {
+      try {
+        const sitios = await sendRPCToBackground<Record<string, string>>('wallet_getConnectedSites')
+        setSitiosConectados(sitios || {})
+      } catch {
+        setSitiosConectados({})
+      }
+    }
+    void cargarSitios()
+    // Mantener el pie en vivo cuando una dApp se conecta o se desconecta.
+    const onChanged = (
+      changes: Record<string, chrome.storage.StorageChange>,
+      area: string
+    ) => {
+      if (area !== 'local' || !changes.codecrypto_connected_sites) return
+      setSitiosConectados(
+        (changes.codecrypto_connected_sites.newValue as Record<string, string>) || {}
+      )
+    }
+    chrome.storage.onChanged.addListener(onChanged)
+    return () => chrome.storage.onChanged.removeListener(onChanged)
+  }, [isWalletLoaded])
+
+  const desconectarSitio = useCallback(
+    async (origen: string) => {
+      try {
+        const sitios = await sendRPCToBackground<Record<string, string>>(
+          'wallet_disconnectSite',
+          [origen]
+        )
+        setSitiosConectados(sitios || {})
+        addLog('event', `Desconectada dApp ${origen}`)
+      } catch (e) {
+        addLog('error', `No se pudo desconectar ${origen}: ${(e as Error).message}`)
+      }
+    },
+    [addLog]
+  )
+
   // ── Cambios de cuenta y de red ──────────────────────────────────────
   const changeAccount = (index: number) => {
     if (index >= accounts.length || index < 0) {
@@ -429,22 +477,42 @@ function App() {
             {/* M2.1.4 · Gestión de saldo */}
             <Ficha id="saldo" titulo="Gestionar saldo" icono="💸" abierta>
               <div className="tk-actions">
-                <button className="tk-action" disabled title="Próximamente">
+                <button
+                  className={`tk-action${panelSaldo === 'recibir' ? ' tk-action--activa' : ''}`}
+                  onClick={() => setPanelSaldo(panelSaldo === 'recibir' ? null : 'recibir')}
+                  title="Ver mi dirección y su QR"
+                >
                   <span className="tk-action__icono">📥</span>Recibir
                 </button>
-                <button className="tk-action" disabled title="Próximamente">
+                <button
+                  className="tk-action"
+                  onClick={() =>
+                    document
+                      .getElementById('ficha-enviar')
+                      ?.scrollIntoView({ behavior: 'smooth' })
+                  }
+                  title="Abrir el formulario de envío"
+                >
                   <span className="tk-action__icono">📤</span>Enviar
                 </button>
-                <button className="tk-action" disabled title="Próximamente">
+                <button className="tk-action" disabled title="Próximamente (D-NW-2)">
                   <span className="tk-action__icono">🛒</span>Comprar
                 </button>
-                <button className="tk-action" disabled title="Próximamente">
+                <button className="tk-action" disabled title="Próximamente (D-NW-2)">
                   <span className="tk-action__icono">🔄</span>Cambiar
                 </button>
-                <button className="tk-action" disabled title="Próximamente">
+                <button
+                  className={`tk-action${panelSaldo === 'contactos' ? ' tk-action--activa' : ''}`}
+                  onClick={() => setPanelSaldo(panelSaldo === 'contactos' ? null : 'contactos')}
+                  title="Direcciones guardadas"
+                >
                   <span className="tk-action__icono">📇</span>Contactos
                 </button>
               </div>
+              {panelSaldo === 'recibir' && accounts[currentAccountIndex] && (
+                <RecibirQR address={accounts[currentAccountIndex]} />
+              )}
+              {panelSaldo === 'contactos' && <Contactos />}
             </Ficha>
 
             {/* Enviar: formulario operativo actual */}
@@ -473,17 +541,61 @@ function App() {
                 Tokens · DeFi · NFT · Actividad: se habilitan en el ciclo C2.
               </p>
             </Ficha>
+
+            {/* M2.1.7 · Conexiones: dApps autorizadas con desconexión individual */}
+            <Ficha id="conexiones" titulo="Conexiones" icono="🔌" abierta={false}>
+              {Object.keys(sitiosConectados).length === 0 ? (
+                <p className="tk-muted" style={{ fontSize: 11, marginTop: 10 }}>
+                  Ninguna dApp conectada.
+                </p>
+              ) : (
+                <ul className="tk-sitios">
+                  {Object.entries(sitiosConectados).map(([origen, cuenta]) => (
+                    <li key={origen} className="tk-sitio">
+                      <div className="tk-sitio__info">
+                        <span className="tk-sitio__origen">{origen}</span>
+                        <span className="tk-sitio__cuenta">
+                          {cuenta.slice(0, 6)}…{cuenta.slice(-4)}
+                        </span>
+                      </div>
+                      <button
+                        className="tk-sitio__desconectar"
+                        onClick={() => void desconectarSitio(origen)}
+                        title={`Desconectar ${origen}`}
+                      >
+                        ⛔
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Ficha>
           </div>
 
-          {/* M2.1.7 · Pie fijo: dApp conectada + bloqueo + reconexión.
-              La desconexión real de la dApp se añadirá con un método del
-              background en el siguiente paso (hoy solo se listan los sitios). */}
+          {/* M2.1.7 · Pie fijo: dApp conectada + desconexión + bloqueo */}
           <footer className="tk-footer">
             <div className="tk-footer__dapp">
-              <span className="tk-dot" aria-hidden />
-              <span>dApp conectada: —</span>
+              <span
+                className={`tk-dot${
+                  Object.keys(sitiosConectados).length > 0 ? ' tk-dot--ok' : ''
+                }`}
+                aria-hidden
+              />
+              <span>
+                {Object.keys(sitiosConectados).length > 0
+                  ? `${Object.keys(sitiosConectados).length} dApp(s) conectada(s)`
+                  : 'Sin dApp conectada'}
+              </span>
             </div>
             <div className="tk-footer__acciones">
+              {Object.keys(sitiosConectados).length > 0 && (
+                <button
+                  onClick={() => void desconectarSitio(Object.keys(sitiosConectados)[0])}
+                  title="Desconectar la dApp"
+                >
+                  ⛔
+                </button>
+              )}
               {boveda?.existe && (
                 <button onClick={() => void bloquearWallet()} title="Bloquear wallet">
                   🔒

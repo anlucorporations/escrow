@@ -898,8 +898,13 @@ nativa** al proyecto.
     estructurada (firmante, qué se firma, valor, red, fecha/hora); botones de aceptar/rechazar
     en forma de píldora. **Shell del popup con fichas contraíbles** (`Ficha.tsx`): Cuenta,
     Balance, Gestionar saldo, Enviar, Red, Características y **pie fijo** con estado de dApp
-    + bloqueo/reinicio. Verificado: `tsc + vite build` y `eslint` limpios.
-    **Pendiente C1:** desconexión real de la dApp (método del background), QR de Recibir,
-    formularios de Comprar/Cambiar y Contactos, y pestañas reales de Tokens/Actividad/NFT (C2).
+    + bloqueo/reinicio.
+  - **C1 (2.º incremento) ✅** — **desconexión real de la dApp**: métodos aditivos
+    `wallet_getConnectedSites` / `wallet_disconnectSite` (solo extensión), ficha **Conexiones**
+    con desconexión individual y pie en vivo (dot + contador); **Recibir con QR** (`qrcode.react`)
+    + copiar dirección; **Contactos** (libreta en `chrome.storage.local`). `tsc + vite build` y
+    `eslint` limpios.
+  - **Pendiente C1/C2:** formularios de **Comprar/Cambiar** (placeholder D-NW-2) y pestañas
+    reales **Tokens/Actividad/NFT** (C2); luego M5 (modos de vista) y M7 (instalación nativa).
 - **Decisión (D-NW-5):** se **mantiene «CodeCrypto Wallet»** como nombre de producto; la
   identidad visual es la de TrueKeate y manifest/EIP-6963 quedan intactos.
