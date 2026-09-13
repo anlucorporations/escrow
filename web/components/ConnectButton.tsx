@@ -27,7 +27,8 @@ import { useSesion } from "@/lib/sesion";
 import { Button } from "@/components/Button";
 
 export function ConnectButton({ className }: { className?: string }) {
-  const { conectar, conectando, aviso, cambiarDeRed, redEsperada } = useEthereum();
+  const { conectar, conectando, aviso, cambiarDeRed, redEsperada, wallets, walletElegida, elegirWallet } =
+    useEthereum();
   const { autenticar, autenticando, refrescar } = useSesion();
   const [ocupado, setOcupado] = useState(false);
   const [cambiandoRed, setCambiandoRed] = useState(false);
@@ -61,6 +62,26 @@ export function ConnectButton({ className }: { className?: string }) {
 
   return (
     <div className="flex flex-col items-center gap-2">
+      {/* Con más de una wallet instalada (p. ej. MetaMask y la propia) el
+          usuario elige con cuál firmar; la elección se recuerda. */}
+      {wallets.length > 1 && (
+        <label className="flex items-center gap-2 text-xs text-navy-800/70">
+          <span>Billetera</span>
+          <select
+            aria-label="Elegir billetera"
+            value={walletElegida ?? ""}
+            onChange={(e) => elegirWallet(e.target.value)}
+            className="rounded-xl border border-navy-800/15 bg-white px-2 py-1 text-xs text-navy-800 outline-none focus:border-teal-500"
+          >
+            {!walletElegida && <option value="">Automática</option>}
+            {wallets.map((w) => (
+              <option key={w.rdns} value={w.rdns}>
+                {w.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
       <Button onClick={() => void onClick()} disabled={cargando} className={className}>
         {cargando ? "Conectando…" : "🔗 Conectar MetaMask e iniciar sesión"}
       </Button>

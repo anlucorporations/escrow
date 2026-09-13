@@ -60,6 +60,10 @@ function Sonda() {
       <button onClick={() => void e.conectar()}>conectar</button>
       <button onClick={() => e.desconectar()}>desconectar</button>
       <button onClick={() => void e.cambiarDeRed()}>cambiar-red</button>
+      {e.wallets.map((w) => (
+        <span key={w.rdns} data-testid="wallet">{w.name}</span>
+      ))}
+      <button onClick={() => e.elegirWallet("io.codecrypto.wallet")}>elegir-codecrypto</button>
     </div>
   );
 }
@@ -312,5 +316,71 @@ describe("desconectar", () => {
     });
     await waitFor(() => expect(leer("conectado")).toBe("false"));
     expect(localStorage.getItem(CLAVE)).toBeNull();
+  });
+});
+
+describe("convivencia de wallets (EIP-6963)", () => {
+  /** Anuncia dos wallets cuando la página las pide, como en un navegador real. */
+  function anunciarDos(meta: Record<string, unknown>, codecrypto: Record<string, unknown>) {
+    window.addEventListener("eip6963:requestProvider", () => {
+      window.dispatchEvent(
+        new CustomEvent("eip6963:announceProvider", {
+          detail: { info: { uuid: "u1", name: "MetaMask", icon: "", rdns: "io.metamask" }, provider: meta },
+        })
+      )
+      window.dispatchEvent(
+        new CustomEvent("eip6963:announceProvider", {
+          detail: {
+            info: { uuid: "u2", name: "CodeCrypto Wallet", icon: "", rdns: "io.codecrypto.wallet" },
+            provider: codecrypto,
+          },
+        })
+      )
+    })
+  }
+
+  const walletFalsa = (cuenta: string, isCodeCrypto = false) => {
+    const oyentes: Record<string, Oyente[]> = {};
+    const eth = {
+      isCodeCrypto,
+      request: vi.fn(async ({ method }: { method: string }) =>
+        method === "eth_chainId" ? "0x7a69" : method === "eth_requestAccounts" || method === "eth_accounts" ? [cuenta] : null
+      ),
+      on: (ev: string, cb: Oyente) => { (oyentes[ev] ||= []).push(cb); },
+      removeListener: () => {},
+    };
+    return eth;
+  };
+
+  test("descubre TODAS las wallets anunciadas, no solo la primera", async () => {
+    const meta = walletFalsa("0x1111111111111111111111111111111111111111");
+    const code = walletFalsa("0x2222222222222222222222222222222222222222", true);
+    (window as unknown as { ethereum: unknown }).ethereum = meta;
+    anunciarDos(meta, code);
+    montar();
+    await waitFor(() => expect(screen.getAllByTestId("wallet")).toHaveLength(2));
+    const nombres = screen.getAllByTestId("wallet").map((n) => n.textContent);
+    expect(nombres).toContain("MetaMask");
+    expect(nombres).toContain("CodeCrypto Wallet");
+  });
+
+  test("conectar usa la wallet elegida y no la de window.ethereum", async () => {
+    const meta = walletFalsa("0x1111111111111111111111111111111111111111");
+    const code = walletFalsa("0x2222222222222222222222222222222222222222", true);
+    (window as unknown as { ethereum: unknown }).ethereum = meta;
+    anunciarDos(meta, code);
+    montar();
+    await waitFor(() => expect(screen.getAllByTestId("wallet")).toHaveLength(2));
+
+    await act(async () => {
+      screen.getByText("elegir-codecrypto").click();
+    });
+    await act(async () => {
+      screen.getByText("conectar").click();
+    });
+
+    await waitFor(() => expect(leer("account")).toBe("0x2222222222222222222222222222222222222222"));
+    const pidioMeta = meta.request.mock.calls.filter((c) => c[0].method === "eth_requestAccounts").length;
+    expect(pidioMeta).toBe(0); // no se usó MetaMask
   });
 });
