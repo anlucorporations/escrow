@@ -261,3 +261,142 @@ code, .tk-mono {
   padding: 10px 12px;
   font-size: 12px;
 }
+
+/* --- Fichas contraíbles del popup (M2.1) ----------------------------------- */
+.tk-ficha {
+  background: var(--white);
+  border: 1px solid rgba(26, 43, 76, 0.1);
+  border-radius: var(--radius-card);
+  margin-bottom: 10px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+}
+
+.tk-ficha__cabecera {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 14px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy-800);
+  text-align: left;
+}
+
+.tk-ficha__cabecera:hover {
+  background: var(--smoke);
+}
+
+.tk-ficha__chevron {
+  color: var(--teal-500);
+  font-size: 12px;
+}
+
+.tk-ficha__cuerpo {
+  padding: 0 14px 14px;
+  border-top: 1px solid rgba(26, 43, 76, 0.06);
+}
+
+/* Rejilla de acciones de saldo (Recibir, Enviar, Comprar, Cambiar, Contactos) */
+.tk-actions {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  padding-top: 12px;
+}
+
+.tk-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 4px;
+  border: 1px solid rgba(26, 43, 76, 0.1);
+  border-radius: 12px;
+  background: var(--white);
+  color: var(--navy-800);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-natural);
+}
+
+.tk-action:hover:not(:disabled) {
+  border-color: var(--teal-500);
+  background: var(--smoke);
+}
+
+.tk-action:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.tk-action__icono {
+  font-size: 18px;
+}
+
+/* Pie fijo: dApp conectada + bloqueo + desconexión (M2.1.7) */
+.tk-footer {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--navy-800);
+  color: var(--white);
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  font-size: 11px;
+}
+
+.tk-footer__dapp {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.tk-footer__dapp span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tk-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.35);
+  flex-shrink: 0;
+}
+
+.tk-dot--ok {
+  background: var(--teal-500);
+  box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.25);
+}
+
+.tk-footer__acciones {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.tk-footer__acciones button {
+  background: rgba(255, 255, 255, 0.12);
+  border: 0;
+  border-radius: 10px;
+  padding: 6px 9px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.tk-footer__acciones button:hover {
+  background: rgba(255, 255, 255, 0.22);
+}

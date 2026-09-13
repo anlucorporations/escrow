@@ -172,7 +172,7 @@ function Connect() {
           src="/brand/TrueKeate_logoIntegral.svg"
           alt="TrueKeate"
         />
-        <h1>TrueKeate Wallet</h1>
+        <h1>CodeCrypto Wallet</h1>
         <p>Solicitud de autorización</p>
       </div>
 

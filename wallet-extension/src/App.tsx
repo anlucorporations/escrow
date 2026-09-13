@@ -5,6 +5,7 @@ import ChainManager from './components/ChainManager'
 import LogsPanel from './components/LogsPanel'
 import TransferSection from './components/TransferSection'
 import WalletSetup from './components/WalletSetup'
+import { Ficha } from './components/Ficha'
 import { VaultPassword } from './components/VaultPassword'
 import { VaultUnlock } from './components/VaultUnlock'
 import { formatWeiToEth, parseEthToWei } from './utils/amount'
@@ -354,7 +355,7 @@ function App() {
           alt="TrueKeate"
         />
         <div className="tk-brand__text">
-          <span className="tk-brand__title">TrueKeate Wallet</span>
+          <span className="tk-brand__title">CodeCrypto Wallet</span>
           <span className="tk-brand__sub">Wallet nativa de la plataforma</span>
         </div>
       </header>
@@ -399,22 +400,9 @@ function App() {
       ) : (
         <>
           <div className="wallet-info">
-            <div className="wallet-header">
-              {boveda?.existe && (
-                <button className="reset-button" onClick={() => void bloquearWallet()}>
-                  🔒 Bloquear
-                </button>
-              )}
-              <button className="reset-button" onClick={resetWallet}>
-                🔄 Reset Wallet
-              </button>
-            </div>
-
-            <div className="info-section">
-              <h3>Cuenta Actual</h3>
+            {/* M2.1.2 · Gestión de cuentas: cuenta en uso + cambio */}
+            <Ficha id="cuenta" titulo="Cuenta" icono="👤" abierta>
               <p className="address">{accounts[currentAccountIndex]}</p>
-              <p className="balance">Balance: {balance} ETH</p>
-
               <div className="account-selector">
                 <label>Cambiar cuenta: </label>
                 <select
@@ -428,22 +416,84 @@ function App() {
                   ))}
                 </select>
               </div>
-            </div>
+            </Ficha>
 
-            <ChainManager
-              chains={chains}
-              activeChainId={chainId}
-              onSwitch={changeChain}
-              onChainsChanged={setChains}
-            />
+            {/* M2.1.3 · Balance (ETH principal; multi-token en C2) */}
+            <Ficha id="balance" titulo="Balance" icono="💰" abierta>
+              <p className="balance">{balance} ETH</p>
+              <p className="tk-muted" style={{ fontSize: 11, margin: '4px 0 0' }}>
+                ◀ ETH ▶ · los tokens agregados con sus flechas llegan en el ciclo C2.
+              </p>
+            </Ficha>
 
-            <TransferSection
-              accounts={accounts}
-              currentAccountIndex={currentAccountIndex}
-              balanceWei={balanceWei}
-              onTransfer={handleTransfer}
-            />
+            {/* M2.1.4 · Gestión de saldo */}
+            <Ficha id="saldo" titulo="Gestionar saldo" icono="💸" abierta>
+              <div className="tk-actions">
+                <button className="tk-action" disabled title="Próximamente">
+                  <span className="tk-action__icono">📥</span>Recibir
+                </button>
+                <button className="tk-action" disabled title="Próximamente">
+                  <span className="tk-action__icono">📤</span>Enviar
+                </button>
+                <button className="tk-action" disabled title="Próximamente">
+                  <span className="tk-action__icono">🛒</span>Comprar
+                </button>
+                <button className="tk-action" disabled title="Próximamente">
+                  <span className="tk-action__icono">🔄</span>Cambiar
+                </button>
+                <button className="tk-action" disabled title="Próximamente">
+                  <span className="tk-action__icono">📇</span>Contactos
+                </button>
+              </div>
+            </Ficha>
+
+            {/* Enviar: formulario operativo actual */}
+            <Ficha id="enviar" titulo="Enviar" icono="📤" abierta={false}>
+              <TransferSection
+                accounts={accounts}
+                currentAccountIndex={currentAccountIndex}
+                balanceWei={balanceWei}
+                onTransfer={handleTransfer}
+              />
+            </Ficha>
+
+            {/* M2.1.5 · Red */}
+            <Ficha id="red" titulo="Red" icono="🌐" abierta={false}>
+              <ChainManager
+                chains={chains}
+                activeChainId={chainId}
+                onSwitch={changeChain}
+                onChainsChanged={setChains}
+              />
+            </Ficha>
+
+            {/* M2.1.6 · Características (Tokens/DeFi/NFT/Actividad → ciclo C2) */}
+            <Ficha id="caracteristicas" titulo="Características" icono="🧩" abierta={false}>
+              <p className="tk-muted" style={{ fontSize: 11, marginTop: 10 }}>
+                Tokens · DeFi · NFT · Actividad: se habilitan en el ciclo C2.
+              </p>
+            </Ficha>
           </div>
+
+          {/* M2.1.7 · Pie fijo: dApp conectada + bloqueo + reconexión.
+              La desconexión real de la dApp se añadirá con un método del
+              background en el siguiente paso (hoy solo se listan los sitios). */}
+          <footer className="tk-footer">
+            <div className="tk-footer__dapp">
+              <span className="tk-dot" aria-hidden />
+              <span>dApp conectada: —</span>
+            </div>
+            <div className="tk-footer__acciones">
+              {boveda?.existe && (
+                <button onClick={() => void bloquearWallet()} title="Bloquear wallet">
+                  🔒
+                </button>
+              )}
+              <button onClick={resetWallet} title="Reiniciar wallet">
+                🔄
+              </button>
+            </div>
+          </footer>
 
           <LogsPanel logs={logs} onClear={handleClearLogs} />
         </>
