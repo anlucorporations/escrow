@@ -823,3 +823,190 @@ code, .tk-mono {
   font-size: 11px;
   padding: 8px 14px;
 }
+
+.tk-volver {
+  align-self: flex-start;
+  border: 0;
+  background: transparent;
+  color: var(--teal-500);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+/* Notificaciones deslizables (M6 · RF-WN-19) */
+.tk-notifs__cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tk-notifs__marcar {
+  border: 0;
+  background: transparent;
+  color: var(--teal-500);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tk-notifs__pista {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 6px 2px 10px;
+  scroll-snap-type: x mandatory;
+}
+
+.tk-notif {
+  position: relative;
+  flex: 0 0 78%;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid rgba(26, 43, 76, 0.1);
+  border-radius: 12px;
+  background: var(--white);
+}
+
+.tk-notif--nueva {
+  border-color: var(--teal-500);
+}
+
+.tk-notif__punto {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
+  background: rgba(26, 43, 76, 0.2);
+}
+
+.tk-notif--nueva .tk-notif__punto {
+  background: var(--teal-500);
+}
+
+.tk-notif__texto {
+  font-size: 11px;
+  color: var(--navy-800);
+}
+
+.tk-notif__hora {
+  font-size: 9px;
+  color: rgba(26, 43, 76, 0.5);
+}
+
+/* Redes (M6 · RF-WN-22) */
+.tk-redes__lista {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tk-red {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(26, 43, 76, 0.1);
+  border-radius: 12px;
+  background: var(--white);
+}
+
+.tk-red__btn {
+  border: 0;
+  background: rgba(42, 157, 143, 0.12);
+  color: var(--navy-800);
+  border-radius: 9999px;
+  padding: 5px 12px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tk-red__btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.tk-red__solo {
+  font-size: 9px;
+  color: rgba(26, 43, 76, 0.45);
+  white-space: nowrap;
+}
+
+/* Perfil (M6 · RF-WN-25) */
+.tk-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--navy-800);
+}
+
+.tk-perfil__frase {
+  display: block;
+  margin: 6px 0;
+  padding: 10px;
+  background: var(--smoke);
+  border-radius: 10px;
+  font-size: 11px;
+  line-height: 1.6;
+  word-spacing: 4px;
+}
+
+/* Modo oscuro (M6 · RF-WN-25) */
+:root[data-theme='dark'] body {
+  background: #0b1220;
+  color: #e2e8f0;
+}
+
+:root[data-theme='dark'] .tk-ficha,
+:root[data-theme='dark'] .tk-card,
+:root[data-theme='dark'] .tk-sitio,
+:root[data-theme='dark'] .tk-mov,
+:root[data-theme='dark'] .tk-coleccion,
+:root[data-theme='dark'] .tk-notif,
+:root[data-theme='dark'] .tk-modo,
+:root[data-theme='dark'] .tk-red,
+:root[data-theme='dark'] .tk-action {
+  background: #16213a;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+}
+
+:root[data-theme='dark'] .tk-input {
+  background: #0f172a;
+  color: #e2e8f0;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+:root[data-theme='dark'] h1,
+:root[data-theme='dark'] h2,
+:root[data-theme='dark'] h3,
+:root[data-theme='dark'] h4,
+:root[data-theme='dark'] .tk-ficha__cabecera,
+:root[data-theme='dark'] .tk-sitio__origen,
+:root[data-theme='dark'] .tk-mov__titulo,
+:root[data-theme='dark'] .tk-modo__titulo,
+:root[data-theme='dark'] .tk-notif__texto,
+:root[data-theme='dark'] .tk-switch {
+  color: #e2e8f0;
+}
+
+:root[data-theme='dark'] .tk-muted,
+:root[data-theme='dark'] .tk-sitio__cuenta,
+:root[data-theme='dark'] .tk-notif__hora,
+:root[data-theme='dark'] .tk-modo__texto,
+:root[data-theme='dark'] .tk-config__area {
+  color: rgba(226, 232, 240, 0.6);
+}

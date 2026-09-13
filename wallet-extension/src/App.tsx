@@ -546,7 +546,16 @@ function App() {
 
             {/* M6 · Configuración (M5: modo de vista) */}
             <Ficha id="configuracion" titulo="Configuración" icono="⚙️" abierta={false}>
-              <Configuracion chainId={chainId} />
+              {accounts[currentAccountIndex] && (
+                <Configuracion
+                  chainId={chainId}
+                  chains={chains}
+                  onSwitch={changeChain}
+                  onChainsChanged={setChains}
+                  account={accounts[currentAccountIndex]}
+                  logs={logs}
+                />
+              )}
             </Ficha>
 
             {/* M2.1.7 · Conexiones: dApps autorizadas con desconexión individual */}

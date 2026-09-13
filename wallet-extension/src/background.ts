@@ -904,6 +904,7 @@ const METODOS_SOLO_EXTENSION = new Set([
   'wallet_createVault',
   'wallet_unlock',
   'wallet_lock',
+  'wallet_revealMnemonic',
   'wallet_getConnectedSites',
   'wallet_disconnectSite',
 ]);
@@ -1380,6 +1381,20 @@ async function handleRPCRequest(method: string, params: unknown[], sender: chrom
       await bloquear();
       logActivity('event', 'Wallet bloqueada', 'wallet');
       return { ok: true };
+
+    case 'wallet_revealMnemonic': {
+      // Solo el popup (M6 · RF-WN-25): respaldo de la frase. Requiere la bóveda
+      // DESBLOQUEADA; nunca se expone si está bloqueada.
+      const frase = await mnemonicDesbloqueado();
+      if (!frase) {
+        throw new AppError(
+          RPC_ERROR_CODES.unauthorized,
+          'La bóveda está bloqueada: desbloquéala para ver la frase de recuperación.'
+        );
+      }
+      logActivity('event', 'Frase de recuperación mostrada (respaldo)', 'wallet');
+      return frase;
+    }
 
     case 'wallet_getConnectedSites':
       // Solo el popup (M2.1.7): lista las dApp autorizadas (origen → cuenta).
