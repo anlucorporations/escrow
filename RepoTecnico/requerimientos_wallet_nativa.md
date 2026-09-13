@@ -189,6 +189,7 @@ API de **NFT/DeFi**, proveedor **on-ramp** para **Comprar**, almacén de **conta
 | **D-NW-2** | Datos externos | **Tokens reales**, **Actividad real** y **NFT real**; **DeFi** y **Comprar** quedan como **placeholder** en esta iteración (ciclo posterior). |
 | **D-NW-3** | Bitcoin y modos de vista | Modos **panel lateral (`chrome.sidePanel`) + pestaña + flotante**; **Bitcoin solo listado informativo** (el núcleo sigue siendo EVM/EIP-1193). |
 | **D-NW-4** | Activos y ayuda | Usar **`TrueKeate/TrueKeate_logoIntegral.{ico,svg,webp}`** como identidad (incluidas las páginas de firma); la **ayuda** reutiliza el manual del proyecto (`/help/manual`). |
+| **D-NW-5** | Nombre del producto | Se **mantiene «CodeCrypto Wallet»** como nombre del producto (manifest y EIP-6963 intactos); lo que cambia es la **identidad visual** (TrueKeate). |
 
 ### 7.2 Preguntas originales (resueltas)
 

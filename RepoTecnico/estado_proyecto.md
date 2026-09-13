@@ -893,11 +893,13 @@ nativa** al proyecto.
 - **Ejecución:**
   - **C0 ✅** — código incorporado a `wallet-extension/` (66 archivos) en `escrow-dsh-GCP`;
     build verificado (`tsc + vite build`).
-  - **C1 en curso** — identidad visual: cabecera de marca (logo `logoIntegral` + «TrueKeate
-    Wallet») en el popup, y cabeceras de firma/conexión con logo + título de acción + dApp;
-    descripción EIP-712 estructurada (firmante, qué se firma, valor, red, fecha/hora); botones
-    de aceptar/rechazar en forma de píldora. Verificado por render real del popup (sin cambios
-    de lógica). **Pendiente C1:** fichas contraíbles, gestión de cuentas, balance multi-token,
-    recibir/enviar/comprar/cambiar/contactos, red y pie de desconexión.
-- **Pendiente de decisión:** nombre visible del producto (¿renombrar «CodeCrypto Wallet» →
-  «TrueKeate Wallet» también en manifest/EIP-6963 y textos de la web? hoy solo cambió la UI).
+  - **C1 en curso** — identidad visual: cabecera de marca (logo `logoIntegral`) en el popup y
+    cabeceras de firma/conexión con logo + título de acción + dApp; descripción EIP-712
+    estructurada (firmante, qué se firma, valor, red, fecha/hora); botones de aceptar/rechazar
+    en forma de píldora. **Shell del popup con fichas contraíbles** (`Ficha.tsx`): Cuenta,
+    Balance, Gestionar saldo, Enviar, Red, Características y **pie fijo** con estado de dApp
+    + bloqueo/reinicio. Verificado: `tsc + vite build` y `eslint` limpios.
+    **Pendiente C1:** desconexión real de la dApp (método del background), QR de Recibir,
+    formularios de Comprar/Cambiar y Contactos, y pestañas reales de Tokens/Actividad/NFT (C2).
+- **Decisión (D-NW-5):** se **mantiene «CodeCrypto Wallet»** como nombre de producto; la
+  identidad visual es la de TrueKeate y manifest/EIP-6963 quedan intactos.
