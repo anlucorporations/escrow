@@ -6,7 +6,7 @@
 | Fuente | `RepoTecnico/mejoras_chrome-extension.md` (23 líneas, 7 bloques) |
 | Fecha de extracción | 2026-09-13 |
 | Rama de trabajo | `escrow-dsh-GCP` |
-| Estado | **Fase 1 (Concepto) — extracción completa; pendiente bloque de preguntas** |
+| Estado | **Fase 1 completada** — decisiones D-NW-1..D-NW-4 tomadas; listo para C0/C1 |
 | Principio rector | La extensión es **nativa de la plataforma** y se ve/instala como parte de ella. **No se modifica la lógica** funcional (firma, RPC, bóveda, EIP-1193/6963/712) ni la del proyecto: los cambios son de interfaz y de integración. |
 
 > Trazabilidad: `[M#]` = bloque numerado del documento fuente. `RF-WN` = requerimiento
@@ -180,6 +180,17 @@ API de **NFT/DeFi**, proveedor **on-ramp** para **Comprar**, almacén de **conta
 ---
 
 ## 7. Ambigüedades y preguntas abiertas
+
+### 7.1 Decisiones del director (2026-09-13)
+
+| # | Pregunta | Decisión |
+|---|---|---|
+| **D-NW-1** | Ubicación e instalación | El código de la extensión **se incorpora al repo del proyecto** como `wallet-extension/` (rama `escrow-dsh-GCP`) y se publica **paquete desempaquetado/firmado**; la web ofrece la instalación desde su barra de navegación. |
+| **D-NW-2** | Datos externos | **Tokens reales**, **Actividad real** y **NFT real**; **DeFi** y **Comprar** quedan como **placeholder** en esta iteración (ciclo posterior). |
+| **D-NW-3** | Bitcoin y modos de vista | Modos **panel lateral (`chrome.sidePanel`) + pestaña + flotante**; **Bitcoin solo listado informativo** (el núcleo sigue siendo EVM/EIP-1193). |
+| **D-NW-4** | Activos y ayuda | Usar **`TrueKeate/TrueKeate_logoIntegral.{ico,svg,webp}`** como identidad (incluidas las páginas de firma); la **ayuda** reutiliza el manual del proyecto (`/help/manual`). |
+
+### 7.2 Preguntas originales (resueltas)
 
 1. **Nativa / ubicación / instalación** `[M7]`: ¿el código de la extensión pasa a vivir en el
    repo del proyecto (p. ej. `wallet-extension/` en `escrow-dsh-GCP`) o se mantiene en su repo

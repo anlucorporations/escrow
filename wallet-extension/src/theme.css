@@ -1,0 +1,248 @@
+/* =============================================================================
+   CodeCrypto Wallet — Identidad visual de TrueKeate (RNF-08)
+   -----------------------------------------------------------------------------
+   Porta el sistema de diseño "Bóveda Digital Moderna" del proyecto TrueKeate
+   (web/app/globals.css) a la extensión, para que la wallet se vea como parte de
+   la plataforma y no como una aplicación aparte.
+
+   Origen de los tokens: escrow/web/app/globals.css (RNF-08.1 a RNF-08.5).
+   Paleta: Navy #1A2B4C/#0A1128 · Teal #2A9D8F · Cyan #48CAE4 · Gold #D4AF37
+           Lienzo #F8F9FA · Error #E63946 · Warning #F4A261
+   Tipografía: Montserrat/Poppins (títulos) · Inter/Roboto (cuerpo)
+   ============================================================================= */
+
+:root {
+  /* RNF-08.1 Paleta (idéntica al proyecto) */
+  --navy-900: #0a1128;
+  --navy-800: #1a2b4c;
+  --teal-500: #2a9d8f;
+  --cyan-400: #48cae4;
+  --gold-500: #d4af37;
+  --gold-300: #f3e5ab;
+  --gold-600: #c5a065;
+  --smoke: #f8f9fa;
+  --white: #ffffff;
+  --crimson: #e63946;
+  --coral: #f4a261;
+
+  /* RNF-08.2 Gradientes */
+  --gradient-cta: linear-gradient(135deg, #1a2b4c 0%, #2a9d8f 100%);
+  --gradient-cyan: linear-gradient(90deg, #2a9d8f 0%, #48cae4 100%);
+  --gradient-gold: linear-gradient(135deg, #d4af37 0%, #f3e5ab 50%, #c5a065 100%);
+  --gradient-card-border: linear-gradient(90deg, #1a2b4c 0%, #2a9d8f 50%, #d4af37 100%);
+
+  /* RNF-08.4 Radios */
+  --radius-pill: 9999px;
+  --radius-card: 16px;
+  --radius-modal: 24px;
+
+  /* RNF-08.5 Curvas y duraciones */
+  --ease-natural: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+
+  /* Tipografías del proyecto (con alternativas del sistema si no están) */
+  --font-sans: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: Montserrat, Poppins, Inter, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+}
+
+/* --- Base ------------------------------------------------------------------ */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--smoke);
+  color: var(--navy-800);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  color: var(--navy-800);
+  letter-spacing: -0.01em;
+}
+
+code, .tk-mono {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+}
+
+/* --- Marca ----------------------------------------------------------------- */
+/* Cabecera de marca: fondo navy con el título degradado en dorado. */
+.tk-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--navy-800);
+  color: var(--white);
+}
+
+.tk-brand__logo {
+  height: 28px;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.tk-brand__title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.tk-brand__sub {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* --- Tarjetas -------------------------------------------------------------- */
+.tk-card {
+  background: var(--white);
+  border: 1px solid rgba(26, 43, 76, 0.1);
+  border-radius: var(--radius-card);
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+/* Borde superior dorado: tarjeta "premium" del proyecto (RWA). */
+.tk-card--premium {
+  border-top: 4px solid var(--gold-500);
+}
+
+/* --- Botones --------------------------------------------------------------- */
+.tk-btn {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--gradient-cta);
+  color: var(--white);
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-natural),
+    filter var(--duration-fast) var(--ease-natural);
+}
+
+.tk-btn:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.tk-btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.tk-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tk-btn--outline {
+  background: transparent;
+  border: 2px solid var(--navy-800);
+  color: var(--navy-800);
+}
+
+.tk-btn--gold {
+  background: var(--gradient-gold);
+  color: var(--navy-800);
+}
+
+.tk-btn--danger {
+  background: var(--crimson);
+  color: var(--white);
+}
+
+/* --- Campos ---------------------------------------------------------------- */
+.tk-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(26, 43, 76, 0.6);
+  margin-bottom: 4px;
+}
+
+.tk-input,
+.tk-select,
+.tk-textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--navy-800);
+  background: var(--white);
+  border: 1px solid rgba(26, 43, 76, 0.15);
+  border-radius: 12px;
+  padding: 9px 12px;
+  outline: none;
+  transition: border-color var(--duration-fast) var(--ease-natural);
+}
+
+.tk-input:focus,
+.tk-select:focus,
+.tk-textarea:focus {
+  border-color: var(--teal-500);
+}
+
+/* --- Insignias de estado (equivalen a StatusBadge del proyecto) ------------ */
+.tk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: var(--radius-pill);
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.tk-badge--navy   { background: var(--navy-800); color: var(--white); }
+.tk-badge--teal   { background: var(--teal-500); color: var(--white); }
+.tk-badge--cyan   { background: var(--cyan-400); color: var(--navy-900); }
+.tk-badge--gold   { background: var(--gold-500); color: var(--navy-900); }
+.tk-badge--crimson{ background: var(--crimson); color: var(--white); }
+.tk-badge--coral  { background: var(--coral); color: var(--navy-900); }
+.tk-badge--smoke  { background: rgba(26, 43, 76, 0.08); color: var(--navy-800); }
+
+/* --- Utilidades ------------------------------------------------------------ */
+.tk-text-gradient-gold {
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Barra de acento superior (motivo del proyecto) */
+.tk-accent-bar {
+  height: 4px;
+  background: var(--gradient-card-border);
+}
+
+.tk-muted {
+  color: rgba(26, 43, 76, 0.6);
+}
+
+.tk-warning {
+  background: rgba(244, 162, 97, 0.12);
+  border-left: 3px solid var(--coral);
+  color: #8a4b12;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 12px;
+}
