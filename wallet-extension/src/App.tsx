@@ -8,6 +8,7 @@ import WalletSetup from './components/WalletSetup'
 import { Ficha } from './components/Ficha'
 import { RecibirQR } from './components/RecibirQR'
 import { Contactos } from './components/Contactos'
+import { Caracteristicas } from './components/Caracteristicas'
 import { VaultPassword } from './components/VaultPassword'
 import { VaultUnlock } from './components/VaultUnlock'
 import { formatWeiToEth, parseEthToWei } from './utils/amount'
@@ -535,11 +536,11 @@ function App() {
               />
             </Ficha>
 
-            {/* M2.1.6 · Características (Tokens/DeFi/NFT/Actividad → ciclo C2) */}
+            {/* M2.1.6 · Características: Tokens reales; DeFi/NFT/Actividad en C2 */}
             <Ficha id="caracteristicas" titulo="Características" icono="🧩" abierta={false}>
-              <p className="tk-muted" style={{ fontSize: 11, marginTop: 10 }}>
-                Tokens · DeFi · NFT · Actividad: se habilitan en el ciclo C2.
-              </p>
+              {accounts[currentAccountIndex] && (
+                <Caracteristicas account={accounts[currentAccountIndex]} chainId={chainId} />
+              )}
             </Ficha>
 
             {/* M2.1.7 · Conexiones: dApps autorizadas con desconexión individual */}

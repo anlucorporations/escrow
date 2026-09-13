@@ -904,7 +904,10 @@ nativa** al proyecto.
     con desconexión individual y pie en vivo (dot + contador); **Recibir con QR** (`qrcode.react`)
     + copiar dirección; **Contactos** (libreta en `chrome.storage.local`). `tsc + vite build` y
     `eslint` limpios.
-  - **Pendiente C1/C2:** formularios de **Comprar/Cambiar** (placeholder D-NW-2) y pestañas
-    reales **Tokens/Actividad/NFT** (C2); luego M5 (modos de vista) y M7 (instalación nativa).
+  - **C2 (inicio) ✅** — **Tokens reales**: pestaña Tokens con añadir/quitar ERC-20 y saldo
+    real vía `eth_call` (`balanceOf`/`decimals`/`symbol`/`name`), persistidos por red en
+    `codecrypto_tokens`; `qrcode.react` y `ethers` ya en el bundle del popup.
+  - **Pendiente C1/C2:** formularios de **Comprar/Cambiar** (placeholder D-NW-2), **Actividad**
+    y **NFT** reales; luego M5 (modos de vista) y M7 (instalación nativa).
 - **Decisión (D-NW-5):** se **mantiene «CodeCrypto Wallet»** como nombre de producto; la
   identidad visual es la de TrueKeate y manifest/EIP-6963 quedan intactos.
