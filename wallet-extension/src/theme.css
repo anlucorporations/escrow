@@ -576,3 +576,119 @@ code, .tk-mono {
   gap: 6px;
   align-items: center;
 }
+
+/* Actividad: lista de movimientos con detalle desplegable */
+.tk-actividad {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tk-actividad__barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tk-actividad__refrescar {
+  font-size: 10px;
+  padding: 5px 10px;
+}
+
+.tk-movs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tk-mov {
+  border: 1px solid rgba(26, 43, 76, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--white);
+}
+
+.tk-mov__fila {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.tk-mov__fila:hover {
+  background: var(--smoke);
+}
+
+.tk-mov__signo {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.tk-mov__signo--in {
+  background: rgba(42, 157, 143, 0.15);
+  color: var(--teal-500);
+}
+
+.tk-mov__signo--out {
+  background: rgba(244, 162, 97, 0.18);
+  color: #8a4b12;
+}
+
+.tk-mov__info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.tk-mov__titulo {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--navy-800);
+}
+
+.tk-mov__sub {
+  font-size: 10px;
+  color: rgba(26, 43, 76, 0.55);
+}
+
+.tk-mov__valor {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--navy-800);
+  white-space: nowrap;
+}
+
+.tk-mov__detalle {
+  padding: 8px 10px 10px;
+  border-top: 1px solid rgba(26, 43, 76, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--navy-800);
+  word-break: break-all;
+}
+
+.tk-mov__etq {
+  display: inline-block;
+  min-width: 52px;
+  font-weight: 700;
+  color: rgba(26, 43, 76, 0.55);
+  text-transform: uppercase;
+}

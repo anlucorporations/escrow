@@ -6,6 +6,7 @@
  */
 import { useState } from 'react'
 import { Tokens } from './Tokens'
+import { Actividad } from './Actividad'
 
 type Pestana = 'tokens' | 'defi' | 'nft' | 'actividad'
 
@@ -46,11 +47,7 @@ export function Caracteristicas({ account, chainId }: { account: string; chainId
             NFT: la colección de la billetera llega en el ciclo C2.
           </p>
         )}
-        {pestana === 'actividad' && (
-          <p className="tk-muted" style={{ fontSize: 11 }}>
-            Actividad: el listado de movimientos llega en el ciclo C2.
-          </p>
-        )}
+        {pestana === 'actividad' && <Actividad account={account} chainId={chainId} />}
       </div>
     </div>
   )

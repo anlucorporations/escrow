@@ -907,7 +907,10 @@ nativa** al proyecto.
   - **C2 (inicio) ✅** — **Tokens reales**: pestaña Tokens con añadir/quitar ERC-20 y saldo
     real vía `eth_call` (`balanceOf`/`decimals`/`symbol`/`name`), persistidos por red en
     `codecrypto_tokens`; `qrcode.react` y `ethers` ya en el bundle del popup.
-  - **Pendiente C1/C2:** formularios de **Comprar/Cambiar** (placeholder D-NW-2), **Actividad**
-    y **NFT** reales; luego M5 (modos de vista) y M7 (instalación nativa).
+  - **C2 (Actividad) ✅** — pestaña **Actividad real**: movimientos ERC-20 de entrada/salida
+    de los últimos 5.000 bloques vía `eth_getLogs` (método de solo lectura añadido al
+    background) con detalle desplegable (hash, token, de/para, valor, bloque).
+  - **Pendiente C1/C2:** **Comprar/Cambiar** (placeholder D-NW-2) y **NFT** real; luego M5
+    (modos de vista) y M7 (instalación nativa desde la web).
 - **Decisión (D-NW-5):** se **mantiene «CodeCrypto Wallet»** como nombre de producto; la
   identidad visual es la de TrueKeate y manifest/EIP-6963 quedan intactos.

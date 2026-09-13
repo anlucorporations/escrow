@@ -1269,6 +1269,25 @@ async function handleRPCRequest(method: string, params: unknown[], sender: chrom
       return '0x' + (await provider.getBlockNumber()).toString(16);
     }
 
+    case 'eth_getLogs': {
+      // Lectura de logs (solo lectura): la usa la pestaña Actividad del popup
+      // para listar transferencias ERC-20 de la cuenta. Se devuelven objetos
+      // planos (los Log de ethers llevan una referencia al provider que no es
+      // serializable por chrome.runtime.sendMessage).
+      const rpcUrl = await resolveRpcUrl(chainId);
+      const provider = new ethers.JsonRpcProvider(rpcUrl);
+      const logs = await provider.getLogs(params[0] as ethers.Filter);
+      return logs.map((l) => ({
+        address: l.address,
+        topics: l.topics,
+        data: l.data,
+        blockNumber: l.blockNumber,
+        transactionHash: l.transactionHash,
+        index: l.index,
+        removed: l.removed
+      }));
+    }
+
     case 'eth_estimateGas': {
       const rpcUrl = await resolveRpcUrl(chainId);
       const provider = new ethers.JsonRpcProvider(rpcUrl);
