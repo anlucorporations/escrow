@@ -19,7 +19,7 @@ Ejemplo: quieres entrar en la web de TrueKeate como **Ana**.
    TrueKeate (cadena 31337).
 2. Abre la web de TrueKeate:
    `https://truekeate-web-593453426217.europe-west1.run.app`
-3. Pulsa **"🔗 Conectar MetaMask e iniciar sesión"**.
+3. Pulsa **"🔗 Conectar billetera e iniciar sesión"**.
 4. En MetaMask aparece el diálogo **"Conectar con TrueKeate"**: es un permiso
    para **ver tus cuentas** (no firma nada). Pulsa aprobar.
 5. Si la cuenta está inscrita, MetaMask te pide **firmar el mensaje de sesión**:
@@ -36,7 +36,7 @@ Ejemplo: quieres entrar en la web de TrueKeate como **Ana**.
 
 ### 2.1 Los tres pasos del botón oficial
 
-El botón **"🔗 Conectar MetaMask e iniciar sesión"** hace tres cosas, en orden:
+El botón **"🔗 Conectar billetera e iniciar sesión"** hace tres cosas, en orden:
 
 1. **Conectar**: MetaMask abre el diálogo *"Conectar con TrueKeate"*. Es un
    **permiso para ver tus cuentas**. No es una firma ni una transacción.
@@ -51,7 +51,7 @@ El botón **"🔗 Conectar MetaMask e iniciar sesión"** hace tres cosas, en ord
    solo podrás ver el catálogo y la pantalla de inscripción.
 - Para operar hay que completar la **inscripción formal**: correo, teléfono,
   dirección y consentimiento de protección de datos.
-- Los botones "Conectar MetaMask" que aparecen en otras pantallas (por ejemplo,
+- Los botones "Conectar billetera" que aparecen en otras pantallas (por ejemplo,
   en "Mi Trueke Central") solo **conectan** la cuenta: no firman la sesión. El
   botón completo para entrar es el de "Conectar **e iniciar sesión**".
 
@@ -170,7 +170,7 @@ Regla mnemotécnica:
 <!-- GENERAR_IMAGEN: flujo-firma.svg -->
 ```mermaid
 flowchart TB
-    A["1. Pulsas<br/>🔗 Conectar MetaMask e iniciar sesión"] --> B["2. MetaMask: Conectar con TrueKeate<br/>(permiso para ver cuentas, sin firma)"]
+    A["1. Pulsas<br/>🔗 Conectar billetera e iniciar sesión"] --> B["2. MetaMask: Conectar con TrueKeate<br/>(permiso para ver cuentas, sin firma)"]
     B --> C["3. La web consulta:<br/>¿esta wallet está inscrita?"]
     C -->|"No inscrita"| D["Solo catálogo e inscripción.<br/>Completa la inscripción formal"]
     C -->|"Inscrita"| E["4. MetaMask pide firmar:<br/>'TrueKeate: iniciar sesión'"]
@@ -199,7 +199,7 @@ flowchart TB
 |---|---|
 | **¿Qué es?** | Es la forma en que tu billetera participa en TrueKeate: conectar (permiso para ver cuentas), firmar la sesión (*"TrueKeate: iniciar sesión"*) y, en el futuro, firmar intents de trueque. |
 | **¿Para qué sirve?** | Para entrar en tu área privada demostrando que controlas tu cuenta (sin enviar tu clave) y para autorizar los pasos de tus trueques. Firmar la sesión **no cuesta gas**. |
-| **Pasos clave** | 1) Conectar MetaMask (permiso de cuentas, sin firma). 2) Si estás inscrito, firmar *"TrueKeate: iniciar sesión"*. 3) Operar: hoy las acciones del trueque van con tu sesión (sin MetaMask). 4) Al cambiar de cuenta, volver a firmar. |
+| **Pasos clave** | 1) Conectar billetera (permiso de cuentas, sin firma). 2) Si estás inscrito, firmar *"TrueKeate: iniciar sesión"*. 3) Operar: hoy las acciones del trueque van con tu sesión (sin MetaMask). 4) Al cambiar de cuenta, volver a firmar. |
 | **Errores comunes** | Confundir conectar con firmar (o firmar con pagar) · Rechazar la firma y creer que algo falló (solo no entras) · Cambiar de cuenta y esperar seguir con la misma sesión (se descarta) · Esperar que la web pida hoy la firma de intents EIP-712 (todavía no existe esa UI). |
 | **Consejo de seguridad** | Revisa siempre el texto que firmas y la URL de la web. Regla: **permiso = ver · firma = autorizar (sin gas) · transacción = ejecutar y pagar gas**. En esta red el gas es ETH simbólico de pruebas, pero el hábito de revisar cada ventana se lleva a las redes reales. |
 

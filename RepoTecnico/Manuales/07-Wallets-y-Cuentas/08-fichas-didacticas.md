@@ -42,7 +42,7 @@
 3. Cargar una cuenta de prueba: importar su **clave privada** (o la frase semilla completa del
    anvil, que deriva en las mismas direcciones; ficha 3.1).
 4. Entrar en la web `https://truekeate-web-593453426217.europe-west1.run.app` y pulsar
-   **"Conectar MetaMask e iniciar sesión"** (ficha 6.1).
+   **"Conectar billetera e iniciar sesión"** (ficha 6.1).
 
 **Errores comunes**
 - Tener seleccionada otra red (p. ej. Ethereum Mainnet) → los saldos de prueba "no aparecen".
@@ -58,7 +58,7 @@
 ### Ficha 1.2 · Conectar la wallet a TrueKeate
 
 **¿Qué es?**
-- El botón **"Conectar MetaMask e iniciar sesión"** (`web/components/BotonConectarLogin.tsx:22-33`)
+- El botón **"Conectar billetera e iniciar sesión"** (`web/components/BotonConectarLogin.tsx:22-33`)
   hace tres cosas en orden: **conectar** (MetaMask pide permiso para ver tus cuentas vía
   `eth_requestAccounts`, sin firma), **consultar** el estado de inscripción de la wallet
   (`GET /auth/estado?wallet=0x…`) y, si está inscrita, **autenticar** pidiendo la firma de sesión.
@@ -70,14 +70,14 @@
   *"Conecta tu billetera para continuar"* (`web/components/SuiteGuard.tsx:27-51`).
 
 **Pasos clave**
-1. Pulsar **"🔗 Conectar MetaMask e iniciar sesión"** (guard de la suite o barra superior PC).
+1. Pulsar **"🔗 Conectar billetera e iniciar sesión"** (guard de la suite o barra superior PC).
 2. En MetaMask, aprobar el diálogo **"Conectar con TrueKeate"** (permiso de cuentas; no firma).
 3. Si la wallet está inscrita, MetaMask pedirá la **firma de sesión** EIP-191 (ficha 6.1).
 4. Al recargar la página, la app restaura la cuenta y el token guardados en `localStorage`
    (`truekeate.account` / `truekeate.token`; `web/lib/ethereum.tsx:41,63-77`).
 
 **Errores comunes**
-- Conectarse solo desde "Mi Trueke Central" (botón "Conectar MetaMask") → conecta pero **no
+- Conectarse solo desde "Mi Trueke Central" (botón "Conectar billetera") → conecta pero **no
   firma** la sesión (`web/app/suite/dashboard/page.tsx:38-41`).
 - Cambiar de cuenta en MetaMask: la plataforma escucha `accountsChanged`, actualiza la cuenta y
   **descarta el token de la cuenta anterior** → hay que volver a firmar
@@ -451,7 +451,7 @@
   la suite según el tipo/estado del usuario (login único: una sola firma para todo).
 
 **Pasos clave**
-1. Pulsar **"Conectar MetaMask e iniciar sesión"**.
+1. Pulsar **"Conectar billetera e iniciar sesión"**.
 2. Aprobar el permiso de cuentas en MetaMask (sin firma).
 3. Si la wallet está inscrita, MetaMask muestra el diálogo de firma con el texto
    *"TrueKeate: iniciar sesión"* (prefijado con el encabezado EIP-191 `\x19Ethereum Signed Message:\n…`,

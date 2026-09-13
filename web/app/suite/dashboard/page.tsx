@@ -116,7 +116,7 @@ export default function Dashboard() {
         </div>
         {!conectado && (
           <Button onClick={() => void conectar()} disabled={conectando}>
-            {conectando ? "Conectando…" : "Conectar MetaMask"}
+            {conectando ? "Conectando…" : "Conectar billetera"}
           </Button>
         )}
       </section>

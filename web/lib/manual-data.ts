@@ -640,7 +640,7 @@ export const manuales: ManualAyuda[] =   [
             {
               "titulo": "4.1 Qué hace",
               "parrafos": [
-                "1. Muestra un botón Conectar MetaMask si no tienes la billetera conectada.",
+                "1. Muestra un botón Conectar billetera si no tienes la billetera conectada.",
                 "2. Al conectar, muestra tu nivel de la escalera (INSCRITO, VERIFICADO o CERTIFICADO).",
                 "3. Activa o atenúa los módulos según tu nivel: Explorar ofertas, Mis truekes (máximo 3 activos si eres VERIFICADO), Reputación y Punto de encuentro."
               ]
@@ -672,7 +672,7 @@ export const manuales: ManualAyuda[] =   [
         {
           "titulo": "6. Conectar la billetera: cómo funciona",
           "parrafos": [
-            "Cuando pulsas Conectar MetaMask:",
+            "Cuando pulsas Conectar billetera:",
             "1. La app pide permiso a MetaMask (aparece una ventanita de MetaMask).",
             "2. Tú aceptas; MetaMask guarda en la app la dirección de tu cuenta.",
             "3. La app recuerda tu cuenta: si recargas la página, vuelve a conectar solo.",
@@ -1816,7 +1816,7 @@ export const manuales: ManualAyuda[] =   [
             "Para empezar en 5 minutos:",
             "1. Abre la portada y pulsa Comenzar a truequear.",
             "2. Se abre tu panel personal (Mi Trueke Central).",
-            "3. Pulsa Conectar MetaMask para conectar tu billetera.",
+            "3. Pulsa Conectar billetera para conectar tu billetera.",
             "4. Verás tu dirección resumida (por ejemplo 0x1234…abcd).",
             "5. Ya estás dentro de la suite: la escalera de verificación te muestra en qué peldaño estás (INSCRITO por ahora).",
             "Nota pendiente de confirmar: hoy el panel muestra tu estado simulado (siempre INSCRITO); en la integración final ese estado vendrá del backend (tu sesión y tu verificación real). Mientras tanto, la app es una demostración visual del diseño."
@@ -1849,7 +1849,7 @@ export const manuales: ManualAyuda[] =   [
           "titulo": "4. Conectar tu billetera con MetaMask (paso a paso)",
           "parrafos": [
             "MetaMask es una billetera (wallet) de cripto: una extensión del navegador (o app móvil) que guarda tus llaves y firma por ti. TrueKeate la usa para saber quién eres.",
-            "El diagrama resume el flujo de conexión: abres Mi Trueke Central; si MetaMask no está instalado aparece un aviso para instalarlo o usar otra wallet; si está instalado, pulsas Conectar MetaMask y MetaMask pide permiso para ver tus cuentas; si aceptas quedas conectado y tu dirección aparece en pantalla, y si rechazas sigues sin conectar y puedes reintentar. Al refrescar la página, la app se reconecta sola."
+            "El diagrama resume el flujo de conexión: abres Mi Trueke Central; si MetaMask no está instalado aparece un aviso para instalarlo o usar otra wallet; si está instalado, pulsas Conectar billetera y MetaMask pide permiso para ver tus cuentas; si aceptas quedas conectado y tu dirección aparece en pantalla, y si rechazas sigues sin conectar y puedes reintentar. Al refrescar la página, la app se reconecta sola."
           ],
           "imagen": "conexion-metamask.svg",
           "subsecciones": [
@@ -1858,7 +1858,7 @@ export const manuales: ManualAyuda[] =   [
               "parrafos": [
                 "1. Instala MetaMask en tu navegador (o usa una wallet compatible).",
                 "2. Abre Mi Trueke Central.",
-                "3. Pulsa el botón Conectar MetaMask.",
+                "3. Pulsa el botón Conectar billetera.",
                 "4. MetaMask te pregunta si permites que este sitio vea tus cuentas: acepta.",
                 "5. Tu dirección aparece en la pantalla (resumida: 0x1234…abcd).",
                 "Si MetaMask no está instalado, la app te avisa claramente: MetaMask no está instalado. Instálalo o usa una wallet compatible."
@@ -2085,7 +2085,7 @@ export const manuales: ManualAyuda[] =   [
             "2. El robot abre las páginas en 2 dispositivos: un ordenador (Chrome) y un móvil (Pixel 5), porque TrueKeate es móvil primero.",
             "3. Cada caso se ejecuta en ambos: 9 casos por 2 dispositivos = 18 ejecuciones.",
             "Qué comprueban los 9 casos. Portada (4 casos): 1. El hero con la marca y el titular aparece. 2. Las cifras de la plataforma se ven. 3. Las ventajas del trueque se ven. 4. El botón lleva a la suite.",
-            "Mi Trueke Central (5 casos): 1. La barra superior muestra @usuario y el logo TrueKeat☑. 2. La escalera de verificación se ve. 3. El módulo bloqueado para INSCRITO se ve atenuado. 4. El botón Conectar MetaMask aparece sin sesión. 5. La barra inferior con su botón central funciona.",
+            "Mi Trueke Central (5 casos): 1. La barra superior muestra @usuario y el logo TrueKeat☑. 2. La escalera de verificación se ve. 3. El módulo bloqueado para INSCRITO se ve atenuado. 4. El botón Conectar billetera aparece sin sesión. 5. La barra inferior con su botón central funciona.",
             "Resultado registrado: 18/18 verdes (dato reportado en el estado del proyecto; ver los pendientes más abajo).",
             "Límite de alcance: estas pruebas no usan una billetera real (MetaMask no está automatizado), ni el backend real, ni la blockchain: son pruebas de las pantallas y del contenido estático."
           ],
@@ -2714,7 +2714,7 @@ export const manuales: ManualAyuda[] =   [
             "2. En el móvil: instala la app de MetaMask (Google Play o App Store).",
             "3. Crea tu billetera y guarda muy bien la frase semilla (12 palabras).",
             "4. Abre la web de TrueKeate: https://truekeate-web-593453426217.europe-west1.run.app",
-            "5. Pulsa el botón Conectar MetaMask e iniciar sesión y acepta el permiso para ver tus cuentas.",
+            "5. Pulsa el botón Conectar billetera e iniciar sesión y acepta el permiso para ver tus cuentas.",
             "Nota importante: esta red es de pruebas. El dinero que veas (ETH, BRLT…) es simbólico y no vale nada real. No uses aquí cuentas con dinero real."
           ],
           "subsecciones": []
@@ -2769,7 +2769,7 @@ export const manuales: ManualAyuda[] =   [
               "titulo": "3.3 Comprobar que quedó lista",
               "parrafos": [
                 "Al abrir la extensión debes ver su pantalla con saldo 0 ETH y el selector de red en la parte superior.",
-                "En la web de TrueKeate, el botón Conectar MetaMask e iniciar sesión dejará de mostrar el aviso de que MetaMask no está instalado."
+                "En la web de TrueKeate, el botón Conectar billetera e iniciar sesión dejará de mostrar el aviso de que MetaMask no está instalado."
               ]
             }
           ]
@@ -2850,7 +2850,7 @@ export const manuales: ManualAyuda[] =   [
           "parrafos": [
             "¿Qué es? Una billetera (wallet) es una aplicación que guarda tus claves y firma por ti sin mostrarlas. TrueKeate usa MetaMask: extensión en el PC y app en el móvil.",
             "¿Para qué sirve? Para conectarte a TrueKeate, iniciar sesión firmando un mensaje, autorizar los trueques y ver tus activos de prueba (ETH, BRLT, NFTs).",
-            "Pasos clave: 1) Instalar MetaMask (PC o móvil). 2) Crear o importar la billetera. 3) Guardar la frase semilla en papel. 4) Abrir la web de TrueKeate y pulsar Conectar MetaMask e iniciar sesión. 5) Aceptar el permiso para ver cuentas.",
+            "Pasos clave: 1) Instalar MetaMask (PC o móvil). 2) Crear o importar la billetera. 3) Guardar la frase semilla en papel. 4) Abrir la web de TrueKeate y pulsar Conectar billetera e iniciar sesión. 5) Aceptar el permiso para ver cuentas.",
             "Errores comunes: descargar extensiones falsas con nombres parecidos · Confundir conectar (ver cuentas) con firmar o enviar dinero · Tener seleccionada otra red y no ver los saldos de prueba · Compartir la frase semilla con un supuesto soporte.",
             "Consejo de seguridad: la frase semilla se escribe en papel y no se comparte jamás. En esta red de pruebas solo usa cuentas sin valor real: las claves de las cuentas de prueba son públicas (ver manual 03-cuentas-anvil)."
           ],
@@ -3041,7 +3041,7 @@ export const manuales: ManualAyuda[] =   [
             "2. Abre MetaMask, pulsa el icono de perfil (arriba a la derecha), elige Añadir cuenta o cuenta de hardware y luego Importar cuenta.",
             "3. Deja el tipo en Clave privada, pega la clave y pulsa Importar.",
             "4. Comprueba que la dirección nueva coincide con la de Ana: 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC.",
-            "5. Abre la web de TrueKeate y pulsa Conectar MetaMask e iniciar sesión: ahora la plataforma te reconoce como Ana.",
+            "5. Abre la web de TrueKeate y pulsa Conectar billetera e iniciar sesión: ahora la plataforma te reconoce como Ana.",
             "Si prefieres importar todas las cuentas de golpe, puedes importar en MetaMask la frase semilla completa del anvil (apartado 2.2): como el camino de derivación es el mismo que usa MetaMask, obtendrás las mismas direcciones.",
             "Aviso muy importante: estas claves son públicas (aparecen en la documentación del framework) y solo sirven para pruebas. Nunca las uses con dinero real ni en producción."
           ],
@@ -3493,7 +3493,7 @@ export const manuales: ManualAyuda[] =   [
             "Ejemplo: quieres entrar en la web de TrueKeate como Ana.",
             "1. Importa la cuenta de Ana en MetaMask (manual 03-cuentas-anvil) y selecciona la red de TrueKeate (cadena 31337).",
             "2. Abre la web de TrueKeate: https://truekeate-web-593453426217.europe-west1.run.app",
-            "3. Pulsa el botón Conectar MetaMask e iniciar sesión.",
+            "3. Pulsa el botón Conectar billetera e iniciar sesión.",
             "4. En MetaMask aparece el diálogo Conectar con TrueKeate: es un permiso para ver tus cuentas (no firma nada). Pulsa aprobar.",
             "5. Si la cuenta está inscrita, MetaMask te pide firmar el mensaje de sesión: TrueKeate: iniciar sesión. Firma.",
             "6. ¡Ya estás dentro! La sesión queda guardada. Al recargar la página, la web te reconoce sin volver a preguntar.",
@@ -3509,7 +3509,7 @@ export const manuales: ManualAyuda[] =   [
             {
               "titulo": "2.1 Los tres pasos del botón oficial",
               "parrafos": [
-                "El botón Conectar MetaMask e iniciar sesión hace tres cosas, en orden:",
+                "El botón Conectar billetera e iniciar sesión hace tres cosas, en orden:",
                 "1. Conectar: MetaMask abre el diálogo Conectar con TrueKeate. Es un permiso para ver tus cuentas. No es una firma ni una transacción.",
                 "2. Consultar: la web pregunta al servidor si esa wallet está inscrita en TrueKeate.",
                 "3. Autenticar: si está inscrita, la web pide la firma de sesión (apartado 3)."
@@ -3520,7 +3520,7 @@ export const manuales: ManualAyuda[] =   [
               "parrafos": [
                 "Si la wallet no está inscrita, la suite (tu área privada) queda bloqueada: solo podrás ver el catálogo y la pantalla de inscripción.",
                 "Para operar hay que completar la inscripción formal: correo, teléfono, dirección y consentimiento de protección de datos.",
-                "Los botones Conectar MetaMask que aparecen en otras pantallas (por ejemplo, en Mi Trueke Central) solo conectan la cuenta: no firman la sesión. El botón completo para entrar es el de Conectar e iniciar sesión."
+                "Los botones Conectar billetera que aparecen en otras pantallas (por ejemplo, en Mi Trueke Central) solo conectan la cuenta: no firman la sesión. El botón completo para entrar es el de Conectar e iniciar sesión."
               ]
             },
             {
@@ -3619,7 +3619,7 @@ export const manuales: ManualAyuda[] =   [
           "parrafos": [
             "¿Qué es? Es la forma en que tu billetera participa en TrueKeate: conectar (permiso para ver cuentas), firmar la sesión (TrueKeate: iniciar sesión) y, en el futuro, firmar intents de trueque.",
             "¿Para qué sirve? Para entrar en tu área privada demostrando que controlas tu cuenta (sin enviar tu clave) y para autorizar los pasos de tus trueques. Firmar la sesión no cuesta gas.",
-            "Pasos clave: 1) Conectar MetaMask (permiso de cuentas, sin firma). 2) Si estás inscrito, firmar TrueKeate: iniciar sesión. 3) Operar: hoy las acciones del trueque van con tu sesión (sin MetaMask). 4) Al cambiar de cuenta, volver a firmar.",
+            "Pasos clave: 1) Conectar billetera (permiso de cuentas, sin firma). 2) Si estás inscrito, firmar TrueKeate: iniciar sesión. 3) Operar: hoy las acciones del trueque van con tu sesión (sin MetaMask). 4) Al cambiar de cuenta, volver a firmar.",
             "Errores comunes: confundir conectar con firmar (o firmar con pagar) · Rechazar la firma y creer que algo falló (solo no entras) · Cambiar de cuenta y esperar seguir con la misma sesión (se descarta) · Esperar que la web pida hoy la firma de intents EIP-712 (todavía no existe esa interfaz).",
             "Consejo de seguridad: revisa siempre el texto que firmas y la URL de la web. Regla: permiso = ver · firma = autorizar (sin gas) · transacción = ejecutar y pagar gas. En esta red el gas es ETH simbólico de pruebas, pero el hábito de revisar cada ventana se lleva a las redes reales."
           ],
@@ -3680,7 +3680,7 @@ export const manuales: ManualAyuda[] =   [
           "parrafos": [
             "¿Qué es? Una aplicación que guarda tus claves privadas y firma por ti sin exponerlas. En TrueKeate la billetera es MetaMask (extensión en el ordenador, app en el móvil). La billetera no guarda tus tokens: guarda las claves; los saldos viven en la blockchain y ella solo los lee y muestra.",
             "¿Para qué sirve? Conectarte a TrueKeate, firmar el inicio de sesión y ver tus activos de la red de pruebas: ETH (moneda de la red), BRLT (token interno) y los NFTs de los trueques.",
-            "Pasos clave: 1) Instalar MetaMask (solo fuentes oficiales). 2) Añadir una vez la red de TrueKeate (cadena 31337), la plataforma no la añade por ti. 3) Importar una cuenta de prueba (por ejemplo la de Ana, con su clave privada). 4) Entrar en la web y pulsar Conectar MetaMask e iniciar sesión.",
+            "Pasos clave: 1) Instalar MetaMask (solo fuentes oficiales). 2) Añadir una vez la red de TrueKeate (cadena 31337), la plataforma no la añade por ti. 3) Importar una cuenta de prueba (por ejemplo la de Ana, con su clave privada). 4) Entrar en la web y pulsar Conectar billetera e iniciar sesión.",
             "Errores comunes: tener seleccionada otra red (los saldos no aparecen) · Confundir conectar (permiso para ver) con firmar o pagar · Usar estas cuentas de prueba con dinero real.",
             "Consejo de seguridad: el mnemónico del anvil (test test test test test test test test test test test junk) es público: nunca lo uses con fondos reales ni en producción. La frase semilla no se comparte jamás.",
             "Manual completo: 01-instalacion-wallet (su sección Ficha didáctica)."
@@ -3740,7 +3740,7 @@ export const manuales: ManualAyuda[] =   [
           "parrafos": [
             "¿Qué es? La forma en que tu billetera participa en TrueKeate: conectar (permiso para ver cuentas, sin firma), firmar la sesión (TrueKeate: iniciar sesión, sin gas) y, en el futuro, firmar intents de trueque.",
             "¿Para qué sirve? Entrar en tu área privada demostrando que controlas tu cuenta (sin enviar tu clave privada) y autorizar los pasos de tus trueques. El diseño previsto: tú firmas tu intención (formato EIP-712) y el relayer (pieza de la plataforma) paga el gas.",
-            "Pasos clave: 1) Pulsar Conectar MetaMask e iniciar sesión. 2) Aprobar el permiso de cuentas. 3) Si estás inscrito, firmar el mensaje de sesión. 4) Operar: hoy las acciones del trueque (custodiar, firmar recepción, valorar) van con tu sesión, sin abrir MetaMask. 5) Al cambiar de cuenta, volver a firmar.",
+            "Pasos clave: 1) Pulsar Conectar billetera e iniciar sesión. 2) Aprobar el permiso de cuentas. 3) Si estás inscrito, firmar el mensaje de sesión. 4) Operar: hoy las acciones del trueque (custodiar, firmar recepción, valorar) van con tu sesión, sin abrir MetaMask. 5) Al cambiar de cuenta, volver a firmar.",
             "Errores comunes: confundir conectar con firmar (o firmar con pagar) · Rechazar la firma y creer que algo falló (solo no entras) · Cambiar de cuenta y esperar conservar la sesión anterior · Esperar que la web pida hoy la firma de intents EIP-712 (esa interfaz todavía no existe).",
             "Consejo de seguridad: revisa siempre el texto exacto que firmas y la URL de la web (evita sitios suplantadores). Regla mnemotécnica: permiso = ver · firma = autorizar (sin gas) · transacción = ejecutar y pagar gas.",
             "Manual completo: 06-interactuar-wallet (su sección Ficha didáctica)."
@@ -4181,7 +4181,7 @@ export const manuales: ManualAyuda[] =   [
             {
               "titulo": "3.1 Paso 1 — Pulsas \"Conectar\" en el navegador",
               "parrafos": [
-                "Cuando entras en una sección de la suite sin billetera conectada, la web te muestra la pantalla de conexión con el botón 🔗 Conectar MetaMask e iniciar sesión."
+                "Cuando entras en una sección de la suite sin billetera conectada, la web te muestra la pantalla de conexión con el botón 🔗 Conectar billetera e iniciar sesión."
               ]
             },
             {

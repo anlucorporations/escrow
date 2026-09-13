@@ -92,7 +92,7 @@ flowchart LR
 ### 3.1 Paso 1 — Pulsas "Conectar" en el navegador
 
 - Cuando entras en una sección de la suite sin billetera conectada, la web
-  te muestra la pantalla de conexión con el botón **"🔗 Conectar MetaMask
+  te muestra la pantalla de conexión con el botón **"🔗 Conectar billetera
   e iniciar sesión"**.
 
 ### 3.2 Paso 2 — La web espera a que una wallet se presente

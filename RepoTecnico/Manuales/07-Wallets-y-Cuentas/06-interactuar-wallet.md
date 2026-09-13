@@ -13,11 +13,11 @@
 #### 1.1 Botones reales de conexión
 
 - **Público/suite sin wallet**: el guard de acceso muestra la pantalla *"Conecta tu billetera para
-  continuar"* con el botón **"🔗 Conectar MetaMask e iniciar sesión"**
+  continuar"* con el botón **"🔗 Conectar billetera e iniciar sesión"**
   (`web/components/SuiteGuard.tsx:27-51`, botón en `SuiteGuard.tsx:41`; el guard envuelve toda la
   suite en `web/app/suite/layout.tsx:25`).
 - **Barra PC**: el mismo botón aparece en la navegación superior (`web/components/TopNavPc.tsx:42`).
-- **Mi Trueke Central**: si no hay wallet conectada muestra el botón **"Conectar MetaMask"**
+- **Mi Trueke Central**: si no hay wallet conectada muestra el botón **"Conectar billetera"**
   (`web/app/suite/dashboard/page.tsx:38-41`) que solo conecta (sin firmar sesión).
 
 #### 1.2 Qué ocurre al pulsar conectar (orden exacto)

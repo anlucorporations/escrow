@@ -59,7 +59,7 @@
 #### 2.3 Comprobar que la extensión quedó operativa
 
 - Al abrir la extensión debe verse la interfaz con saldo **0 ETH** y el selector de red.
-- En la plataforma TrueKeate, el botón "🔗 Conectar MetaMask e iniciar sesión"
+- En la plataforma TrueKeate, el botón "🔗 Conectar billetera e iniciar sesión"
   (`web/components/BotonConectarLogin.tsx:37`) dejará de mostrar el aviso de *"MetaMask no está
   instalado"*.
 - La plataforma escucha en vivo el evento `accountsChanged` de MetaMask: si cambias de cuenta o la

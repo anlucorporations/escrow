@@ -76,7 +76,7 @@ y los NFTs de los trueques.
 **Pasos clave** 1) Instalar MetaMask (solo fuentes oficiales). 2) Añadir una
 vez la red de TrueKeate (cadena 31337) — la plataforma no la añade por ti.
 3) Importar una cuenta de prueba (por ejemplo la de Ana, con su clave privada).
-4) Entrar en la web y pulsar "Conectar MetaMask e iniciar sesión".
+4) Entrar en la web y pulsar "Conectar billetera e iniciar sesión".
 
 **Errores comunes** Tener seleccionada otra red (los saldos "no aparecen") ·
 Confundir conectar (permiso para ver) con firmar o pagar · Usar estas cuentas
@@ -226,7 +226,7 @@ cuenta (sin enviar tu clave privada) y autorizar los pasos de tus trueques. El
 diseño previsto: tú firmas tu intención (formato EIP-712) y el **relayer**
 (pieza de la plataforma) paga el gas.
 
-**Pasos clave** 1) Pulsar "Conectar MetaMask e iniciar sesión". 2) Aprobar el
+**Pasos clave** 1) Pulsar "Conectar billetera e iniciar sesión". 2) Aprobar el
 permiso de cuentas. 3) Si estás inscrito, firmar el mensaje de sesión.
 4) Operar: hoy las acciones del trueque (custodiar, firmar recepción, valorar)
 van con tu sesión, sin abrir MetaMask. 5) Al cambiar de cuenta, volver a

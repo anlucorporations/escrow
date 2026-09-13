@@ -136,7 +136,7 @@ test.describe("Suite de usuario — control de acceso", () => {
     await page.goto("/suite/dashboard");
     await expect(page.getByText("Conecta tu billetera para continuar")).toBeVisible();
     // Puede haber un botón en la barra PC y otro en el guard; basta con que exista uno.
-    await expect(page.getByRole("button", { name: "Conectar MetaMask" }).first()).toBeVisible();
+    await expect(page.getByRole("button", { name: /Conectar (billetera|.+ e iniciar sesión)/ }).first()).toBeVisible();
     // El contenido privado NO se muestra
     await expect(page.getByRole("heading", { name: "Mi Trueke Central" })).toHaveCount(0);
   });
@@ -164,8 +164,11 @@ test.describe("Suite de usuario — control de acceso", () => {
     await expect(escalera.getByText("VERIFICADO")).toBeVisible();
     await expect(escalera.getByText("CERTIFICADO")).toBeVisible();
 
-    // módulo "Mis truekes" atenuado para Inscrito (RF-14.3/D28)
-    const modulo = page.locator("h3", { hasText: "Mis truekes" }).locator("..");
+    // módulo "Mis truekes" atenuado para Inscrito (RF-14.3/D28). La clase de
+    // atenuación vive en la Card, no en el div que envuelve al h3.
+    const modulo = page
+      .locator("h3", { hasText: "Mis truekes" })
+      .locator("xpath=ancestor::div[contains(@class,'rounded-card')][1]");
     await expect(modulo).toHaveClass(/opacity-50/);
   });
 

@@ -6,7 +6,7 @@
 // y con el TOKEN de sesión global (firma EIP-191 única al conectar → login).
 //
 // Flujo (decisión del director):
-//   1) Al conectar la billetera (botón "Conectar MetaMask") se pide UNA firma
+//   1) Al conectar la billetera (botón "Conectar billetera") se pide UNA firma
 //      EIP-191 ("TrueKeate: iniciar sesión") que emite el token Bearer global.
 //   2) Ese token da acceso a TODAS las secciones según el tipo/estado del
 //      usuario (las páginas ya no piden autenticación propia).
@@ -77,7 +77,7 @@ const CLAVE_TOKEN = "truekeate.token";
 const CLAVE_TOKEN_WALLET = "truekeate.token.wallet";
 
 export function SesionProvider({ children }: { children: ReactNode }) {
-  const { account, conectado, signer } = useEthereum();
+  const { account, conectado, signer, proveedorActivo } = useEthereum();
   const [acceso, setAcceso] = useState<EstadoAcceso>({ fase: "sinWallet" });
   // ¿La cuenta conectada es el Owner? (lo devuelve /auth/estado y /auth/session)
   const [esOwner, setEsOwner] = useState(false);
@@ -154,12 +154,13 @@ export function SesionProvider({ children }: { children: ReactNode }) {
   const autenticar = useCallback(async (): Promise<boolean> => {
     setAutenticando(true);
     try {
-      // Provider/signer FRESCOS en el momento de firmar: se firma con la wallet
-      // ACTIVA ahora mismo en MetaMask (la que el usuario acaba de elegir), sin
-      // depender del estado de React (que puede no haberse propagado aún tras
-      // reconectar con OTRA wallet).
-      if (typeof window === "undefined" || !window.ethereum) return false;
-      const bp = new BrowserProvider(window.ethereum);
+      // Provider/signer FRESCOS creados desde la wallet ACTIVA (la que el
+      // usuario eligió en el popup de conexión), NO desde window.ethereum: si el
+      // usuario eligió CodeCrypto Wallet u otra, el login debe abrir ESA
+      // billetera y no MetaMask.
+      const eth = proveedorActivo ?? (typeof window !== "undefined" ? window.ethereum : null);
+      if (!eth) return false;
+      const bp = new BrowserProvider(eth);
       const signerFresco = await bp.getSigner();
       const walletFirmante = (await signerFresco.getAddress()).toLowerCase();
       const firma = await signerFresco.signMessage("TrueKeate: iniciar sesión");
@@ -175,14 +176,24 @@ export function SesionProvider({ children }: { children: ReactNode }) {
     } finally {
       setAutenticando(false);
     }
-  }, []);
+  }, [proveedorActivo]);
 
-  // Firma por acción: usa el signer de la wallet conectada (EIP-191).
+  // Firma por acción: usa un signer FRESCO de la wallet ACTIVA (EIP-191), para
+  // que cada acción abra la billetera elegida y no MetaMask.
   const firmarAccion = useCallback(
     async (accion: string): Promise<FirmaAccion | null> => {
+      if (proveedorActivo) {
+        try {
+          const bp = new BrowserProvider(proveedorActivo);
+          const signerActivo = await bp.getSigner();
+          return await firmarConSigner(signerActivo, accion);
+        } catch {
+          /* si falla, se intenta con el signer del contexto */
+        }
+      }
       return firmarConSigner(signer, accion);
     },
-    [signer]
+    [proveedorActivo, signer]
   );
 
   const cerrarSesion = useCallback(() => {

@@ -168,7 +168,7 @@ export default function PaginaAdmin() {
         <p className="mt-1 text-sm text-navy-800/60">Conecta la billetera del Owner para continuar.</p>
         <div className="mt-4 flex justify-center">
           <Button onClick={() => void conectar()} disabled={conectando}>
-            {conectando ? "Conectando…" : "Conectar MetaMask"}
+            {conectando ? "Conectando…" : "Conectar billetera"}
           </Button>
         </div>
       </Card>

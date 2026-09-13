@@ -31,6 +31,12 @@ declare global {
   }
 }
 
+/** Proveedor EIP-1193 con los métodos de eventos opcionales de EIP-1193. */
+type ProveedorConEventos = Eip1193Provider & {
+  on?: (ev: string, cb: (args: unknown[]) => void) => void;
+  removeListener?: (ev: string, cb: (args: unknown[]) => void) => void;
+};
+
 export type MotivoSinProveedor = "sin_wallet" | "app_movil" | null;
 
 /** Avisos accionables que dependen de la wallet, no de su ausencia. */
@@ -43,6 +49,10 @@ export interface EstadoEthereum {
   account: string | null;
   provider: BrowserProvider | null;
   signer: JsonRpcSigner | null;
+  /** Proveedor EIP-1193 de la wallet ELEGIDA (MetaMask, CodeCrypto Wallet, …).
+   *  Es la fuente de verdad para firmar, escuchar eventos y cambiar de red;
+   *  window.ethereum solo se usa como último recurso. */
+  proveedorActivo: Eip1193Provider | null;
   conectando: boolean;
   conectado: boolean;
   conectar: () => Promise<string | null>;
@@ -110,6 +120,9 @@ export interface WalletAnunciada {
 /** Proveedores anunciados por EIP-6963, indexados por rdns. */
 const anunciados = new Map<string, { info: WalletAnunciada; provider: Eip1193Provider }>();
 
+/** rdns sintético para una wallet que solo expone window.ethereum (legacy). */
+const RDNS_INYECTADA = "__inyectada__";
+
 export function EthereumProvider({ children }: { children: ReactNode }) {
   const [account, setAccount] = useState<string | null>(null);
   const [provider, setProvider] = useState<BrowserProvider | null>(null);
@@ -125,24 +138,48 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
   });
 
   /**
+   * Resuelve el proveedor EIP-1193 activo: la wallet elegida por su rdns; si no
+   * hay elección y solo hay UNA anunciada, esa. Con VARIAS wallets y sin
+   * elección devuelve null: la app no adopta ninguna ni toca `window.ethereum`
+   * (el usuario debe elegir en el popup). Es la pieza que hace que la firma de
+   * sesión y la firma por acción usen la MISMA wallet que se conectó.
+   */
+  const resolverActivo = useCallback((): Eip1193Provider | null => {
+    if (typeof window === "undefined") return null;
+    const rdns = localStorage.getItem(CLAVE_WALLET);
+    const elegido = rdns ? anunciados.get(rdns)?.provider : null;
+    if (elegido) return elegido;
+    if (anunciados.size === 1) return [...anunciados.values()][0].provider;
+    return null;
+  }, []);
+  /** Proveedor EIP-1193 de la wallet activa (se mantiene sincronizado). */
+  const [proveedorActivo, setProveedorActivo] = useState<Eip1193Provider | null>(null);
+
+  /** Aplica una elección: persiste el rdns y activa ese proveedor. NO se toca
+   *  `window.ethereum` para no interferir con las demás wallets del navegador;
+   *  toda la app usa el proveedor activo de forma explícita. */
+  const activarProveedor = useCallback((rdns: string | null, provider: Eip1193Provider | null) => {
+    if (rdns) localStorage.setItem(CLAVE_WALLET, rdns);
+    setWalletElegida(rdns);
+    setProveedorActivo(provider);
+  }, []);
+
+  /**
    * Fija la wallet con la que se conectará la app. Sin elección, el
    * comportamiento es el de siempre (window.ethereum): así la convivencia no
    * cambia nada para quien solo tiene MetaMask.
    */
   const elegirWallet = useCallback((rdns: string) => {
     if (typeof window === "undefined") return;
-    localStorage.setItem(CLAVE_WALLET, rdns);
-    setWalletElegida(rdns);
-    const elegido = anunciados.get(rdns)?.provider;
-    if (elegido) window.ethereum = elegido as unknown as Window["ethereum"];
+    activarProveedor(rdns, anunciados.get(rdns)?.provider ?? null);
     setErrorConexion(null);
-  }, []);
+  }, [activarProveedor]);
   const [aviso, setAviso] = useState<AvisoConexion>(null);
   const [redActual, setRedActual] = useState<number | null>(null);
 
   /** Lee el chainId de la wallet y marca aviso si no es la red esperada. */
   const revisarRed = useCallback(async (eth?: Eip1193Provider | null): Promise<number | null> => {
-    const w = eth ?? (typeof window !== "undefined" ? window.ethereum : null);
+    const w = eth ?? proveedorActivo ?? (typeof window !== "undefined" ? window.ethereum : null);
     if (!w?.request) return null;
     try {
       const hex = (await w.request({ method: "eth_chainId" })) as string;
@@ -154,7 +191,7 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
     } catch {
       return null;
     }
-  }, []);
+  }, [proveedorActivo]);
 
   /** Fija la cuenta activa con un provider/signer SIEMPRE frescos.
    *  - Desde conectar(): se pasa el BrowserProvider recién creado (bp).
@@ -170,8 +207,9 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
       }
       const cuenta = cuentas[0].toLowerCase();
       let prov = bp ?? provider;
-      if (!prov && typeof window !== "undefined" && window.ethereum) {
-        prov = new BrowserProvider(window.ethereum);
+      if (!prov) {
+        const eth = proveedorActivo ?? (typeof window !== "undefined" ? window.ethereum : null);
+        if (eth) prov = new BrowserProvider(eth);
       }
       setProvider(prov);
       setAccount(cuenta);
@@ -189,41 +227,76 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
         setSigner(null);
       }
     },
-    [provider]
+    [provider, proveedorActivo]
   );
 
   // EIP-6963: se escuchan TODAS las wallets anunciadas (MetaMask también se
-  // anuncia por este estándar). Antes solo se atendía el primer anuncio y
-  // únicamente si NO existía window.ethereum, de modo que con MetaMask instalada
-  // la wallet propia quedaba invisible para la app.
+  // anuncia por este estándar). Se listan todas para que el usuario elija y la
+  // elección se mantiene durante toda la sesión: la firma de login y la firma
+  // por acción usan el proveedor activo, no window.ethereum.
   useEffect(() => {
     if (typeof window === "undefined") return;
+
+    // Estado limpio en cada montaje: las wallets se re-anuncian al pedirlo, así
+    // no quedan proveedores obsoletos de una carga anterior (ni entre pruebas).
+    anunciados.clear();
+
+    const sincronizar = () => {
+      // Wallet legacy: si hay window.ethereum y ninguna wallet anunciada es ESE
+      // mismo proveedor, se añade como opción (wallets antiguas sin EIP-6963).
+      const ethInyectado = window.ethereum;
+      const yaAnunciado =
+        ethInyectado && [...anunciados.values()].some((w) => w.provider === ethInyectado);
+      if (ethInyectado && !yaAnunciado && !anunciados.has(RDNS_INYECTADA)) {
+        anunciados.set(RDNS_INYECTADA, {
+          info: { rdns: RDNS_INYECTADA, name: "Billetera del navegador", icon: "" },
+          provider: ethInyectado,
+        });
+      }
+      setWallets([...anunciados.values()].map((w) => w.info));
+      const activo = resolverActivo();
+      setProveedorActivo(activo);
+      if (activo) setErrorConexion(null);
+    };
+
     const aceptar = (e: Event) => {
       const detalle = (e as CustomEvent<{ info?: WalletAnunciada; provider?: Eip1193Provider }>).detail;
       if (!detalle?.provider || !detalle.info?.rdns) return;
+      // Si la recién anunciada es la misma que la legacy sintética, se retira el
+      // duplicado para no listar dos veces la misma billetera.
+      const sintetica = anunciados.get(RDNS_INYECTADA);
+      if (sintetica && sintetica.provider === detalle.provider) anunciados.delete(RDNS_INYECTADA);
       anunciados.set(detalle.info.rdns, { info: detalle.info, provider: detalle.provider });
-      setWallets([...anunciados.values()].map((w) => w.info));
-      // Compatibilidad: si no hay window.ethereum (solo la wallet propia) se
-      // adopta, como se hacía antes, para no romper el resto del código.
-      if (!window.ethereum) {
-        window.ethereum = detalle.provider as unknown as Window["ethereum"];
-        setErrorConexion(null);
-      }
+      sincronizar();
     };
+
     window.addEventListener("eip6963:announceProvider", aceptar);
     window.dispatchEvent(new Event("eip6963:requestProvider"));
-    return () => window.removeEventListener("eip6963:announceProvider", aceptar);
-  }, []);
+    // Resolución inmediata: las wallets que anuncian al pedirlo ya están, y la
+    // legacy (window.ethereum) debe listarse YA (si no, el popup no la mostraría
+    // si el usuario pulsa Conectar nada más cargar).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    sincronizar();
+    // Los anuncios tardíos se recogen igualmente; este segundo pase incorpora la
+    // legacy si apareció después del primero.
+    const t = setTimeout(sincronizar, 250);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("eip6963:announceProvider", aceptar);
+    };
+  }, [resolverActivo]);
 
-  // Auto-reconexión al refrescar (RF-16.2)
+  // Auto-reconexión al refrescar (RF-16.2) con la wallet ACTIVA (la elegida).
+  // Si hay varias wallets y ninguna elegida, NO se toca ninguna: la app espera
+  // a que el usuario elija en el popup.
   useEffect(() => {
     const previa = localStorage.getItem(CLAVE_ACCOUNT);
-    if (typeof window !== "undefined" && window.ethereum) {
-      // Detectar de entrada si la wallet está en otra red (aviso temprano).
-      void revisarRed(window.ethereum);
-    }
-    if (previa && typeof window !== "undefined" && window.ethereum) {
-      const bp = new BrowserProvider(window.ethereum);
+    const eth = proveedorActivo;
+    if (!eth) return;
+    // Detectar de entrada si la wallet está en otra red (aviso temprano).
+    void revisarRed(eth);
+    if (previa) {
+      const bp = new BrowserProvider(eth);
       setProvider(bp);
       bp.getSigner().then((s) => {
         setSigner(s);
@@ -233,55 +306,56 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
         setAccount(previa);
       });
     }
-  }, [revisarRed]);
+  }, [proveedorActivo, revisarRed]);
 
-  // Escuchar cambios de cuenta/red de MetaMask
+  // Escuchar cambios de cuenta/red de la wallet ACTIVA (no de window.ethereum).
   useEffect(() => {
-    if (typeof window === "undefined" || !window.ethereum?.on) return;
+    const eth = (proveedorActivo ??
+      (typeof window !== "undefined" ? window.ethereum : null)) as ProveedorConEventos | null;
+    if (typeof window === "undefined" || !eth?.on) return;
     const handleAccounts = (cuentas: unknown[]) => void fijarCuenta(cuentas as string[]);
-    window.ethereum.on("accountsChanged", handleAccounts);
+    eth.on("accountsChanged", handleAccounts);
     return () => {
-      window.ethereum?.removeListener?.("accountsChanged", handleAccounts);
+      eth.removeListener?.("accountsChanged", handleAccounts);
     };
-  }, [fijarCuenta]);
+  }, [proveedorActivo, fijarCuenta]);
 
   // Cambio de red en la wallet: el provider anterior queda inservible, así que
   // se reconstruye y se avisa si la red no es la de la plataforma.
   useEffect(() => {
-    if (typeof window === "undefined" || !window.ethereum?.on) return;
+    const eth = (proveedorActivo ??
+      (typeof window !== "undefined" ? window.ethereum : null)) as ProveedorConEventos | null;
+    if (typeof window === "undefined" || !eth?.on) return;
     const handleChain = (hex: unknown) => {
       const id = Number.parseInt(String(hex), 16);
       setRedActual(id);
       setAviso(id === RED_ESPERADA ? null : "red_incorrecta");
-      const eth = window.ethereum;
-      if (eth) {
-        const bp = new BrowserProvider(eth);
-        setProvider(bp);
-        setSigner(null);
-        void bp.getSigner().then(setSigner).catch(() => setSigner(null));
-        if (account) void fijarCuenta([account], bp);
-      }
+      const bp = new BrowserProvider(eth);
+      setProvider(bp);
+      setSigner(null);
+      void bp.getSigner().then(setSigner).catch(() => setSigner(null));
+      if (account) void fijarCuenta([account], bp);
     };
-    window.ethereum.on("chainChanged", handleChain);
+    eth.on("chainChanged", handleChain);
     return () => {
-      window.ethereum?.removeListener?.("chainChanged", handleChain);
+      eth.removeListener?.("chainChanged", handleChain);
     };
-  }, [account, fijarCuenta]);
+  }, [proveedorActivo, account, fijarCuenta]);
 
   const conectar = useCallback(async (): Promise<string | null> => {
     if (typeof window === "undefined") return null;
-    // Si el usuario eligió una wallet concreta, se usa esa; si no, el
-    // comportamiento de siempre (window.ethereum).
-    const rdnsElegido = typeof window !== "undefined" ? localStorage.getItem(CLAVE_WALLET) : null;
+    // Si el usuario eligió una wallet concreta, se usa esa; si no, la activa
+    // (una sola anunciada) o window.ethereum.
+    const rdnsElegido = localStorage.getItem(CLAVE_WALLET);
     const elegido = rdnsElegido ? anunciados.get(rdnsElegido)?.provider : null;
-    let eth = elegido ?? window.ethereum;
+    let eth = elegido ?? proveedorActivo ?? window.ethereum;
     if (!eth) {
       // Sin extensión ni navegador interno: esperamos un provider EIP-6963
       // (algunas wallets móviles lo anuncian al cargar) antes de rendirnos.
       const anunciado = await aguardarProveedor6963(1200);
       if (anunciado) {
         eth = anunciado;
-        window.ethereum = anunciado as unknown as Window["ethereum"];
+        setProveedorActivo(anunciado);
       } else {
         // Móvil: no hay extensiones → se abre/guía hacia la app de la wallet.
         setErrorConexion(esDispositivoMovil() ? "app_movil" : "sin_wallet");
@@ -314,11 +388,11 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
     } finally {
       setConectando(false);
     }
-  }, [fijarCuenta, revisarRed]);
+  }, [fijarCuenta, revisarRed, proveedorActivo]);
 
   /** Pide a la wallet cambiar a la red esperada; si no la conoce, la agrega. */
   const cambiarDeRed = useCallback(async (): Promise<boolean> => {
-    const eth = typeof window !== "undefined" ? window.ethereum : null;
+    const eth = proveedorActivo ?? (typeof window !== "undefined" ? window.ethereum : null);
     if (!eth?.request) return false;
     const hex = `0x${RED_ESPERADA.toString(16)}`;
     try {
@@ -347,7 +421,7 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
       }
       return false;
     }
-  }, [revisarRed]);
+  }, [revisarRed, proveedorActivo]);
 
   /** Deep link a la app de MetaMask (móvil): abre esta misma dApp en su navegador interno. */
   const abrirEnAppWallet = useCallback(() => {
@@ -361,11 +435,12 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
     setSigner(null);
     setProvider(null);
     localStorage.removeItem(CLAVE_ACCOUNT);
-    // Revoca el permiso eth_accounts en MetaMask: sin esta llamada el próximo
-    // eth_requestAccounts devolvería la cuenta ANTERIOR sin mostrar el selector
-    // de cuentas (bug reportado: "no desconecta / queda la wallet anterior").
+    // Revoca el permiso eth_accounts en la wallet ACTIVA: sin esta llamada el
+    // próximo eth_requestAccounts devolvería la cuenta ANTERIOR sin mostrar el
+    // selector de cuentas (bug reportado: "no desconecta / queda la anterior").
     try {
-      const p = window.ethereum?.request?.({
+      const activo = proveedorActivo ?? (typeof window !== "undefined" ? window.ethereum : null);
+      const p = activo?.request?.({
         method: "wallet_revokePermissions",
         params: [{ eth_accounts: {} }],
       }) as Promise<unknown> | undefined;
@@ -375,13 +450,14 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
     } catch {
       // error síncrono de la wallet: se ignora
     }
-  }, []);
+  }, [proveedorActivo]);
 
   const valor = useMemo<EstadoEthereum>(
     () => ({
       account,
       provider,
       signer,
+      proveedorActivo,
       conectando,
       // Control de acceso: "billetera conectada" = hay cuenta (la auto-reconexión
       // RF-16.2 restaura la cuenta al refrescar). El signer solo se necesita
@@ -400,7 +476,7 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
       abrirEnAppWallet,
       esMovil: esDispositivoMovil(),
     }),
-    [account, provider, signer, conectando, conectar, desconectar, errorConexion, aviso, redActual, cambiarDeRed, abrirEnAppWallet, wallets, walletElegida, elegirWallet]
+    [account, provider, signer, proveedorActivo, conectando, conectar, desconectar, errorConexion, aviso, redActual, cambiarDeRed, abrirEnAppWallet, wallets, walletElegida, elegirWallet]
   );
 
   return <EthereumContext.Provider value={valor}>{children}</EthereumContext.Provider>;

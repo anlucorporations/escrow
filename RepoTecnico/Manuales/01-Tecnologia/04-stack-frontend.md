@@ -83,7 +83,7 @@ Layout de la suite (`web/app/suite/layout.tsx`): barra superior con marca `TrueK
 - Estado simulado de la escalera D28: `const estado: EstadoD28 = "INSCRITO"` con comentario "En una
   integración real el estado proviene del backend (/auth/session + /kyc/status). Aquí se simula
   para demostrar el render por estado de la escalera (D28)" (`dashboard/page.tsx:20-22`).
-- Botón "Conectar MetaMask" cuando no hay cuenta (`dashboard/page.tsx:35-39`).
+- Botón "Conectar billetera" cuando no hay cuenta (`dashboard/page.tsx:35-39`).
 - Visualización de la escalera INSCRITO → VERIFICADO → CERTIFICADO (`dashboard/page.tsx:43-71`).
 - Módulos habilitados/atenuados según estado (Explorar ofertas, Mis truekes — máx. 3 activos
   RF-14.4 —, Reputación, Punto de encuentro) (`dashboard/page.tsx:74-96`).

@@ -435,3 +435,168 @@ entradas: hay que editar la red para cambiar de uno a otro. Queda documentado en
 **Pendiente:** validar los pasos interactivos en la máquina del director (este entorno no
 tiene navegador) y comprobar el selector de billetera con MetaMask y la wallet propia
 instaladas a la vez.
+
+---
+
+## 10. Selector de billetera verificado y desplegado (2026-09-13)
+
+Reporte del director: *«después de instalar la extensión, el proyecto no me permite elegir
+con cuál wallet conectarme»*. Diagnóstico y cierre:
+
+### 10.1 Causa
+
+1. **El frontend desplegado estaba desactualizado.** La revisión en Cloud Run era la imagen
+   `web:release-0f10a88`, **anterior** al commit `0487af8` que introduce el selector
+   EIP-6963. El bundle servido no contenía ni el texto «Elegir billetera» ni ninguna
+   mención a CodeCrypto Wallet.
+2. **Con una sola wallet anunciada el selector se ocultaba** (`wallets.length > 1`) y el
+   botón decía «Conectar MetaMask». Con la extensión como única wallet, la app parecía no
+   aceptarla aunque el flujo interno sí funcionaba.
+3. El descubrimiento EIP-6963 de la extensión **sí era correcto** (`window.codecrypto`,
+   `rdns: io.codecrypto.wallet`), tanto en solitario como junto a MetaMask.
+
+### 10.2 Cambios aplicados
+
+| Archivo | Cambio |
+|---|---|
+| `web/components/ConnectButton.tsx` | El selector «Billetera» se muestra con **una o más** wallets EIP-6963 (antes solo con dos); el botón se rotula con la wallet elegida (`Conectar <wallet> e iniciar sesión`) y por defecto dice «billetera», sin nombrar a MetaMask. |
+| `web/components/SuiteGuard.tsx` | La pantalla de acceso y el aviso «sin wallet» mencionan la extensión **CodeCrypto Wallet** y el selector. |
+| `web/app/page.tsx`, `app/suite/dashboard`, `app/suite/admin` | Textos de conexión sin sesgo MetaMask-only. |
+| `web/lib/manual-data.ts` y `RepoTecnico/Manuales`, `docs/Manuales` | Nomenclatura del botón actualizada en los manuales. |
+| `web/e2e/*` | Aserciones del botón actualizadas. |
+
+### 10.3 Verificación real (Chromium + extensión `dist/` v1.1.0)
+
+Con la extensión cargada desempaquetada y un doble de MetaMask anunciado por EIP-6963:
+
+| Escenario | Resultado |
+|---|---|
+| Solo extensión | Selector visible: `Automática`, `CodeCrypto Wallet`; al elegirla, `window.ethereum.isCodeCrypto === true` y se guarda `io.codecrypto.wallet` |
+| Extensión + MetaMask simulado | Selector: `Automática`, `MetaMask`, `CodeCrypto Wallet` |
+| Conectar | El RPC `eth_requestAccounts` llega al service worker de la extensión (responde según si hay bóveda creada) |
+
+Pruebas del proyecto: **76/76 en verde** (`vitest`), `tsc --noEmit` y build de producción
+correctos. Verificado también contra la **URL pública**.
+
+### 10.4 Despliegue
+
+- Imagen: `southamerica-east1-docker.pkg.dev/truekeate-main/truekeate-repo/web:release-0487af8-wselect`
+  (Cloud Build `07855f7f-1033-4f40-bc71-92bcbb891eed`, SUCCESS).
+- Cloud Run: `truekeate-web` **rev. 00033-zgw**, 100 % del tráfico.
+- Comprobado en vivo (`https://truekeate-web-593453426217.europe-west1.run.app/suite/dashboard`)
+  con la extensión real: selector con `Automática`, `MetaMask`, `CodeCrypto Wallet`.
+
+**Nota:** los cambios están en el árbol de trabajo local; no se han subido a ningún
+repositorio (la imagen se construyó desde el working tree).
+
+---
+
+## 11. Elección de billetera para TODA la sesión (2026-09-13)
+
+Segundo reporte del director: *«en las otras funciones de firmas y autorizaciones se abre
+MetaMask y no la extensión; que al conectar me pida elegir entre las billeteras del
+navegador (MetaMask, Rabby, Backpack, …) incluida la extensión, y que esa elección se use
+durante la sesión»*.
+
+### 11.1 Causa
+
+La conexión respetaba la wallet elegida, pero **las firmas no**:
+
+- `web/lib/sesion.tsx` → `autenticar()` construía el signer desde `window.ethereum`, que
+  seguía siendo MetaMask. El login EIP-191 abría MetaMask aunque se hubiera elegido otra.
+- `firmarAccion()` firmaba con el `signer` del contexto, derivado de un `provider` que en
+  varios caminos (auto-reconexión, `accountsChanged`, `chainChanged`) también nacía de
+  `window.ethereum`.
+- El selector ocultaba la elección: por defecto «Automática» usaba `window.ethereum`, sin
+  obligar a elegir cuando había varias wallets.
+
+### 11.2 Cambios aplicados
+
+| Archivo | Cambio |
+|---|---|
+| `web/lib/ethereum.tsx` | Nuevo **proveedor activo** (`proveedorActivo`) resuelto por rdns elegido; `resolverActivo()` decide entre la wallet elegida, la única anunciada o `window.ethereum`. `window.ethereum` se sincroniza con la elección (`fijarProveedorGlobal`). Eventos (`accountsChanged`/`chainChanged`), reconexión, `revisarRed`, `cambiarDeRed` y `desconectar` usan el proveedor activo. Se añade una entrada sintética para wallets legacy que solo exponen `window.ethereum`. |
+| `web/lib/sesion.tsx` | `autenticar()` y `firmarAccion()` crean el signer desde `proveedorActivo` (la wallet elegida), no desde `window.ethereum`. |
+| `web/components/ConnectButton.tsx` | Con **varias** wallets y sin elección, el botón queda bloqueado con «Elige una billetera» y un aviso; la elección se guarda y gobierna login y firmas. Con una sola wallet se usa automáticamente. |
+| `web/test/firma-wallet.test.tsx` (nuevo) | Regresión: con MetaMask + CodeCrypto, el login y la firma por acción llegan a CodeCrypto y **no** a MetaMask. |
+
+### 11.3 Verificación real (Chromium + extensión v1.1.0)
+
+| Comprobación | Resultado |
+|---|---|
+| Varias wallets, sin elección | Selector «Elige billetera… / MetaMask / CodeCrypto Wallet»; botón deshabilitado |
+| Tras elegir CodeCrypto | `localStorage=truekeate.wallet=io.codecrypto.wallet`, `window.ethereum.isCodeCrypto === true`, botón habilitado |
+| `personal_sign` tras elegir | Llega a **CodeCrypto** (log RPC) y **no** a MetaMask (`false`) |
+
+Pruebas del proyecto: **77/77 en verde** (incluye la nueva regresión), `tsc --noEmit` y
+build de producción correctos.
+
+### 11.4 Despliegue
+
+Nueva imagen y revisión de `truekeate-web` con este segundo incremento (ver §12).
+
+---
+
+## 12. Estado del despliegue tras el segundo incremento (2026-09-13)
+
+- Imagen: `southamerica-east1-docker.pkg.dev/truekeate-main/truekeate-repo/web:release-0487af8-sesion`
+  (Cloud Build `c157de35-ae09-48c5-9145-8808c45cfde4`, SUCCESS).
+- Cloud Run: `truekeate-web` rev. **00034-kjq**, 100 % del tráfico.
+- Verificado en vivo con la extensión real: selector con `MetaMask` y `CodeCrypto Wallet`,
+  elección persistente y firma dirigida a la wallet elegida.
+
+---
+
+## 13. Popup de conexión y cero interferencia (2026-09-13)
+
+Tercer reporte del director: *«que al conectar se despliegue un popup con todas las
+billeteras del navegador, no una opción de selección permanente en la página; y que tras
+conectar, todas las páginas usen esa conexión sin abrir otra ni interferir con las
+demás»*.
+
+### 13.1 Qué cambió
+
+| Archivo | Cambio |
+|---|---|
+| `web/components/ConnectButton.tsx` | Se elimina el `<select>` permanente. El botón abre un **popup** (`role="dialog"`) con todas las billeteras detectadas (icono + nombre), cierre con Escape o fondo, y una llamada atómica `conectarCon(rdns)` que fija la elección y encadena conexión + login. |
+| `web/lib/ethereum.tsx` | `resolverActivo()` ya **no adopta `window.ethereum`** cuando hay varias wallets sin elección (devuelve `null`): la app espera a que el usuario elija. Se elimina la sobreescritura de `window.ethereum` (`fijarProveedorGlobal`), por lo que **no se interfiere con MetaMask ni con ninguna otra wallet**. La auto-reconexión y los eventos usan el `proveedorActivo`. |
+| `web/test/firma-wallet.test.tsx` | Nueva prueba del popup: no hay selector permanente, el diálogo lista las wallets y conecta con la elegida. |
+
+### 13.2 Garantías
+
+1. **Una sola elección por conexión**: el popup aparece al pulsar Conectar; la elección
+   (rdns) se guarda y gobierna login, firma por acción, eventos, red y desconexión.
+2. **Sin selector permanente**: ninguna página muestra un desplegable de billeteras.
+3. **Sin interferencia**: el proyecto nunca escribe `window.ethereum`; con varias
+   billeteras y ninguna elegida no llama a ninguna hasta que el usuario elige.
+4. **Todas las páginas**: `autenticar()` y `firmarAccion()` (`web/lib/sesion.tsx`) crean
+   el signer desde el `proveedorActivo`; no queda ningún camino que abra otra wallet.
+
+### 13.3 Verificación real (Chromium + extensión v1.1.0)
+
+| Comprobación | Resultado |
+|---|---|
+| `<select>` permanente en la página | ausente |
+| Popup al pulsar Conectar | `MetaMask`, `CodeCrypto Wallet` |
+| Tras elegir CodeCrypto | popup cerrado · `truekeate.wallet=io.codecrypto.wallet` |
+| `window.ethereum` | sigue siendo MetaMask (`isMetaMask=true`, `isCodeCrypto=false`) |
+| `eth_requestAccounts` | recibido por **CodeCrypto**; MetaMask **no** lo recibe |
+
+Pruebas: **78/78 en verde** (`vitest`), `tsc --noEmit` y build de producción correctos.
+E2E afectados (`suite.spec`, `desconectar-reconectar.spec`): **12/12 en verde**. Se corrigió
+además un localizador desactualizado de `suite.spec` (la atenuación `opacity-50` vive en la
+`Card`, no en el `div` que envuelve al `h3`).
+
+### 13.4 Despliegue
+
+Nueva imagen y revisión de `truekeate-web` con este tercer incremento (ver §14).
+
+---
+
+## 14. Estado del despliegue tras el tercer incremento (2026-09-13)
+
+- Imagen: `southamerica-east1-docker.pkg.dev/truekeate-main/truekeate-repo/web:release-0487af8-popup2`
+  (Cloud Build `35c76517-bafc-4c28-8db7-4e6a225c694d`, SUCCESS).
+- Cloud Run: `truekeate-web` rev. **00036-c9n**, 100 % del tráfico.
+- Verificado en vivo con la extensión real: popup de selección, sin selector permanente,
+  `window.ethereum` intacto (MetaMask) y **cero** llamadas a MetaMask (`metaCalls: []`),
+  con `eth_requestAccounts` dirigido a CodeCrypto Wallet.

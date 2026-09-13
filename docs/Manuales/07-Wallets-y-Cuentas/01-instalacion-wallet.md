@@ -16,7 +16,7 @@ Resumen de todo lo que necesitas hacer (los detalles están más abajo):
 2. **En el móvil**: instala la app de MetaMask (Google Play o App Store).
 3. **Crea tu billetera** y guarda muy bien la **frase semilla** (12 palabras).
 4. Abre la web de TrueKeate: `https://truekeate-web-593453426217.europe-west1.run.app`
-5. Pulsa el botón **"🔗 Conectar MetaMask e iniciar sesión"** y acepta el
+5. Pulsa el botón **"🔗 Conectar billetera e iniciar sesión"** y acepta el
    permiso para ver tus cuentas.
 
 > Nota importante: esta red es de **pruebas**. El dinero que veas (ETH, BRLT…)
@@ -76,7 +76,7 @@ Descarga la extensión **únicamente** desde:
 
 - Al abrir la extensión debes ver su pantalla con saldo **0 ETH** y el
   selector de red en la parte superior.
-- En la web de TrueKeate, el botón **"🔗 Conectar MetaMask e iniciar sesión"**
+- En la web de TrueKeate, el botón **"🔗 Conectar billetera e iniciar sesión"**
   dejará de mostrar el aviso de "MetaMask no está instalado".
 
 ---
@@ -119,7 +119,7 @@ flowchart TB
     D --> F["Crear o importar la billetera<br/>dentro de la app"]
     E --> G["Abrir la web de TrueKeate<br/>(navegador del PC)"]
     F --> H["Abrir la web de TrueKeate<br/>(navegador interno de MetaMask)"]
-    G --> I["Pulsar: Conectar MetaMask<br/>e iniciar sesión"]
+    G --> I["Pulsar: Conectar billetera<br/>e iniciar sesión"]
     H --> I
     I --> J["MetaMask pide permiso<br/>para ver tus cuentas"]
     J --> K["¡Listo! La web reconoce tu cuenta"]
@@ -217,7 +217,7 @@ flowchart TB
 |---|---|
 | **¿Qué es?** | Una billetera (wallet) es una aplicación que guarda tus claves y firma por ti sin mostrarlas. TrueKeate usa MetaMask: extensión en el PC y app en el móvil. |
 | **¿Para qué sirve?** | Para conectarte a TrueKeate, iniciar sesión firmando un mensaje, autorizar los trueques y ver tus activos de prueba (ETH, BRLT, NFTs). |
-| **Pasos clave** | 1) Instalar MetaMask (PC o móvil). 2) Crear o importar la billetera. 3) Guardar la frase semilla en papel. 4) Abrir la web de TrueKeate y pulsar "Conectar MetaMask e iniciar sesión". 5) Aceptar el permiso para ver cuentas. |
+| **Pasos clave** | 1) Instalar MetaMask (PC o móvil). 2) Crear o importar la billetera. 3) Guardar la frase semilla en papel. 4) Abrir la web de TrueKeate y pulsar "Conectar billetera e iniciar sesión". 5) Aceptar el permiso para ver cuentas. |
 | **Errores comunes** | Descargar extensiones falsas con nombres parecidos · Confundir "conectar" (ver cuentas) con "firmar" o "enviar dinero" · Tener seleccionada otra red y no ver los saldos de prueba · Compartir la frase semilla con un supuesto soporte. |
 | **Consejo de seguridad** | La frase semilla se escribe en papel y no se comparte jamás. En esta red de pruebas solo usa cuentas sin valor real: las claves de las cuentas de prueba son públicas (ver manual `03-cuentas-anvil.md`). |
 

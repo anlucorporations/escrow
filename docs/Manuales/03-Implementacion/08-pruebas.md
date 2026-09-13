@@ -145,7 +145,7 @@ Qué comprueban los 9 casos:
 1. La barra superior muestra @usuario y el logo TrueKeat☑.
 2. La escalera de verificación se ve.
 3. El módulo bloqueado para INSCRITO se ve atenuado.
-4. El botón "Conectar MetaMask" aparece sin sesión.
+4. El botón "Conectar billetera" aparece sin sesión.
 5. La barra inferior con su botón central funciona.
 
 Resultado registrado: **18/18 verdes** (dato reportado en el estado del

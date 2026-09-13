@@ -100,7 +100,7 @@
 ### 4.3 Cobertura funcional E2E
 
 - Landing (RF-14.1): hero/marca, métricas, ventajas, CTA → `/suite/dashboard` (`web/e2e/landing.spec.ts`).
-- Suite (RF-14.2): barra superior `@usuario` (RNF-08.4), escalera D28, gating visual de módulos por estado (RF-14.3), botón Conectar MetaMask sin sesión (RF-16), BottomNav central (`web/e2e/suite.spec.ts`).
+- Suite (RF-14.2): barra superior `@usuario` (RNF-08.4), escalera D28, gating visual de módulos por estado (RF-14.3), botón Conectar billetera sin sesión (RF-16), BottomNav central (`web/e2e/suite.spec.ts`).
 - **Limitación de alcance**: los E2E no ejercitan wallet real (MetaMask no automatizado), ni backend real, ni contratos; son pruebas de UI/estado estático.
 
 ---

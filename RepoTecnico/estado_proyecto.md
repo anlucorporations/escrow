@@ -833,3 +833,29 @@ reiniciar y no se compartía entre instancias de Cloud Run).
   en GCP mantiene MetaMask como wallet y la propia queda como artefacto paralelo de
   prácticas. La bóveda cifrada se conserva como calidad didáctica, ya no como requisito
   bloqueante. Ver §10 de `PROPUESTA_WALLET_CHROME_EXTENSION.md`.
+
+---
+
+## 🆕 Mejora continua de wallet/selector (2026-09-13, dirección)
+
+Instrucción del director: la plataforma debe **aceptar la wallet de la extensión y permitir
+elegir entre todas las billeteras del navegador** (MetaMask, Rabby, Backpack, CodeCrypto
+Wallet, …) al conectar, y usar **esa única conexión** en todas las páginas y firmas, sin
+interferir con las demás. Esto **sustituye** la nota de "la plataforma mantiene MetaMask
+como wallet" anterior.
+
+Tres incrementos implementados, probados y **desplegados en `truekeate-web`**:
+
+| # | Incremento | Resultado |
+|---|---|---|
+| 1 | Selector EIP-6963 de convivencia | El proyecto lista la wallet de la extensión junto a MetaMask. |
+| 2 | Firma con la billetera elegida | `autenticar()` y `firmarAccion()` usan el proveedor activo (no `window.ethereum`); con varias wallets se obliga a elegir. |
+| 3 | Popup de conexión + cero interferencia | El botón abre un **popup** con todas las billeteras (se elimina el `select` permanente). La app **no escribe `window.ethereum`** y no toca ninguna wallet hasta que el usuario elige. |
+
+- **Pruebas:** frontend **78/78** (`vitest`), `tsc --noEmit` limpio, verificación real en
+  Chromium con la extensión cargada (popup, sin selector permanente, `window.ethereum`
+  intacto, `personal_sign`/`eth_requestAccounts` dirigidos a la wallet elegida).
+- **Despliegue actual:** `truekeate-web` rev **00036-c9n** (imagen `web:release-0487af8-popup2`),
+  100 % del tráfico. Ver §§10–14 de `PROPUESTA_WALLET_CHROME_EXTENSION.md`.
+- **Pendiente:** commit/push (requiere orden `/push`) y validación interactiva del director
+  con sus wallets reales (MetaMask, Rabby, Backpack y la extensión) en la URL pública.

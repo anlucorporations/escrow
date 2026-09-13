@@ -143,7 +143,12 @@ test.describe("Desconectar billetera y reconectar con OTRA wallet", () => {
     // del guard: se pulsa el de la pantalla principal (dentro de <main>).
     await page
       .getByRole("main")
-      .getByRole("button", { name: /Conectar MetaMask e iniciar sesión/ })
+      .getByRole("button", { name: /Conectar .+ e iniciar sesión/ })
+      .click();
+    // Popup de selección de billetera: se elige la única detectada (la simulada).
+    await page
+      .getByRole("dialog", { name: "Elige tu billetera" })
+      .getByRole("button", { name: /Billetera del navegador/ })
       .click();
 
     // El login único firma con B (inscrita) → dashboard con la sesión de B

@@ -3,52 +3,144 @@
 // =============================================================================
 // TrueKeate — ConnectButton: conectar la billetera + login único
 // (el enunciado lo pedía como components/ConnectButton.tsx)
-// Flujo (decisión del director): al pulsar se (1) conecta la wallet MetaMask,
-// (2) consulta el estado de inscripción y (3) si está inscrito, pide la ÚNICA
-// firma EIP-191 que emite el token de sesión global. Tras esto, todas las
-// secciones quedan accesibles según el Tipo de Usuario (login con la billetera).
 //
-// Fix (reporte del director): al reconectar con OTRA wallet tras desconectar,
-// el login único podía saltarse porque refrescar()/autenticar() dependían del
-// estado de React, que aún no reflejaba la cuenta recién elegida (en MetaMask
-// real el popup daba tiempo a vaciar el estado; en reconexión inmediata no).
-// Ahora refrescar() recibe la wallet EXPLÍCITA recién conectada y autenticar()
-// crea un provider/signer FRESCO en el momento de firmar (firma con la wallet
-// activa en MetaMask), sin depender del estado de React.
+// Flujo (decisión del director, 2026-09-13): al pulsar el botón se abre un
+// POPUP con TODAS las billeteras detectadas en el navegador (MetaMask, Rabby,
+// Backpack, CodeCrypto Wallet, … vía EIP-6963 + la legacy de window.ethereum).
+// El usuario elige UNA; esa elección (1) conecta la cuenta, (2) consulta el
+// estado de inscripción y (3) si está inscrito, pide la ÚNICA firma EIP-191 que
+// emite el token de sesión global. Después NO queda ningún selector en la
+// página: todas las secciones y firmas usan la billetera conectada, sin tocar
+// `window.ethereum` (cero interferencia con las demás wallets).
 //
-// Avisos al usuario (hallazgo de auditoría): antes, si el usuario cancelaba el
-// popup de MetaMask (código 4001) sólo se escribía en consola y el botón volvía
-// a su estado sin explicar nada. Ahora se muestra el motivo, y si la wallet está
-// en otra red se ofrece cambiarla.
+// Avisos al usuario: si cancela en la wallet (código 4001) se le informa, y si
+// la wallet está en otra red se ofrece cambiarla.
 // =============================================================================
-import { useState } from "react";
-import { useEthereum } from "@/lib/ethereum";
+import { useEffect, useState } from "react";
+import { useEthereum, type WalletAnunciada } from "@/lib/ethereum";
 import { useSesion } from "@/lib/sesion";
 import { Button } from "@/components/Button";
 
+/** Popup de selección de billetera: lista las detectadas en el navegador. */
+function ModalBilleteras({
+  wallets,
+  ocupado,
+  onElegir,
+  onCerrar,
+}: {
+  wallets: WalletAnunciada[];
+  ocupado: boolean;
+  onElegir: (rdns: string) => void;
+  onCerrar: () => void;
+}) {
+  // Cerrar con Escape (accesibilidad del modal).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onCerrar();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onCerrar]);
+
+  return (
+    <div
+      role="presentation"
+      onClick={onCerrar}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-navy-900/60 p-4"
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="titulo-elegir-billetera"
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-sm rounded-card border border-navy-800/10 bg-white p-5 shadow-xl"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <h2
+            id="titulo-elegir-billetera"
+            className="font-display text-lg font-bold text-navy-800"
+          >
+            Elige tu billetera
+          </h2>
+          <button
+            type="button"
+            aria-label="Cerrar"
+            onClick={onCerrar}
+            className="rounded-lg px-2 py-0.5 text-navy-800/50 transition-colors hover:bg-smoke hover:text-navy-800"
+          >
+            ✕
+          </button>
+        </div>
+        <p className="mt-1 text-xs text-navy-800/60">
+          Billeteras detectadas en tu navegador. La que elijas se usará para
+          iniciar sesión y firmar tus acciones; las demás no se tocan.
+        </p>
+        <ul className="mt-4 flex flex-col gap-2">
+          {wallets.map((w) => (
+            <li key={w.rdns}>
+              <button
+                type="button"
+                disabled={ocupado}
+                onClick={() => onElegir(w.rdns)}
+                className="flex w-full items-center gap-3 rounded-xl border border-navy-800/10 px-3 py-2 text-left text-sm text-navy-800 transition-colors hover:border-teal-500 hover:bg-smoke disabled:opacity-60"
+              >
+                {w.icon ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={w.icon} alt="" width={24} height={24} className="h-6 w-6 rounded" />
+                ) : (
+                  <span aria-hidden className="text-lg">
+                    👛
+                  </span>
+                )}
+                <span className="font-medium">{w.name}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+        {ocupado && (
+          <p className="mt-3 text-center text-xs text-navy-800/60">Conectando…</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function ConnectButton({ className }: { className?: string }) {
-  const { conectar, conectando, aviso, cambiarDeRed, redEsperada, wallets, walletElegida, elegirWallet } =
+  const { conectar, conectando, aviso, cambiarDeRed, redEsperada, wallets, elegirWallet } =
     useEthereum();
   const { autenticar, autenticando, refrescar } = useSesion();
   const [ocupado, setOcupado] = useState(false);
   const [cambiandoRed, setCambiandoRed] = useState(false);
+  const [modalAbierto, setModalAbierto] = useState(false);
 
   const cargando = conectando || autenticando || ocupado;
 
-  async function onClick() {
+  /** Conecta con la billetera elegida (rdns) y encadena el login único.
+   *  `rdns=null` = camino directo cuando no hay ninguna billetera que elegir. */
+  async function conectarCon(rdns: string | null) {
     setOcupado(true);
+    setModalAbierto(false);
     try {
+      if (rdns) elegirWallet(rdns);
       const cuenta = await conectar();
       if (!cuenta) return;
-      // refrescar(wallet) consulta con la wallet EXPLÍCITA recién conectada
-      // (no depende del closure `acceso` ni de que React ya haya propagado la
-      // cuenta). Devuelve el estado consultado para encadenar el login único.
+      // refrescar(wallet) consulta con la wallet EXPLÍCITA recién conectada.
       const estado = await refrescar(cuenta.toLowerCase());
       // Si la wallet ya está inscrita, se firma una vez (login único).
       if (estado.fase === "inscrito") await autenticar();
     } finally {
       setOcupado(false);
     }
+  }
+
+  function onClick() {
+    // Sin billeteras detectadas se intenta el camino directo (móvil / sin
+    // extensión), que muestra el aviso correspondiente si no hay ninguna.
+    if (wallets.length === 0) {
+      void conectarCon(null);
+      return;
+    }
+    setModalAbierto(true);
   }
 
   async function onCambiarRed() {
@@ -62,28 +154,8 @@ export function ConnectButton({ className }: { className?: string }) {
 
   return (
     <div className="flex flex-col items-center gap-2">
-      {/* Con más de una wallet instalada (p. ej. MetaMask y la propia) el
-          usuario elige con cuál firmar; la elección se recuerda. */}
-      {wallets.length > 1 && (
-        <label className="flex items-center gap-2 text-xs text-navy-800/70">
-          <span>Billetera</span>
-          <select
-            aria-label="Elegir billetera"
-            value={walletElegida ?? ""}
-            onChange={(e) => elegirWallet(e.target.value)}
-            className="rounded-xl border border-navy-800/15 bg-white px-2 py-1 text-xs text-navy-800 outline-none focus:border-teal-500"
-          >
-            {!walletElegida && <option value="">Automática</option>}
-            {wallets.map((w) => (
-              <option key={w.rdns} value={w.rdns}>
-                {w.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      )}
-      <Button onClick={() => void onClick()} disabled={cargando} className={className}>
-        {cargando ? "Conectando…" : "🔗 Conectar MetaMask e iniciar sesión"}
+      <Button onClick={onClick} disabled={cargando} className={className}>
+        {cargando ? "Conectando…" : "🔗 Conectar billetera e iniciar sesión"}
       </Button>
 
       {aviso === "rechazado" && (
@@ -101,6 +173,15 @@ export function ConnectButton({ className }: { className?: string }) {
             {cambiandoRed ? "Cambiando…" : `Cambiar a la red ${redEsperada}`}
           </Button>
         </div>
+      )}
+
+      {modalAbierto && (
+        <ModalBilleteras
+          wallets={wallets}
+          ocupado={cargando}
+          onElegir={(rdns) => void conectarCon(rdns)}
+          onCerrar={() => setModalAbierto(false)}
+        />
       )}
     </div>
   );

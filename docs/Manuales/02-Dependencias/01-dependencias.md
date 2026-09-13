@@ -88,7 +88,7 @@ de peticiones por minuto para saturar la app, este freno corta el abuso.
 | Next.js | 16.3.4 | El esqueleto de la web |
 | React | 19.2.8 | Las pantallas |
 | react-dom | 19.2.8 | Dibujar las pantallas |
-| ethers | 6.17.0 | Conectar MetaMask y contratos |
+| ethers | 6.17.0 | Conectar billetera y contratos |
 
 ### 5.2 Piezas de desarrollo (solo para quien construye)
 

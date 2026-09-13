@@ -172,8 +172,9 @@ describe("red de la wallet (chainChanged)", () => {
       screen.getByText("conectar").click();
     });
     await waitFor(() => expect(leer("account")).toBe(CUENTA));
+    // revisarRed() se resuelve después de fijar la cuenta: se espera el chainId.
+    await waitFor(() => expect(leer("red")).toBe("31337"));
     expect(leer("aviso")).toBe("ninguno");
-    expect(leer("red")).toBe("31337");
   });
 
   test("conectar en otra red avisa al usuario", async () => {

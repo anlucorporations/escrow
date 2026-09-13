@@ -33,7 +33,7 @@ Para empezar a usar la app en 5 minutos:
 ```mermaid
 flowchart LR
     L["Página principal<br/>(landing pública)"] -->|"Comenzar a truequear"| D["Panel personal<br/>(dashboard)"]
-    D -->|"Conectar MetaMask"| W["Billetera conectada"]
+    D -->|"Conectar billetera"| W["Billetera conectada"]
     W --> N["Nivel de la escalera"]
     N -->|"INSCRITO"| V1["Solo ver catálogo<br/>(módulos atenuados)"]
     N -->|"VERIFICADO"| V2["Crear trueques<br/>(máx. 3 activos)"]
@@ -83,7 +83,7 @@ Es la única pantalla de la zona privada que ya está **totalmente funcional**.
 
 ### 4.1 Qué hace
 
-1. Muestra un botón **"Conectar MetaMask"** si no tienes la billetera conectada.
+1. Muestra un botón **"Conectar billetera"** si no tienes la billetera conectada.
 2. Al conectar, muestra tu **nivel de la escalera** (INSCRITO → VERIFICADO → CERTIFICADO).
 3. Activa o atenúa los módulos según tu nivel:
    - Explorar ofertas
@@ -152,7 +152,7 @@ flowchart TB
 
 ## 6. Conectar la billetera: cómo funciona
 
-Cuando pulsas "Conectar MetaMask":
+Cuando pulsas "Conectar billetera":
 
 1. La app pide permiso a MetaMask (aparece una ventanita de MetaMask).
 2. Tú aceptas. MetaMask guarda en la app la dirección de tu cuenta.

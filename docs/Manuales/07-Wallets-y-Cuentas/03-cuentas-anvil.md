@@ -22,7 +22,7 @@ Ejemplo: quieres entrar en la web como **Ana** (cuenta 2).
 3. Deja el *Tipo* en **Clave privada**, pega la clave y pulsa **Importar**.
 4. Comprueba que la dirección nueva coincide con la de Ana:
    `0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC`
-5. Abre la web de TrueKeate y pulsa **"🔗 Conectar MetaMask e iniciar sesión"**:
+5. Abre la web de TrueKeate y pulsa **"🔗 Conectar billetera e iniciar sesión"**:
    ahora la plataforma te reconoce como Ana.
 
 > Si prefieres importar todas las cuentas de golpe, puedes importar en MetaMask
