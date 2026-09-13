@@ -935,6 +935,9 @@ nativa** al proyecto.
     + QR de recepción; sin proveedor on-ramp, D-NW-2). **Cambiar**: swap ERC-20→ERC-20 contra
     un router compatible **Uniswap V2** indicado por el usuario, con **cotización**
     (`getAmountsOut`) y flujo **aprobar → intercambiar** (`eth_sendTransaction`).
-  - **Pendiente:** prueba interactiva del director con sus wallets reales.
+  - **Pruebas (Fase 4):** checklist E2E de **51 casos** y plantilla de informe en
+    `RepoTecnico/pruebas/checklist_wallet_nativa.md` e
+    `RepoTecnico/pruebas/INFORME_WALLET_NATIVA.md`.
+  - **Pendiente:** ejecutar la prueba interactiva con wallets reales y registrar el informe.
 - **Decisión (D-NW-5):** se **mantiene «CodeCrypto Wallet»** como nombre de producto; la
   identidad visual es la de TrueKeate y manifest/EIP-6963 quedan intactos.
