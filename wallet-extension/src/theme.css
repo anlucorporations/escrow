@@ -692,3 +692,72 @@ code, .tk-mono {
   color: rgba(26, 43, 76, 0.55);
   text-transform: uppercase;
 }
+
+/* NFT: colecciones y tarjetas */
+.tk-nft {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tk-coleccion {
+  border: 1px solid rgba(26, 43, 76, 0.1);
+  border-radius: 12px;
+  padding: 8px 10px;
+  background: var(--white);
+}
+
+.tk-coleccion__cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tk-nft__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.tk-nft__tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border: 1px solid rgba(26, 43, 76, 0.08);
+  border-radius: 10px;
+  padding: 5px;
+  background: var(--smoke);
+}
+
+.tk-nft__imagen {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--white);
+  font-size: 22px;
+}
+
+.tk-nft__imagen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tk-nft__nombre {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--navy-800);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tk-nft__id {
+  font-size: 9px;
+  color: rgba(26, 43, 76, 0.55);
+}

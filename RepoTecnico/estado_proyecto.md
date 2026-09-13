@@ -910,7 +910,10 @@ nativa** al proyecto.
   - **C2 (Actividad) ✅** — pestaña **Actividad real**: movimientos ERC-20 de entrada/salida
     de los últimos 5.000 bloques vía `eth_getLogs` (método de solo lectura añadido al
     background) con detalle desplegable (hash, token, de/para, valor, bloque).
-  - **Pendiente C1/C2:** **Comprar/Cambiar** (placeholder D-NW-2) y **NFT** real; luego M5
-    (modos de vista) y M7 (instalación nativa desde la web).
+  - **C2 (NFT) ✅** — pestaña **NFT real**: colecciones ERC-721 que el usuario añade, con
+    `balanceOf` + `tokenOfOwnerByIndex` (Enumerable) + `tokenURI` y metadata (JSON/imagen,
+    `ipfs://` → pasarela); aviso para colecciones sin Enumerable.
+  - **Pendiente C1/C2:** **Comprar/Cambiar** (placeholder D-NW-2); luego M5 (modos de vista)
+    y M7 (instalación nativa desde la web).
 - **Decisión (D-NW-5):** se **mantiene «CodeCrypto Wallet»** como nombre de producto; la
   identidad visual es la de TrueKeate y manifest/EIP-6963 quedan intactos.

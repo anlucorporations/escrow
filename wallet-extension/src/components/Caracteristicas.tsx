@@ -7,6 +7,7 @@
 import { useState } from 'react'
 import { Tokens } from './Tokens'
 import { Actividad } from './Actividad'
+import { NFT } from './NFT'
 
 type Pestana = 'tokens' | 'defi' | 'nft' | 'actividad'
 
@@ -42,11 +43,7 @@ export function Caracteristicas({ account, chainId }: { account: string; chainId
             DeFi: placeholder (D-NW-2); se conecta en un ciclo posterior.
           </p>
         )}
-        {pestana === 'nft' && (
-          <p className="tk-muted" style={{ fontSize: 11 }}>
-            NFT: la colección de la billetera llega en el ciclo C2.
-          </p>
-        )}
+        {pestana === 'nft' && <NFT account={account} chainId={chainId} />}
         {pestana === 'actividad' && <Actividad account={account} chainId={chainId} />}
       </div>
     </div>
