@@ -947,5 +947,7 @@ nativa** al proyecto.
     no por `sender.tab`) y la etiqueta EIP-191 vs EIP-712 en la ventana de firma.
   - **Pendiente manual:** TC-WN-03, 08, 17, 37, 43, 49, 50 y 51 (panel lateral del
     navegador, permisos de host, autobloqueo…).
+  - **CIERRE:** informe final en `RepoTecnico/INFORME_CIERRE_WALLET_NATIVA.md` (alcance,
+    matriz RF-WN-01..27, decisiones D-NW-1..5, correcciones, despliegues y evidencia **40/40**).
 - **Decisión (D-NW-5):** se **mantiene «CodeCrypto Wallet»** como nombre de producto; la
   identidad visual es la de TrueKeate y manifest/EIP-6963 quedan intactos.
