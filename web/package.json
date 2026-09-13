@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:wallet": "playwright test --config playwright.wallet.config.ts"
   },
   "dependencies": {
     "ethers": "^6.17.0",

@@ -937,7 +937,9 @@ nativa** al proyecto.
     (`getAmountsOut`) y flujo **aprobar → intercambiar** (`eth_sendTransaction`).
   - **Pruebas (Fase 4):** checklist E2E de **51 casos** y plantilla de informe en
     `RepoTecnico/pruebas/checklist_wallet_nativa.md` e
-    `RepoTecnico/pruebas/INFORME_WALLET_NATIVA.md`.
-  - **Pendiente:** ejecutar la prueba interactiva con wallets reales y registrar el informe.
+    `RepoTecnico/pruebas/INFORME_WALLET_NATIVA.md`. Suite **automatizada** en
+    `web/e2e-wallet/wallet-nativa.spec.ts` (`npm run test:wallet`): **8 tests** que cubren
+    TC-WN-01/02/04/05/06/07/09/13/39/40 → **8/8 en verde**.
+  - **Pendiente:** ejecutar los casos manuales con wallets reales y registrar el informe.
 - **Decisión (D-NW-5):** se **mantiene «CodeCrypto Wallet»** como nombre de producto; la
   identidad visual es la de TrueKeate y manifest/EIP-6963 quedan intactos.

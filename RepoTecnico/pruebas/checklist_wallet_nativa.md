@@ -13,6 +13,11 @@
 Convención: `TC-WN-nn` = caso de prueba. **Tipo**: `A` automático / `M` manual.
 **Resultado**: ✅ pasa · ❌ falla · ⚠️ parcial. Registrar en la tabla final.
 
+> **Cobertura automatizada**: el spec `web/e2e-wallet/wallet-nativa.spec.ts`
+> (`npm run test:wallet` desde `web/`, requiere `wallet-extension/dist` construido)
+> automatiza **TC-WN-01, 02, 04, 05, 06, 07, 09, 13, 39 y 40**. El resto son manuales
+> (firma, KYC, datos con contratos reales, cambio de clave…).
+
 ---
 
 ## 0. Preparación del entorno
@@ -42,7 +47,7 @@ Convención: `TC-WN-nn` = caso de prueba. **Tipo**: `A` automático / `M` manual
 | TC-WN-03 | M | Carga en Chrome | Cargar la carpeta descomprimida | La extensión aparece como **CodeCrypto Wallet 1.1.0** sin errores |
 | TC-WN-04 | A | Detección en la web (sin extensión) | Abrir la portada en un perfil sin la extensión | Botón **🧩 Instalar wallet nativa** |
 | TC-WN-05 | A | Detección en la web (con extensión) | Con la extensión cargada, recargar la portada | Botón **✅ Wallet nativa instalada**; el popup la detecta |
-| TC-WN-06 | M | Barra de la suite | Entrar a `/suite/dashboard` | El botón de wallet nativa aparece en la barra superior (PC) |
+| TC-WN-06 | A | Barra de la suite | Entrar a `/suite/dashboard` | El botón de wallet nativa aparece en la barra superior (PC) |
 
 ---
 
@@ -52,7 +57,7 @@ Convención: `TC-WN-nn` = caso de prueba. **Tipo**: `A` automático / `M` manual
 |---|---|---|---|---|
 | TC-WN-07 | A | Un solo selector, tipo popup | Pulsar **Conectar billetera e iniciar sesión** | Se abre un **modal** con las wallets detectadas; **no** hay `<select>` permanente en la página |
 | TC-WN-08 | M | Elección recordada | Elegir *CodeCrypto Wallet* y conectar | Conecta; la elección se conserva al recargar |
-| TC-WN-09 | M | No interfiere con MetaMask | Con MetaMask + CodeCrypto instaladas, elegir CodeCrypto | La firma la pide **CodeCrypto**; `window.ethereum` sigue siendo MetaMask; MetaMask no recibe `eth_requestAccounts`/`personal_sign` |
+| TC-WN-09 | A | No interfiere con MetaMask | Con MetaMask + CodeCrypto instaladas, elegir CodeCrypto | La firma la pide **CodeCrypto**; `window.ethereum` sigue siendo MetaMask; MetaMask no recibe `eth_requestAccounts`/`personal_sign` |
 | TC-WN-10 | M | Login único (EIP-191) | Con una cuenta inscrita, conectar | **Una** firma `TrueKeate: iniciar sesión`; token emitido; acceso a la suite |
 | TC-WN-11 | M | Firma por acción | Publicar/custodiar/valorar | Cada acción firma con la **misma** billetera conectada (una firma por acción) |
 | TC-WN-12 | M | Desconexión | Menú de usuario → Desconectar | Se limpia la sesión y la autorización del sitio en la wallet |
@@ -63,7 +68,7 @@ Convención: `TC-WN-nn` = caso de prueba. **Tipo**: `A` automático / `M` manual
 
 | ID | Tipo | Objetivo | Pasos | Resultado esperado |
 |---|---|---|---|---|
-| TC-WN-13 | M | Identidad en el popup | Abrir el popup | Cabecera con el logo `logoIntegral`, título **CodeCrypto Wallet** y colores TrueKeate |
+| TC-WN-13 | A | Identidad en el popup | Abrir el popup | Cabecera con el logo `logoIntegral`, título **CodeCrypto Wallet** y colores TrueKeate |
 | TC-WN-14 | M | Cabecera en conexión | Provocar una conexión desde una dApp | Cabecera con logo + **Solicitud de autorización** + dApp solicitante |
 | TC-WN-15 | M | Cabecera en firma | Provocar `personal_sign` | Cabecera con logo + **Solicitud de firma** |
 | TC-WN-16 | M | EIP-712 estructurado | Provocar `eth_signTypedData_v4` | Se muestran: **billetera firmante** (abreviada), **qué se firma** (dominio + primaryType), **valor** si aplica, **red** y **fecha/hora**; JSON completo en desplegable |
@@ -120,8 +125,8 @@ Convención: `TC-WN-nn` = caso de prueba. **Tipo**: `A` automático / `M` manual
 |---|---|---|---|---|
 | TC-WN-37 | M | Panel lateral | Configuración → **Panel lateral** | Se abre el panel lateral con la UI de la wallet |
 | TC-WN-38 | M | Pestaña | Configuración → **Pestaña** | Se abre `index.html` en una pestaña nueva |
-| TC-WN-39 | M | Flotante | Configuración → **Flotante**; abrir una dApp | Aparece el botón 🔐 y el panel flotante; al cambiar a otro modo desaparece |
-| TC-WN-40 | M | Modo recordado | Cerrar y reabrir el popup | El modo elegido sigue seleccionado |
+| TC-WN-39 | A | Flotante | Configuración → **Flotante**; abrir una dApp | Aparece el botón 🔐 y el panel flotante; al cambiar a otro modo desaparece |
+| TC-WN-40 | A | Modo recordado | Cerrar y reabrir el popup | El modo elegido sigue seleccionado |
 
 ## I. Configuración (M6)
 
