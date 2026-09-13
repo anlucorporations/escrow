@@ -126,8 +126,9 @@ export function ConnectButton({ className }: { className?: string }) {
       if (!cuenta) return;
       // refrescar(wallet) consulta con la wallet EXPLÍCITA recién conectada.
       const estado = await refrescar(cuenta.toLowerCase());
-      // Si la wallet ya está inscrita, se firma una vez (login único).
-      if (estado.fase === "inscrito") await autenticar();
+      // Si la wallet ya está inscrita, se firma una vez (login único). Se le
+      // pasa la cuenta recién conectada para que firme ESA (no la del render).
+      if (estado.fase === "inscrito") await autenticar(cuenta);
     } finally {
       setOcupado(false);
     }

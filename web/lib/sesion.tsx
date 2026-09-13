@@ -34,6 +34,7 @@ import {
   consultarEstado,
   inscribirse,
   iniciarSesion,
+  MENSAJE_SESION,
   type UsuarioPublico,
 } from "./api";
 
@@ -50,8 +51,9 @@ export interface Sesion {
   /** La wallet conectada es el OWNER (dueño on-chain del SociosRegistry): es la
    *  única con acceso a la sección Sistemas (/suite/admin, RF-13.1). */
   esOwner: boolean;
-  /** Autentica (firma EIP-191) y guarda el token global. */
-  autenticar: () => Promise<boolean>;
+  /** Autentica (firma EIP-191) y guarda el token global. `wallet` permite
+   *  firmar con la cuenta EXACTA recién conectada sin depender del render. */
+  autenticar: (wallet?: string) => Promise<boolean>;
   /** Cierra la sesión (borra el token). */
   cerrarSesion: () => void;
   /** Fuerza una re-consulta del estado de inscripción de la wallet actual.
@@ -77,7 +79,7 @@ const CLAVE_TOKEN = "truekeate.token";
 const CLAVE_TOKEN_WALLET = "truekeate.token.wallet";
 
 export function SesionProvider({ children }: { children: ReactNode }) {
-  const { account, conectado, signer, proveedorActivo } = useEthereum();
+  const { account, conectado, signer, obtenerProveedorActivo } = useEthereum();
   const [acceso, setAcceso] = useState<EstadoAcceso>({ fase: "sinWallet" });
   // ¿La cuenta conectada es el Owner? (lo devuelve /auth/estado y /auth/session)
   const [esOwner, setEsOwner] = useState(false);
@@ -151,19 +153,24 @@ export function SesionProvider({ children }: { children: ReactNode }) {
   }, [account, conectado, refrescar]);
 
   // Firma EIP-191 única → POST /auth/session → token global (login con wallet).
-  const autenticar = useCallback(async (): Promise<boolean> => {
+  const autenticar = useCallback(async (wallet?: string): Promise<boolean> => {
     setAutenticando(true);
     try {
-      // Provider/signer FRESCOS creados desde la wallet ACTIVA (la que el
-      // usuario eligió en el popup de conexión), NO desde window.ethereum: si el
-      // usuario eligió CodeCrypto Wallet u otra, el login debe abrir ESA
-      // billetera y no MetaMask.
-      const eth = proveedorActivo ?? (typeof window !== "undefined" ? window.ethereum : null);
-      if (!eth) return false;
+      // Proveedor resuelto EN ESTE MOMENTO (no en el render): así el login usa
+      // SIEMPRE la billetera conectada, aunque el estado de React no se haya
+      // propagado todavía (reconexión inmediata tras elegir en el popup).
+      const eth = obtenerProveedorActivo();
+      if (!eth) {
+        console.error("[sesion] no hay billetera activa para iniciar sesión");
+        return false;
+      }
+      // Se firma con la CUENTA CONECTADA (no con la primera de la billetera):
+      // el backend recupera el firmante y debe coincidir con la wallet inscrita.
+      const objetivo = (wallet ?? account ?? "").toLowerCase();
       const bp = new BrowserProvider(eth);
-      const signerFresco = await bp.getSigner();
+      const signerFresco = objetivo ? await bp.getSigner(objetivo) : await bp.getSigner();
       const walletFirmante = (await signerFresco.getAddress()).toLowerCase();
-      const firma = await signerFresco.signMessage("TrueKeate: iniciar sesión");
+      const firma = await signerFresco.signMessage(MENSAJE_SESION);
       const sesion = await iniciarSesion(firma);
       setToken(sesion.token);
       setEsOwner(Boolean(sesion.esOwner));
@@ -176,16 +183,18 @@ export function SesionProvider({ children }: { children: ReactNode }) {
     } finally {
       setAutenticando(false);
     }
-  }, [proveedorActivo]);
+  }, [account, obtenerProveedorActivo]);
 
-  // Firma por acción: usa un signer FRESCO de la wallet ACTIVA (EIP-191), para
-  // que cada acción abra la billetera elegida y no MetaMask.
+  // Firma por acción: usa un signer FRESCO de la billetera ACTIVA (EIP-191), con
+  // la cuenta conectada, para que cada acción abra la billetera elegida.
   const firmarAccion = useCallback(
     async (accion: string): Promise<FirmaAccion | null> => {
-      if (proveedorActivo) {
+      const eth = obtenerProveedorActivo();
+      if (eth) {
         try {
-          const bp = new BrowserProvider(proveedorActivo);
-          const signerActivo = await bp.getSigner();
+          const bp = new BrowserProvider(eth);
+          const objetivo = (account ?? "").toLowerCase();
+          const signerActivo = objetivo ? await bp.getSigner(objetivo) : await bp.getSigner();
           return await firmarConSigner(signerActivo, accion);
         } catch {
           /* si falla, se intenta con el signer del contexto */
@@ -193,7 +202,7 @@ export function SesionProvider({ children }: { children: ReactNode }) {
       }
       return firmarConSigner(signer, accion);
     },
-    [proveedorActivo, signer]
+    [account, obtenerProveedorActivo, signer]
   );
 
   const cerrarSesion = useCallback(() => {

@@ -96,6 +96,7 @@ function PantallaConectar() {
  *  que emite el token de sesión global. Una sola vez; luego todas las secciones. */
 function PantallaIniciarSesion() {
   const { token, autenticar, autenticando } = useSesion();
+  const { account } = useEthereum();
   if (token) return null; // ya autenticado (el guard re-renderiza al cambiar token)
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-4 py-16 text-center">
@@ -110,7 +111,7 @@ function PantallaIniciarSesion() {
           al navegar.
         </p>
         <div className="mt-6 flex justify-center">
-          <Button onClick={() => void autenticar()} disabled={autenticando}>
+          <Button onClick={() => void autenticar(account ?? undefined)} disabled={autenticando}>
             {autenticando ? "Firmando…" : "🔏 Iniciar sesión (una firma)"}
           </Button>
         </div>

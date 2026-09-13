@@ -53,6 +53,10 @@ export interface EstadoEthereum {
    *  Es la fuente de verdad para firmar, escuchar eventos y cambiar de red;
    *  window.ethereum solo se usa como último recurso. */
   proveedorActivo: Eip1193Provider | null;
+  /** Devuelve, EN EL MOMENTO DE LA LLAMADA, el proveedor de la billetera
+   *  elegida (o la única disponible). Evita closures obsoletos al firmar: la
+   *  elección se lee del almacenamiento, no del render anterior. */
+  obtenerProveedorActivo: () => Eip1193Provider | null;
   conectando: boolean;
   conectado: boolean;
   conectar: () => Promise<string | null>;
@@ -458,6 +462,7 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
       provider,
       signer,
       proveedorActivo,
+      obtenerProveedorActivo: resolverActivo,
       conectando,
       // Control de acceso: "billetera conectada" = hay cuenta (la auto-reconexión
       // RF-16.2 restaura la cuenta al refrescar). El signer solo se necesita
@@ -476,7 +481,7 @@ export function EthereumProvider({ children }: { children: ReactNode }) {
       abrirEnAppWallet,
       esMovil: esDispositivoMovil(),
     }),
-    [account, provider, signer, proveedorActivo, conectando, conectar, desconectar, errorConexion, aviso, redActual, cambiarDeRed, abrirEnAppWallet, wallets, walletElegida, elegirWallet]
+    [account, provider, signer, proveedorActivo, resolverActivo, conectando, conectar, desconectar, errorConexion, aviso, redActual, cambiarDeRed, abrirEnAppWallet, wallets, walletElegida, elegirWallet]
   );
 
   return <EthereumContext.Provider value={valor}>{children}</EthereumContext.Provider>;

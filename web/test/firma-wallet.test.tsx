@@ -10,6 +10,7 @@ import { SesionProvider, useSesion } from "../lib/sesion";
 import { ConnectButton } from "../components/ConnectButton";
 
 vi.mock("@/lib/api", () => ({
+  MENSAJE_SESION: "TrueKeate: iniciar sesión",
   consultarEstado: vi.fn(async (wallet: string) => ({
     inscrito: true,
     esOwner: false,
@@ -155,5 +156,9 @@ describe("popup de selección de billetera al conectar", () => {
     });
     await waitFor(() => expect(code.metodos).toContain("eth_requestAccounts"));
     expect(meta.metodos).not.toContain("eth_requestAccounts");
+    // El login único automático tras conectar debe firmar con la billetera
+    // elegida (regresión: antes firmaba con la closure obsoleta / window.ethereum).
+    await waitFor(() => expect(code.metodos).toContain("personal_sign"));
+    expect(meta.metodos).not.toContain("personal_sign");
   });
 });

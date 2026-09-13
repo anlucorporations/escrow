@@ -600,3 +600,47 @@ Nueva imagen y revisión de `truekeate-web` con este tercer incremento (ver §14
 - Verificado en vivo con la extensión real: popup de selección, sin selector permanente,
   `window.ethereum` intacto (MetaMask) y **cero** llamadas a MetaMask (`metaCalls: []`),
   con `eth_requestAccounts` dirigido a CodeCrypto Wallet.
+
+---
+
+## 15. El login no reconocía la billetera conectada (2026-09-13)
+
+Reporte del director: *«el botón de iniciar sesión no reconoce la billetera conectada»*.
+
+### 15.1 Causa
+
+`autenticar()` resolvía la billetera de dos formas frágiles:
+
+1. **Closure obsoleta**: `ConnectButton` llamaba a `autenticar` **inmediatamente** después
+   de `elegirWallet(rdns)`, pero `autenticar` se había creado en el render ANTERIOR (con
+   `proveedorActivo = null`). Caía al respaldo `window.ethereum` → **firmaba con MetaMask**.
+   El backend recuperaba la dirección de MetaMask, que no es la wallet conectada/inscrita →
+   `usuario_inexistente` (o el token quedaba ligado a otra cuenta).
+2. **Cuenta implícita**: `bp.getSigner()` sin dirección usa **la primera cuenta** de la
+   wallet, no necesariamente la conectada.
+
+### 15.2 Corrección
+
+- `web/lib/ethereum.tsx`: nuevo `obtenerProveedorActivo()` que resuelve la billetera
+  **en el momento de la llamada** (lee la elección del almacenamiento + anuncios), no del
+  render.
+- `web/lib/sesion.tsx`: `autenticar(wallet?)` y `firmarAccion()` usan ese resolvedor y
+  firman con la **cuenta conectada** (`bp.getSigner(account)`). La firma usa la constante
+  compartida `MENSAJE_SESION` (exportada en `web/lib/api.ts`).
+- `web/components/ConnectButton.tsx` y `web/components/SuiteGuard.tsx`: pasan la cuenta
+  conectada a `autenticar(cuenta)`.
+- `web/test/firma-wallet.test.tsx`: la prueba del popup ahora exige que el **login
+  automático** firme con CodeCrypto (`personal_sign` en CodeCrypto y **no** en MetaMask).
+
+### 15.3 Verificación
+
+- Pruebas: **78/78** (`vitest`), `tsc --noEmit` limpio, build de producción correcto.
+- Chromium real (extensión v1.1.0): tras elegir CodeCrypto, `metaCalls: []` y
+  `eth_requestAccounts` en CodeCrypto; la regresión de login exige `personal_sign` en
+  CodeCrypto y ausencia en MetaMask.
+
+### 15.4 Despliegue
+
+- Imagen: `southamerica-east1-docker.pkg.dev/truekeate-main/truekeate-repo/web:release-0487af8-login`
+  (Cloud Build `adedbcab-e6da-48bf-9631-4389b5b3a708`, SUCCESS).
+- Cloud Run: `truekeate-web` rev. **00037-gwq**, 100 % del tráfico.

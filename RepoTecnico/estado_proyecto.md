@@ -855,8 +855,12 @@ Tres incrementos implementados, probados y **desplegados en `truekeate-web`**:
 - **Pruebas:** frontend **78/78** (`vitest`), `tsc --noEmit` limpio, verificación real en
   Chromium con la extensión cargada (popup, sin selector permanente, `window.ethereum`
   intacto, `personal_sign`/`eth_requestAccounts` dirigidos a la wallet elegida).
-- **Despliegue actual:** `truekeate-web` rev **00036-c9n** (imagen `web:release-0487af8-popup2`),
-  100 % del tráfico. Ver §§10–14 de `PROPUESTA_WALLET_CHROME_EXTENSION.md`.
+- **Despliegue actual:** `truekeate-web` rev **00037-gwq** (imagen `web:release-0487af8-login`),
+  100 % del tráfico. Ver §§10–15 de `PROPUESTA_WALLET_CHROME_EXTENSION.md`.
+- **Fix login (2026-09-13):** `autenticar()` resolvía la billetera desde un closure
+  obsoleto (o la primera cuenta) y podía firmar con MetaMask en vez de la conectada; ahora
+  resuelve el proveedor activo en el momento de la llamada y firma con la cuenta conectada
+  (ver §15 de la propuesta).
 - **Repositorios:** cambios **subidos el 2026-09-13 a los 3 remotos** (`gitlab`, `github`,
   `codecrypto`) **solo en la rama `escrow-dsh-GCP`** (commit `e44020c`). `main` no se tocó.
   Trabajo vigente de esta mejora: rama `escrow-dsh-GCP`.

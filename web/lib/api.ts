@@ -94,7 +94,7 @@ export async function obtenerCatalogo(): Promise<ArticuloCatalogo[]> {
 // Sesión autenticada (firma EIP-191) + endpoints del panel Owner (RF-13.1)
 // =============================================================================
 
-const MENSAJE_SESION = "TrueKeate: iniciar sesión";
+export const MENSAJE_SESION = "TrueKeate: iniciar sesión";
 
 /** POST /auth/session — firma EIP-191 → token Bearer + usuario (+ esOwner). */
 export async function iniciarSesion(firma: string, mensaje = MENSAJE_SESION): Promise<{ token: string; usuario: UsuarioPublico; esOwner?: boolean }> {
