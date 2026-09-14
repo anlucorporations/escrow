@@ -949,5 +949,10 @@ nativa** al proyecto.
     navegador, permisos de host, autobloqueo…).
   - **CIERRE:** informe final en `RepoTecnico/INFORME_CIERRE_WALLET_NATIVA.md` (alcance,
     matriz RF-WN-01..27, decisiones D-NW-1..5, correcciones, despliegues y evidencia **40/40**).
+  - **DESPLIEGUE FINAL GCP (2026-09-14):** web `truekeate-web` **rev. 00044-8sw**
+    (imagen `web:release-d0972fc-final`, commit final `d0972fc`); API `truekeate-api`
+    **rev. 00025-484** (imagen `backend:release-b4feb46`, ya en el commit final del backend);
+    `/`, `/suite/dashboard`, `/instalar-wallet`, `/help/manual`, `/wallet/TrueKeateWallet.zip`
+    y API `/health` → **200**. Contratos, BD e indexador sin cambios en este sub-proyecto.
 - **Decisión (D-NW-5):** se **mantiene «CodeCrypto Wallet»** como nombre de producto; la
   identidad visual es la de TrueKeate y manifest/EIP-6963 quedan intactos.
