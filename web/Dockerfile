@@ -19,7 +19,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # --build-arg con el MISMO nombre. Los nombres deben coincidir exactamente con
 # las variables que lee web/lib/contracts.ts (DIRECCIONES) y con las que
 # escribe deploy-local.sh.
-ARG NEXT_PUBLIC_ESCROW=0x8a93d247134d91e0de6f96547cb0204e5be8e5d8
+ARG NEXT_PUBLIC_ESCROW=0xd49a0e9a4cd5979ae36840f542d2d7f02c4817be
 ARG NEXT_PUBLIC_FACTORY=0x40918ba7f132e0acba2ce4de4c4baf9bd2d7d849
 ARG NEXT_PUBLIC_BRLT=0x6f6f570f45833e249e27022648a26f4076f48f78
 ARG NEXT_PUBLIC_REGISTRY=0xb0f05d25e41fbc2b52013099ed9616f1206ae21b
