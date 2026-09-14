@@ -957,13 +957,13 @@ nativa** al proyecto.
   - **CIERRE:** informe final en `RepoTecnico/INFORME_CIERRE_WALLET_NATIVA.md` (alcance,
     matriz RF-WN-01..33, decisiones D-NW-1..6, correcciones, despliegues y evidencia **41/41**).
   - **DESPLIEGUE FINAL GCP (2026-09-14):** **un único proyecto y despliegue** en `truekeate-main`:
-    web `truekeate-web` **europe-west1 rev. 00044-8sw** (imagen `web:release-d0972fc-final`,
-    commit `d0972fc`) y API `truekeate-api` **rev. 00027-d4h** (imagen `backend:release-b4feb46`).
+    web `truekeate-web` **europe-west1 rev. 00045-g2p** (imagen `web:release-9098e70`, rediseño
+    de la wallet incluido) y API `truekeate-api` **rev. 00027-d4h** (imagen `backend:release-b4feb46`).
     Se detectó un segundo servicio `truekeate-web` en `southamerica-east1` (rev. antigua) y se
     **eliminó**; el `CORS_ORIGEN` del API quedó con el origen único de europe-west1. Verificado:
-    `/`, `/suite/dashboard`, `/instalar-wallet`, `/help/manual`, `/wallet/TrueKeateWallet.zip` y
-    API `/health` → **200**; el antiguo dominio de southamerica → 404. Contratos, BD e indexador
-    sin cambios en este sub-proyecto.
+    `/`, `/suite/dashboard`, `/instalar-wallet`, `/help/manual`, `/wallet/TrueKeateWallet.zip`
+    (manifest `TrueKeate Wallet`) y API `/health` → **200**; el antiguo dominio de southamerica
+    → 404. Contratos, BD e indexador sin cambios en este sub-proyecto.
 - **Decisión (D-NW-5, superseded por D-NW-6):** inicialmente se mantuvo «CodeCrypto Wallet»
   como nombre de producto.
 - **Decisión (D-NW-6):** el nombre visible pasa a **TrueKeate Wallet** (manifest, EIP-6963,
