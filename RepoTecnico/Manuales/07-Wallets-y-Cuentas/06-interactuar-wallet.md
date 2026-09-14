@@ -133,7 +133,7 @@ El botón oficial hace tres cosas en orden (`web/components/BotonConectarLogin.t
 
 #### 5.2 Estado del escrow on-chain
 
-- El contrato **Escrow** con sus estados está desplegado (`0x8a93d247134d91e0de6f96547cb0204e5be8e5d8`,
+- El contrato **Escrow** con sus estados está desplegado (`0xd49a0e9a4cd5979ae36840f542d2d7f02c4817be`,
   `web/lib/contracts.ts:22`) y su máquina de estados está cubierta por tests en `sc/test/`
   (ver `RepoTecnico/Manuales/03-Implementacion/01-contratos-escrow.md`); la gestión desde la
   wallet (firma de intents para custodiar/completar) es la parte pendiente de la integración.

@@ -212,7 +212,7 @@ NFT_ADDRESS=NFT_ADDRESS:latest,STRIPE_SECRET_KEY=STRIPE_SECRET_KEY:latest"
 |---|---|---|
 | **TrueKeateNFT** | `0x6C2d83262fF84cBaDb3e416D527403135D757892` | Minteo NFT al publicar (env `NFT_ADDRESS`) |
 | **TrueKeateSBT** | `0x870526b7973b56163a6997bB7C886F5E4EA53638` | SBT de certificación (escalera D28) |
-| **Escrow** | `0x8a93d247134d91e0de6f96547cb0204e5be8e5d8` | Escrow de trueques (estados/eventos indexados) |
+| **Escrow** | `0xd49a0e9a4cd5979ae36840f542d2d7f02c4817be` | Escrow de trueques (estados/eventos indexados) |
 | **BRLT** | `0x6f6f570f45833e249e27022648a26f4076f48f78` | Token BRLT (1:1) |
 | **SociosRegistry** | `0xb0f05d25e41fbc2b52013099ed9616f1206ae21b` | Padrón de socios + gobernanza; **owner = `0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`** |
 | **SuscripcionEmpresa** | `0x5feaebfb4439f3516c74939a9d04e95afe82c4ae` | Suscripciones de empresas |

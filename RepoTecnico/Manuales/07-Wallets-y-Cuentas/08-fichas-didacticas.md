@@ -99,7 +99,7 @@
 - La red del proyecto es un nodo **anvil/Foundry remoto** (cadena Ethereum de pruebas) expuesto por
   RPC: `https://mcc-foundry-anvil-slzlptbcla-ew.a.run.app`. Sus parámetros auditados: **chain ID
   `31337`** (hex `0x7a69`) y moneda nativa **ETH** (simbólico de pruebas, 18 decimales).
-- En esa red viven los contratos desplegados: **Escrow** `0x8a93d247134d91e0de6f96547cb0204e5be8e5d8`,
+- En esa red viven los contratos desplegados: **Escrow** `0xd49a0e9a4cd5979ae36840f542d2d7f02c4817be`,
   **SmartAccountFactory** `0x40918ba7f132e0acba2ce4de4c4baf9bd2d7d849`, **BRLT** (BorloTokens)
   `0x6f6f570f45833e249e27022648a26f4076f48f78`, **TrueKeateNFT**
   `0x99dbe4aea58e518c50a1c04ae9b48c9f6354612f` y **SociosRegistry**

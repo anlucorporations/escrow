@@ -969,3 +969,20 @@ nativa** al proyecto.
 - **Decisión (D-NW-6):** el nombre visible pasa a **TrueKeate Wallet** (manifest, EIP-6963,
   cabecera y páginas); se conserva el `rdns` `io.codecrypto.wallet` para no invalidar las
   elecciones guardadas en la plataforma.
+
+## ⛓️ Escrow nuevo vinculado (NFT + Registry) — 2026-09-09
+
+Contexto (auditoría): el Escrow desplegado en GCP era anterior a F1 (su
+`trueKeateNft()` revertía y `sociosRegistry()` = 0x0) y `siguienteId()` = 0
+(nunca hubo trueques on-chain: los 40 de la BD son espejo off-chain).
+- Nuevo script `sc/script/DeployEscrow.s.sol`: despliega SOLO un Escrow nuevo y
+  lo vincula a los contratos existentes (no recrea registry/NFT/BRLT/SBT).
+- Desplegado en el anvil de GCP: Escrow **`0xd49a0e9a4cd5979ae36840f542d2d7f02c4817be`**
+  (antes `0x8a93…e5d8`), owner `0xf39F…2266`.
+- Verificado on-chain: `trueKeateNft()` = `0x6C2d…7892` (NFT oficial),
+  `sociosRegistry()` = `0xB0f0…e21B`, `siguienteId()` = 0, `owner()` = Owner.
+- Actualizadas las direcciones en `backend/contratos.json`, `web/lib/contracts.ts`
+  (NEXT_PUBLIC_ESCROW) y la documentación (`entornos_globales.md`, manuales 07).
+- Foundry 80/80 verdes. El flujo funcional de la app sigue en BD (espejo); el
+  Escrow nuevo queda listo para la integración on-chain futura (crear trueques
+  reales) y habilita la restricción "solo NFT oficial" del contrato.
