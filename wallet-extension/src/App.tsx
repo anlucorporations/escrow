@@ -5,13 +5,15 @@ import ChainManager from './components/ChainManager'
 import LogsPanel from './components/LogsPanel'
 import TransferSection from './components/TransferSection'
 import WalletSetup from './components/WalletSetup'
-import { Ficha } from './components/Ficha'
 import { RecibirQR } from './components/RecibirQR'
 import { Contactos } from './components/Contactos'
 import { Comprar } from './components/Comprar'
 import { Cambiar } from './components/Cambiar'
 import { Caracteristicas } from './components/Caracteristicas'
 import { Configuracion } from './components/Configuracion'
+import { Aprobacion, type SolicitudConexion, type SolicitudFirma } from './components/Aprobacion'
+import { Inicio, type SeccionInicio } from './components/Inicio'
+import { Pagina } from './components/Pagina'
 import { VaultPassword } from './components/VaultPassword'
 import { VaultUnlock } from './components/VaultUnlock'
 import { formatWeiToEth, parseEthToWei } from './utils/amount'
@@ -35,6 +37,45 @@ import type { ChainConfig, LogEntry, LogMessage, LogType } from './types'
  * (derivación de cuentas, firmas y envío de transacciones) ocurre en el service
  * worker, al que se piden las operaciones por RPC.
  */
+
+/** Páginas internas de la wallet (rediseño: navegación por páginas). */
+type Vista =
+  | 'inicio'
+  | 'cuenta'
+  | 'balance'
+  | 'recibir'
+  | 'enviar'
+  | 'comprar'
+  | 'cambiar'
+  | 'contactos'
+  | 'red'
+  | 'caracteristicas'
+  | 'configuracion'
+  | 'conexiones'
+  | 'notificaciones'
+  | 'redes'
+  | 'perfil'
+
+/** Secciones del inicio. */
+const SECCIONES: SeccionInicio[] = [
+  { id: 'cuenta', icono: '👤', titulo: 'Cuenta' },
+  { id: 'balance', icono: '💰', titulo: 'Balance' },
+  { id: 'recibir', icono: '📥', titulo: 'Recibir' },
+  { id: 'enviar', icono: '📤', titulo: 'Enviar' },
+  { id: 'comprar', icono: '🛒', titulo: 'Comprar' },
+  { id: 'cambiar', icono: '🔄', titulo: 'Cambiar' },
+  { id: 'contactos', icono: '📇', titulo: 'Contactos' },
+  { id: 'red', icono: '🌐', titulo: 'Red' },
+  { id: 'caracteristicas', icono: '🧩', titulo: 'Características' },
+  { id: 'configuracion', icono: '⚙️', titulo: 'Configuración' },
+  { id: 'conexiones', icono: '🔌', titulo: 'Conexiones' },
+]
+
+/** Abrevia una dirección para mostrarla (0x1234…abcd). */
+function acortarDireccion(a: string): string {
+  return a.length > 12 ? `${a.slice(0, 6)}…${a.slice(-4)}` : a
+}
+
 function App() {
   const [isWalletLoaded, setIsWalletLoaded] = useState(false)
   const [accounts, setAccounts] = useState<string[]>([])
@@ -47,10 +88,11 @@ function App() {
   const [isLoading, setIsLoading] = useState(true)
   /** dApps autorizadas (origen → cuenta) para el pie y la ficha Conexiones. */
   const [sitiosConectados, setSitiosConectados] = useState<Record<string, string>>({})
-  /** Panel de gestión de saldo abierto (M2.1.4). */
-  const [panelSaldo, setPanelSaldo] = useState<
-    'recibir' | 'enviar' | 'comprar' | 'cambiar' | 'contactos' | null
-  >(null)
+  /** Página activa (rediseño: navegación por páginas). */
+  const [vista, setVista] = useState<Vista>('inicio')
+  /** Solicitudes pendientes: se atienden DENTRO de la wallet. */
+  const [solicitudConexion, setSolicitudConexion] = useState<SolicitudConexion | null>(null)
+  const [solicitudFirma, setSolicitudFirma] = useState<SolicitudFirma | null>(null)
   /** Estado de la bóveda cifrada: si existe y si está abierta. */
   const [boveda, setBoveda] = useState<{
     existe: boolean
@@ -305,6 +347,72 @@ function App() {
     [addLog]
   )
 
+  // ── Solicitudes pendientes (conexión/firma) DENTRO de la wallet ─────
+  useEffect(() => {
+    const cargar = async () => {
+      const s = await chrome.storage.local.get([
+        'codecrypto_connect_request',
+        'codecrypto_pending_request',
+      ])
+      setSolicitudConexion((s.codecrypto_connect_request as SolicitudConexion | undefined) ?? null)
+      setSolicitudFirma((s.codecrypto_pending_request as SolicitudFirma | undefined) ?? null)
+    }
+    void cargar()
+    const onChanged = (cambios: Record<string, chrome.storage.StorageChange>, area: string) => {
+      if (area !== 'local') return
+      if (cambios.codecrypto_connect_request) {
+        setSolicitudConexion(
+          (cambios.codecrypto_connect_request.newValue as SolicitudConexion | undefined) ?? null
+        )
+      }
+      if (cambios.codecrypto_pending_request) {
+        setSolicitudFirma(
+          (cambios.codecrypto_pending_request.newValue as SolicitudFirma | undefined) ?? null
+        )
+      }
+    }
+    chrome.storage.onChanged.addListener(onChanged)
+    return () => chrome.storage.onChanged.removeListener(onChanged)
+  }, [])
+
+  const responderConexion = useCallback(
+    (ok: boolean, account?: string, accountIndex?: number) => {
+      if (!solicitudConexion) return
+      chrome.runtime.sendMessage(
+        {
+          type: 'CONNECT_RESPONSE',
+          requestId: solicitudConexion.requestId,
+          success: ok,
+          account,
+          accountIndex,
+          error: ok ? undefined : 'User rejected connection',
+        },
+        () => void chrome.runtime.lastError
+      )
+      setSolicitudConexion(null)
+      addLog('event', ok ? 'Conexión autorizada en la wallet' : 'Conexión rechazada')
+    },
+    [solicitudConexion, addLog]
+  )
+
+  const responderFirma = useCallback(
+    (ok: boolean) => {
+      if (!solicitudFirma) return
+      chrome.runtime.sendMessage(
+        {
+          type: 'SIGN_RESPONSE',
+          approvalId: solicitudFirma.approvalId,
+          success: ok,
+          error: ok ? undefined : 'User rejected',
+        },
+        () => void chrome.runtime.lastError
+      )
+      setSolicitudFirma(null)
+      addLog('event', ok ? 'Firma aprobada en la wallet' : 'Firma rechazada')
+    },
+    [solicitudFirma, addLog]
+  )
+
   // ── Cambios de cuenta y de red ──────────────────────────────────────
   const changeAccount = (index: number) => {
     if (index >= accounts.length || index < 0) {
@@ -400,18 +508,164 @@ function App() {
   }
 
   // ── Render ──────────────────────────────────────────────────────────
+  const nombreRed =
+    chains.find((c) => c.chainId.toLowerCase() === chainId.toLowerCase())?.name ??
+    `Chain ${Number(chainId)}`
+
+  /** Contenido de cada página interna (cada sección ocupa todo el espacio). */
+  const paginaActual = () => {
+    const volver = () => setVista('inicio')
+    const cuenta = accounts[currentAccountIndex] ?? ''
+    switch (vista) {
+      case 'cuenta':
+        return (
+          <Pagina titulo="Cuenta" onVolver={volver}>
+            <p className="tk-pagina__dato tk-mono">{cuenta}</p>
+            <p className="tk-muted" style={{ fontSize: 12 }}>
+              Cambia de cuenta desde el selector de la cabecera.
+            </p>
+          </Pagina>
+        )
+      case 'balance':
+        return (
+          <Pagina titulo="Balance" onVolver={volver}>
+            <p className="tk-inicio__monto">{balance} ETH</p>
+            <p className="tk-muted" style={{ fontSize: 12 }}>
+              Red: {nombreRed}
+            </p>
+          </Pagina>
+        )
+      case 'recibir':
+        return (
+          <Pagina titulo="Recibir" onVolver={volver}>
+            {cuenta && <RecibirQR address={cuenta} />}
+          </Pagina>
+        )
+      case 'enviar':
+        return (
+          <Pagina titulo="Enviar" onVolver={volver}>
+            <TransferSection
+              accounts={accounts}
+              currentAccountIndex={currentAccountIndex}
+              balanceWei={balanceWei}
+              onTransfer={handleTransfer}
+            />
+          </Pagina>
+        )
+      case 'comprar':
+        return (
+          <Pagina titulo="Comprar" onVolver={volver}>
+            {cuenta && <Comprar account={cuenta} />}
+          </Pagina>
+        )
+      case 'cambiar':
+        return (
+          <Pagina titulo="Cambiar" onVolver={volver}>
+            {cuenta && <Cambiar account={cuenta} chainId={chainId} />}
+          </Pagina>
+        )
+      case 'contactos':
+        return (
+          <Pagina titulo="Contactos" onVolver={volver}>
+            <Contactos />
+          </Pagina>
+        )
+      case 'red':
+        return (
+          <Pagina titulo="Red" onVolver={volver}>
+            <ChainManager
+              chains={chains}
+              activeChainId={chainId}
+              onSwitch={changeChain}
+              onChainsChanged={setChains}
+            />
+          </Pagina>
+        )
+      case 'caracteristicas':
+        return (
+          <Pagina titulo="Características" onVolver={volver}>
+            {cuenta && <Caracteristicas account={cuenta} chainId={chainId} />}
+          </Pagina>
+        )
+      case 'configuracion':
+        return (
+          <Pagina titulo="Configuración" onVolver={volver}>
+            {cuenta && (
+              <Configuracion
+                chainId={chainId}
+                chains={chains}
+                onSwitch={changeChain}
+                onChainsChanged={setChains}
+                account={cuenta}
+                logs={logs}
+              />
+            )}
+          </Pagina>
+        )
+      case 'conexiones':
+        return (
+          <Pagina titulo="Conexiones" onVolver={volver}>
+            {Object.keys(sitiosConectados).length === 0 ? (
+              <p className="tk-muted" style={{ fontSize: 12 }}>
+                Ninguna dApp conectada.
+              </p>
+            ) : (
+              <ul className="tk-sitios">
+                {Object.entries(sitiosConectados).map(([origen, c]) => (
+                  <li key={origen} className="tk-sitio">
+                    <div className="tk-sitio__info">
+                      <span className="tk-sitio__origen">{origen}</span>
+                      <span className="tk-sitio__cuenta">{acortarDireccion(c)}</span>
+                    </div>
+                    <button
+                      className="tk-sitio__desconectar"
+                      onClick={() => void desconectarSitio(origen)}
+                      title={`Desconectar ${origen}`}
+                    >
+                      ⛔
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Pagina>
+        )
+      default:
+        return null
+    }
+  }
+
   return (
     <div className="app">
-      <header className="tk-brand">
-        <img
-          className="tk-brand__logo"
-          src="/brand/TrueKeate_logoIntegral.svg"
-          alt="TrueKeate"
-        />
-        <div className="tk-brand__text">
-          <span className="tk-brand__title">CodeCrypto Wallet</span>
-          <span className="tk-brand__sub">Wallet nativa de la plataforma</span>
+      {/* Header alineado arriba: icono + título; 2.ª línea con cuenta y red */}
+      <header className="tk-header">
+        <div className="tk-header__marca">
+          <img
+            className="tk-header__logo"
+            src="/brand/TrueKeate_logoIntegral.svg"
+            alt="TrueKeate"
+          />
+          <span className="tk-header__titulo">TrueKeate Wallet</span>
         </div>
+        {isWalletLoaded && (
+          <div className="tk-header__estado">
+            <select
+              className="tk-header__cuenta"
+              aria-label="Cuenta activa"
+              value={currentAccountIndex}
+              onChange={(e) => changeAccount(parseInt(e.target.value))}
+            >
+              {accounts.map((acc, i) => (
+                <option key={acc} value={i}>
+                  {acortarDireccion(acc)}
+                </option>
+              ))}
+            </select>
+            <span className="tk-header__red" title={nombreRed}>
+              {nombreRed}
+            </span>
+          </div>
+        )}
       </header>
 
       {boveda?.migracionPendiente && isWalletLoaded && !pendienteCifrar && (
@@ -453,158 +707,24 @@ function App() {
         </>
       ) : (
         <>
-          <div className="wallet-info">
-            {/* M2.1.2 · Gestión de cuentas: cuenta en uso + cambio */}
-            <Ficha id="cuenta" titulo="Cuenta" icono="👤" abierta>
-              <p className="address">{accounts[currentAccountIndex]}</p>
-              <div className="account-selector">
-                <label>Cambiar cuenta: </label>
-                <select
-                  value={currentAccountIndex}
-                  onChange={(e) => changeAccount(parseInt(e.target.value))}
-                >
-                  {accounts.map((acc, i) => (
-                    <option key={i} value={i}>
-                      Cuenta {i}: {acc.slice(0, 6)}...{acc.slice(-4)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </Ficha>
-
-            {/* M2.1.3 · Balance (ETH principal; multi-token en C2) */}
-            <Ficha id="balance" titulo="Balance" icono="💰" abierta>
-              <p className="balance">{balance} ETH</p>
-              <p className="tk-muted" style={{ fontSize: 11, margin: '4px 0 0' }}>
-                ◀ ETH ▶ · los tokens agregados con sus flechas llegan en el ciclo C2.
-              </p>
-            </Ficha>
-
-            {/* M2.1.4 · Gestión de saldo */}
-            <Ficha id="saldo" titulo="Gestionar saldo" icono="💸" abierta>
-              <div className="tk-actions">
-                <button
-                  className={`tk-action${panelSaldo === 'recibir' ? ' tk-action--activa' : ''}`}
-                  onClick={() => setPanelSaldo(panelSaldo === 'recibir' ? null : 'recibir')}
-                  title="Ver mi dirección y su QR"
-                >
-                  <span className="tk-action__icono">📥</span>Recibir
-                </button>
-                <button
-                  className="tk-action"
-                  onClick={() =>
-                    document
-                      .getElementById('ficha-enviar')
-                      ?.scrollIntoView({ behavior: 'smooth' })
-                  }
-                  title="Abrir el formulario de envío"
-                >
-                  <span className="tk-action__icono">📤</span>Enviar
-                </button>
-                <button
-                  className={`tk-action${panelSaldo === 'comprar' ? ' tk-action--activa' : ''}`}
-                  onClick={() => setPanelSaldo(panelSaldo === 'comprar' ? null : 'comprar')}
-                  title="Comprar cripto o recibir desde un exchange"
-                >
-                  <span className="tk-action__icono">🛒</span>Comprar
-                </button>
-                <button
-                  className={`tk-action${panelSaldo === 'cambiar' ? ' tk-action--activa' : ''}`}
-                  onClick={() => setPanelSaldo(panelSaldo === 'cambiar' ? null : 'cambiar')}
-                  title="Intercambiar tokens ERC-20"
-                >
-                  <span className="tk-action__icono">🔄</span>Cambiar
-                </button>
-                <button
-                  className={`tk-action${panelSaldo === 'contactos' ? ' tk-action--activa' : ''}`}
-                  onClick={() => setPanelSaldo(panelSaldo === 'contactos' ? null : 'contactos')}
-                  title="Direcciones guardadas"
-                >
-                  <span className="tk-action__icono">📇</span>Contactos
-                </button>
-              </div>
-              {panelSaldo === 'recibir' && accounts[currentAccountIndex] && (
-                <RecibirQR address={accounts[currentAccountIndex]} />
-              )}
-              {panelSaldo === 'comprar' && accounts[currentAccountIndex] && (
-                <Comprar account={accounts[currentAccountIndex]} />
-              )}
-              {panelSaldo === 'cambiar' && accounts[currentAccountIndex] && (
-                <Cambiar account={accounts[currentAccountIndex]} chainId={chainId} />
-              )}
-              {panelSaldo === 'contactos' && <Contactos />}
-            </Ficha>
-
-            {/* Enviar: formulario operativo actual */}
-            <Ficha id="enviar" titulo="Enviar" icono="📤" abierta={false}>
-              <TransferSection
-                accounts={accounts}
-                currentAccountIndex={currentAccountIndex}
-                balanceWei={balanceWei}
-                onTransfer={handleTransfer}
-              />
-            </Ficha>
-
-            {/* M2.1.5 · Red */}
-            <Ficha id="red" titulo="Red" icono="🌐" abierta={false}>
-              <ChainManager
-                chains={chains}
-                activeChainId={chainId}
-                onSwitch={changeChain}
-                onChainsChanged={setChains}
-              />
-            </Ficha>
-
-            {/* M2.1.6 · Características: Tokens reales; DeFi/NFT/Actividad en C2 */}
-            <Ficha id="caracteristicas" titulo="Características" icono="🧩" abierta={false}>
-              {accounts[currentAccountIndex] && (
-                <Caracteristicas account={accounts[currentAccountIndex]} chainId={chainId} />
-              )}
-            </Ficha>
-
-            {/* M6 · Configuración (M5: modo de vista) */}
-            <Ficha id="configuracion" titulo="Configuración" icono="⚙️" abierta={false}>
-              {accounts[currentAccountIndex] && (
-                <Configuracion
-                  chainId={chainId}
-                  chains={chains}
-                  onSwitch={changeChain}
-                  onChainsChanged={setChains}
-                  account={accounts[currentAccountIndex]}
-                  logs={logs}
-                />
-              )}
-            </Ficha>
-
-            {/* M2.1.7 · Conexiones: dApps autorizadas con desconexión individual */}
-            <Ficha id="conexiones" titulo="Conexiones" icono="🔌" abierta={false}>
-              {Object.keys(sitiosConectados).length === 0 ? (
-                <p className="tk-muted" style={{ fontSize: 11, marginTop: 10 }}>
-                  Ninguna dApp conectada.
-                </p>
-              ) : (
-                <ul className="tk-sitios">
-                  {Object.entries(sitiosConectados).map(([origen, cuenta]) => (
-                    <li key={origen} className="tk-sitio">
-                      <div className="tk-sitio__info">
-                        <span className="tk-sitio__origen">{origen}</span>
-                        <span className="tk-sitio__cuenta">
-                          {cuenta.slice(0, 6)}…{cuenta.slice(-4)}
-                        </span>
-                      </div>
-                      <button
-                        className="tk-sitio__desconectar"
-                        onClick={() => void desconectarSitio(origen)}
-                        title={`Desconectar ${origen}`}
-                      >
-                        ⛔
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Ficha>
-          </div>
+          {solicitudConexion || solicitudFirma ? (
+            <Aprobacion
+              conexion={solicitudConexion}
+              firma={solicitudFirma}
+              chains={chains}
+              onResponderConexion={responderConexion}
+              onResponderFirma={responderFirma}
+            />
+          ) : vista === 'inicio' ? (
+            <Inicio
+              saldo={balance}
+              cuenta={acortarDireccion(accounts[currentAccountIndex] ?? '')}
+              secciones={SECCIONES}
+              onIr={(id) => setVista(id as Vista)}
+            />
+          ) : (
+            paginaActual()
+          )}
 
           {/* M2.1.7 · Pie fijo: dApp conectada + desconexión + bloqueo */}
           <footer className="tk-footer">

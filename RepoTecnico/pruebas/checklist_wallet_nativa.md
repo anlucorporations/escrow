@@ -1,25 +1,33 @@
-# Checklist de pruebas E2E — Wallet Nativa (extensión CodeCrypto Wallet)
+# Checklist de pruebas E2E — Wallet Nativa (extensión TrueKeate Wallet)
 
 | Campo | Valor |
 |---|---|
 | Proyecto | **TrueKeate — Wallet Nativa** (sub-proyecto chrome-extension) |
-| Fecha | 2026-09-13 |
+| Fecha | 2026-09-14 (rediseño de la wallet) |
 | Rama | `escrow-dsh-GCP` |
 | Versión de la wallet | **1.1.0** (paquete `web/public/wallet/TrueKeateWallet.zip`) |
-| Web desplegada | https://truekeate-web-593453426217.europe-west1.run.app (rev. `00042-6z6`) |
-| Base de requerimientos | `RepoTecnico/requerimientos_wallet_nativa.md` (RF-WN-01..27, D-NW-1..5) |
+| Web desplegada | https://truekeate-web-593453426217.europe-west1.run.app |
+| Base de requerimientos | `RepoTecnico/requerimientos_wallet_nativa.md` (RF-WN-01..33, D-NW-1..6) |
 | Objetivo | Validar de punta a punta la wallet nativa y su integración con la plataforma |
 
 Convención: `TC-WN-nn` = caso de prueba. **Tipo**: `A` automático / `M` manual.
 **Resultado**: ✅ pasa · ❌ falla · ⚠️ parcial. Registrar en la tabla final.
 
+> **Rediseño (RF-WN-28..33 · D-NW-6):** la wallet se llama **TrueKeate Wallet**; el
+> espacio tiene ancho fijo **480 px**; la cabecera va alineada arriba (línea 1: logo +
+> título; línea 2: selector de cuenta acortada + red); las secciones son **páginas**
+> completas con flecha de volver; y **conexiones, firmas y notificaciones se atienden
+> dentro de la propia wallet**, sin ventanas flotantes.
+
 > **Cobertura automatizada** (specs en `web/e2e-wallet/`, `npm run test:wallet` desde `web/`):
 > - `wallet-nativa.spec.ts` → **TC-WN-01, 02, 04, 05, 06, 07, 09, 13** (popup), **39, 40**.
-> - `wallet-popup.spec.ts` → **TC-WN-18..36, 38, 41..48** (todas las funciones del popup).
-> - `wallet-firmas.spec.ts` → **TC-WN-10, 11, 12, 14, 15, 16** (dApp: conexión y firmas).
+> - `wallet-popup.spec.ts` → **TC-WN-18..36, 38, 41..48** (navegación por páginas: F-00..F-19).
+> - `wallet-firmas.spec.ts` → **TC-WN-10, 11, 12, 14, 15, 16** (conexión y firmas **dentro del popup**).
 > - `plataforma-wallet.spec.ts` → **TC-WN-07, 10, 11, 12** (plataforma × wallet REAL:
 >   descubrimiento, conexión, login, firma por acción, sesión persistente,
 >   auto-reconexión, `accountsChanged`, `chainChanged` y desconexión/revocación).
+>
+> Estado actual: **41/41 E2E ✅**, **45/45 background ✅**, **25/25 bóveda ✅**, **78/78 web ✅**.
 >
 > Quedan como **manuales**: TC-WN-03 (carga real en Chrome), 08 (recuerdo de elección en
 > el popup real), 17 (forma de los botones), 37 (panel lateral del navegador), 43 (permiso
@@ -51,7 +59,7 @@ Convención: `TC-WN-nn` = caso de prueba. **Tipo**: `A` automático / `M` manual
 |---|---|---|---|---|
 | TC-WN-01 | A | La web ofrece la descarga | Abrir `/instalar-wallet` | HTTP 200; botón **Descargar wallet (.zip)**; pasos de instalación visibles |
 | TC-WN-02 | A | El paquete se descarga | Pulsar la descarga | `TrueKeateWallet.zip` (`application/zip`) con `manifest.json` en la raíz |
-| TC-WN-03 | M | Carga en Chrome | Cargar la carpeta descomprimida | La extensión aparece como **CodeCrypto Wallet 1.1.0** sin errores |
+| TC-WN-03 | M | Carga en Chrome | Cargar la carpeta descomprimida | La extensión aparece como **TrueKeate Wallet 1.1.0** sin errores |
 | TC-WN-04 | A | Detección en la web (sin extensión) | Abrir la portada en un perfil sin la extensión | Botón **🧩 Instalar wallet nativa** |
 | TC-WN-05 | A | Detección en la web (con extensión) | Con la extensión cargada, recargar la portada | Botón **✅ Wallet nativa instalada**; el popup la detecta |
 | TC-WN-06 | A | Barra de la suite | Entrar a `/suite/dashboard` | El botón de wallet nativa aparece en la barra superior (PC) |
@@ -63,33 +71,33 @@ Convención: `TC-WN-nn` = caso de prueba. **Tipo**: `A` automático / `M` manual
 | ID | Tipo | Objetivo | Pasos | Resultado esperado |
 |---|---|---|---|---|
 | TC-WN-07 | A | Un solo selector, tipo popup | Pulsar **Conectar billetera e iniciar sesión** | Se abre un **modal** con las wallets detectadas; **no** hay `<select>` permanente en la página |
-| TC-WN-08 | M | Elección recordada | Elegir *CodeCrypto Wallet* y conectar | Conecta; la elección se conserva al recargar |
-| TC-WN-09 | A | No interfiere con MetaMask | Con MetaMask + CodeCrypto instaladas, elegir CodeCrypto | La firma la pide **CodeCrypto**; `window.ethereum` sigue siendo MetaMask; MetaMask no recibe `eth_requestAccounts`/`personal_sign` |
+| TC-WN-08 | M | Elección recordada | Elegir *TrueKeate Wallet* y conectar | Conecta; la elección se conserva al recargar |
+| TC-WN-09 | A | No interfiere con MetaMask | Con MetaMask + TrueKeate instaladas, elegir TrueKeate | La firma la pide **TrueKeate**; `window.ethereum` sigue siendo MetaMask; MetaMask no recibe `eth_requestAccounts`/`personal_sign` |
 | TC-WN-10 | M | Login único (EIP-191) | Con una cuenta inscrita, conectar | **Una** firma `TrueKeate: iniciar sesión`; token emitido; acceso a la suite |
 | TC-WN-11 | M | Firma por acción | Publicar/custodiar/valorar | Cada acción firma con la **misma** billetera conectada (una firma por acción) |
 | TC-WN-12 | M | Desconexión | Menú de usuario → Desconectar | Se limpia la sesión y la autorización del sitio en la wallet |
 
 ---
 
-## C. Identidad visual y páginas de firma (M1/M3/M4)
+## C. Identidad visual y vistas de aprobación (M1/M3/M4 · rediseño)
 
 | ID | Tipo | Objetivo | Pasos | Resultado esperado |
 |---|---|---|---|---|
-| TC-WN-13 | A | Identidad en el popup | Abrir el popup | Cabecera con el logo `logoIntegral`, título **CodeCrypto Wallet** y colores TrueKeate |
-| TC-WN-14 | M | Cabecera en conexión | Provocar una conexión desde una dApp | Cabecera con logo + **Solicitud de autorización** + dApp solicitante |
-| TC-WN-15 | M | Cabecera en firma | Provocar `personal_sign` | Cabecera con logo + **Solicitud de firma** |
+| TC-WN-13 | A | Identidad y cabecera | Abrir el popup | Ancho **480 px**; cabecera arriba con logo `logoIntegral` + título **TrueKeate Wallet**; 2.ª línea con cuenta acortada + red |
+| TC-WN-14 | M | Conexión desde una dApp | Provocar una conexión | La vista **Solicitud de autorización** aparece **dentro de la wallet** (sin ventana flotante) con la dApp solicitante |
+| TC-WN-15 | M | Firma desde una dApp | Provocar `personal_sign` | La vista **Solicitud de firma** aparece **dentro de la wallet** |
 | TC-WN-16 | M | EIP-712 estructurado | Provocar `eth_signTypedData_v4` | Se muestran: **billetera firmante** (abreviada), **qué se firma** (dominio + primaryType), **valor** si aplica, **red** y **fecha/hora**; JSON completo en desplegable |
-| TC-WN-17 | M | Botones de firma | Ver acciones de la ventana de firma | *Aprobar/Rechazar* con forma de píldora (estilo del proyecto) |
+| TC-WN-17 | M | Botones de firma | Ver acciones de la vista de aprobación | *Aprobar/Rechazar* con forma de píldora (estilo del proyecto) dentro de la wallet |
 
 ---
 
-## D. Popup — secciones y gestión de saldo (M2.1)
+## D. Wallet — páginas y gestión de saldo (M2.1 · rediseño)
 
 | ID | Tipo | Objetivo | Pasos | Resultado esperado |
 |---|---|---|---|---|
-| TC-WN-18 | M | Fichas contraíbles | Plegar/desplegar secciones | Cada ficha recuerda su estado entre aperturas |
-| TC-WN-19 | M | Cuenta | Ver la sección Cuenta | Dirección en uso + selector para cambiar de cuenta |
-| TC-WN-20 | M | Balance | Ver la sección Balance | Saldo ETH y acho completo; aviso de tokens |
+| TC-WN-18 | M | Navegación por páginas | Abrir una sección y volver | Cada sección ocupa todo el espacio de la wallet; la **flecha de volver** regresa al inicio |
+| TC-WN-19 | M | Cuenta | Ver la página Cuenta | Dirección completa en uso + selector para cambiar de cuenta (también en la cabecera) |
+| TC-WN-20 | M | Balance | Ver la página Balance | Saldo ETH y ancho completo; aviso de tokens |
 | TC-WN-21 | M | Recibir (QR) | Gestionar saldo → **Recibir** | QR de la dirección + **Copiar** funcional |
 | TC-WN-22 | M | Enviar | Gestionar saldo → **Enviar** | Formulario de envío; transacción firmable |
 | TC-WN-23 | M | Comprar (guiado) | **Comprar** | Enlace a VALOR de la plataforma + QR de recepción |
@@ -97,7 +105,7 @@ Convención: `TC-WN-nn` = caso de prueba. **Tipo**: `A` automático / `M` manual
 | TC-WN-25 | M | Contactos | **Contactos** → guardar/eliminar | Libreta persistente con validación de dirección |
 | TC-WN-26 | M | Red | Sección Red | Red actual + conexión de redes |
 | TC-WN-27 | M | Características | Abrir Características | Pestañas Tokens/DeFi/NFT/Actividad |
-| TC-WN-28 | M | Conexiones y pie | Ver ficha Conexiones y pie | dApp(s) conectada(s) con **desconexión individual**; pie con estado + bloqueo |
+| TC-WN-28 | M | Conexiones y pie | Ver la página Conexiones y el pie | dApp(s) conectada(s) con **desconexión individual**; pie con estado + bloqueo |
 
 ---
 
@@ -154,7 +162,7 @@ Convención: `TC-WN-nn` = caso de prueba. **Tipo**: `A` automático / `M` manual
 
 | ID | Tipo | Objetivo | Pasos | Resultado esperado |
 |---|---|---|---|---|
-| TC-WN-49 | M | No escribe `window.ethereum` | Consola en la dApp tras elegir CodeCrypto | `window.ethereum.isMetaMask === true`; la app no lo sobrescribe |
+| TC-WN-49 | M | No escribe `window.ethereum` | Consola en la dApp tras elegir TrueKeate | `window.ethereum.isMetaMask === true`; la app no lo sobrescribe |
 | TC-WN-50 | M | Métodos de bóveda solo-extensión | Intentar `wallet_createVault`/`revealMnemonic` desde una dApp | Rechazado (no invocable por dApps) |
 | TC-WN-51 | M | Autobloqueo | Dejar la wallet 15 min | La bóveda se bloquea y pide clave para firmar |
 

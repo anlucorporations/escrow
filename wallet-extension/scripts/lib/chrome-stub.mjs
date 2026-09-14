@@ -86,6 +86,9 @@ export function installChromeStub() {
 
   globalThis.chrome = {
     runtime: {
+      // Igual que en el manifest real: la guarda de métodos de la bóveda
+      // compara el origen del remitente con `chrome-extension://<id>`.
+      id: 'test',
       onMessage: { addListener: (fn) => messageListeners.push(fn) },
       removeListener: () => {},
       // El bus de logs avisa al popup; en las pruebas solo se ACK-ea

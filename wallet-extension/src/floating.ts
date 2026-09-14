@@ -63,10 +63,10 @@ function crear(): void {
   panel.id = 'cc-panel'
   panel.innerHTML = `
     <div id="cc-barra">
-      <span>CodeCrypto Wallet</span>
+      <span>TrueKeate Wallet</span>
       <button id="cc-cerrar" type="button" aria-label="Cerrar">✕</button>
     </div>
-    <iframe id="cc-frame" title="CodeCrypto Wallet" src="${chrome.runtime.getURL('index.html')}"></iframe>
+    <iframe id="cc-frame" title="TrueKeate Wallet" src="${chrome.runtime.getURL('index.html')}"></iframe>
   `
   shadow.appendChild(panel)
 

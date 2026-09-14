@@ -55,7 +55,7 @@ npx playwright test    # E2E de la plataforma (Chromium + Pixel 5)
 ## Integración de la wallet nativa
 
 - **Descubrimiento**: `lib/ethereum.tsx` escucha **EIP-6963** y lista todas las wallets
-  detectadas (MetaMask, Rabby, Backpack, CodeCrypto Wallet…), incluida la legacy de
+  detectadas (MetaMask, Rabby, Backpack, TrueKeate Wallet…), incluida la legacy de
   `window.ethereum`.
 - **Selección**: `ConnectButton` abre un **popup** con las billeteras; la elección se guarda y
   gobierna el login y **cada firma** de la sesión. No hay `select` permanente en la página.

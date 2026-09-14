@@ -18,8 +18,8 @@ representados en NFTs, con **custodia atómica** mediante contrato escrow, **rep
     (imagen `web:release-d0972fc-final`).
   - API: <https://truekeate-api-593453426217.europe-west1.run.app> — rev. **00027-d4h**.
   - Se retiró el despliegue duplicado de `truekeate-web` en `southamerica-east1`.
-- **Pruebas**: frontend **78/78** (Vitest) · wallet/E2E **40/40** (Playwright con la extensión real)
-  · extensión `background` **41/41** y `vault` **25/25** · contratos con Foundry.
+- **Pruebas**: frontend **78/78** (Vitest) · wallet/E2E **41/41** (Playwright con la extensión real)
+  · extensión `background` **45/45** y `vault` **25/25** · contratos con Foundry.
 - **Rama de trabajo** `escrow-dsh-GCP`, sincronizada con `main` en los tres remotos.
 
 ---
@@ -73,7 +73,7 @@ python3 scripts/package-web.py   # opcional: publica el ZIP en web/public/wallet
 ```
 
 Al conectar en la plataforma, el botón **Conectar billetera** abre un popup con las wallets
-detectadas (EIP-6963); elegir **CodeCrypto Wallet**. Esa elección gobierna el login (EIP-191) y
+detectadas (EIP-6963); elegir **TrueKeate Wallet**. Esa elección gobierna el login (EIP-191) y
 **cada firma** de la sesión.
 
 ---
@@ -84,7 +84,7 @@ detectadas (EIP-6963); elegir **CodeCrypto Wallet**. Esa elección gobierna el l
 # Plataforma (Vitest)
 cd web && npm test
 
-# E2E de la plataforma con la wallet nativa REAL (Playwright, 40 tests)
+# E2E de la plataforma con la wallet nativa REAL (Playwright, 41 tests)
 cd wallet-extension && npm run build
 cd ../web && npm run test:wallet
 

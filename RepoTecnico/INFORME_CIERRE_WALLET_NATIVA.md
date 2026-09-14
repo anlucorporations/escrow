@@ -48,16 +48,16 @@ seguimiento. Cobertura: **100% de las funciones de la wallet que el proyecto inv
 |---|---|---|---|
 | 01 | Identidad visual en toda la extensión | ✅ | `theme.css`, `App/Connect/Notification` |
 | 02 | Activos de marca (`logoIntegral`) | ✅ | `public/brand/`, cabeceras |
-| 03 | Fichas contraíbles | ✅ | `components/Ficha.tsx` |
-| 04 | Barra superior con icono + título | ✅ | `App.tsx` (`.tk-brand`) |
-| 05 | Gestión de cuentas | ✅ | `App.tsx` (ficha Cuenta) |
+| 03 | Páginas de sección con flecha de volver | ✅ | `components/Pagina.tsx`, `App.tsx` (rediseño) |
+| 04 | Cabecera de dos líneas: logo + **TrueKeate Wallet** · cuenta + red | ✅ | `App.tsx` (`.tk-header`) |
+| 05 | Gestión de cuentas | ✅ | `App.tsx` (página Cuenta + selector de cabecera) |
 | 06 | Balance multi-token con flechas | ✅ (ETH + aviso de C2) | `App.tsx` |
 | 07 | Recibir/Enviar/Comprar/Cambiar/Contactos | ✅ | `RecibirQR`, `TransferSection`, `Comprar`, `Cambiar`, `Contactos` |
 | 08 | Sección de red | ✅ | `ChainManager` |
 | 09 | Pestañas Tokens/DeFi/NFT/Actividad | ✅ (DeFi placeholder D-NW-2) | `Caracteristicas`, `Tokens`, `NFT`, `Actividad` |
 | 10 | Pie fijo: dApp + estado + bloqueo + desconexión | ✅ | `App.tsx` + `wallet_getConnectedSites`/`wallet_disconnectSite` |
-| 11 | Cabecera de firma (logo, acción, dApp) | ✅ | `Connect.tsx`, `Notification.tsx` |
-| 12 | Botones aceptar/rechazar estilo proyecto | ✅ | `connect.html`/`notification.html` (píldora) |
+| 11 | Cabecera de aprobación (logo, acción, dApp) | ✅ | `components/Aprobacion.tsx` (dentro de la wallet) |
+| 12 | Botones aceptar/rechazar estilo proyecto | ✅ | `Aprobacion.tsx` (píldora, dentro de la wallet) |
 | 13 | EIP-712 estructurado | ✅ | `Notification.tsx` (`describirEip712`) |
 | 14-16 | Modos pestaña / panel / flotante | ✅ | `Configuracion.tsx`, `floating.ts`, `manifest.ts` |
 | 17 | Modo recordado | ✅ | `codecrypto_view_mode` |
@@ -82,6 +82,7 @@ EVM, versionado/empaquetado): aplicados.
 | D-NW-3 | Modos **panel lateral + pestaña + flotante**; **Bitcoin solo informativo** (núcleo EVM) |
 | D-NW-4 | Identidad con **`TrueKeate_logoIntegral`**; ayuda = manual del proyecto (`/help/manual`) |
 | D-NW-5 | Se **mantiene «CodeCrypto Wallet»** como nombre de producto (manifest/EIP-6963 intactos) |
+| D-NW-6 | **Rediseño (supersede D-NW-5):** el nombre visible es **«TrueKeate Wallet»** (manifest, EIP-6963, cabecera y páginas); se conserva el `rdns` `io.codecrypto.wallet`. Espacio fijo de **480 px**, cabecera alineada arriba, secciones como **páginas** con flecha de volver y **aprobaciones dentro de la wallet** (RF-WN-28..33) |
 
 ---
 
@@ -97,23 +98,28 @@ EVM, versionado/empaquetado): aplicados.
    extensión abierta en pestaña); ahora distingue por **origen** `chrome-extension://`,
    manteniendo bloqueadas a las dApps.
 5. **Ventana de firma**: separación **EIP-191** vs **EIP-712**.
+6. **Rediseño de la wallet (D-NW-6)**: las aprobaciones se atienden **dentro del popup**
+   (se eliminaron las 4 ventanas flotantes de `background.ts`), la identidad pasa a
+   **TrueKeate Wallet**, el espacio es de **480 px** y las secciones son páginas con
+   flecha de volver.
 
 ---
 
 ## 6. Pruebas y evidencia
 
 ### Suite automatizada (navegador, extensión real)
-`web/e2e-wallet/` — **40 tests, 40/40 en verde** (`npm run test:wallet`):
+`web/e2e-wallet/` — **41 tests, 41/41 en verde** (`npm run test:wallet`):
 
 | Spec | Tests | Cobertura |
 |---|---|---|
 | `wallet-nativa.spec.ts` | 8 | Instalación/detección (M7), modal de selección, no interferencia, identidad, modos flotante |
-| `wallet-popup.spec.ts` | 19 | **Todas las funciones del popup** (cuenta, saldo, Recibir/Enviar/Comprar/Cambiar/Contactos, Tokens/NFT/Actividad, Red, Conexiones, Configuración, Redes, modos, Perfil: dark/frase/clave/backup) |
-| `wallet-firmas.spec.ts` | 5 | Conexión, `eth_accounts`, `personal_sign`, **EIP-712 estructurado**, rechazo `4001` |
+| `wallet-popup.spec.ts` | 19 | **Todas las funciones del popup** como páginas con volver (F-00..F-19): cuenta, saldo, Recibir/Enviar/Comprar/Cambiar/Contactos, Tokens/NFT/Actividad, Red, Conexiones, Configuración, Redes, modos, Perfil |
+| `wallet-firmas.spec.ts` | 5 | Conexión, `eth_accounts`, `personal_sign`, **EIP-712 estructurado**, rechazo `4001` — todo aprobado **dentro de la wallet** |
 | `plataforma-wallet.spec.ts` | 8 | **Plataforma × wallet real**: descubrimiento, conexión, login, firma por acción, sesión, `accountsChanged`, `chainChanged`, desconexión/revocación |
 
-Evidencia en vivo de la suite: **`40 passed (2.1m)`**. El backend se simula con `page.route`
-(sin escrituras reales); la wallet y las firmas son reales.
+Evidencia en vivo de la suite: **`41 passed (1.7m)`**. El backend se simula con `page.route`
+(sin escrituras reales); la wallet y las firmas son reales. Además: `background` **45/45**,
+`vault` **25/25** y frontend **78/78**.
 
 ### Checklist y pendiente manual
 `RepoTecnico/pruebas/checklist_wallet_nativa.md` (51 casos) e `INFORME_WALLET_NATIVA.md`.

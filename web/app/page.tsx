@@ -146,7 +146,7 @@ export default function Landing() {
       <section className="mx-auto max-w-6xl px-6 py-16 text-center">
         <h2 className="font-display text-2xl font-bold text-navy-800">Listo para tu primer Trueke</h2>
         <p className="mx-auto mt-2 max-w-xl text-navy-800/70">
-          Conecta tu wallet (MetaMask, CodeCrypto Wallet u otra compatible) y descubre el mercado descentralizado de TrueKeate.
+          Conecta tu wallet (MetaMask, TrueKeate Wallet u otra compatible) y descubre el mercado descentralizado de TrueKeate.
         </p>
         <div className="mt-6">
           <Link href="/suite/dashboard">

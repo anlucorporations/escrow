@@ -170,7 +170,7 @@ function Notification() {
           src="/brand/TrueKeate_logoIntegral.svg"
           alt="TrueKeate"
         />
-        <h1>CodeCrypto Wallet</h1>
+        <h1>TrueKeate Wallet</h1>
         <p>
           {isTransaction
             ? 'Solicitud de firma de transacción'

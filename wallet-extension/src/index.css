@@ -8,15 +8,15 @@ html,
 body {
   margin: 0;
   padding: 0;
-  /* Ancho del popup de Chrome: formato wallet, como MetaMask (~380 px). */
-  width: 380px;
-  min-height: 520px;
+  /* Ancho FIJO de la billetera: 480 px (rediseño). */
+  width: 480px;
+  min-height: 560px;
   background: var(--smoke);
   color: var(--navy-800);
 }
 
 #root {
-  min-height: 520px;
+  min-height: 560px;
   display: flex;
   flex-direction: column;
 }

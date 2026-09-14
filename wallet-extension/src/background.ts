@@ -340,17 +340,6 @@ async function persistPendingRequests(): Promise<void> {
   }
 }
 
-/** ¿Sigue abierta esa ventana de la extensión? */
-async function windowExists(windowId?: number | null): Promise<boolean> {
-  if (!windowId) return false;
-  try {
-    await chrome.windows.get(windowId);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 /**
  * Rechaza y limpia TODAS las solicitudes pendientes (reset de la wallet) y
  * cierra sus ventanas.
@@ -403,22 +392,16 @@ async function restorePendingRequests(): Promise<void> {
       });
       approvalIdCounter = Math.max(approvalIdCounter, approvalId);
 
-      if (!(await windowExists(windowId))) {
-        console.log('🪟 Reabriendo ventana de aprobación:', approvalId);
-        await chrome.storage.local.set({
-          codecrypto_pending_request: {
-            approvalId,
-            method: raw.method,
-            params: raw.params,
-            chainId: raw.chainId
-          }
-        });
-        const win = await chrome.windows.create({
-          url: 'notification.html', type: 'popup', width: 400, height: 600, focused: true
-        });
-        const pending = pendingApprovals.get(approvalId);
-        if (pending) pending.windowId = win?.id;
-      }
+      // La solicitud se rehidrata en storage; se aprueba DENTRO de la wallet
+      // (ya no se abren ventanas flotantes independientes).
+      await chrome.storage.local.set({
+        codecrypto_pending_request: {
+          approvalId,
+          method: raw.method,
+          params: raw.params,
+          chainId: raw.chainId
+        }
+      });
     }
 
     for (const raw of connections) {
@@ -434,22 +417,15 @@ async function restorePendingRequests(): Promise<void> {
       });
       connectionIdCounter = Math.max(connectionIdCounter, requestId);
 
-      if (!(await windowExists(windowId))) {
-        console.log('🪟 Reabriendo ventana de conexión:', requestId);
-        await chrome.storage.local.set({
-          codecrypto_connect_request: {
-            requestId,
-            origin: raw.origin,
-            accounts: raw.accounts,
-            currentAccountIndex: raw.currentAccountIndex
-          }
-        });
-        const win = await chrome.windows.create({
-          url: 'connect.html', type: 'popup', width: 420, height: 650, focused: true
-        });
-        const pending = pendingConnections.get(requestId);
-        if (pending) pending.windowId = win?.id;
-      }
+      // La solicitud de conexión se rehidrata en storage para la wallet.
+      await chrome.storage.local.set({
+        codecrypto_connect_request: {
+          requestId,
+          origin: raw.origin,
+          accounts: raw.accounts,
+          currentAccountIndex: raw.currentAccountIndex
+        }
+      });
     }
 
     updateBadge();
@@ -475,7 +451,7 @@ async function requestUserApprovalAndSign(method: string, params: unknown[], cha
     chrome.notifications.create({
       type: 'basic',
       iconUrl: 'icon-128.png',
-      title: 'CodeCrypto Wallet',
+      title: 'TrueKeate Wallet',
       message: method === 'eth_sendTransaction' 
         ? '🔔 Solicitud de transacción - Abre la wallet para aprobar'
         : '🔔 Solicitud de firma - Abre la wallet para aprobar',
@@ -493,34 +469,10 @@ async function requestUserApprovalAndSign(method: string, params: unknown[], cha
         chainId: chainId
       }
     }).then(() => {
-      console.log('✅ Solicitud guardada en storage');
-      
-      // Abrir página de notificación independiente
-      console.log('🪟 Abriendo página de confirmación...');
-      chrome.windows.create({
-        url: 'notification.html',
-        type: 'popup',
-        width: 400,
-        height: 600,
-        focused: true
-      }).then((window: chrome.windows.Window | undefined) => {
-        console.log('✅ Ventana de confirmación abierta:', window?.id);
-        
-        // Guardar el ID de la ventana
-        const pending = pendingApprovals.get(approvalId);
-        if (pending && window) {
-          pending.windowId = window.id;
-          void persistPendingRequests();
-        }
-      }).catch((err: Error) => {
-        console.error('❌ No se pudo abrir ventana de confirmación:', err);
-        // Limpiar solicitud pendiente
-        pendingApprovals.delete(approvalId);
-        chrome.storage.local.remove('codecrypto_pending_request');
-        updateBadge();
-        void persistPendingRequests();
-        reject(new AppError(RPC_ERROR_CODES.internal, 'Failed to open confirmation window'));
-      });
+      // La aprobación se muestra DENTRO de la wallet (mismo espacio que el popup);
+      // el badge y la notificación avisan al usuario de que abra la wallet. Las
+      // ventanas flotantes independientes se eliminaron (rediseño de la wallet).
+      console.log('✅ Solicitud guardada: se aprueba en la wallet');
     }).catch((err: Error) => {
       console.error('❌ Error guardando solicitud:', err);
       pendingApprovals.delete(approvalId);
@@ -578,32 +530,8 @@ async function requestUserConnection(origin: string, accounts: string[], current
         currentAccountIndex: currentAccountIndex
       }
     }).then(() => {
-      console.log('✅ Solicitud de conexión guardada en storage');
-      
-      // Abrir ventana de conexión
-      console.log('🪟 Abriendo ventana de conexión...');
-      chrome.windows.create({
-        url: 'connect.html',
-        type: 'popup',
-        width: 420, 
-        height: 650,
-        focused: true
-      }).then((window: chrome.windows.Window | undefined) => {
-        console.log('✅ Ventana de conexión abierta:', window?.id);
-        
-        // Guardar el ID de la ventana
-        const pending = pendingConnections.get(requestId);
-        if (pending && window) {
-          pending.windowId = window.id;
-          void persistPendingRequests();
-        }
-      }).catch((err: Error) => {
-        console.error('❌ No se pudo abrir ventana de conexión:', err);
-        pendingConnections.delete(requestId);
-        chrome.storage.local.remove('codecrypto_connect_request');
-        void persistPendingRequests();
-        reject(new AppError(RPC_ERROR_CODES.internal, 'Failed to open connection window'));
-      });
+      // La solicitud de conexión se atiende DENTRO de la wallet (mismo espacio).
+      console.log('✅ Solicitud de conexión guardada: se atiende en la wallet');
     }).catch((err: Error) => {
       console.error('❌ Error guardando solicitud de conexión:', err);
       pendingConnections.delete(requestId);
@@ -934,7 +862,7 @@ async function obtenerMnemonic(): Promise<string> {
     if (!claro) {
       throw new AppError(
         RPC_ERROR_CODES.unauthorized,
-        `Wallet bloqueada: abre CodeCrypto Wallet y desbloquea con tu contraseña ` +
+        `Wallet bloqueada: abre TrueKeate Wallet y desbloquea con tu contraseña ` +
           `(se bloquea sola tras ${MINUTOS_AUTOBLOQUEO} minutos de inactividad).`
       );
     }

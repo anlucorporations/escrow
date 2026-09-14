@@ -53,7 +53,7 @@ interface ManifestV3 {
 
 const manifest: ManifestV3 = {
   manifest_version: 3,
-  name: 'CodeCrypto Wallet',
+  name: 'TrueKeate Wallet',
   version: '1.1.0',
   description: 'Wallet extension para Ethereum con soporte EIP-1193, EIP-712 y EIP-6963',
   permissions: [
@@ -76,7 +76,7 @@ const manifest: ManifestV3 = {
   ],
   action: {
     default_popup: 'index.html',
-    default_title: 'CodeCrypto Wallet',
+    default_title: 'TrueKeate Wallet',
     default_icon: {
       '16': 'icon-16.png',
       '48': 'icon-48.png',

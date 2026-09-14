@@ -6,7 +6,7 @@
 //
 // Flujo (decisión del director, 2026-09-13): al pulsar el botón se abre un
 // POPUP con TODAS las billeteras detectadas en el navegador (MetaMask, Rabby,
-// Backpack, CodeCrypto Wallet, … vía EIP-6963 + la legacy de window.ethereum).
+// Backpack, TrueKeate Wallet, … vía EIP-6963 + la legacy de window.ethereum).
 // El usuario elige UNA; esa elección (1) conecta la cuenta, (2) consulta el
 // estado de inscripción y (3) si está inscrito, pide la ÚNICA firma EIP-191 que
 // emite el token de sesión global. Después NO queda ningún selector en la

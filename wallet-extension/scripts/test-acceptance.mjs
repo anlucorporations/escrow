@@ -77,7 +77,7 @@ const { check, summary, results } = createReporter()
 
 addTab(1, SITE_URL)
 const dappSender = { tab: { id: 1, url: SITE_URL } }
-const popupSender = {}
+const popupSender = { origin: 'chrome-extension://test/' }
 const provider = new ethers.JsonRpcProvider(RPC_URL)
 
 const evidence = []
@@ -86,14 +86,14 @@ function note(text) {
   console.log(`     ↳ ${text}`)
 }
 
-/** Simula que el usuario aprueba la solicitud pendiente en notification.html. */
+/** Simula que el usuario aprueba la solicitud pendiente en la wallet. */
 async function approvePending() {
   const pending = localData.get('codecrypto_pending_request')
   if (!pending) throw new Error('No hay solicitud de aprobación pendiente')
   return send({ type: 'SIGN_RESPONSE', approvalId: pending.approvalId, success: true }, popupSender)
 }
 
-/** Simula que el usuario elige una cuenta en connect.html. */
+/** Simula que el usuario elige una cuenta en la wallet. */
 async function approveConnection(accountIndex) {
   const request = localData.get('codecrypto_connect_request')
   const accounts = localData.get('codecrypto_accounts')
@@ -107,9 +107,9 @@ async function approveConnection(accountIndex) {
   }, popupSender)
 }
 
-/** ¿Hay una ventana abierta con esa URL? */
-function hasWindow(url) {
-  return Array.from(openWindows.values()).some((win) => win.url === url)
+/** Las aprobaciones se atienden en la wallet: nunca debe abrirse una ventana. */
+function sinVentanas() {
+  return openWindows.size === 0
 }
 
 /** ¿Se difundió ese evento a la pestaña de la dApp? */
@@ -185,7 +185,7 @@ const connectRpc = send({ type: 'CODECRYPTO_RPC', method: 'eth_requestAccounts',
 await delay(120)
 
 const connectRequest = localData.get('codecrypto_connect_request')
-check('se abre la ventana connect.html', hasWindow('connect.html'), JSON.stringify([...openWindows.values()]))
+check('la solicitud queda pendiente en la wallet (sin ventana flotante)', Boolean(connectRequest) && sinVentanas(), JSON.stringify([...openWindows.values()]))
 check('la solicitud incluye el origen de la dApp', connectRequest?.origin === SITE_URL, String(connectRequest?.origin))
 check('la solicitud lleva las 5 cuentas', connectRequest?.accounts?.length === 5)
 
@@ -224,7 +224,8 @@ const txRpc = send({
 await delay(150)
 
 const pendingTx = localData.get('codecrypto_pending_request')
-check('se abre la ventana notification.html', hasWindow('notification.html'))
+check('la solicitud de firma queda pendiente en la wallet (sin ventana flotante)',
+  Boolean(pendingTx) && sinVentanas())
 check('la solicitud muestra destino, valor y red',
   pendingTx?.params?.[0]?.to === recipient && pendingTx?.chainId === '0x7a69',
   JSON.stringify(pendingTx?.params?.[0]))
@@ -423,7 +424,7 @@ const badgeRpc = send({
 }, dappSender)
 await delay(150)
 check('con una solicitud pendiente el badge muestra 1', getBadgeText() === '1', getBadgeText())
-check('se abrió la ventana de confirmación automáticamente', hasWindow('notification.html'))
+check('la confirmación se muestra en la wallet, sin ventana flotante', sinVentanas())
 await approvePending()
 await badgeRpc
 check('al resolverse, el badge vuelve a estar vacío', getBadgeText() === '', getBadgeText())
@@ -443,10 +444,10 @@ const connectRpc2 = send({ type: 'CODECRYPTO_RPC', method: 'eth_requestAccounts'
 await delay(120)
 
 const connectRequest2 = localData.get('codecrypto_connect_request')
-check('connect.html muestra el origen de la solicitud',
+check('la solicitud de conexión en la wallet lleva el origen',
   connectRequest2?.origin === 'http://localhost:5173/otra.html', String(connectRequest2?.origin))
-check('la ventana de conexión se abre con las 5 cuentas',
-  connectRequest2?.accounts?.length === 5 && hasWindow('connect.html'))
+check('la solicitud de conexión lleva las 5 cuentas y no abre ventana',
+  connectRequest2?.accounts?.length === 5 && sinVentanas())
 
 await approveConnection(3)
 const connected2 = await connectRpc2
@@ -502,7 +503,7 @@ const lines = [
   '**Casos que requieren navegador (MANUAL)**',
   '',
   'Estos puntos no se pueden automatizar en Node y se verifican cargando `dist/` en Chrome:',
-  'la apertura real de las ventanas `connect.html` / `notification.html`, la notificación',
+  'la vista real de aprobación **dentro de la wallet**, la notificación',
   'nativa de Chrome, el render del popup (selector de cuentas, panel de actividad, alta de',
   'redes con el diálogo de permisos) y el aspecto visual del badge. Los pasos están en',
   '`INSTRUCCIONES.md` (§6, §7 y §8).',

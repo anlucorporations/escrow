@@ -1,4 +1,4 @@
-# 🔐 CodeCrypto Wallet — Extensión de Chrome
+# 🔐 TrueKeate Wallet — Extensión de Chrome
 
 **Versión 1.1.0** · Wallet Ethereum como extensión de navegador (Manifest V3), al
 estilo de MetaMask, con soporte para **EIP-1193**, **EIP-712**, **EIP-1559** y
@@ -40,13 +40,22 @@ blockchain local de desarrollo.
   `wallet_switchEthereumChain`, con alta de redes desde el popup y validación del RPC
 - Eventos `accountsChanged` y `chainChanged` emitidos a **todas las pestañas**
 
-### Experiencia de aprobación (como MetaMask)
-- `connect.html` (420×650) para elegir qué cuenta compartir con cada dApp
-- `notification.html` (400×600) para aprobar o rechazar transacciones y firmas
+### Experiencia de aprobación (rediseño 2026-09-14 · RF-WN-28..33)
+
+- **Un único espacio de 480 px**: el popup de la wallet. Las solicitudes de
+  **conexión**, las **firmas** (`personal_sign`, `eth_signTypedData_v4`,
+  `eth_sendTransaction`) y las **notificaciones** se muestran **dentro de la
+  wallet**, con el mismo diseño que las páginas internas; ya no se abren ventanas
+  flotantes (`connect.html` / `notification.html` quedan como páginas heredadas).
+- **Cabecera alineada arriba**: línea 1 = logo + título **TrueKeate Wallet**;
+  línea 2 = selector de cuenta (dirección acortada) + nombre de la red conectada.
+- **Secciones como páginas**: Cuenta, Balance, Recibir, Enviar, Comprar, Cambiar,
+  Contactos, Red, Características, Configuración, Conexiones, Notificaciones,
+  Redes y Perfil ocupan todo el espacio y vuelven al inicio con la **flecha ←**.
 - **Badge** con el número de solicitudes pendientes y **notificación** de Chrome
+  para avisar de que hay que abrir la wallet.
 - La dApp espera hasta **130 s** (la aprobación caduca a los 120 s)
 - Las solicitudes **sobreviven** a que Chrome duerma el service worker
-- Cerrar la ventana a mano **rechaza** la solicitud al instante
 - **Panel de actividad** en el popup que muestra también lo que ocurre en las dApps:
   llamadas RPC, eventos, transacciones, firmas y errores (historial de 200 entradas
   persistido, con botón para limpiarlo)
@@ -126,16 +135,17 @@ npm run dev        # 4. sirve test.html en http://localhost:5173/test.html
   *instalada / no instalada*.
 - **Descubrimiento**: la dApp escucha **EIP-6963** y la lista junto a MetaMask/Rabby/Backpack;
   el usuario elige en un popup y esa elección gobierna el login y las firmas de la sesión.
-- **UI del popup** (identidad TrueKeate): fichas contraíbles — Cuenta, Balance, Gestionar saldo
+- **UI del popup** (identidad TrueKeate, ancho fijo 480 px): **páginas** con flecha de
+  volver — Inicio (saldo + menú), Cuenta, Balance, Gestionar saldo
   (Recibir QR · Enviar · Comprar · Cambiar · Contactos), Red, Características (**Tokens** ERC-20,
-  **NFT**, **Actividad**), Configuración (notificaciones, modo de vista, redes, ayuda, perfil) y
-  Conexiones con desconexión por dApp.
+  **NFT**, **Actividad**), Configuración (notificaciones, modo de vista, redes, ayuda, perfil),
+  Conexiones con desconexión por dApp y **Notificaciones**.
 - **Modos de vista**: panel lateral, pestaña o **flotante** (overlay inyectado por content script).
 - **Métodos solo-extensión**: `wallet_revealMnemonic`, `wallet_changeVaultPassword`,
   `wallet_exportVault`/`wallet_importVault`, `wallet_getConnectedSites`/`wallet_disconnectSite`
   (las dApps no pueden invocarlos).
 - **E2E**: `cd ../web && npm run test:wallet` prueba la plataforma con esta extensión **real**
-  (40 tests en `web/e2e-wallet/`).
+  (41 tests en `web/e2e-wallet/`).
 
 ---
 
@@ -151,13 +161,13 @@ proveedores EIP-1193), así que sirve también para comparar con otras wallets.
 ### Pruebas automatizadas
 
 ```bash
-npm test                  # las cuatro baterías (92 comprobaciones)
+npm test                  # las cuatro baterías (96 comprobaciones)
 npm run test:acceptance   # los 11 casos del enunciado contra anvil real (50)
 npm run test:extension    # smoke test en Chrome real (7; requiere puppeteer)
 npm run verify            # build + todas las pruebas
 npm run test:amount       # conversión ETH → wei (20)
 npm run test:contracts    # forge test (6)
-npm run test:background   # service worker con chrome simulado (41)
+npm run test:background   # service worker con chrome simulado (45)
 npm run test:vault        # bóveda cifrada del mnemonic (25)
 npm run lint              # ESLint (0 errores)
 ```
@@ -195,7 +205,7 @@ await window.codecrypto.request({ method: 'eth_chainId' })
 // Balance
 await window.codecrypto.request({ method: 'eth_getBalance', params: [account, 'latest'] })
 
-// Enviar transacción (se abre la ventana de aprobación)
+// Enviar transacción (la aprobación aparece dentro de la wallet)
 await window.codecrypto.request({
   method: 'eth_sendTransaction',
   params: [{ from: account, to: '0x…', value: '0x…', data: '0x' }]
@@ -274,8 +284,9 @@ mnemonic desde `chrome.storage.local`.
 ├── src/
 │   ├── background.ts · vault.ts                     Service worker (RPC/firma) y bóveda cifrada
 │   ├── inject.ts · content-script.ts · floating.ts  Provider EIP-1193/6963 y overlay flotante
-│   ├── App.tsx · Connect.tsx · Notification.tsx     Popup y ventanas de aprobación
-│   └── components/                                  Ficha, Tokens, NFT, Actividad, RecibirQR,
+│   ├── App.tsx · Connect.tsx · Notification.tsx     Popup (páginas + aprobaciones en línea)
+│   ├── components/Aprobacion.tsx · Inicio.tsx · Pagina.tsx   Vistas del rediseño
+│   └── components/                                  Tokens, NFT, Actividad, RecibirQR,
 │                                                    Contactos, Comprar, Cambiar, Configuración,
 │                                                    Redes, Perfil, ChainManager, VaultUnlock…
 ├── contracts/  test/       Contrato de ejemplo y pruebas (Foundry)

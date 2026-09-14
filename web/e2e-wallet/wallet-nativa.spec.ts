@@ -184,10 +184,10 @@ test("TC-WN-07 y 09 · modal de selección y cero interferencia con MetaMask", a
     const dialogo = page.getByRole("dialog", { name: "Elige tu billetera" });
     await expect(dialogo).toBeVisible();
     await expect(dialogo).toContainText("MetaMask");
-    await expect(dialogo).toContainText("CodeCrypto Wallet");
+    await expect(dialogo).toContainText("TrueKeate Wallet");
 
-    // Elegir CodeCrypto y comprobar la no interferencia
-    await dialogo.getByRole("button", { name: /CodeCrypto Wallet/ }).click();
+    // Elegir TrueKeate y comprobar la no interferencia
+    await dialogo.getByRole("button", { name: /TrueKeate Wallet/ }).click();
     await page.waitForTimeout(4000);
     const estado = await page.evaluate(() => ({
       ethereumEsMetaMask: Boolean(
@@ -212,8 +212,8 @@ test("TC-WN-13 · el popup muestra la identidad de TrueKeate", async () => {
     const page = await ctx.newPage();
     await page.goto(`chrome-extension://${id}/index.html`, { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(2000);
-    await expect(page.locator(".tk-brand__title")).toHaveText("CodeCrypto Wallet");
-    await expect(page.locator(".tk-brand__logo")).toHaveAttribute("src", /logoIntegral/);
+    await expect(page.locator(".tk-header__titulo")).toHaveText("TrueKeate Wallet");
+    await expect(page.locator(".tk-header__logo")).toHaveAttribute("src", /logoIntegral/);
   } finally {
     await ctx.close();
   }

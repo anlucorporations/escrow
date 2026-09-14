@@ -21,7 +21,7 @@ const PASOS = [
     titulo: "Carga la extensión",
     texto: "Abre chrome://extensions, activa el Modo de desarrollador y pulsa «Cargar descomprimida»; elige la carpeta.",
   },
-  { n: 4, titulo: "Conecta", texto: "Recarga TrueKeate, pulsa Conectar y elige «CodeCrypto Wallet»." },
+  { n: 4, titulo: "Conecta", texto: "Recarga TrueKeate, pulsa Conectar y elige «TrueKeate Wallet»." },
 ];
 
 export default function InstalarWalletPage() {

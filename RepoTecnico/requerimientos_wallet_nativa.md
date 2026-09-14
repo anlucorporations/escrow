@@ -227,3 +227,28 @@ API de **NFT/DeFi**, proveedor **on-ramp** para **Comprar**, almacén de **conta
 
 Responder el **bloque de preguntas** de la §7 (las 3 primeras desbloquean C0/C1). Con las
 respuestas se cierra la Fase 1 y se aprueba el plan de ciclos.
+
+---
+
+## 16. Rediseño: navegación por páginas y aprobaciones dentro de la wallet (2026-09-14)
+
+Instrucción del director (revisión de la extensión):
+
+- **RF-WN-28 · Aprobaciones en el mismo espacio**: confirmaciones, autorizaciones, firmas y
+  notificaciones se muestran **dentro de la wallet** (mismo espacio y forma que la página
+  principal). Se **eliminan las ventanas flotantes** independientes que abría el background
+  (`chrome.windows.create` de `notification.html`/`connect.html`).
+- **RF-WN-29 · Secciones como páginas**: cada sección es una **página propia** que ocupa todo el
+  espacio de la billetera, invocada desde el inicio y con **flecha para volver al inicio**.
+- **RF-WN-30 · Título**: el título de la billetera es **TrueKeate Wallet**.
+- **RF-WN-31 · Header en dos líneas**: línea 1 = **icono + título** (sin subtítulo); línea 2 =
+  **selector de cuentas** (dirección resumida, no completa) + **nombre de la red** conectada.
+  Alineado a la parte superior.
+- **RF-WN-32 · Cuerpo**: contiene las diferentes páginas.
+- **RF-WN-33 · Espacio fijo de 480 px**; en móvil se muestra como **pestaña flotante** del navegador.
+
+**Decisión D-NW-6** (sustituye a D-NW-5): el nombre visible pasa a **TrueKeate Wallet** en la
+interfaz (se mantiene el `rdns` `io.codecrypto.wallet` para no invalidar la elección guardada).
+
+Estado: **implementado** (rediseño de App: header, Inicio + `Pagina`, `Aprobacion` en el popup y
+background sin ventanas de aprobación).

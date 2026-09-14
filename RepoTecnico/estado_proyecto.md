@@ -938,17 +938,24 @@ nativa** al proyecto.
   - **Pruebas (Fase 4):** checklist E2E de **51 casos** y plantilla de informe en
     `RepoTecnico/pruebas/checklist_wallet_nativa.md` e
     `RepoTecnico/pruebas/INFORME_WALLET_NATIVA.md`. Suite **automatizada** en
-    `web/e2e-wallet/` (`npm run test:wallet`): **40 tests** en 4 specs
+    `web/e2e-wallet/` (`npm run test:wallet`): **41 tests** en 4 specs
     (`wallet-nativa` web/instalación/detección/modos, `wallet-popup` todas las funciones
     del popup, `wallet-firmas` conexión + EIP-191 + EIP-712 + rechazo, y
     **`plataforma-wallet`** que prueba la **plataforma × wallet real**: descubrimiento,
     conexión, login, firma por acción, sesión, `accountsChanged`, `chainChanged` y
     desconexión/revocación). Se corrigieron además el guard «solo extensión» (por origen,
-    no por `sender.tab`) y la etiqueta EIP-191 vs EIP-712 en la ventana de firma.
+    no por `sender.tab`) y la etiqueta EIP-191 vs EIP-712 en la vista de firma.
+  - **REDISEÑO DE LA WALLET (2026-09-14 · D-NW-6, RF-WN-28..33):** la wallet pasa a llamarse
+    **TrueKeate Wallet** (manifest, EIP-6963 y cabecera; se conserva el `rdns`
+    `io.codecrypto.wallet`); el espacio es fijo de **480 px**; la cabecera se alinea arriba
+    (línea 1: logo + título · línea 2: cuenta acortada + red); las secciones son **páginas**
+    completas con **flecha de volver**; y las **conexiones, firmas y notificaciones se
+    atienden dentro de la propia wallet** (se eliminaron las 4 ventanas flotantes de
+    `background.ts`). Suite E2E actualizada a **41/41**, `background` **45/45**, `vault` **25/25**.
   - **Pendiente manual:** TC-WN-03, 08, 17, 37, 43, 49, 50 y 51 (panel lateral del
     navegador, permisos de host, autobloqueo…).
   - **CIERRE:** informe final en `RepoTecnico/INFORME_CIERRE_WALLET_NATIVA.md` (alcance,
-    matriz RF-WN-01..27, decisiones D-NW-1..5, correcciones, despliegues y evidencia **40/40**).
+    matriz RF-WN-01..33, decisiones D-NW-1..6, correcciones, despliegues y evidencia **41/41**).
   - **DESPLIEGUE FINAL GCP (2026-09-14):** **un único proyecto y despliegue** en `truekeate-main`:
     web `truekeate-web` **europe-west1 rev. 00044-8sw** (imagen `web:release-d0972fc-final`,
     commit `d0972fc`) y API `truekeate-api` **rev. 00027-d4h** (imagen `backend:release-b4feb46`).
@@ -957,5 +964,8 @@ nativa** al proyecto.
     `/`, `/suite/dashboard`, `/instalar-wallet`, `/help/manual`, `/wallet/TrueKeateWallet.zip` y
     API `/health` → **200**; el antiguo dominio de southamerica → 404. Contratos, BD e indexador
     sin cambios en este sub-proyecto.
-- **Decisión (D-NW-5):** se **mantiene «CodeCrypto Wallet»** como nombre de producto; la
-  identidad visual es la de TrueKeate y manifest/EIP-6963 quedan intactos.
+- **Decisión (D-NW-5, superseded por D-NW-6):** inicialmente se mantuvo «CodeCrypto Wallet»
+  como nombre de producto.
+- **Decisión (D-NW-6):** el nombre visible pasa a **TrueKeate Wallet** (manifest, EIP-6963,
+  cabecera y páginas); se conserva el `rdns` `io.codecrypto.wallet` para no invalidar las
+  elecciones guardadas en la plataforma.

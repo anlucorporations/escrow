@@ -51,21 +51,19 @@ export async function popupConWallet(ctx: BrowserContext, id: string, password =
   await popup.locator("#vault-pass").fill(password);
   await popup.locator("#vault-pass2").fill(password);
   await popup.getByRole("button", { name: /Cifrar y continuar/ }).click();
-  await popup.locator(".tk-ficha").first().waitFor({ timeout: 90_000 }); // PBKDF2
+  await popup.locator(".tk-inicio").first().waitFor({ timeout: 90_000 }); // PBKDF2
   await popup.waitForTimeout(1200);
   return popup;
 }
 
-/** Despliega una ficha del popup si no está ya abierta. */
-export async function abrirFicha(popup: Page, titulo: string): Promise<void> {
-  const cabecera = popup.locator(".tk-ficha__cabecera", { hasText: titulo }).first();
-  if ((await cabecera.getAttribute("aria-expanded")) !== "true") await cabecera.click();
-  await popup.waitForTimeout(250);
+/** Abre una sección desde el inicio (navegación por páginas). */
+export async function abrirSeccion(popup: Page, nombre: string | RegExp): Promise<void> {
+  await popup.locator(".tk-inicio__seccion", { hasText: nombre }).first().click();
+  await popup.waitForTimeout(300);
 }
 
-/** Cierra una ficha del popup si está abierta. */
-export async function cerrarFicha(popup: Page, titulo: string): Promise<void> {
-  const cabecera = popup.locator(".tk-ficha__cabecera", { hasText: titulo }).first();
-  if ((await cabecera.getAttribute("aria-expanded")) === "true") await cabecera.click();
-  await popup.waitForTimeout(200);
+/** Vuelve al inicio desde una página interna. */
+export async function volverInicio(popup: Page): Promise<void> {
+  await popup.locator(".tk-pagina__volver").first().click();
+  await popup.waitForTimeout(250);
 }

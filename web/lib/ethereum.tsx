@@ -49,7 +49,7 @@ export interface EstadoEthereum {
   account: string | null;
   provider: BrowserProvider | null;
   signer: JsonRpcSigner | null;
-  /** Proveedor EIP-1193 de la wallet ELEGIDA (MetaMask, CodeCrypto Wallet, …).
+  /** Proveedor EIP-1193 de la wallet ELEGIDA (MetaMask, TrueKeate Wallet, …).
    *  Es la fuente de verdad para firmar, escuchar eventos y cambiar de red;
    *  window.ethereum solo se usa como último recurso. */
   proveedorActivo: Eip1193Provider | null;

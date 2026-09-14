@@ -65,25 +65,32 @@ async function simularBackend(pagina: Page): Promise<void> {
   );
 }
 
-/** Espera una ventana nueva de la extensión con el texto dado. */
-async function esperarVentana(texto: RegExp, antes: Page[] = []): Promise<Page> {
-  const excluidas = new Set(antes);
-  const limite = Date.now() + 30_000;
-  while (Date.now() < limite) {
-    const paginas = ctx
-      .pages()
-      .filter((p) => p.url().includes("chrome-extension://") && !excluidas.has(p));
-    for (const p of paginas) {
-      const contenido = await p.content().catch(() => "");
-      if (texto.test(contenido)) return p;
-    }
-    await new Promise((r) => setTimeout(r, 400));
-  }
-  throw new Error(`No apareció la ventana ${texto}`);
+/**
+ * Espera la vista de aprobación DENTRO de la wallet (popup) y verifica su texto.
+ * El rediseño eliminó las ventanas flotantes: todo se atiende en la wallet.
+ */
+async function esperarAprobacion(texto: RegExp): Promise<void> {
+  await popup.locator(".tk-aprobacion").waitFor({ timeout: 30_000 });
+  await expect(popup.locator(".tk-aprobacion")).toContainText(texto);
 }
 
-async function esperarCierre(win: Page): Promise<void> {
-  await win.waitForEvent("close", { timeout: 8_000 }).catch(() => undefined);
+/** Aprueba (último botón de la vista) y espera a que la aprobación desaparezca. */
+async function aprobar(): Promise<void> {
+  await popup.locator(".tk-aprobacion__acciones .tk-btn").last().click();
+  await popup
+    .locator(".tk-aprobacion")
+    .waitFor({ state: "detached", timeout: 15_000 })
+    .catch(() => undefined);
+}
+
+/** Comprueba que la aprobación no abrió ninguna ventana flotante nueva. */
+function sinVentanasNuevas(antes: Page[]): void {
+  const nuevas = ctx
+    .pages()
+    .filter(
+      (p) => !antes.includes(p) && p.url().includes("chrome-extension://") && !p.url().includes("popup.html")
+    );
+  expect(nuevas.length).toBe(0);
 }
 
 test.beforeAll(async () => {
@@ -114,11 +121,12 @@ test("P-01 · la plataforma descubre la wallet nativa y la ofrece", async () => 
     .click();
   const dialogo = page.getByRole("dialog", { name: "Elige tu billetera" });
   await expect(dialogo).toBeVisible();
-  await expect(dialogo).toContainText("CodeCrypto Wallet");
+  await expect(dialogo).toContainText("TrueKeate Wallet");
   await dialogo.getByRole("button", { name: /Cerrar/ }).click();
 });
 
 test("P-02 · conexión con autorización y login EIP-191", async () => {
+  const antes = ctx.pages();
   await page
     .getByRole("main")
     .getByRole("button", { name: /Conectar .* e iniciar sesión/ })
@@ -126,19 +134,18 @@ test("P-02 · conexión con autorización y login EIP-191", async () => {
     .click();
   await page
     .getByRole("dialog", { name: "Elige tu billetera" })
-    .getByRole("button", { name: /CodeCrypto Wallet/ })
+    .getByRole("button", { name: /TrueKeate Wallet/ })
     .click();
 
-  // Ventana de autorización por origen
-  const connect = await esperarVentana(/Solicitud de autorizaci/i);
-  await expect(connect.locator(".connect-origin")).toContainText(/truekeate/i);
-  await connect.locator(".account-item").first().click();
-  await connect.getByRole("button", { name: /Conectar/ }).click();
+  // Autorización por origen: se muestra dentro de la wallet
+  await esperarAprobacion(/Solicitud de autorizaci/i);
+  await expect(popup.locator(".tk-aprobacion__dapp")).toContainText(/truekeate/i);
+  sinVentanasNuevas(antes);
+  await aprobar();
 
-  // Login único: firma EIP-191 con la wallet real
-  const firma = await esperarVentana(/EIP-191/i);
-  await expect(firma.locator(".notification-header")).toContainText(/EIP-191/i);
-  await firma.getByRole("button", { name: /Aprobar/ }).click();
+  // Login único: firma EIP-191 con la wallet real, también en la wallet
+  await esperarAprobacion(/EIP-191/i);
+  await aprobar();
 
   await expect(page.getByRole("heading", { name: "Mi Trueke Central" })).toBeVisible({ timeout: 25_000 });
   const estado = await page.evaluate(() => ({
@@ -148,8 +155,7 @@ test("P-02 · conexión con autorización y login EIP-191", async () => {
   expect(estado.token).toBe("tok-e2e-wallet");
   expect(estado.cuenta).toBe(CUENTA_0.toLowerCase());
   expect(await page.getByText(/otra red/i).count()).toBe(0); // eth_chainId correcto
-  await esperarCierre(connect);
-  await esperarCierre(firma);
+  sinVentanasNuevas(antes);
 });
 
 test("P-03 · sesión persistente: recargar no re-firma", async () => {
@@ -182,11 +188,11 @@ test("P-05 · firma por acción (personal_sign) al publicar en el inventario", a
   await page.getByPlaceholder(/Bicicleta de montaña/).fill("Artículo E2E");
   const antes = ctx.pages();
   await page.getByRole("button", { name: /Publicar artículo/ }).click();
-  const firma = await esperarVentana(/EIP-191/i, antes);
-  await firma.getByRole("button", { name: /Aprobar/ }).click();
+  await esperarAprobacion(/EIP-191/i);
+  sinVentanasNuevas(antes);
+  await aprobar();
   // La plataforma envía la acción firmada (backend simulado) sin error
   await expect(page.getByText(/error al publicar/i)).toHaveCount(0, { timeout: 15_000 });
-  await esperarCierre(firma);
 });
 
 // ── Eventos de la wallet ────────────────────────────────────────────────
@@ -194,12 +200,12 @@ test("P-05 · firma por acción (personal_sign) al publicar en el inventario", a
 test("P-06 · accountsChanged: cambiar de cuenta en la wallet actualiza la plataforma", async () => {
   await page.goto(`${SITE}/suite/dashboard`, { waitUntil: "domcontentloaded" });
   await page.waitForTimeout(2000);
-  await popup.locator(".account-selector select").selectOption("1");
+  await popup.locator(".tk-header__cuenta").selectOption("1");
   await page.waitForTimeout(2500);
   expect(await page.evaluate(() => localStorage.getItem("truekeate.account"))).toBe(
     CUENTA_1.toLowerCase()
   );
-  await popup.locator(".account-selector select").selectOption("0");
+  await popup.locator(".tk-header__cuenta").selectOption("0");
   await page.waitForTimeout(1500);
 });
 

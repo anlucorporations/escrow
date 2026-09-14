@@ -38,7 +38,7 @@ function PantallaConectar() {
         </h1>
         <p className="mx-auto mt-2 max-w-md text-sm text-navy-800/60">
           El área de la suite es privada. Conecta tu billetera (MetaMask,
-          CodeCrypto Wallet u otra compatible) para iniciar sesión con tu cuenta
+          TrueKeate Wallet u otra compatible) para iniciar sesión con tu cuenta
           (una sola firma). Al pulsar Conectar se abre un popup con las
           billeteras de tu navegador: elige una y toda la sesión usará esa. El
           público en general solo tiene acceso a la página de inicio.
@@ -73,7 +73,7 @@ function PantallaConectar() {
             <p className="text-sm font-bold text-navy-800">🦊 No se detectó una wallet en este navegador</p>
             <p className="mt-1 text-xs text-navy-800/70">
               Instala la <strong>extensión de MetaMask</strong> o la{" "}
-              <strong>extensión CodeCrypto Wallet</strong> (u otra wallet
+              <strong>extensión TrueKeate Wallet</strong> (u otra wallet
               compatible, RF-16.1), recarga la página y vuelve a pulsar
               “Conectar”. Si tienes varias, el popup de conexión te deja elegir
               con cuál entrar y esa se usará en toda la sesión. Si estás en el

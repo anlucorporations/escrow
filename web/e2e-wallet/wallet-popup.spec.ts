@@ -1,10 +1,8 @@
 // =============================================================================
 // TrueKeate — E2E de FUNCIONES del popup de la wallet nativa · Fase 4
 //
-// Recorrido completo de la interfaz autenticada: cuenta, balance, gestión de
-// saldo (Recibir/Enviar/Comprar/Cambiar/Contactos), red, características
-// (Tokens/NFT/Actividad), conexiones, configuración (notificaciones, modos,
-// redes, ayuda, perfil), perfil (modo oscuro, respaldo, clave, backup) y pie.
+// Rediseño (2026-09-14): navegación POR PÁGINAS (inicio → sección → volver),
+// header de 2 líneas (título + cuenta/red) y ancho fijo 480 px.
 //
 // Uso:  (desde web/)  npm run test:wallet
 // =============================================================================
@@ -18,8 +16,8 @@ import {
   extDisponible,
   lanzarExtension,
   popupConWallet,
-  abrirFicha,
-  cerrarFicha,
+  abrirSeccion,
+  volverInicio,
 } from "./helpers";
 
 declare const chrome: {
@@ -50,94 +48,97 @@ test.afterAll(async () => {
   await ctx?.close();
 });
 
-// ── Cuenta y balance ────────────────────────────────────────────────────
+// ── Header, inicio y navegación ─────────────────────────────────────────
 
-test("F-01 · Cuenta: dirección derivada y cambio de cuenta", async () => {
-  await abrirFicha(popup, "Cuenta");
-  await expect(popup.locator(".address")).toContainText(CUENTA_0.slice(0, 10));
-  await popup.locator(".account-selector select").selectOption("1");
+test("F-00 · header de dos líneas, ancho 480 y menú de inicio", async () => {
+  await expect(popup.locator(".tk-header__titulo")).toHaveText("TrueKeate Wallet");
+  await expect(popup.locator(".tk-header__cuenta")).toBeVisible();
+  await expect(popup.locator(".tk-header__red")).toContainText(/Anvil|31337/);
+  expect(await popup.evaluate(() => getComputedStyle(document.body).width)).toBe("480px");
+  await expect(popup.locator(".tk-inicio__seccion")).toHaveCount(11);
+});
+
+test("F-01 · Cuenta: dirección y cambio desde el header", async () => {
+  await abrirSeccion(popup, "Cuenta");
+  await expect(popup.locator(".tk-pagina__dato")).toContainText(CUENTA_0.slice(0, 10));
+  await popup.locator(".tk-header__cuenta").selectOption("1");
   await popup.waitForTimeout(600);
-  await expect(popup.locator(".address")).toContainText(CUENTA_1.slice(0, 10));
-  await popup.locator(".account-selector select").selectOption("0"); // restaurar
+  await expect(popup.locator(".tk-pagina__dato")).toContainText(CUENTA_1.slice(0, 10));
+  await popup.locator(".tk-header__cuenta").selectOption("0");
+  await expect(popup.locator(".tk-pagina__volver")).toBeVisible();
+  await volverInicio(popup);
 });
 
 test("F-02 · Balance: muestra el saldo de ETH", async () => {
-  await expect(popup.locator(".balance")).toContainText("ETH");
+  await abrirSeccion(popup, "Balance");
+  await expect(popup.locator(".tk-inicio__monto")).toContainText("ETH");
+  await volverInicio(popup);
 });
 
-// ── Gestión de saldo ────────────────────────────────────────────────────
+// ── Gestión de saldo (páginas independientes) ───────────────────────────
 
 test("F-03 · Recibir: QR y copiar", async () => {
-  await abrirFicha(popup, "Gestionar saldo");
-  await popup.getByRole("button", { name: /Recibir/ }).click();
+  await abrirSeccion(popup, "Recibir");
   await expect(popup.locator(".tk-recibir svg")).toBeVisible();
   await expect(popup.locator(".tk-recibir__direccion")).toContainText(CUENTA_0.slice(0, 8));
   await expect(popup.getByRole("button", { name: /Copiar dirección/ })).toBeVisible();
-  await popup.getByRole("button", { name: /Recibir/ }).click(); // cerrar
+  await volverInicio(popup);
 });
 
-test("F-04 · Enviar: formulario de envío disponible", async () => {
-  await abrirFicha(popup, "Enviar");
-  const ficha = popup.locator(".tk-ficha", { hasText: "Enviar" }).first();
-  await expect(ficha).toContainText(/Enviar|destinatario|cantidad/i);
+test("F-04 · Enviar: formulario de envío", async () => {
+  await abrirSeccion(popup, "Enviar");
+  await expect(popup.locator(".tk-pagina__cuerpo")).toContainText(/destino|enviar|cuenta/i);
+  await volverInicio(popup);
 });
 
 test("F-05 · Comprar: panel guiado", async () => {
-  await popup.getByRole("button", { name: /Comprar/ }).click();
+  await abrirSeccion(popup, "Comprar");
   await expect(popup.locator(".tk-comprar")).toBeVisible();
   await expect(popup.getByRole("button", { name: /Ir a comprar/ })).toBeVisible();
-  await popup.getByRole("button", { name: /Comprar/ }).click();
+  await volverInicio(popup);
 });
 
 test("F-06 · Cambiar: formulario de swap", async () => {
-  await popup.getByRole("button", { name: /Cambiar/ }).click();
+  await abrirSeccion(popup, "Cambiar");
   await expect(popup.locator(".tk-cambiar")).toBeVisible();
   await expect(popup.getByPlaceholder(/Router del DEX/)).toBeVisible();
-  await expect(popup.getByRole("button", { name: /Cotizar/ })).toBeVisible();
-  await popup.getByRole("button", { name: /Cambiar/ }).click();
+  await volverInicio(popup);
 });
 
 test("F-07 · Contactos: validación, alta, duplicado y baja", async () => {
-  await popup.getByRole("button", { name: /Contactos/ }).click();
+  await abrirSeccion(popup, "Contactos");
   const panel = popup.locator(".tk-contactos");
   await expect(panel).toBeVisible();
 
-  // inválida
   await panel.getByPlaceholder("Nombre").fill("Ana");
   await panel.getByPlaceholder("0x…").fill("0x123");
   await panel.getByRole("button", { name: /Guardar/ }).click();
   await expect(panel).toContainText(/inválida/i);
 
-  // válida
   await panel.getByPlaceholder("0x…").fill(CUENTA_1);
   await panel.getByRole("button", { name: /Guardar/ }).click();
   await expect(panel.locator(".tk-sitio")).toHaveCount(1);
 
-  // duplicada
   await panel.getByPlaceholder("Nombre").fill("Otra");
   await panel.getByPlaceholder("0x…").fill(CUENTA_1);
   await panel.getByRole("button", { name: /Guardar/ }).click();
   await expect(panel).toContainText(/ya está guardada/i);
 
-  // baja
   await panel.locator(".tk-sitio__desconectar").first().click();
   await expect(panel.locator(".tk-sitio")).toHaveCount(0);
-  await popup.getByRole("button", { name: /Contactos/ }).click();
+  await volverInicio(popup);
 });
 
-// ── Red ─────────────────────────────────────────────────────────────────
-
-test("F-08 · Red: el gestor lista las redes y permite añadir", async () => {
-  await abrirFicha(popup, "Red");
-  const ficha = popup.locator(".tk-ficha", { hasText: "Red" }).first();
-  await expect(ficha).toContainText(/Chain ID/);
-  await expect(ficha.getByRole("button", { name: /Añadir red|Agregar|personalizada/i }).first()).toBeVisible();
+test("F-08 · Red: gestor de redes", async () => {
+  await abrirSeccion(popup, "Red");
+  await expect(popup.locator(".tk-pagina__cuerpo")).toContainText(/Chain ID/);
+  await volverInicio(popup);
 });
 
 // ── Características: Tokens / NFT / Actividad ───────────────────────────
 
 test("F-09 · Tokens: validación, alta, duplicado y baja", async () => {
-  await abrirFicha(popup, "Características");
+  await abrirSeccion(popup, "Características");
   await popup.getByRole("tab", { name: "Tokens" }).click();
   const panel = popup.locator(".tk-tokens");
   await expect(panel).toBeVisible();
@@ -180,27 +181,26 @@ test("F-11 · Actividad: estado inicial y refresco", async () => {
   await expect(panel).toBeVisible();
   await expect(panel).toContainText(/Sin movimientos|Entrada|Salida/i);
   await expect(panel.getByRole("button", { name: /Actualizar/ })).toBeVisible();
-  await cerrarFicha(popup, "Características");
+  await volverInicio(popup);
 });
 
 // ── Conexiones y pie ────────────────────────────────────────────────────
 
-test("F-12 · Conexiones: lista la dApp conectada y la desconecta", async () => {
+test("F-12 · Conexiones: lista la dApp y la desconecta", async () => {
   await popup.evaluate((cuenta) =>
     chrome.storage.local.set({ codecrypto_connected_sites: { "https://dapp.example": cuenta } }),
     CUENTA_0
   );
+  await popup.waitForTimeout(500);
+  await abrirSeccion(popup, "Conexiones");
+  const cuerpo = popup.locator(".tk-pagina__cuerpo");
+  await expect(cuerpo).toContainText("dapp.example");
+  await cuerpo.locator(".tk-sitio__desconectar").first().click();
   await popup.waitForTimeout(600);
-  await abrirFicha(popup, "Conexiones");
-  const ficha = popup.locator(".tk-ficha", { hasText: "Conexiones" }).first();
-  await expect(ficha).toContainText("dapp.example");
-  await ficha.locator(".tk-sitio__desconectar").first().click();
-  await popup.waitForTimeout(600);
-  await expect(ficha).toContainText(/Ninguna dApp conectada/i);
-  const sitios = await popup.evaluate(() =>
-    chrome.storage.local.get("codecrypto_connected_sites")
-  );
+  await expect(cuerpo).toContainText(/Ninguna dApp conectada/i);
+  const sitios = await popup.evaluate(() => chrome.storage.local.get("codecrypto_connected_sites"));
   expect(Object.keys((sitios.codecrypto_connected_sites as object) || {})).toHaveLength(0);
+  await volverInicio(popup);
 });
 
 test("F-13 · Pie: bloqueo y reinicio presentes", async () => {
@@ -211,7 +211,7 @@ test("F-13 · Pie: bloqueo y reinicio presentes", async () => {
 // ── Configuración ───────────────────────────────────────────────────────
 
 test("F-14 · Configuración: cinco áreas", async () => {
-  await abrirFicha(popup, "Configuración");
+  await abrirSeccion(popup, "Configuración");
   const cfg = popup.locator(".tk-config");
   for (const area of ["Notificaciones", "Modo de vista", "Red", "Ayuda", "Perfil"]) {
     await expect(cfg).toContainText(area);
@@ -221,8 +221,7 @@ test("F-14 · Configuración: cinco áreas", async () => {
 });
 
 test("F-15 · Redes: pestañas y Bitcoin informativo", async () => {
-  const cfg = popup.locator(".tk-config");
-  await cfg.getByRole("button", { name: /Gestionar redes/ }).click();
+  await popup.locator(".tk-config").getByRole("button", { name: /Gestionar redes/ }).click();
   const redes = popup.locator(".tk-redes");
   await expect(redes.getByRole("tab", { name: "Públicas" })).toBeVisible();
   await expect(redes).toContainText("Ethereum");
@@ -236,31 +235,28 @@ test("F-15 · Redes: pestañas y Bitcoin informativo", async () => {
 });
 
 test("F-16 · Modo de vista: pestaña abre otra página", async () => {
-  const cfg = popup.locator(".tk-config");
   const [nueva] = await Promise.all([
     ctx.waitForEvent("page", { timeout: 15_000 }),
-    cfg.getByRole("button", { name: /Pestaña/ }).click(),
+    popup.locator(".tk-config").getByRole("button", { name: /Pestaña/ }).click(),
   ]);
   expect(nueva.url()).toContain("index.html");
   await nueva.close();
-  // restaurar a panel para no dejar estado raro
   await popup.evaluate(() => chrome.storage.local.set({ codecrypto_view_mode: "panel" }));
+  await volverInicio(popup);
 });
 
 test("F-17 · Perfil: modo oscuro y respaldo de la frase", async () => {
-  const cfg = popup.locator(".tk-config");
-  await cfg.getByRole("button", { name: /Abrir perfil/ }).click();
+  await abrirSeccion(popup, "Configuración");
+  await popup.locator(".tk-config").getByRole("button", { name: /Abrir perfil/ }).click();
   const perfil = popup.locator(".tk-perfil");
   await expect(perfil).toBeVisible();
 
-  // modo oscuro
   const switchOscuro = perfil.locator('.tk-switch input[type="checkbox"]');
   await switchOscuro.check();
   expect(await popup.evaluate(() => document.documentElement.dataset.theme)).toBe("dark");
   await switchOscuro.uncheck();
   expect(await popup.evaluate(() => document.documentElement.dataset.theme)).toBe("light");
 
-  // respaldo de la frase
   await perfil.getByRole("button", { name: /Mostrar frase/ }).click();
   await expect(perfil.locator(".tk-perfil__frase")).toHaveText(MNEMONIC);
   await perfil.getByRole("button", { name: /^Ocultar$/ }).click();
@@ -292,7 +288,7 @@ test("F-19 · Perfil: backup exportable y restauración", async () => {
   const backup = JSON.parse(fs.readFileSync(ruta as string, "utf8"));
   expect(backup.cifrado).toBeTruthy();
   expect(backup.kdf).toBe("PBKDF2-SHA256");
-  expect(JSON.stringify(backup)).not.toContain("test test"); // nunca la frase en claro
+  expect(JSON.stringify(backup)).not.toContain("test test");
 
   await perfil.getByPlaceholder("Contraseña del backup").fill(PASS2);
   await perfil.locator('.tk-backup input[type="file"]').setInputFiles(ruta as string);

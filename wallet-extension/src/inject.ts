@@ -173,7 +173,7 @@ function toProviderError(payload: SerializedError | string | null | undefined): 
     detail: {
       info: {
         uuid: crypto.randomUUID(),
-        name: 'CodeCrypto Wallet',
+        name: 'TrueKeate Wallet',
         icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="16" fill="%231A2B4C"/></svg>',
         rdns: 'io.codecrypto.wallet'
       },

@@ -8,7 +8,7 @@
  *   1. La extensión se instala y registra el service worker (MV3) sin errores.
  *   2. `window.codecrypto` se inyecta en una página real y anuncia EIP-6963.
  *   3. El popup carga, valida la frase BIP-39 en vivo y muestra el saldo de anvil.
- *   4. La dApp abre `connect.html` y la conexión se completa.
+ *   4. La dApp pide la conexión y se aprueba **dentro de la wallet** (sin ventana flotante).
  *
  * Los pasos 3 y 4 necesitan que Chrome pueda renderizar páginas de extensión.
  * En contenedores sin escritorio (CI, Docker, esta VM) el renderer de esas
@@ -177,33 +177,30 @@ try {
     popup = null
   }
 
-  // ── 4. Conexión desde la dApp ──────────────────────────────────────
+  // ── 4. Conexión desde la dApp (aprobación DENTRO de la wallet) ─────
   try {
-    const connectTargetPromise = browser.waitForTarget(
-      (target) => target.url().includes('connect.html'),
-      { timeout: 20000 }
-    )
+    if (!popup) {
+      throw new Error('Waiting for selector .tk-aprobacion (popup no disponible)')
+    }
 
     await dapp.evaluate(() => {
       const button = document.getElementById('connectBtn')
       if (button) button.click()
     })
 
-    const connectTarget = await connectTargetPromise
-    const connectPage = await connectTarget.page()
-    check('la dApp abre connect.html para elegir la cuenta', Boolean(connectPage))
+    await popup.waitForSelector('.tk-aprobacion', { timeout: 20000 })
+    check('la conexión se pide dentro de la wallet (sin ventana flotante)', true)
 
-    await connectPage.waitForSelector('.account-item', { timeout: 15000 })
-    const accountsShown = await connectPage.evaluate(
-      () => document.querySelectorAll('.account-item').length
+    const accountsShown = await popup.evaluate(
+      () => document.querySelectorAll('.tk-aprobacion__cuenta').length
     )
-    check('connect.html lista las 5 cuentas con su balance', accountsShown === 5, `${accountsShown} cuentas`)
-    await connectPage.screenshot({ path: resolve(SHOTS_DIR, 'connect-1-seleccion.png') })
+    check('la vista de conexión lista las 5 cuentas', accountsShown === 5, `${accountsShown} cuentas`)
+    await popup.screenshot({ path: resolve(SHOTS_DIR, 'wallet-1-conexion.png') })
 
-    await connectPage.evaluate(() => {
-      const button = [...document.querySelectorAll('button')]
-        .find((item) => item.textContent?.includes('Conectar'))
-      if (button) button.click()
+    // Aprobar: el último botón de la vista es «Conectar»
+    await popup.evaluate(() => {
+      const buttons = [...document.querySelectorAll('.tk-aprobacion__acciones .tk-btn')]
+      buttons[buttons.length - 1]?.click()
     })
 
     await dapp.waitForFunction(() => document.body.innerText.includes('Conectado'), { timeout: 25000 })
@@ -211,7 +208,7 @@ try {
     await dapp.screenshot({ path: resolve(SHOTS_DIR, 'dapp-conectada.png') })
   } catch (error) {
     if (!isExtensionPageFailure(error)) throw error
-    skip('conexión desde la dApp (connect.html)',
+    skip('conexión desde la dApp (aprobación en la wallet)',
       'el renderer de páginas de extensión no sobrevive en este headless de contenedor')
   }
 

@@ -23,7 +23,7 @@ const SITE_ORIGIN = 'http://localhost:5174'
 
 // ── Stub de chrome.* y utilidades (compartidos con test-acceptance.mjs) ──
 const api = installChromeStub()
-const { localData, sessionData, send, closeWindow, getBadgeText } = api
+const { localData, sessionData, send, getBadgeText } = api
 const { check, summary } = createReporter()
 
 
@@ -63,7 +63,8 @@ const connectRpc = send({ type: 'CODECRYPTO_RPC', method: 'eth_requestAccounts',
 await delay(100)
 
 const connectRequest = localData.get('codecrypto_connect_request')
-check('se abre connect.html con la solicitud', Boolean(connectRequest), JSON.stringify(connectRequest))
+check('la solicitud de conexión queda guardada para la wallet', Boolean(connectRequest), JSON.stringify(connectRequest))
+check('sin abrir ninguna ventana flotante', api.openWindows.size === 0, `${api.openWindows.size} ventana(s)`)
 
 await send({
   type: 'CONNECT_RESPONSE',
@@ -118,21 +119,50 @@ const persisted = sessionData.get('codecrypto_session_approvals') || []
 check('la aprobación pendiente se persiste en storage.session',
   persisted.length === 1 && persisted[0].method === 'eth_sendTransaction', JSON.stringify(persisted))
 check('el badge muestra 1 pendiente', getBadgeText() === '1', `badge="${getBadgeText()}"`)
+check('la solicitud no abre ventana flotante (se atiende en la wallet)',
+  persisted[0]?.windowId === null && api.openWindows.size === 0,
+  `windowId=${persisted[0]?.windowId} · ${api.openWindows.size} ventana(s)`)
 
 // ═══════════════════════════════════════════════════════════════════
-console.log('\nT5 · cerrar la ventana a mano rechaza la solicitud (B9)')
+console.log('\nT5 · la wallet rechaza dentro del popup (SIGN_RESPONSE)')
 // ═══════════════════════════════════════════════════════════════════
-const approvalWindowId = persisted[0]?.windowId
-check('la solicitud tiene ventana asociada', Boolean(approvalWindowId), `windowId=${approvalWindowId}`)
-
-closeWindow(approvalWindowId)
+await send({
+  type: 'SIGN_RESPONSE',
+  approvalId: persisted[0]?.approvalId,
+  success: false,
+  error: 'User rejected'
+})
 const txResult = await txRpc
 check('la dApp recibe un error claro (no null)',
-  txResult?.error?.message === 'User closed the confirmation window', JSON.stringify(txResult))
+  /user rejected/i.test(txResult?.error?.message || ''), JSON.stringify(txResult))
 check('y con el código EIP-1193 de rechazo del usuario (4001)',
   txResult?.error?.code === 4001, JSON.stringify(txResult?.error))
 check('se limpia la solicitud pendiente', (sessionData.get('codecrypto_session_approvals') || []).length === 0)
 check('el badge queda vacío', getBadgeText() === '', `badge="${getBadgeText()}"`)
+
+// ═══════════════════════════════════════════════════════════════════
+console.log('\nT5b · la wallet aprueba una firma dentro del popup (SIGN_RESPONSE)')
+// ═══════════════════════════════════════════════════════════════════
+const signRpc = send({
+  type: 'CODECRYPTO_RPC',
+  method: 'personal_sign',
+  params: ['0x547275654b656174653a20707275656261', ADDRESS]
+}, senderWithTab)
+await delay(150)
+const pendienteFirma = localData.get('codecrypto_pending_request')
+check('la firma queda pendiente para la wallet', Boolean(pendienteFirma?.approvalId),
+  JSON.stringify(pendienteFirma))
+await send({
+  type: 'SIGN_RESPONSE',
+  approvalId: pendienteFirma?.approvalId,
+  success: true
+})
+const signResult = await signRpc
+check('la dApp recibe la firma EIP-191',
+  typeof signResult?.result === 'string' && signResult.result.startsWith('0x') && signResult.result.length > 120,
+  JSON.stringify(signResult)?.slice(0, 80))
+check('no se abrió ninguna ventana flotante', api.openWindows.size === 0,
+  `${api.openWindows.size} ventana(s)`)
 
 // ═══════════════════════════════════════════════════════════════════
 console.log('\nT6 · WALLET_RESET cancela pendientes y limpia el estado (B2)')

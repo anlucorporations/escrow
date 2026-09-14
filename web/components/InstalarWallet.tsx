@@ -75,7 +75,7 @@ export function InstalarWallet({
             {instalada ? (
               <>
                 <p className="mt-2 text-sm text-teal-600">
-                  ✅ La extensión <strong>CodeCrypto Wallet</strong> está instalada en este
+                  ✅ La extensión <strong>TrueKeate Wallet</strong> está instalada en este
                   navegador.
                 </p>
                 <p className="mt-2 text-xs text-navy-800/60">
