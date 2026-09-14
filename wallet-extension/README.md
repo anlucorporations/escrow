@@ -7,7 +7,11 @@ estilo de MetaMask, con soporte para **EIP-1193**, **EIP-712**, **EIP-1559** y
 Construida con **React 19 + TypeScript + Ethers.js v6** y **Foundry (anvil)** como
 blockchain local de desarrollo.
 
-> ⚠️ Proyecto **educativo**. No cifra el mnemonic y no debe usarse con fondos reales.
+> 🧩 **Wallet nativa de TrueKeate**: vive en `escrow/wallet-extension/`, se **instala desde la
+> propia plataforma** (`/instalar-wallet`) y la dApp la detecta por **EIP-6963** para conectar,
+> iniciar sesión (EIP-191) y firmar cada acción.
+>
+> ⚠️ Proyecto **educativo**: no debe usarse con fondos reales.
 
 ---
 
@@ -70,9 +74,11 @@ npm run dev      # y abre http://localhost:5173/test.html
 ### Desarrollo y pruebas
 - **dApp de prueba** (`test.html`) con detección multi-wallet e historial de operaciones
 - **Foundry**: `anvil` como nodo local, `forge` para contratos y `cast` para el CLI
-- **149 comprobaciones automáticas** (92 + 50 de aceptación + 7 en Chrome real) y **ESLint en 0 errores**
+- **Baterías propias**: importes (20), contratos (6), `background` (41) y bóveda cifrada (25)
+- **Aceptación**: los 11 casos del enunciado contra anvil real (50 comprobaciones)
+- **E2E de la plataforma** con esta extensión real: `cd ../web && npm run test:wallet` (40 tests)
 - **Errores EIP-1193**: las dApps reciben `error.code` (4001, 4200, 4902, -32602…)
-- Visor del `chrome.storage.local` para depurar (`viewextensiondata/`)
+- **ESLint en 0 errores** y build de TypeScript estricto
 
 ---
 
@@ -113,6 +119,26 @@ npm run dev        # 4. sirve test.html en http://localhost:5173/test.html
 
 ---
 
+## 🧩 Integración con TrueKeate (wallet nativa)
+
+- **Instalación nativa**: la plataforma sirve el paquete en `/wallet/TrueKeateWallet.zip` y la
+  guía en `/instalar-wallet`; el componente `InstalarWallet` (web) muestra el estado
+  *instalada / no instalada*.
+- **Descubrimiento**: la dApp escucha **EIP-6963** y la lista junto a MetaMask/Rabby/Backpack;
+  el usuario elige en un popup y esa elección gobierna el login y las firmas de la sesión.
+- **UI del popup** (identidad TrueKeate): fichas contraíbles — Cuenta, Balance, Gestionar saldo
+  (Recibir QR · Enviar · Comprar · Cambiar · Contactos), Red, Características (**Tokens** ERC-20,
+  **NFT**, **Actividad**), Configuración (notificaciones, modo de vista, redes, ayuda, perfil) y
+  Conexiones con desconexión por dApp.
+- **Modos de vista**: panel lateral, pestaña o **flotante** (overlay inyectado por content script).
+- **Métodos solo-extensión**: `wallet_revealMnemonic`, `wallet_changeVaultPassword`,
+  `wallet_exportVault`/`wallet_importVault`, `wallet_getConnectedSites`/`wallet_disconnectSite`
+  (las dApps no pueden invocarlos).
+- **E2E**: `cd ../web && npm run test:wallet` prueba la plataforma con esta extensión **real**
+  (40 tests en `web/e2e-wallet/`).
+
+---
+
 ## 🧪 Probar la extensión
 
 1. Con `npm run chain` y `npm run dev` en marcha, abre <http://localhost:5173/test.html>
@@ -144,11 +170,13 @@ cuenta) y escribe la evidencia en `documentacion/evidencia-fase4.md`.
 ### Entrega
 
 ```bash
-bash scripts/package-delivery.sh      # genera codecrypto_wallet_entrega.zip
+bash scripts/package-delivery.sh      # genera el ZIP del entregable académico
+python3 scripts/package-web.py        # publica TrueKeateWallet.zip en web/public/wallet/
 ```
 
 El ZIP incluye el código, `dist/` ya compilado, los contratos y la documentación
-vigente; excluye `node_modules` y el historial de desarrollo.
+vigente; excluye `node_modules` y el historial de desarrollo. `package-web.py` deja el
+paquete que **sirve la plataforma** en `/wallet/TrueKeateWallet.zip`.
 
 ---
 
@@ -243,11 +271,15 @@ mnemonic desde `chrome.storage.local`.
 ### Estructura
 
 ```
-├── src/                    Código fuente (100 % TypeScript)
+├── src/
+│   ├── background.ts · vault.ts                     Service worker (RPC/firma) y bóveda cifrada
+│   ├── inject.ts · content-script.ts · floating.ts  Provider EIP-1193/6963 y overlay flotante
+│   ├── App.tsx · Connect.tsx · Notification.tsx     Popup y ventanas de aprobación
+│   └── components/                                  Ficha, Tokens, NFT, Actividad, RecibirQR,
+│                                                    Contactos, Comprar, Cambiar, Configuración,
+│                                                    Redes, Perfil, ChainManager, VaultUnlock…
 ├── contracts/  test/       Contrato de ejemplo y pruebas (Foundry)
-├── scripts/                Iconos, pruebas automatizadas, lanzador de Foundry
-├── viewextensiondata/      Visor de chrome.storage.local
-├── documentacion/          Plan de mejora e histórico del desarrollo
+├── scripts/                Iconos, pruebas automatizadas, empaquetado web y lanzador Foundry
 ├── test.html               dApp de pruebas
 ├── dist/                   Extensión compilada (`npm run build`)
 └── foundry.toml            Configuración de Foundry

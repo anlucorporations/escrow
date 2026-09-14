@@ -54,13 +54,11 @@ Garantías implementadas (RNF-07.4 / H-16):
 ## Tests
 
 ```bash
-npm test                    # suite completa (52/52 en verde)
+npm test                    # suite completa (53/53 en verde)
 ```
 
 > Los tests usan un pool en memoria (sin PostgreSQL): validan la lógica de mapeo de eventos e
 > idempotencia. La integración con `mcc-postgres` real se verifica en el entorno GCP (D25).
-
-## Roadmap
 
 ## Relayer EIP-712 (`relayer.js` — Ciclo 5)
 
@@ -83,8 +81,6 @@ const res = await relayer.procesarIntent({ signer, destino, valor, data, nonce, 
 Integración E2E verificada en anvil: SmartAccount marcada VERIFICADO (D28) + meta-tx enviada por
 la cuenta 1 con nonce incrementado ✅ (`test/integracion-relayer.js`).
 
-## Roadmap
-
 ## Backend API REST (`api/` — Ciclo 6)
 
 Express con rate-limiting **global** (120 req/min por IP — D16/RF-09.6); el límite
@@ -100,7 +96,7 @@ por usuario lo aplica el relayer (20 meta-tx/día + bloqueo tras 3 fallos). Mód
 
 ```bash
 npm run api        # arranca en http://127.0.0.1:4000 (PORT configurable)
-npm test           # 52/52: indexador, relayer, API, trueke abierto, disputas,
+npm test           # 53/53: indexador, relayer, API, trueke abierto, disputas,
                    # subastas, reputación, puntos de encuentro y minteo de NFT
                    # (incluye el script manual test/integracion-relayer.js, que se
                    #  omite solo si no se le pasa la dirección de la factory)
@@ -110,12 +106,11 @@ npm test           # 52/52: indexador, relayer, API, trueke abierto, disputas,
 > firma de sesión se implementa con EIP-191; el flujo completo de meta-tx (firma EIP-712 del
 > usuario → relayer paga gas) se valida en `test/integracion-relayer.js`.
 
-## Roadmap
+## Estado y despliegue
 
-| Ciclo | Contenido |
-|---|---|
-| C7 | Frontend Next.js 16 (landing + suite por rol, sistema de diseño RNF-08) |
-| C8 | Integración E2E completa |
-| C8 | Integración E2E + reconciliación fina por trueke |
+Ciclos **C1–C11 completos** (Fases 1–5). El backend/API está desplegado en **Cloud Run**
+(`truekeate-api`, europe-west1) y el indexador corre como **Cloud Run Job**; el build y el
+despliegue son reproducibles con `../scripts/cloudbuild-backend.yaml` y
+`../scripts/cloudbuild-indexer.yaml`.
 
 > Referencia: `../RepoTecnico/arquitectura_tecnica.md` §4 (modelo BD) y §5 (indexador).
