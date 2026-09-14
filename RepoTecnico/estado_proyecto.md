@@ -986,3 +986,57 @@ Contexto (auditoría): el Escrow desplegado en GCP era anterior a F1 (su
 - Foundry 80/80 verdes. El flujo funcional de la app sigue en BD (espejo); el
   Escrow nuevo queda listo para la integración on-chain futura (crear trueques
   reales) y habilita la restricción "solo NFT oficial" del contrato.
+
+## 💳 Stripe a producción (webhook firmado + Payouts) — 2026-09-09/14
+
+Sin push a repos (orden del director: "no subas el proyecto a los repos hasta
+que te lo indique"). Deploy GCP realizado.
+
+**1. Webhook con verificación de firma REAL**
+- Se montó `POST /valor/brlt/webhook` con `express.raw` **antes** del parser JSON
+  (`api/app.js`) para poder verificar la firma sobre el body crudo.
+- `api/routes/valor.js` exporta `crearManejadorWebhookValor({almacen})`: valida
+  con `stripe.webhooks.constructEvent` cuando existe `STRIPE_WEBHOOK_SECRET`
+  (si no, modo tolerante con aviso). Maneja `checkout.session.completed`,
+  `payment_intent.succeeded` (con metadata wallet/montoBRLT, respaldo de cobro)
+  y `payout.paid` / `payout.failed` (este último devuelve el saldo).
+- Secret **STRIPE_WEBHOOK_SECRET** creado en Secret Manager y añadido al deploy.
+- Endpoint de Stripe creado vía API: **`we_1UFcui3SsKtEjZCdv2tUPfXO`** (enabled)
+  → `https://truekeate-api-…/valor/brlt/webhook`, suscrito a
+  `checkout.session.completed`, `payment_intent.succeeded`, `payout.paid`,
+  `payout.failed`.
+- Verificado en vivo: sin firma → 400; firma inválida → 400; firma válida → 200;
+  **pago REAL con tarjeta de prueba** (`pm_card_visa`, PaymentIntent 13 USD) →
+  el webhook firmado de Stripe acreditó exactamente **+13 BRLT** a Ana
+  (2650 → 2663). Idempotencia verificada (repetir el evento no duplica).
+
+**2. Retiros BRLT→fiat con Stripe Payouts**
+- Migración `db/migracion_stripe_payouts.sql` (tabla `payouts_brlt`) aplicada.
+- `POST /valor/brlt/retirar`: descuenta saldo, y si hay `STRIPE_SECRET_KEY` +
+  `STRIPE_PAYOUT_DESTINATION` crea un **Payout real**; sin destino queda
+  **REGISTRADO** (auditable). Si Stripe falla → **502 y devolución del saldo**.
+- `GET /valor/mi` devuelve `payoutHabilitado` y `retiros`; la UI de VALOR (4.3)
+  lista los retiros con su estado.
+- Verificado en vivo: retiro de 50 BRLT → REGISTRADO, saldo 2663 → 2613 y el
+  retiro visible con su detalle.
+
+**3. Estado de la cuenta Stripe (dato para el director)**
+- Clave en **modo test** (`sk_test…`); saldo de prueba ≈ 13.264 USD.
+- Cuenta `acct_1U33mX3SsKtEjZCd`: **`charges_enabled: false` y
+  `payouts_enabled: false`** (cuenta test sin activar; los cobros funcionan en
+  test, los payouts requieren onboarding).
+
+**Pasos que dependen del director para pasar a LIVE**
+1. Activar la cuenta Stripe (onboarding: datos fiscales/persona y **cuenta
+   bancaria**) para habilitar `payouts_enabled`.
+2. Añadir la cuenta bancaria y fijar `STRIPE_PAYOUT_DESTINATION=ba_…` (o conectar
+   una cuenta Stripe Connect) para el desembolso real de los retiros.
+3. Reemplazar los secrets `STRIPE_SECRET_KEY` / `STRIPE_PUBLISHABLE_KEY` por las
+   claves **live** (`sk_live_…` / `pk_live_…`) y el `NEXT_PUBLIC_STRIPE_KEY` de la
+   web. El código no cambia (lee de secrets/env).
+4. Opcional: recrear el webhook endpoint en modo live y actualizar
+   `STRIPE_WEBHOOK_SECRET` (el actual es de test).
+
+Tests backend **56/56** (nuevos: webhook firmado + idempotencia, PI con metadata,
+retiro REGISTRADO). Deploy: API rev **truekeate-api-00031-rck**, web rev
+**truekeate-web-00047-52j** (release-65bbe06). Commit local `65bbe06` (+ fix PI).

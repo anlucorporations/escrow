@@ -342,6 +342,28 @@ export function crearManejadorWebhookValor({ almacen }) {
         }
       }
 
+      // Respaldo: PaymentIntent pagado con metadata { wallet, montoBRLT } → acredita BRLT
+      // (permite cobros fuera de Checkout; idempotente por stripe_payment).
+      if (evento?.type === 'payment_intent.succeeded' && objeto?.id) {
+        const wallet = (objeto.metadata?.wallet || '').toLowerCase();
+        const montoBRLT = Number(objeto.metadata?.montoBRLT || 0);
+        const ya = await almacen.buscarMovimientoBrltPorPago?.(objeto.id);
+        if (ya && ya.estado === 'PAGADO') {
+          console.log('[valor] webhook: payment_intent ya procesado:', objeto.id);
+        } else if (ya && ya.estado === 'PENDIENTE') {
+          const confirmado = await almacen.confirmarMovimientoBrlt(ya.id, { stripePayment: objeto.id });
+          if (confirmado) console.log(`[valor] webhook: ${confirmado.montoBrlt} BRLT acreditados (PI) a ${confirmado.wallet}`);
+        } else if (wallet && montoBRLT > 0) {
+          // crearMovimientoBrlt devuelve el id (pg) o el objeto (memoria) → normalizar
+          const creado = await almacen.crearMovimientoBrlt({ wallet, montoBrlt: montoBRLT, montoFiat: objeto.amount ? objeto.amount / 100 : null, fiatMoneda: objeto.currency ?? 'usd', stripeSession: null });
+          const idMov = creado && typeof creado === 'object' ? creado.id : creado;
+          await almacen.confirmarMovimientoBrlt(idMov, { stripePayment: objeto.id });
+          console.log(`[valor] webhook: ${montoBRLT} BRLT acreditados (PI nuevo) a ${wallet}`);
+        } else {
+          console.warn('[valor] webhook: payment_intent sin metadata wallet/montoBRLT:', objeto.id);
+        }
+      }
+
       if (evento?.type === 'payout.paid' && objeto?.id) {
         const p = await almacen.buscarPayoutPorStripeId?.(objeto.id);
         if (p && p.estado !== 'PAGADO') {

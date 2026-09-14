@@ -581,6 +581,17 @@ export async function crearAlmacenPg(pool) {
       return { id: Number(f.id), wallet: f.wallet.trim().toLowerCase(), montoBrlt: Number(f.monto_brlt), estado: f.estado };
     },
 
+    /** Busca una compra BRLT por PaymentIntent (respaldo del webhook). */
+    async buscarMovimientoBrltPorPago(stripePayment) {
+      const r = await pool.query(
+        `SELECT id, wallet, monto_brlt, estado FROM movimientos_brlt WHERE stripe_payment = $1 ORDER BY id DESC LIMIT 1`,
+        [stripePayment]
+      );
+      const f = r.rows[0];
+      if (!f) return null;
+      return { id: Number(f.id), wallet: f.wallet.trim().toLowerCase(), montoBrlt: Number(f.monto_brlt), estado: f.estado };
+    },
+
     /** Marca PAGADO y acredita BRLT (llamado por el webhook de Stripe). */
     async confirmarMovimientoBrlt(id, { stripePayment }) {
       const r = await pool.query(

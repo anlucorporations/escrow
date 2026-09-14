@@ -615,3 +615,33 @@ test('VALOR: retiro BRLT sin destino Stripe queda REGISTRADO y descuenta el sald
     if (previoDestino !== undefined) process.env.STRIPE_PAYOUT_DESTINATION = previoDestino;
   }
 });
+
+test('Stripe webhook: payment_intent.succeeded con metadata acredita BRLT (idempotente)', async () => {
+  const Stripe = (await import('stripe')).default;
+  const SECRETO = 'whsec_test_pi_dsh';
+  process.env.STRIPE_SECRET_KEY = 'sk_test_dummy_pi';
+  process.env.STRIPE_WEBHOOK_SECRET = SECRETO;
+  try {
+    const wallet = ethers.Wallet.createRandom();
+    const w = wallet.address.toLowerCase();
+    almacen.crearUsuario({ wallet: w, tipo: 'EMPRESA', nivel: 'FRECUENTE', medalla: 'ORO', estado: 'CERTIFICADO' });
+
+    const payload = JSON.stringify({
+      type: 'payment_intent.succeeded',
+      data: { object: { id: 'pi_test_dsh_1', object: 'payment_intent', amount: 1100, currency: 'usd', status: 'succeeded', metadata: { wallet: w, montoBRLT: '11' } } },
+    });
+    const firma = Stripe.webhooks.generateTestHeaderString({ payload, secret: SECRETO });
+    const r = await request(app).post('/valor/brlt/webhook')
+      .set('Content-Type', 'application/json').set('stripe-signature', firma).send(payload);
+    assert.equal(r.status, 200, JSON.stringify(r.body));
+    assert.equal(almacen.getFinanzas(w).brlt, 11);
+
+    // repetido → idempotente
+    await request(app).post('/valor/brlt/webhook')
+      .set('Content-Type', 'application/json').set('stripe-signature', firma).send(payload);
+    assert.equal(almacen.getFinanzas(w).brlt, 11);
+  } finally {
+    delete process.env.STRIPE_WEBHOOK_SECRET;
+    delete process.env.STRIPE_SECRET_KEY;
+  }
+});

@@ -245,6 +245,11 @@ export function crearAlmacen() {
       estado.movimientosBrlt.push(m);
       return m;
     },
+    buscarMovimientoBrltPorPago(stripePayment) {
+      const m = [...(estado.movimientosBrlt ?? [])].reverse().find((x) => x.stripePayment === stripePayment);
+      if (!m) return null;
+      return { id: m.id, wallet: m.wallet, montoBrlt: m.montoBrlt, estado: m.estado };
+    },
     buscarMovimientoBrltPorSesion(stripeSession) {
       const m = [...(estado.movimientosBrlt ?? [])]
         .filter((x) => x.stripeSession === stripeSession)
