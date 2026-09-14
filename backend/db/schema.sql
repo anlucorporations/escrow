@@ -237,6 +237,21 @@ CREATE TABLE IF NOT EXISTS votos_disputa (
     UNIQUE (disputa_id, socio)
 );
 
+-- Retiros BRLT→fiat con Stripe Payouts (VALOR 4.3, 2026-09-09)
+CREATE TABLE IF NOT EXISTS payouts_brlt (
+    id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    wallet        CHAR(42) NOT NULL,
+    monto_brlt    NUMERIC NOT NULL,
+    monto_fiat    NUMERIC,
+    fiat_moneda   TEXT NOT NULL DEFAULT 'usd',
+    stripe_payout TEXT,                    -- id del payout en Stripe (po_xxx)
+    destino       TEXT,                    -- ba_xxx / card_xxx / acct_xxx
+    estado        TEXT NOT NULL DEFAULT 'REGISTRADO', -- REGISTRADO|PENDIENTE|PAGADO|FALLIDO
+    detalle       TEXT,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+    confirmado_at TIMESTAMPTZ
+);
+
 -- Notificaciones in-app (campana; decisión del director)
 CREATE TABLE IF NOT EXISTS notificaciones (
     id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

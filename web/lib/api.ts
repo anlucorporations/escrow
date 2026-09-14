@@ -257,6 +257,20 @@ export interface ValorMi {
   pendientesValoracion: ValorPendienteValoracion[];
   ultimasValoraciones: ValoracionPrevia[];
   movimientos: MovimientoValor[];
+  payoutHabilitado?: boolean;
+  retiros?: RetiroBrlt[];
+}
+
+export interface RetiroBrlt {
+  id: number;
+  montoBrlt: number;
+  montoFiat?: number | null;
+  fiatMoneda?: string;
+  stripePayout?: string | null;
+  estado: "REGISTRADO" | "PENDIENTE" | "PAGADO" | "FALLIDO";
+  detalle?: string | null;
+  createdAt: string;
+  confirmadoAt?: string | null;
 }
 
 /** GET /valor/mi — resumen VALOR (criptos + reputación + valoraciones + BRLT). */

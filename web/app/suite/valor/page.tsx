@@ -523,9 +523,42 @@ export default function PaginaValor() {
                   </div>
                 </div>
                 <p className="mt-2 text-[11px] text-navy-800/50">
-                  El retiro a fiat real se desembolsa por <strong>Stripe Payouts</strong> cuando
-                  la cuenta esté vinculada; en este entorno se registra la salida.
+                  El retiro de BRLT a fiat se ejecuta con <strong>Stripe Payouts</strong>{" "}
+                  {datos.payoutHabilitado
+                    ? "(habilitado: la cuenta y el destino están configurados)."
+                    : "(pendiente de configurar la cuenta/destino: el retiro queda registrado y auditable)."}
                 </p>
+
+                {/* Retiros BRLT→fiat y su estado */}
+                {(datos.retiros?.length ?? 0) > 0 && (
+                  <div className="mt-4">
+                    <h3 className="text-xs font-bold uppercase tracking-wide text-navy-800/60">
+                      Mis retiros BRLT→fiat
+                    </h3>
+                    <div className="mt-2 space-y-1.5">
+                      {datos.retiros!.map((r) => (
+                        <div key={r.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-smoke/70 px-3 py-2 text-xs">
+                          <span className="font-mono text-navy-800/70">
+                            {r.montoBrlt} BRLT
+                            {r.montoFiat != null ? ` ≈ ${r.montoFiat} ${(r.fiatMoneda ?? "usd").toUpperCase()}` : ""}
+                            {r.stripePayout ? ` · ${r.stripePayout}` : ""}
+                          </span>
+                          <span
+                            className={`rounded-pill px-2 py-0.5 text-[10px] font-bold ${
+                              r.estado === "PAGADO"
+                                ? "bg-teal-500/15 text-teal-700"
+                                : r.estado === "FALLIDO"
+                                  ? "bg-crimson/10 text-crimson"
+                                  : "bg-gold-500/15 text-gold-700"
+                            }`}
+                          >
+                            {r.estado}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </>
             )}
           </Card>

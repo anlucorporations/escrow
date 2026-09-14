@@ -24,7 +24,7 @@ import { crearRouterAdmin } from './routes/admin.js';
 import { crearRouterReputacion } from './routes/reputacion.js';
 import { crearRouterSubastas } from './routes/subastas.js';
 import { crearRouterFinanzas } from './routes/finanzas.js';
-import { crearRouterValor } from './routes/valor.js';
+import { crearRouterValor, crearManejadorWebhookValor } from './routes/valor.js';
 import { crearRouterDisputas } from './routes/disputas.js';
 import { crearRouterNotificaciones } from './routes/notificaciones.js';
 import { crearRouterGobernanza } from './routes/gobernanza.js';
@@ -36,6 +36,11 @@ import { crearRouterPuntosEncuentro } from './routes/puntos-encuentro.js';
  */
 export function crearApp(deps = {}) {
   const app = express();
+
+  // Webhook de Stripe (VALOR 4.3): se monta con body CRUDO ANTES del parser JSON
+  // para poder verificar la firma (STRIPE_WEBHOOK_SECRET) con constructEvent.
+  app.post('/valor/brlt/webhook', express.raw({ type: 'application/json' }), crearManejadorWebhookValor(deps));
+
   app.use(express.json({ limit: '12mb' }));
 
   // CORS: la web (Cloud Run truekeate-web) llama a esta API desde otro origen.

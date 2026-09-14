@@ -106,6 +106,8 @@ export function crearRouterValor({ almacen, proveedor, registryAddress, ownerWal
         pendientesValoracion,
         ultimasValoraciones: valoracionesPrevias.slice(0, 10),
         movimientos: (await almacen.listarMovimientosValor(req.wallet, 20)) ?? [],
+        payoutHabilitado: Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_PAYOUT_DESTINATION),
+        retiros: puedeB ? ((await almacen.listarPayoutsBrlt?.(req.wallet, 10)) ?? []) : [],
       });
     } catch (e) { next(e); }
   });
@@ -228,42 +230,10 @@ export function crearRouterValor({ almacen, proveedor, registryAddress, ownerWal
     }
   });
 
-  // POST /valor/brlt/webhook — Stripe confirma el pago → acredita BRLT
-  // (sin sesión: Stripe firma; se valida con STRIPE_WEBHOOK_SECRET si existe)
-  r.post('/brlt/webhook', async (req, res) => {
-    try {
-      const stripeKey = process.env.STRIPE_SECRET_KEY || '';
-      const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
-      let evento;
-      if (stripeKey && webhookSecret) {
-        const stripe = (await import('stripe')).default;
-        const cliente = new stripe(stripeKey);
-        const firma = req.headers['stripe-signature'];
-        evento = cliente.webhooks.constructEvent(req.body, firma, webhookSecret);
-      } else {
-        // sin clave/secret (dev/test): se confía en el payload con el tipo esperado
-        evento = req.body;
-      }
-      const objeto = evento?.data?.object ?? evento;
-      if ((evento?.type === 'checkout.session.completed' || objeto?.payment_status === 'paid') && objeto?.id) {
-        const pendiente = await almacen.buscarMovimientoBrltPorSesion?.(objeto.id);
-        if (pendiente && pendiente.estado === 'PENDIENTE') {
-          const confirmado = await almacen.confirmarMovimientoBrlt(pendiente.id, { stripePayment: objeto.payment_intent ?? objeto.id });
-          if (confirmado) {
-            console.log(`[valor] webhook: ${confirmado.montoBrlt} BRLT acreditados a ${confirmado.wallet}`);
-          }
-        } else {
-          console.warn('[valor] webhook: sesión no encontrada o ya procesada:', objeto.id);
-        }
-      }
-      res.json({ recibido: true });
-    } catch (e) {
-      console.error('[valor] webhook:', e.message);
-      res.status(400).json({ error: 'webhook_error', detalle: e.message });
-    }
-  });
-
-  // POST /valor/brlt/retirar — retiro de BRLT (registro + aviso Payouts)
+  // POST /valor/brlt/retirar — retiro de BRLT→fiat con Stripe Payouts (VALOR 4.3)
+  // - Descuenta el saldo al crear el retiro (evita doble gasto).
+  // - Con STRIPE_SECRET_KEY + STRIPE_PAYOUT_DESTINATION crea un Payout real.
+  // - Sin destino configurado queda REGISTRADO (auditable) hasta habilitarlo.
   r.post('/brlt/retirar', requiereSesion(almacen), async (req, res, next) => {
     try {
       if (!(await puedeBRLT(req))) {
@@ -273,14 +243,57 @@ export function crearRouterValor({ almacen, proveedor, registryAddress, ownerWal
       if (!Number.isFinite(monto) || monto <= 0) {
         return res.status(400).json({ error: 'monto_invalido' });
       }
+      const tasa = Number(process.env.BRLT_FIAT || 1); // 1 BRLT = 1 unidad fiat (configurable)
+      const centavos = Math.round(monto * tasa * 100);
       const plataforma = walletPlataforma();
+      // descuenta saldo ahora (si el payout falla, se devuelve)
       const f = await almacen.moverSaldo(req.wallet, { deltaBrlt: -monto });
-      await almacen.registrarMovimientoValor({
-        wallet: req.wallet, tipo: 'RETIRO_BRLT', moneda: 'BRLT', monto,
-        contraparte: plataforma,
-        detalle: 'Retiro BRLT→fiat: requiere Stripe Payouts (cuenta Stripe conectada). En este entorno se registra la salida.',
-      });
-      res.json({ ok: true, saldos: f, aviso: 'El desembolso fiat real se ejecuta por Stripe Payouts cuando la cuenta esté vinculada.' });
+
+      const stripeKey = process.env.STRIPE_SECRET_KEY || '';
+      const destino = process.env.STRIPE_PAYOUT_DESTINATION || '';
+      const moneda = (process.env.STRIPE_FIAT_CURRENCY || 'usd').toLowerCase();
+
+      if (!stripeKey || !destino) {
+        const p = await almacen.crearPayoutBrlt({
+          wallet: req.wallet, montoBrlt: monto, montoFiat: centavos / 100, fiatMoneda: moneda,
+          stripePayout: null, destino: null, estado: 'REGISTRADO',
+          detalle: 'Retiro registrado; falta configurar STRIPE_PAYOUT_DESTINATION (cuenta bancaria/tarjeta o cuenta conectada) para el desembolso real.',
+        });
+        await almacen.registrarMovimientoValor({
+          wallet: req.wallet, tipo: 'RETIRO_BRLT', moneda: 'BRLT', monto, contraparte: plataforma,
+          detalle: 'Retiro BRLT→fiat registrado (Stripe Payouts pendiente de destino).',
+        });
+        return res.json({
+          ok: true, saldos: f, payoutId: p.id, estado: 'REGISTRADO',
+          aviso: 'Retiro registrado. El desembolso fiat real requiere configurar STRIPE_PAYOUT_DESTINATION y la cuenta Stripe verificada.',
+        });
+      }
+
+      try {
+        const stripe = (await import('stripe')).default;
+        const cliente = new stripe(stripeKey);
+        const payout = await cliente.payouts.create({
+          amount: centavos,
+          currency: moneda,
+          destination: destino,
+          metadata: { wallet: req.wallet, montoBrlt: String(monto) },
+        });
+        const p = await almacen.crearPayoutBrlt({
+          wallet: req.wallet, montoBrlt: monto, montoFiat: centavos / 100, fiatMoneda: moneda,
+          stripePayout: payout.id, destino, estado: 'PENDIENTE',
+          detalle: `Stripe Payout ${payout.id} creado (estado ${payout.status}).`,
+        });
+        await almacen.registrarMovimientoValor({
+          wallet: req.wallet, tipo: 'RETIRO_BRLT', moneda: 'BRLT', monto, contraparte: plataforma,
+          detalle: `Retiro BRLT→fiat iniciado por Stripe Payouts (${payout.id}).`,
+        });
+        return res.json({ ok: true, saldos: f, payoutId: p.id, payout: { id: payout.id, estado: payout.status } });
+      } catch (err) {
+        // Stripe falló: se devuelve el saldo para no perderlo
+        await almacen.moverSaldo(req.wallet, { deltaBrlt: monto });
+        console.error('[valor] payout Stripe:', err.message);
+        return res.status(502).json({ error: 'stripe_payout_error', detalle: err.message });
+      }
     } catch (e) {
       if (e.message === 'saldo_insuficiente') return res.status(409).json({ error: 'saldo_insuficiente' });
       next(e);
@@ -288,4 +301,69 @@ export function crearRouterValor({ almacen, proveedor, registryAddress, ownerWal
   });
 
   return r;
+}
+
+/**
+ * Manejador del webhook de Stripe (se monta con express.raw en app.js, ANTES del
+ * parser JSON global, para poder verificar la firma sobre el body CRUDO).
+ * Eventos soportados:
+ *   · checkout.session.completed → acredita BRLT de la compra con fiat.
+ *   · payout.paid                → marca PAGADO el retiro BRLT→fiat.
+ *   · payout.failed              → marca FALLIDO y devuelve el saldo al usuario.
+ * Idempotencia: los estados PENDIENTE/PAGADO evitan doble acreditación.
+ */
+export function crearManejadorWebhookValor({ almacen }) {
+  return async function manejadorWebhook(req, res) {
+    try {
+      const stripeKey = process.env.STRIPE_SECRET_KEY || '';
+      const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
+      const bodyCrudo = Buffer.isBuffer(req.body) ? req.body : Buffer.from(req.body ?? '');
+      let evento;
+      if (stripeKey && webhookSecret) {
+        const stripe = (await import('stripe')).default;
+        const cliente = new stripe(stripeKey);
+        const firma = req.headers['stripe-signature'];
+        // Lanza si la firma no es válida (protege contra webhooks falsos)
+        evento = cliente.webhooks.constructEvent(bodyCrudo, firma, webhookSecret);
+      } else {
+        // Sin secret (dev/test): se acepta el payload y se advierte en logs
+        console.warn('[valor] webhook SIN verificación de firma (falta STRIPE_WEBHOOK_SECRET)');
+        evento = JSON.parse(bodyCrudo.toString('utf8') || '{}');
+      }
+      const objeto = evento?.data?.object ?? evento;
+
+      if ((evento?.type === 'checkout.session.completed' || objeto?.payment_status === 'paid') && objeto?.id && objeto?.object !== 'payout') {
+        const pendiente = await almacen.buscarMovimientoBrltPorSesion?.(objeto.id);
+        if (pendiente && pendiente.estado === 'PENDIENTE') {
+          const confirmado = await almacen.confirmarMovimientoBrlt(pendiente.id, { stripePayment: objeto.payment_intent ?? objeto.id });
+          if (confirmado) console.log(`[valor] webhook: ${confirmado.montoBrlt} BRLT acreditados a ${confirmado.wallet}`);
+        } else {
+          console.warn('[valor] webhook: sesión no encontrada o ya procesada:', objeto.id);
+        }
+      }
+
+      if (evento?.type === 'payout.paid' && objeto?.id) {
+        const p = await almacen.buscarPayoutPorStripeId?.(objeto.id);
+        if (p && p.estado !== 'PAGADO') {
+          await almacen.actualizarPayoutEstado(p.id, { estado: 'PAGADO', detalle: `Payout ${objeto.id} pagado por Stripe.` });
+          console.log(`[valor] webhook: payout ${objeto.id} PAGADO (${p.montoBrlt} BRLT → fiat)`);
+        }
+      }
+
+      if (evento?.type === 'payout.failed' && objeto?.id) {
+        const p = await almacen.buscarPayoutPorStripeId?.(objeto.id);
+        if (p && p.estado !== 'FALLIDO') {
+          // devuelve el saldo BRLT (el retiro no se completó)
+          await almacen.moverSaldo(p.wallet, { deltaBrlt: p.montoBrlt });
+          await almacen.actualizarPayoutEstado(p.id, { estado: 'FALLIDO', detalle: `Payout ${objeto.id} falló: ${objeto.failure_message ?? 'sin detalle'}. Saldo devuelto.` });
+          console.warn(`[valor] webhook: payout ${objeto.id} FALLIDO — saldo devuelto a ${p.wallet}`);
+        }
+      }
+
+      res.json({ recibido: true, tipo: evento?.type ?? null });
+    } catch (e) {
+      console.error('[valor] webhook:', e.message);
+      res.status(400).json({ error: 'webhook_error', detalle: e.message });
+    }
+  };
 }

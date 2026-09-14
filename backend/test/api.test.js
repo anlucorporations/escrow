@@ -548,3 +548,70 @@ test('subastas: Empresa crea, Certificado puja, vencida se adjudica al mayor val
   const auto = await request(app).post(`/subastas/${crear2.body.subasta.id}/pujas`).set('Authorization', `Bearer ${tokEmp}`).send({ valor: 80 });
   assert.equal(auto.status, 403);
 });
+
+test('Stripe webhook: firma válida acredita BRLT (idempotente); firma inválida rechaza', async () => {
+  const Stripe = (await import('stripe')).default;
+  const SECRETO = 'whsec_test_secret_dsh';
+  process.env.STRIPE_SECRET_KEY = 'sk_test_dummy_para_firma';
+  process.env.STRIPE_WEBHOOK_SECRET = SECRETO;
+  try {
+    const wallet = ethers.Wallet.createRandom();
+    const w = wallet.address.toLowerCase();
+    almacen.crearUsuario({ wallet: w, tipo: 'EMPRESA', nivel: 'FRECUENTE', medalla: 'ORO', estado: 'CERTIFICADO' });
+    await almacen.crearMovimientoBrlt({ wallet: w, montoBrlt: 40, montoFiat: 40, fiatMoneda: 'usd', stripeSession: 'cs_test_firmado_1' });
+
+    const payload = JSON.stringify({
+      type: 'checkout.session.completed',
+      data: { object: { id: 'cs_test_firmado_1', object: 'checkout.session', payment_status: 'paid', payment_intent: 'pi_test_1' } },
+    });
+    const firma = Stripe.webhooks.generateTestHeaderString({ payload, secret: SECRETO });
+
+    const ok = await request(app).post('/valor/brlt/webhook')
+      .set('Content-Type', 'application/json').set('stripe-signature', firma).send(payload);
+    assert.equal(ok.status, 200, JSON.stringify(ok.body));
+    assert.equal(almacen.getFinanzas(w).brlt, 40);
+
+    // repetido (misma sesión) → idempotente, no duplica
+    await request(app).post('/valor/brlt/webhook')
+      .set('Content-Type', 'application/json').set('stripe-signature', firma).send(payload);
+    assert.equal(almacen.getFinanzas(w).brlt, 40);
+
+    // firma inválida → 400 (no acredita)
+    const bad = await request(app).post('/valor/brlt/webhook')
+      .set('Content-Type', 'application/json').set('stripe-signature', 't=1,v1=deadbeef').send(payload);
+    assert.equal(bad.status, 400);
+    assert.equal(almacen.getFinanzas(w).brlt, 40);
+  } finally {
+    delete process.env.STRIPE_WEBHOOK_SECRET;
+    delete process.env.STRIPE_SECRET_KEY;
+  }
+});
+
+test('VALOR: retiro BRLT sin destino Stripe queda REGISTRADO y descuenta el saldo', async () => {
+  const previoDestino = process.env.STRIPE_PAYOUT_DESTINATION;
+  delete process.env.STRIPE_PAYOUT_DESTINATION;
+  try {
+    const wallet = ethers.Wallet.createRandom();
+    const w = wallet.address.toLowerCase();
+    almacen.crearUsuario({ wallet: w, tipo: 'EMPRESA', nivel: 'FRECUENTE', medalla: 'ORO', estado: 'CERTIFICADO' });
+    const tok = sesionDe(wallet);
+    await almacen.moverSaldo(w, { deltaBrlt: 500 });
+
+    const r = await request(app).post('/valor/brlt/retirar').set('Authorization', `Bearer ${tok}`).send({ monto: 200 });
+    assert.equal(r.status, 200, JSON.stringify(r.body));
+    assert.equal(r.body.estado, 'REGISTRADO');
+    assert.equal(r.body.saldos.brlt, 300);
+
+    // el retiro queda auditable y listable
+    const payouts = await almacen.listarPayoutsBrlt(w);
+    assert.equal(payouts.length, 1);
+    assert.equal(payouts[0].montoBrlt, 200);
+    assert.equal(payouts[0].estado, 'REGISTRADO');
+
+    // retirar más que el saldo → 409
+    const exceso = await request(app).post('/valor/brlt/retirar').set('Authorization', `Bearer ${tok}`).send({ monto: 9999 });
+    assert.equal(exceso.status, 409);
+  } finally {
+    if (previoDestino !== undefined) process.env.STRIPE_PAYOUT_DESTINATION = previoDestino;
+  }
+});

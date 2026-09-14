@@ -618,6 +618,45 @@ export function crearAlmacen() {
       return s;
     },
 
+    // ------------------------------------------------------------ payouts BRLT (memoria — Stripe Payouts 4.3)
+    crearPayoutBrlt({ wallet, montoBrlt, montoFiat, fiatMoneda = 'usd', stripePayout = null, destino = null, estado: estadoInicial = 'REGISTRADO', detalle = null }) {
+      if (!estado.payoutsBrlt) estado.payoutsBrlt = [];
+      const p = {
+        id: estado.payoutsBrlt.length + 1,
+        wallet: (wallet || '').toLowerCase(),
+        montoBrlt: Number(montoBrlt),
+        montoFiat: montoFiat != null ? Number(montoFiat) : null,
+        fiatMoneda,
+        stripePayout,
+        destino,
+        estado: estadoInicial,
+        detalle,
+        createdAt: new Date().toISOString(),
+        confirmadoAt: null,
+      };
+      estado.payoutsBrlt.push(p);
+      return { id: p.id, estado: p.estado, createdAt: p.createdAt };
+    },
+    buscarPayoutPorStripeId(stripePayout) {
+      const p = [...(estado.payoutsBrlt ?? [])].reverse().find((x) => x.stripePayout === stripePayout);
+      if (!p) return null;
+      return { id: p.id, wallet: p.wallet, montoBrlt: p.montoBrlt, estado: p.estado };
+    },
+    actualizarPayoutEstado(id, { estado: nuevo, detalle = null }) {
+      const p = (estado.payoutsBrlt ?? []).find((x) => x.id === Number(id));
+      if (!p) return false;
+      p.estado = nuevo;
+      if (detalle) p.detalle = detalle;
+      if (['PAGADO', 'FALLIDO'].includes(nuevo)) p.confirmadoAt = new Date().toISOString();
+      return true;
+    },
+    listarPayoutsBrlt(wallet, limite = 20) {
+      return [...(estado.payoutsBrlt ?? [])]
+        .filter((p) => p.wallet === wallet)
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .slice(0, Number(limite));
+    },
+
     // ------------------------------------------------------------ sesiones
     guardarSesion(token, wallet) {
       estado.sesiones.set(token, { wallet, createdAt: new Date().toISOString() });

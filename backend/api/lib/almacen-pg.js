@@ -1066,6 +1066,57 @@ export async function crearAlmacenPg(pool) {
       return this.getSubasta(Number(id));
     },
 
+    // ------------------------------------------------------------ payouts BRLT (Stripe Payouts — VALOR 4.3)
+    async crearPayoutBrlt({ wallet, montoBrlt, montoFiat, fiatMoneda = 'usd', stripePayout = null, destino = null, estado = 'REGISTRADO', detalle = null }) {
+      const r = await pool.query(
+        `INSERT INTO payouts_brlt (wallet, monto_brlt, monto_fiat, fiat_moneda, stripe_payout, destino, estado, detalle)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id, estado, created_at`,
+        [NORMALIZA_WALLET(wallet), Number(montoBrlt), montoFiat != null ? Number(montoFiat) : null,
+         fiatMoneda, stripePayout, destino, estado, detalle]
+      );
+      const f = r.rows[0];
+      return { id: Number(f.id), estado: f.estado, createdAt: f.created_at.toISOString() };
+    },
+
+    async buscarPayoutPorStripeId(stripePayout) {
+      const r = await pool.query(
+        `SELECT id, wallet, monto_brlt, estado FROM payouts_brlt WHERE stripe_payout = $1 ORDER BY id DESC LIMIT 1`,
+        [stripePayout]
+      );
+      const f = r.rows[0];
+      if (!f) return null;
+      return { id: Number(f.id), wallet: f.wallet.trim().toLowerCase(), montoBrlt: Number(f.monto_brlt), estado: f.estado };
+    },
+
+    async actualizarPayoutEstado(id, { estado, detalle = null }) {
+      const r = await pool.query(
+        `UPDATE payouts_brlt SET estado=$2, detalle=COALESCE($3, detalle),
+                confirmado_at = CASE WHEN $2 IN ('PAGADO','FALLIDO') THEN now() ELSE confirmado_at END
+          WHERE id=$1 RETURNING id`,
+        [Number(id), estado, detalle]
+      );
+      return r.rowCount > 0;
+    },
+
+    async listarPayoutsBrlt(wallet, limite = 20) {
+      const r = await pool.query(
+        `SELECT id, monto_brlt, monto_fiat, fiat_moneda, stripe_payout, estado, detalle, created_at, confirmado_at
+           FROM payouts_brlt WHERE wallet=$1 ORDER BY id DESC LIMIT $2`,
+        [NORMALIZA_WALLET(wallet), Number(limite)]
+      );
+      return r.rows.map((f) => ({
+        id: Number(f.id),
+        montoBrlt: Number(f.monto_brlt),
+        montoFiat: f.monto_fiat !== null ? Number(f.monto_fiat) : null,
+        fiatMoneda: f.fiat_moneda,
+        stripePayout: f.stripe_payout ?? null,
+        estado: f.estado,
+        detalle: f.detalle ?? null,
+        createdAt: f.created_at.toISOString(),
+        confirmadoAt: f.confirmado_at ? f.confirmado_at.toISOString() : null,
+      }));
+    },
+
     // ------------------------------------------------------------ sesiones (persistidas)
     async guardarSesion(token, wallet) {
       await pool.query(
