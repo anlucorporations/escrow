@@ -13,8 +13,11 @@ representados en NFTs, con **custodia atómica** mediante contrato escrow, **rep
   desde la propia web, con selección de billetera, firma exclusiva con la cuenta conectada y
   **cero interferencia** con MetaMask u otras wallets.
 - **Desplegado en GCP (producción piloto)**:
-  - Web: <https://truekeate-web-593453426217.europe-west1.run.app> — rev. **00044-8sw**.
-  - API: <https://truekeate-api-593453426217.europe-west1.run.app> — rev. **00025-484**.
+  - Web (canónica): <https://truekeate-web-593453426217.europe-west1.run.app> — rev. **00044-8sw**.
+  - Web (sur): <https://truekeate-web-593453426217.southamerica-east1.run.app> — rev. **00005-glr**.
+  - API: <https://truekeate-api-593453426217.europe-west1.run.app> — rev. **00026-b9w**.
+  - **Ambas webs sirven la misma imagen final** (`web:release-d0972fc-final`); el API permite
+    los dos orígenes (CORS).
 - **Pruebas**: frontend **78/78** (Vitest) · wallet/E2E **40/40** (Playwright con la extensión real)
   · extensión `background` **41/41** y `vault` **25/25** · contratos con Foundry.
 - **Rama de trabajo** `escrow-dsh-GCP`, sincronizada con `main` en los tres remotos.
