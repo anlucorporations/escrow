@@ -12,12 +12,12 @@ representados en NFTs, con **custodia atómica** mediante contrato escrow, **rep
 - **Sub-proyecto Wallet Nativa cerrado**: la plataforma incorpora su extensión nativa, instalable
   desde la propia web, con selección de billetera, firma exclusiva con la cuenta conectada y
   **cero interferencia** con MetaMask u otras wallets.
-- **Desplegado en GCP (producción piloto)**:
-  - Web (canónica): <https://truekeate-web-593453426217.europe-west1.run.app> — rev. **00044-8sw**.
-  - Web (sur): <https://truekeate-web-593453426217.southamerica-east1.run.app> — rev. **00005-glr**.
-  - API: <https://truekeate-api-593453426217.europe-west1.run.app> — rev. **00026-b9w**.
-  - **Ambas webs sirven la misma imagen final** (`web:release-d0972fc-final`); el API permite
-    los dos orígenes (CORS).
+- **Desplegado en GCP (producción piloto)** — un único proyecto (`truekeate-main`) y un único
+  despliegue:
+  - Web: <https://truekeate-web-593453426217.europe-west1.run.app> — rev. **00044-8sw**
+    (imagen `web:release-d0972fc-final`).
+  - API: <https://truekeate-api-593453426217.europe-west1.run.app> — rev. **00027-d4h**.
+  - Se retiró el despliegue duplicado de `truekeate-web` en `southamerica-east1`.
 - **Pruebas**: frontend **78/78** (Vitest) · wallet/E2E **40/40** (Playwright con la extensión real)
   · extensión `background` **41/41** y `vault` **25/25** · contratos con Foundry.
 - **Rama de trabajo** `escrow-dsh-GCP`, sincronizada con `main` en los tres remotos.
