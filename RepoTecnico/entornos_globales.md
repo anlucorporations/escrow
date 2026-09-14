@@ -276,3 +276,15 @@ Rutas por archivo en `backend/api/routes/*.js`. Cliente tipado: `web/lib/api.ts`
 | `web/lib/api.ts` / `web/lib/contracts.ts` | Cliente tipado / direcciones frontend |
 | `/home/dsh/workspace/gcp-env.sh` / `.env.global` | Cargador global de entorno y secretos |
 | `/tmp/cb-backend.yaml` / `/tmp/cb-web.yaml` | Cloud Build (Artifact Registry `truekeate-repo`) |
+
+### Stripe — estado de la integración (2026-09-14)
+
+| Elemento | Valor |
+|---|---|
+| Modo | **test** (`sk_test…` / `pk_test…`); la web usa `NEXT_PUBLIC_STRIPE_KEY` |
+| Cuenta | `acct_1U33mX3SsKtEjZCdtzeQeA2…` — `charges_enabled: false`, **`payouts_enabled: false`** (sin activar) |
+| Webhook endpoint | **`we_1UFcui3SsKtEjZCdv2tUPfXO`** (enabled) → `https://truekeate-api-…/valor/brlt/webhook` |
+| Eventos suscritos | `checkout.session.completed`, `payment_intent.succeeded`, `payout.paid`, `payout.failed` |
+| Firma | `STRIPE_WEBHOOK_SECRET` (Secret Manager) — obligatoria si existe; el endpoint monta `express.raw` antes del parser JSON |
+| Retiros | `STRIPE_PAYOUT_DESTINATION` **pendiente** (requiere cuenta activada con cuenta bancaria); sin él el retiro queda REGISTRADO |
+| Para live | 1) activar la cuenta y añadir cuenta bancaria; 2) fijar `STRIPE_PAYOUT_DESTINATION`; 3) cambiar secrets a `sk_live_…`/`pk_live_…`; 4) recrear el webhook en modo live y actualizar `STRIPE_WEBHOOK_SECRET` |
