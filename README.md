@@ -1,29 +1,131 @@
 # TrueKeate
 
 **TrueKeate** — Plataforma Web3 de intercambio (trueque) de Bienes, Productos, Servicios y Criptos
-representados en NFTs, con custodia atómica mediante contrato escrow, reputación comunitaria y
-meta-transacciones sin gas (EIP-712).
+representados en NFTs, con **custodia atómica** mediante contrato escrow, **reputación comunitaria**,
+**meta-transacciones sin gas (EIP-712)** y una **wallet nativa** propia (extensión de Chrome).
+
+---
 
 ## Estado del proyecto
 
-- **Fase 1 — Concepto**: completada (requerimientos, diccionario de datos, entornos, decisiones D1–D41).
-- **Fase 2 — Auditoría**: completada (informes de auditoría, casos de uso con criterios Gherkin/EARS,
-  diagramas CDU, sincronía de documentos, estilo visual RNF-08/RF-19).
-- **Fase 3 — Desarrollo**: pendiente (plan de ciclos C1–C8 definido en `arquitectura_tecnica.md`).
+- **Fases 1–5 completas**: Concepto, Auditoría, Desarrollo, Pruebas y Manuales (decisiones D1–D41).
+- **Sub-proyecto Wallet Nativa cerrado**: la plataforma incorpora su extensión nativa, instalable
+  desde la propia web, con selección de billetera, firma exclusiva con la cuenta conectada y
+  **cero interferencia** con MetaMask u otras wallets.
+- **Desplegado en GCP (producción piloto)**:
+  - Web: <https://truekeate-web-593453426217.europe-west1.run.app> — rev. **00044-8sw**.
+  - API: <https://truekeate-api-593453426217.europe-west1.run.app> — rev. **00025-484**.
+- **Pruebas**: frontend **78/78** (Vitest) · wallet/E2E **40/40** (Playwright con la extensión real)
+  · extensión `background` **41/41** y `vault` **25/25** · contratos con Foundry.
+- **Rama de trabajo** `escrow-dsh-GCP`, sincronizada con `main` en los tres remotos.
+
+---
 
 ## Estructura
 
 | Carpeta | Contenido |
 |---|---|
-| `RepoTecnico/` | Documentación técnica: `requerimientos.md` (guía principal, D1–D41), `diccionario_datos.md`, `arquitectura_tecnica.md` (ciclos C1–C8), `casos_uso.md` (CU-01…CU-31), `CDU/` (diagramas), informes de auditoría, `estado_proyecto.md` |
-| `TrueKeate/` | Activos de marca: logotipos/título (SVG recolorables, PNG, ICO), imágenes hero, guía SBT (RF-19) |
+| `web/` | Plataforma Next.js 16 + React 19 (landing, suite, login con billetera, instalación de la wallet) |
+| `backend/` | API Node/Express (Cloud Run) + indexador PostgreSQL y relayer EIP-712 |
+| `sc/` | Contratos inteligentes en Foundry (Escrow, Socios, SBT, NFT, subastas…) |
+| `wallet-extension/` | **Wallet nativa** (extensión Chrome MV3): popup, Tokens/NFT/Actividad, modos de vista, configuración/perfil |
+| `RepoTecnico/` | Documentación: requerimientos, arquitectura, casos de uso, pruebas, manuales e informes |
+| `TrueKeate/` | Activos de marca (logotipos, título, imágenes, guía SBT) |
+| `scripts/` | Builds/despliegue en Cloud Build, contratos GCP, utilidades |
+| `docs/` | Manuales literales y material de usuario |
 
-## Ramas
+---
 
-- `escrow-dsh-GCP` — rama de trabajo del proyecto (documentación TrueKeate).
-- `main` — rama del repositorio base (contenido previo, sin relación funcional con esta rama).
+## Arranque rápido (local)
 
-## Flujo de trabajo
+Requisitos: **Node 22+**, **Foundry** (`anvil`/`forge`) y **Chrome/Chromium**.
 
-Los commits se crean localmente en `escrow-dsh-GCP` y se cargan (push) a los repositorios remotos
-(GitHub, GitLab.com) únicamente cuando el director del proyecto lo indique.
+```bash
+# Todo en uno: anvil + despliegue de contratos + web
+./start.sh
+
+# O por partes
+anvil                                   # nodo local (chain 31337)
+cd web && npm install && npm run dev    # plataforma en http://localhost:3000
+cd backend && npm install && npm start  # API en http://127.0.0.1:4000
+```
+
+Cuentas de prueba (anvil) y roles: `deployment-info.txt` / `RepoTecnico/BaseOperaciones/cuentas_anvil.md`.
+
+---
+
+## Wallet nativa
+
+**Instalarla desde la plataforma** (recomendado): abrir
+<https://truekeate-web-593453426217.europe-west1.run.app/instalar-wallet> → *Descargar wallet (.zip)*
+→ descomprimir → `chrome://extensions` → *Modo de desarrollador* → *Cargar descomprimida*.
+
+**Desde el repositorio**:
+
+```bash
+cd wallet-extension
+npm install
+npm run build            # genera dist/ (cargable como extensión desempaquetada)
+python3 scripts/package-web.py   # opcional: publica el ZIP en web/public/wallet/
+```
+
+Al conectar en la plataforma, el botón **Conectar billetera** abre un popup con las wallets
+detectadas (EIP-6963); elegir **CodeCrypto Wallet**. Esa elección gobierna el login (EIP-191) y
+**cada firma** de la sesión.
+
+---
+
+## Pruebas
+
+```bash
+# Plataforma (Vitest)
+cd web && npm test
+
+# E2E de la plataforma con la wallet nativa REAL (Playwright, 40 tests)
+cd wallet-extension && npm run build
+cd ../web && npm run test:wallet
+
+# Pruebas propias de la extensión
+cd wallet-extension && npm test            # importes + contratos + background + bóveda
+
+# Contratos
+cd sc && forge test
+```
+
+Checklist de aceptación (51 casos) y plantilla de informe:
+`RepoTecnico/pruebas/checklist_wallet_nativa.md` e `INFORME_WALLET_NATIVA.md`.
+
+---
+
+## Despliegue (GCP)
+
+- **Web**: `scripts/cloudbuild.yaml` + `gcloud run deploy truekeate-web`.
+- **API**: `scripts/cloudbuild-backend.yaml` + `gcloud run deploy truekeate-api`.
+- **Indexador**: `scripts/cloudbuild-indexer.yaml` (Cloud Run Job).
+- **Contratos**: `scripts/deploy-contracts-gcp.sh`.
+- Guía completa: `RepoTecnico/Manuales/04-Despliegue/` y `entornos_globales.md`.
+
+---
+
+## Documentación
+
+| Documento | Contenido |
+|---|---|
+| `RepoTecnico/requerimientos.md` | Requerimientos RF/RNF/RT y decisiones D1–D41 |
+| `RepoTecnico/estado_proyecto.md` | Estado, hitos y pendientes |
+| `RepoTecnico/arquitectura_tecnica.md` | Arquitectura y ciclos de desarrollo |
+| `RepoTecnico/requerimientos_wallet_nativa.md` | Requerimientos de la wallet nativa (RF-WN-01..27) |
+| `RepoTecnico/INFORME_CIERRE_WALLET_NATIVA.md` | Informe de cierre del sub-proyecto wallet |
+| `RepoTecnico/pruebas/` | Checklist E2E e informes de prueba |
+| `RepoTecnico/Manuales/` | Manuales técnicos; `docs/Manuales/` literales |
+
+---
+
+## Ramas y flujo de trabajo
+
+- `escrow-dsh-GCP` — rama de trabajo del proyecto.
+- `main` — sincronizada con `escrow-dsh-GCP` al cierre de la entrega.
+- Los commits se cargan a los repositorios remotos (GitHub, GitLab.com, GitLab CodeCrypto)
+  cuando el director del proyecto lo indica.
+
+> **Aviso**: el proyecto corre sobre una cadena de pruebas (anvil 31337). No usar con fondos reales.
