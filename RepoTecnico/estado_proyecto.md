@@ -1124,8 +1124,10 @@ Instrucción del director (2 puntos). Implementado y **desplegado** (orden del d
 **Pruebas:** E2E **42/42** (F-13 y F-20 nuevos/ampliados), `background` **45/45**, `vault`
 **25/25**; `build` y `lint` limpios.
 
-**Push y despliegue (2026-09-15, orden del director):** commit `03266ee` subido a `escrow-dsh-GCP`
-y `main` en gitlab y github; **codecrypto rechazó el push por un error 500 del pre-receive hook
-del servidor** (se reintentará). Web desplegada en GCP con `web:release-03266ee` (rev.
-**00052-5cl**). Zip servido verificado (498 902 bytes, con `tk-footer__red`) y E2E **42/42**
-contra el despliegue. La API no cambió.
+**Push y despliegue (2026-09-15, orden del director):** commit `ec4357e` subido a `escrow-dsh-GCP`
+y `main` en gitlab y github; **codecrypto rechazó el push con un error 500 del pre-receive hook del
+servidor** (`Internal API error (500)`), persistente tras **5 reintentos** en ~10 min — incidencia
+de `gitlab.codecrypto.academy`, no del contenido (gitlab.com y GitHub aceptan el mismo commit).
+Codecrypto queda en `de95f87` pendiente de reintento. Web desplegada en GCP con
+`web:release-03266ee` (rev. **00052-5cl**). Zip servido verificado (498 902 bytes, con
+`tk-footer__red`) y E2E **42/42** contra el despliegue. La API no cambió.
