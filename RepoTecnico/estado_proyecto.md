@@ -957,8 +957,9 @@ nativa** al proyecto.
   - **CIERRE:** informe final en `RepoTecnico/INFORME_CIERRE_WALLET_NATIVA.md` (alcance,
     matriz RF-WN-01..33, decisiones D-NW-1..6, correcciones, despliegues y evidencia **41/41**).
   - **DESPLIEGUE FINAL GCP (2026-09-14):** **un único proyecto y despliegue** en `truekeate-main`:
-    web `truekeate-web` **europe-west1 rev. 00045-g2p** (imagen `web:release-9098e70`, rediseño
-    de la wallet incluido) y API `truekeate-api` **rev. 00027-d4h** (imagen `backend:release-b4feb46`).
+    web `truekeate-web` **europe-west1 rev. 00049-9wk** (imagen `web:release-07dc7fb`, rediseño
+    de la wallet + Escrow nuevo + UI de retiros) y API `truekeate-api` **rev. 00033-cnt**
+    (imagen `backend:release-07dc7fb`, fix de `crearMovimientoBrlt`).
     Se detectó un segundo servicio `truekeate-web` en `southamerica-east1` (rev. antigua) y se
     **eliminó**; el `CORS_ORIGEN` del API quedó con el origen único de europe-west1. Verificado:
     `/`, `/suite/dashboard`, `/instalar-wallet`, `/help/manual`, `/wallet/TrueKeateWallet.zip`
@@ -1038,5 +1039,8 @@ que te lo indique"). Deploy GCP realizado.
    `STRIPE_WEBHOOK_SECRET` (el actual es de test).
 
 Tests backend **56/56** (nuevos: webhook firmado + idempotencia, PI con metadata,
-retiro REGISTRADO). Deploy: API rev **truekeate-api-00031-rck**, web rev
-**truekeate-web-00047-52j** (release-65bbe06). Commit local `65bbe06` (+ fix PI).
+retiro REGISTRADO). **Cierre de ciclo (2026-09-14):** commits `023169c`…`07dc7fb` subidos a
+`escrow-dsh-GCP` y `main` en los 3 remotos; web rev **truekeate-web-00049-9wk** y API rev
+**truekeate-api-00033-cnt**, ambas con imagen `release-07dc7fb` (incluye Escrow nuevo, UI de
+retiros y fix de `crearMovimientoBrlt`). Verificado: web/API **200**, webhook sin firma **400**,
+`TrueKeateWallet.zip` con manifest **TrueKeate Wallet** y E2E de wallet **41/41**.
