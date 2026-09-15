@@ -1040,9 +1040,9 @@ que te lo indique"). Deploy GCP realizado.
    `STRIPE_WEBHOOK_SECRET` (el actual es de test).
 
 Tests backend **56/56** (nuevos: webhook firmado + idempotencia, PI con metadata,
-retiro REGISTRADO). **Cierre de ciclo (2026-09-15):** commits `023169c`…`03266ee` subidos a
-`escrow-dsh-GCP` y `main` (gitlab/github; codecrypto con incidencia 500 del servidor); API rev
-**truekeate-api-00033-cnt** (`backend:release-07dc7fb`) y web rev **truekeate-web-00052-5cl**
+retiro REGISTRADO). **Cierre de ciclo (2026-09-15):** commits `023169c`…`43a30a1` subidos a
+`escrow-dsh-GCP` y `main` en **los 3 remotos** (codecrypto se recuperó del 500 del servidor); API
+rev **truekeate-api-00033-cnt** (`backend:release-07dc7fb`) y web rev **truekeate-web-00052-5cl**
 (`web:release-03266ee`, con el rediseño del inicio/pie, pie al fondo, icono de red, redes
 personalizadas y notificaciones listadas).
 Verificado: web/API **200**, webhook sin firma **400**, `TrueKeateWallet.zip` (498 902 bytes) con
@@ -1124,10 +1124,10 @@ Instrucción del director (2 puntos). Implementado y **desplegado** (orden del d
 **Pruebas:** E2E **42/42** (F-13 y F-20 nuevos/ampliados), `background` **45/45**, `vault`
 **25/25**; `build` y `lint` limpios.
 
-**Push y despliegue (2026-09-15, orden del director):** commit `ec4357e` subido a `escrow-dsh-GCP`
-y `main` en gitlab y github; **codecrypto rechazó el push con un error 500 del pre-receive hook del
-servidor** (`Internal API error (500)`), persistente tras **5 reintentos** en ~10 min — incidencia
-de `gitlab.codecrypto.academy`, no del contenido (gitlab.com y GitHub aceptan el mismo commit).
-Codecrypto queda en `de95f87` pendiente de reintento. Web desplegada en GCP con
-`web:release-03266ee` (rev. **00052-5cl**). Zip servido verificado (498 902 bytes, con
-`tk-footer__red`) y E2E **42/42** contra el despliegue. La API no cambió.
+**Push y despliegue (2026-09-15, orden del director):** commits `03266ee`…`43a30a1` subidos a
+`escrow-dsh-GCP` y `main` en **los 3 remotos**. Incidencia resuelta: codecrypto devolvía
+`Internal API error (500)` en el hook `pre_receive` y rechazaba **cualquier** push (probado con una
+rama nueva vacía); tras ~15 min y varios reintentos el servidor volvió a aceptar y ambas ramas
+quedaron en `43a30a1`. Web desplegada en GCP con `web:release-03266ee` (rev. **00052-5cl**). Zip
+servido verificado (498 902 bytes, con `tk-footer__red`) y E2E **42/42** contra el despliegue. La
+API no cambió.
