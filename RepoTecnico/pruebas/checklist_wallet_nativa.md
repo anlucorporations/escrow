@@ -104,9 +104,9 @@ Convención: `TC-WN-nn` = caso de prueba. **Tipo**: `A` automático / `M` manual
 | TC-WN-23 | M | Comprar (guiado) | Barra de operaciones → **Comprar** | Enlace a VALOR + QR, dentro de la ficha de balance |
 | TC-WN-24 | M | Cambiar (swap) | Barra de operaciones → **Cambiar** | Formulario de swap en la ficha de balance; **Aprobar** e **Intercambiar** |
 | TC-WN-25 | M | Contactos | Pestaña **Contactos** → guardar/eliminar | Libreta persistente con validación de dirección |
-| TC-WN-26 | M | Redes | Menú Configuración → **Redes** | Pestañas Públicas/Prueba/Personalizadas; conectar redes |
+| TC-WN-26 | M | Redes | Menú Configuración → **Redes** → Personalizadas → **Añadir red personalizada** | Conectar redes públicas/prueba; alta de red propia (nombre, RPC, chainId, símbolo) con permiso del RPC y validación del chainId |
 | TC-WN-27 | M | Pestañas | Ver la ficha inferior | Pestañas **Actividades/Tokens/NFTs/Contactos** operativas |
-| TC-WN-28 | M | Conexiones y pie | Pulsar el estado de la dApp; ver el pie | Gestión de dApps con desconexión; pie = estado + Configuración/Bloquear/Desconectar |
+| TC-WN-28 | M | Conexiones y pie | Pulsar el estado de la dApp; ver el pie | Pie **anclado al fondo** = estado + Configuración/Bloquear/Desconectar; gestión de dApps |
 
 ---
 
@@ -148,7 +148,7 @@ Convención: `TC-WN-nn` = caso de prueba. **Tipo**: `A` automático / `M` manual
 
 | ID | Tipo | Objetivo | Pasos | Resultado esperado |
 |---|---|---|---|---|
-| TC-WN-41 | M | Notificaciones | Configuración → Notificaciones | Fichas deslizables; contador de no leídas; **marcar como leídas** |
+| TC-WN-41 | M | Notificaciones | Menú Configuración → Notificaciones | **Lista completa** (vertical) con icono por tipo, texto, hora y origen; contador de no leídas; **marcar como leídas** |
 | TC-WN-42 | M | Redes (3 pestañas) | Configuración → Red → Gestionar redes | Pestañas **Públicas / Prueba / Personalizadas**; Ethereum, Base, Polygon, Arbitrum, Optimism, Sepolia, Base Sepolia; **Bitcoin solo informativo** |
 | TC-WN-43 | M | Conectar red | Conectar una red pública | Pide permiso del RPC y la deja activa |
 | TC-WN-44 | M | Ayuda | Configuración → Ayuda | Abre la ayuda de la plataforma |

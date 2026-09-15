@@ -9,6 +9,7 @@
 import { useState } from 'react'
 import { normalizeChainId, rpcPermissionPattern } from '../utils/chains'
 import { sendRPCToBackground } from '../utils/rpc'
+import { FormularioRed } from './FormularioRed'
 import type { ChainConfig } from '../types'
 
 interface RedConocida {
@@ -52,6 +53,7 @@ export function Redes({
   const [pestana, setPestana] = useState<Pestana>('publica')
   const [busy, setBusy] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [mostrarForm, setMostrarForm] = useState(false)
 
   const norm = (id: string) => {
     try {
@@ -174,24 +176,48 @@ export function Redes({
           </ul>
         )}
 
-        {pestana === 'personalizadas' &&
-          (personalizadas.length === 0 ? (
-            <p className="tk-muted" style={{ fontSize: 11 }}>
-              Aún no hay redes personalizadas. Añádelas desde la ficha «Red».
-            </p>
-          ) : (
-            <ul className="tk-redes__lista">
-              {personalizadas.map((c) =>
-                fila({
-                  nombre: c.name,
-                  chainId: c.chainId,
-                  conectada: true,
-                  activa: activa(c.chainId),
-                  onConectar: () => onSwitch(norm(c.chainId)),
-                })
-              )}
-            </ul>
-          ))}
+        {pestana === 'personalizadas' && (
+          <>
+            <div className="tk-redes__acciones">
+              <button
+                type="button"
+                className="tk-btn"
+                onClick={() => setMostrarForm((v) => !v)}
+                aria-expanded={mostrarForm}
+              >
+                {mostrarForm ? '✕ Cerrar' : '➕ Añadir red personalizada'}
+              </button>
+            </div>
+
+            {mostrarForm && (
+              <FormularioRed
+                onAgregada={(nuevas) => {
+                  onChainsChanged(nuevas)
+                  setMostrarForm(false)
+                }}
+                onCancelar={() => setMostrarForm(false)}
+              />
+            )}
+
+            {personalizadas.length === 0 ? (
+              <p className="tk-muted" style={{ fontSize: 11 }}>
+                Aún no hay redes personalizadas.
+              </p>
+            ) : (
+              <ul className="tk-redes__lista">
+                {personalizadas.map((c) =>
+                  fila({
+                    nombre: c.name,
+                    chainId: c.chainId,
+                    conectada: true,
+                    activa: activa(c.chainId),
+                    onConectar: () => onSwitch(norm(c.chainId)),
+                  })
+                )}
+              </ul>
+            )}
+          </>
+        )}
       </div>
 
       {error && (

@@ -283,3 +283,27 @@ Estado: **implementado**. Notificaciones y Modo de vista se recuperaron en el me
 (decisión del director). Única nota de alcance: la página *Características* (pestañas
 Tokens/DeFi/NFT/Actividad) queda sin acceso directo porque su contenido vive ahora en la ficha de
 pestañas del inicio; el código se conserva.
+
+---
+
+## 18. Ajustes de pie, redes personalizadas y notificaciones (2026-09-15, 2.ª iteración)
+
+- **RF-WN-40 · Pie anclado al fondo**: el pie (estado de la dApp + Configuración/Bloquear/
+  Desconectar) queda **alineado a la parte inferior** de la billetera, aunque el contenido de la
+  página sea corto (la zona de contenido crece para empujarlo).
+- **RF-WN-41 · Redes personalizadas**: la pestaña **Personalizadas** de la página Redes permite
+  **añadir** una red EVM (nombre, URL del RPC, Chain ID, símbolo y explorador opcional) y
+  **seleccionarla** como red activa. El alta pide permiso de host solo para ese RPC
+  (`chrome.permissions.request`) y valida con `wallet_addEthereumChain` que el RPC responde con el
+  chainId declarado; la red queda persistida en `codecrypto_chains`.
+- **RF-WN-42 · Notificaciones listadas**: la página Notificaciones muestra la **lista completa**
+  (vertical, de la más reciente a la más antigua) de la actividad de la wallet y de las dApps,
+  con icono por tipo, texto, hora legible y origen; contador y «Marcar como leídas».
+
+**Decisión D-NW-8**: el timestamp del bus de actividad pasa de `toLocaleTimeString()` (no
+parseable) a **ISO 8601**, con un formateador de respaldo para las entradas antiguas; así la hora
+y el estado «sin leer» de las notificaciones funcionan.
+
+Estado: **implementado**. Pruebas: E2E **41/41** (F-13 valida el pie al fondo; F-15 el alta y la
+validación de red personalizada; F-19 la lista de notificaciones), `background` **45/45** y
+`vault` **25/25**.

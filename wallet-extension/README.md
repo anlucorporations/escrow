@@ -141,9 +141,11 @@ npm run dev        # 4. sirve test.html en http://localhost:5173/test.html
     Comprar) que carga la operación **dentro** de la ficha de balance; y **ficha con pestañas**
     (Actividades · Tokens · NFTs · Contactos).
   - **Pie**: estado de la dApp + botones icono **Configuración** (menú con Perfil · Redes · Ayuda ·
-    Notificaciones · Modo de vista), **Bloquear** y **Desconectar**.
-  - Páginas completas de **Redes**, **Perfil**, **Conexiones** y **Notificaciones** con flecha de
-    volver.
+    Notificaciones · Modo de vista), **Bloquear** y **Desconectar**. Queda anclado al fondo de la
+    billetera.
+  - Páginas completas con flecha de volver: **Redes** (pestañas Públicas/Prueba/**Personalizadas**,
+    donde se **añaden y seleccionan** redes EVM propias), **Perfil**, **Conexiones** y
+    **Notificaciones** (lista completa de la actividad con icono por tipo, hora y origen).
 - **Modos de vista**: panel lateral, pestaña o **flotante** (overlay inyectado por content script).
 - **Métodos solo-extensión**: `wallet_revealMnemonic`, `wallet_changeVaultPassword`,
   `wallet_exportVault`/`wallet_importVault`, `wallet_getConnectedSites`/`wallet_disconnectSite`

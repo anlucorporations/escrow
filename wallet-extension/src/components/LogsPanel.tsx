@@ -1,4 +1,5 @@
 import type { LogEntry } from '../types'
+import { horaLog } from '../utils/logs'
 
 /**
  * Panel de actividad: muestra las operaciones de la wallet **y** las llamadas,
@@ -31,7 +32,7 @@ function LogsPanel({ logs, onClear }: LogsPanelProps) {
         )}
         {logs.map((log, index) => (
           <div key={`${log.timestamp}-${index}`} className={`log log-${log.type}`}>
-            <span className="log-timestamp">[{log.timestamp}]</span>
+            <span className="log-timestamp">[{horaLog(log)}]</span>
             <span className="log-type">[{log.type.toUpperCase()}]</span>
             {log.source && <span className="log-source">{log.source}</span>}
             <span className="log-content">{log.content}</span>

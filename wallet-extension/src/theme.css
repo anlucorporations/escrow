@@ -1583,3 +1583,92 @@ code, .tk-mono {
   text-align: left;
   cursor: pointer;
 }
+
+/* ==========================================================================
+   Ajustes 2026-09-15 (2.ª iteración) — pie al fondo, redes personalizadas y
+   lista de notificaciones.
+   ========================================================================== */
+
+/* 1 · El pie queda anclado al fondo de la billetera aunque el contenido sea corto */
+.app {
+  flex: 1;
+}
+
+.tk-inicio {
+  flex: 1;
+  min-height: 0;
+}
+
+/* 3 · Notificaciones: lista vertical de todas las notificaciones */
+.tk-notifs__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 0 10px;
+  margin: 0;
+  list-style: none;
+}
+
+.tk-notif {
+  flex: none;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 8px;
+  padding-right: 22px;
+}
+
+.tk-notif__icono {
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.tk-notif__cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.tk-notifs__vacio {
+  padding: 8px 0;
+}
+
+/* 2 · Redes personalizadas: alta y selección */
+.tk-redes__acciones {
+  padding: 4px 0 8px;
+}
+
+.tk-red-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid rgba(26, 43, 76, 0.12);
+  border-radius: 12px;
+  background: var(--smoke);
+}
+
+.tk-red-form__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 10px;
+  color: rgba(26, 43, 76, 0.65);
+}
+
+.tk-red-form__fila {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.tk-red-form__acciones {
+  display: flex;
+  gap: 8px;
+}
+
+.tk-red-form__acciones .tk-btn {
+  flex: 1;
+}

@@ -1077,3 +1077,24 @@ conserva. El hub de *Configuración* también queda sin enlace (sus áreas está
 `escrow-dsh-GCP` y `main` en los 3 remotos; web desplegada en GCP con `web:release-2822d1b`
 (rev. **00050-d6n**). Zip servido verificado (497 348 bytes, UI nueva) y E2E **41/41** contra el
 despliegue. La API no cambió en este ciclo.
+
+## 📌 Ajustes de pie, redes personalizadas y notificaciones (2026-09-15, 2.ª iteración)
+
+Instrucción del director (3 puntos). Implementado en `escrow-dsh-GCP`, commit local (sin push
+hasta orden), con `wallet-extension/` reconstruida.
+
+- **Pie al fondo (RF-WN-40):** `.app` y `.tk-inicio` crecen (`flex: 1`) para que el pie quede
+  anclado a la parte inferior de la billetera aunque el contenido sea corto.
+- **Redes personalizadas (RF-WN-41):** nuevo `src/components/FormularioRed.tsx`; la pestaña
+  *Personalizadas* de Redes permite añadir (nombre, RPC, Chain ID, símbolo, explorador) y
+  seleccionar la red. Pide permiso de host del RPC y el background valida el chainId.
+- **Notificaciones (RF-WN-42):** lista vertical completa con icono por tipo, hora y origen.
+  **D-NW-8:** el timestamp del bus pasa a ISO 8601 (antes `toLocaleTimeString()`, no parseable, lo
+  que rompía la hora y el contador de no leídas); `LogsPanel` usa el nuevo formateador.
+
+**Archivos:** `src/components/FormularioRed.tsx` (nuevo), `src/components/Redes.tsx`,
+`src/components/Notificaciones.tsx`, `src/components/LogsPanel.tsx`, `src/utils/logs.ts`,
+`src/theme.css`. **Decisión D-NW-8** en `requerimientos_wallet_nativa.md` §18.
+
+**Pruebas:** E2E **41/41** (F-13 pie al fondo, F-15 alta/validación de red personalizada, F-19
+lista de notificaciones), `background` **45/45**, `vault` **25/25**; `build` y `lint` limpios.

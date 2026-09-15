@@ -17,9 +17,19 @@ import type { LogEntry, LogMessage, LogType } from '../types'
 export const LOGS_KEY = 'codecrypto_logs'
 export const MAX_LOG_ENTRIES = 200
 
-/** Crea una entrada con la hora actual. */
+/** Crea una entrada con la hora actual (ISO 8601, parseable). */
 export function createLogEntry(type: LogType, content: string, source?: string): LogEntry {
-  return { type, content, source, timestamp: new Date().toLocaleTimeString() }
+  return { type, content, source, timestamp: new Date().toISOString() }
+}
+
+/**
+ * Hora legible de una entrada. Admite el formato antiguo (`toLocaleTimeString`,
+ * no parseable) y lo devuelve tal cual si no se puede interpretar.
+ */
+export function horaLog(entry: LogEntry): string {
+  const fecha = new Date(entry.timestamp)
+  if (Number.isNaN(fecha.getTime())) return entry.timestamp
+  return fecha.toLocaleTimeString('es')
 }
 
 /** Lee el historial completo (el más antiguo primero). */

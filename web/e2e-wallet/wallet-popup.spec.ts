@@ -239,6 +239,13 @@ test("F-13 · Pie: estado de la dApp + 3 acciones (sin sección de actividad)", 
   // La actividad salió del pie
   await expect(popup.locator(".tk-footer .tk-logs")).toHaveCount(0);
   await expect(popup.locator(".tk-footer")).not.toContainText(/actividad/i);
+  // El pie queda alineado al fondo de la billetera
+  const caja = await popup.evaluate(() => {
+    const f = document.querySelector(".tk-footer")!.getBoundingClientRect();
+    const a = document.querySelector(".app")!.getBoundingClientRect();
+    return { pie: Math.round(f.bottom), app: Math.round(a.bottom) };
+  });
+  expect(caja.pie).toBe(caja.app);
 });
 
 test("F-14 · Menú Configuración: Perfil, Redes, Ayuda, Notificaciones y Modo de vista", async () => {
@@ -262,7 +269,19 @@ test("F-15 · Redes: pestañas y Bitcoin informativo (desde el menú)", async ()
   await redes.getByRole("tab", { name: "Prueba" }).click();
   await expect(redes).toContainText("Sepolia");
   await redes.getByRole("tab", { name: "Personalizadas" }).click();
-  await expect(redes).toContainText(/Aún no hay redes personalizadas|Red personalizada/i);
+  await expect(redes).toContainText(/Aún no hay redes personalizadas/i);
+
+  // Alta de una red personalizada: formulario + validación
+  await redes.getByRole("button", { name: /Añadir red personalizada/ }).click();
+  const form = redes.locator(".tk-red-form");
+  await expect(form.locator(".tk-input")).toHaveCount(5);
+  await form.getByPlaceholder("https://rpc-amoy.polygon.technology").fill("https://rpc.example.org");
+  await form.getByPlaceholder("80002 o 0x13882").fill("abc");
+  await form.getByRole("button", { name: /Añadir red/ }).click();
+  await expect(form).toContainText(/chainId inválido/i);
+  await redes.getByRole("button", { name: /✕ Cerrar/ }).click();
+  await expect(redes).toContainText(/Aún no hay redes personalizadas/i);
+
   await popup.locator(".tk-pagina__volver").click();
   await popup.locator(".tk-inicio").waitFor();
 });
@@ -320,15 +339,26 @@ test("F-18 · Perfil: backup exportable y restauración", async () => {
 
 // ── Accesos recuperados en el menú ──────────────────────────────────────
 
-test("F-19 · Menú: Notificaciones y Modo de vista abren sus páginas", async () => {
+test("F-19 · Menú: Notificaciones (lista) y Modo de vista abren sus páginas", async () => {
+  // Volver al inicio desde Perfil
   await popup.locator(".tk-pagina__volver").click();
   await popup.locator(".tk-inicio").waitFor();
 
+  // Genera una notificación (evento accountsChanged al cambiar de cuenta)
+  await popup.locator(".tk-header__cuenta").selectOption("1");
+  await popup.waitForTimeout(700);
+
   await abrirConfig(popup, /Notificaciones/);
   await expect(popup.locator(".tk-pagina__titulo")).toHaveText("Notificaciones");
-  await expect(popup.locator(".tk-notifs")).toBeVisible();
+  const lista = popup.locator(".tk-notifs__lista .tk-notif");
+  await expect(lista.first()).toBeVisible({ timeout: 10_000 });
+  expect(await lista.first().innerText()).not.toMatch(/Invalid Date/i);
+  await expect(popup.locator(".tk-notifs__cabecera")).toContainText(/notificaciones/i);
+
   await popup.locator(".tk-pagina__volver").click();
   await popup.locator(".tk-inicio").waitFor();
+  await popup.locator(".tk-header__cuenta").selectOption("0");
+  await popup.waitForTimeout(400);
 
   await abrirConfig(popup, /Modo de vista/);
   await expect(popup.locator(".tk-pagina__titulo")).toHaveText("Modo de vista");
