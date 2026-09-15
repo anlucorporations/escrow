@@ -135,17 +135,21 @@ npm run dev        # 4. sirve test.html en http://localhost:5173/test.html
   *instalada / no instalada*.
 - **Descubrimiento**: la dApp escucha **EIP-6963** y la lista junto a MetaMask/Rabby/Backpack;
   el usuario elige en un popup y esa elección gobierna el login y las firmas de la sesión.
-- **UI del popup** (identidad TrueKeate, ancho fijo 480 px): **páginas** con flecha de
-  volver — Inicio (saldo + menú), Cuenta, Balance, Gestionar saldo
-  (Recibir QR · Enviar · Comprar · Cambiar · Contactos), Red, Características (**Tokens** ERC-20,
-  **NFT**, **Actividad**), Configuración (notificaciones, modo de vista, redes, ayuda, perfil),
-  Conexiones con desconexión por dApp y **Notificaciones**.
+- **UI del popup** (identidad TrueKeate, ancho fijo 480 px, páginas a todo el ancho sin márgenes):
+  - **Inicio** (rediseño 2026-09-15): ficha de **balance deslizable** (carrusel con ETH + tokens
+    ERC-20 reales, flechas y puntos); **barra de operaciones** (Enviar · Recibir · Cambiar ·
+    Comprar) que carga la operación **dentro** de la ficha de balance; y **ficha con pestañas**
+    (Actividades · Tokens · NFTs · Contactos).
+  - **Pie**: estado de la dApp + botones icono **Configuración** (menú con Perfil · Redes · Ayuda),
+    **Bloquear** y **Desconectar**.
+  - Páginas completas de **Redes**, **Perfil**, **Conexiones** y **Notificaciones** con flecha de
+    volver.
 - **Modos de vista**: panel lateral, pestaña o **flotante** (overlay inyectado por content script).
 - **Métodos solo-extensión**: `wallet_revealMnemonic`, `wallet_changeVaultPassword`,
   `wallet_exportVault`/`wallet_importVault`, `wallet_getConnectedSites`/`wallet_disconnectSite`
   (las dApps no pueden invocarlos).
 - **E2E**: `cd ../web && npm run test:wallet` prueba la plataforma con esta extensión **real**
-  (41 tests en `web/e2e-wallet/`).
+  (40 tests en `web/e2e-wallet/`).
 
 ---
 

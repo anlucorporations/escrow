@@ -252,3 +252,32 @@ interfaz (se mantiene el `rdns` `io.codecrypto.wallet` para no invalidar la elec
 
 Estado: **implementado** (rediseño de App: header, Inicio + `Pagina`, `Aprobacion` en el popup y
 background sin ventanas de aprobación).
+
+---
+
+## 17. Rediseño del inicio y del pie (instrucción del director, 2026-09-15)
+
+- **RF-WN-34 · Pie (footer)**: contiene **solo** el **estado de la dApp** conectada y tres
+  botones tipo icono: **Configuración** (menú desplegable), **Bloquear** y **Desconectar**.
+  Se **elimina la sección de actividades** del pie (la actividad vive ahora en una pestaña).
+  El estado de la dApp abre la página de Conexiones.
+- **RF-WN-35 · Ancho y páginas**: la billetera mantiene **480 px fijos**; las páginas abarcan
+  **todo el espacio disponible** de la wallet, **sin márgenes** exteriores.
+- **RF-WN-36 · Ficha de balance deslizable**: la ficha superior es un **carrusel** (gesto de
+  deslizar + flechas + puntos) que recorre las **monedas de la billetera** (ETH + tokens ERC-20
+  añadidos con su saldo real).
+- **RF-WN-37 · Barra de operaciones**: debajo de la ficha de balance hay una barra con iconos de
+  **Enviar, Recibir, Cambiar y Comprar**. La página de cada operación **se carga dentro de la
+  ficha de balance**, con flecha para volver al saldo.
+- **RF-WN-38 · Ficha con pestañas**: debajo de la barra de operaciones, una ficha con pestañas
+  **Actividades, Tokens, NFTs y Contactos**.
+- **RF-WN-39 · Menú Configuración**: el botón desplegable del pie contiene los iconos de
+  **Perfil, Redes y Ayuda** (además de la acción de reinicio, de seguridad).
+
+**Decisión D-NW-7** (sustituye el inicio de secciones de RF-WN-29): el inicio pasa de un menú de
+11 secciones a una sola página con carrusel de saldo, barra de operaciones y ficha de pestañas.
+Las páginas de Perfil/Redes/Conexiones se siguen abriendo a pantalla completa.
+
+Estado: **implementado**. Nota de alcance: la página *Configuración* (hub con notificaciones y
+modo de vista) y la de *Características* quedan sin acceso directo desde el menú nuevo; se
+mantienen en el código a la espera de decisión del director.

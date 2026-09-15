@@ -11,8 +11,10 @@ import { Comprar } from './components/Comprar'
 import { Cambiar } from './components/Cambiar'
 import { Caracteristicas } from './components/Caracteristicas'
 import { Configuracion } from './components/Configuracion'
+import { Redes } from './components/Redes'
+import { Perfil } from './components/Perfil'
 import { Aprobacion, type SolicitudConexion, type SolicitudFirma } from './components/Aprobacion'
-import { Inicio, type SeccionInicio } from './components/Inicio'
+import { Inicio } from './components/Inicio'
 import { Pagina } from './components/Pagina'
 import { VaultPassword } from './components/VaultPassword'
 import { VaultUnlock } from './components/VaultUnlock'
@@ -56,20 +58,8 @@ type Vista =
   | 'redes'
   | 'perfil'
 
-/** Secciones del inicio. */
-const SECCIONES: SeccionInicio[] = [
-  { id: 'cuenta', icono: '👤', titulo: 'Cuenta' },
-  { id: 'balance', icono: '💰', titulo: 'Balance' },
-  { id: 'recibir', icono: '📥', titulo: 'Recibir' },
-  { id: 'enviar', icono: '📤', titulo: 'Enviar' },
-  { id: 'comprar', icono: '🛒', titulo: 'Comprar' },
-  { id: 'cambiar', icono: '🔄', titulo: 'Cambiar' },
-  { id: 'contactos', icono: '📇', titulo: 'Contactos' },
-  { id: 'red', icono: '🌐', titulo: 'Red' },
-  { id: 'caracteristicas', icono: '🧩', titulo: 'Características' },
-  { id: 'configuracion', icono: '⚙️', titulo: 'Configuración' },
-  { id: 'conexiones', icono: '🔌', titulo: 'Conexiones' },
-]
+/** Ayuda de la plataforma (menú Configuración del pie). */
+const URL_AYUDA = 'https://truekeate-web-593453426217.europe-west1.run.app/help/manual'
 
 /** Abrevia una dirección para mostrarla (0x1234…abcd). */
 function acortarDireccion(a: string): string {
@@ -90,6 +80,8 @@ function App() {
   const [sitiosConectados, setSitiosConectados] = useState<Record<string, string>>({})
   /** Página activa (rediseño: navegación por páginas). */
   const [vista, setVista] = useState<Vista>('inicio')
+  /** Menú desplegable del pie (Configuración: Perfil, Redes, Ayuda). */
+  const [menuConfig, setMenuConfig] = useState(false)
   /** Solicitudes pendientes: se atienden DENTRO de la wallet. */
   const [solicitudConexion, setSolicitudConexion] = useState<SolicitudConexion | null>(null)
   const [solicitudFirma, setSolicitudFirma] = useState<SolicitudFirma | null>(null)
@@ -630,6 +622,23 @@ function App() {
             )}
           </Pagina>
         )
+      case 'redes':
+        return (
+          <Pagina titulo="Redes" onVolver={volver}>
+            <Redes
+              chains={chains}
+              activeChainId={chainId}
+              onSwitch={changeChain}
+              onChainsChanged={setChains}
+            />
+          </Pagina>
+        )
+      case 'perfil':
+        return (
+          <Pagina titulo="Perfil" onVolver={volver}>
+            {cuenta ? <Perfil account={cuenta} /> : null}
+          </Pagina>
+        )
       default:
         return null
     }
@@ -717,18 +726,26 @@ function App() {
             />
           ) : vista === 'inicio' ? (
             <Inicio
-              saldo={balance}
-              cuenta={acortarDireccion(accounts[currentAccountIndex] ?? '')}
-              secciones={SECCIONES}
-              onIr={(id) => setVista(id as Vista)}
+              cuenta={accounts[currentAccountIndex] ?? ''}
+              balanceETH={balance}
+              balanceWei={balanceWei}
+              accounts={accounts}
+              currentAccountIndex={currentAccountIndex}
+              chainId={chainId}
+              onTransfer={handleTransfer}
             />
           ) : (
             paginaActual()
           )}
 
-          {/* M2.1.7 · Pie fijo: dApp conectada + desconexión + bloqueo */}
+          {/* Pie fijo: estado de la dApp + Configuración (menú), Bloquear y Desconectar */}
           <footer className="tk-footer">
-            <div className="tk-footer__dapp">
+            <button
+              type="button"
+              className="tk-footer__dapp"
+              onClick={() => setVista('conexiones')}
+              title="Ver conexiones"
+            >
               <span
                 className={`tk-dot${
                   Object.keys(sitiosConectados).length > 0 ? ' tk-dot--ok' : ''
@@ -740,28 +757,77 @@ function App() {
                   ? `${Object.keys(sitiosConectados).length} dApp(s) conectada(s)`
                   : 'Sin dApp conectada'}
               </span>
-            </div>
+            </button>
             <div className="tk-footer__acciones">
-              {Object.keys(sitiosConectados).length > 0 && (
+              <div className="tk-menu">
                 <button
-                  onClick={() => void desconectarSitio(Object.keys(sitiosConectados)[0])}
-                  title="Desconectar la dApp"
+                  type="button"
+                  onClick={() => setMenuConfig((v) => !v)}
+                  title="Configuración"
+                  aria-haspopup="menu"
+                  aria-expanded={menuConfig}
                 >
-                  ⛔
+                  ⚙️
                 </button>
-              )}
+                {menuConfig && (
+                  <div className="tk-menu__lista" role="menu" aria-label="Configuración">
+                    <button
+                      role="menuitem"
+                      onClick={() => {
+                        setMenuConfig(false)
+                        setVista('perfil')
+                      }}
+                    >
+                      <span aria-hidden>👤</span> Perfil
+                    </button>
+                    <button
+                      role="menuitem"
+                      onClick={() => {
+                        setMenuConfig(false)
+                        setVista('redes')
+                      }}
+                    >
+                      <span aria-hidden>🌐</span> Redes
+                    </button>
+                    <button
+                      role="menuitem"
+                      onClick={() => {
+                        setMenuConfig(false)
+                        void chrome.tabs.create({ url: URL_AYUDA })
+                      }}
+                    >
+                      <span aria-hidden>❓</span> Ayuda
+                    </button>
+                    <button
+                      role="menuitem"
+                      className="tk-menu__peligro"
+                      onClick={() => {
+                        setMenuConfig(false)
+                        resetWallet()
+                      }}
+                    >
+                      <span aria-hidden>🔄</span> Reiniciar
+                    </button>
+                  </div>
+                )}
+              </div>
               {boveda?.existe && (
                 <button onClick={() => void bloquearWallet()} title="Bloquear wallet">
                   🔒
                 </button>
               )}
-              <button onClick={resetWallet} title="Reiniciar wallet">
-                🔄
+              <button
+                onClick={() => {
+                  const origen = Object.keys(sitiosConectados)[0]
+                  if (origen) void desconectarSitio(origen)
+                }}
+                title="Desconectar la dApp"
+                disabled={Object.keys(sitiosConectados).length === 0}
+              >
+                🔌
               </button>
             </div>
           </footer>
-
-          <LogsPanel logs={logs} onClear={handleClearLogs} />
         </>
       )}
     </div>

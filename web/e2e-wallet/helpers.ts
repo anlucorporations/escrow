@@ -56,14 +56,27 @@ export async function popupConWallet(ctx: BrowserContext, id: string, password =
   return popup;
 }
 
-/** Abre una sección desde el inicio (navegación por páginas). */
-export async function abrirSeccion(popup: Page, nombre: string | RegExp): Promise<void> {
-  await popup.locator(".tk-inicio__seccion", { hasText: nombre }).first().click();
-  await popup.waitForTimeout(300);
+/** Abre una operación en la ficha de balance (Enviar/Recibir/Cambiar/Comprar). */
+export async function abrirOperacion(popup: Page, nombre: string | RegExp): Promise<void> {
+  await popup.locator(".tk-ops").getByRole("button", { name: nombre }).first().click();
+  await popup.locator(".tk-balance__operacion").waitFor({ timeout: 10_000 });
 }
 
-/** Vuelve al inicio desde una página interna. */
-export async function volverInicio(popup: Page): Promise<void> {
-  await popup.locator(".tk-pagina__volver").first().click();
-  await popup.waitForTimeout(250);
+/** Vuelve del contenido de la operación al carrusel de saldo. */
+export async function volverSaldo(popup: Page): Promise<void> {
+  await popup.locator(".tk-balance__volver").click();
+  await popup.locator(".tk-balance__carrusel").waitFor({ timeout: 10_000 });
+}
+
+/** Abre una pestaña del detalle (Actividades/Tokens/NFTs/Contactos). */
+export async function abrirPestana(popup: Page, nombre: string | RegExp): Promise<void> {
+  await popup.locator(".tk-ficha-tabs").getByRole("tab", { name: nombre }).click();
+  await popup.waitForTimeout(200);
+}
+
+/** Abre una opción del menú desplegable de Configuración del pie. */
+export async function abrirConfig(popup: Page, nombre: string | RegExp): Promise<void> {
+  await popup.locator('.tk-menu button[title="Configuración"]').click();
+  await popup.locator(".tk-menu__lista").getByRole("menuitem", { name: nombre }).click();
+  await popup.waitForTimeout(200);
 }

@@ -7,7 +7,7 @@
 | Rama | `escrow-dsh-GCP` |
 | Versión de la wallet | **1.1.0** (paquete `web/public/wallet/TrueKeateWallet.zip`) |
 | Web desplegada | https://truekeate-web-593453426217.europe-west1.run.app |
-| Base de requerimientos | `RepoTecnico/requerimientos_wallet_nativa.md` (RF-WN-01..33, D-NW-1..6) |
+| Base de requerimientos | `RepoTecnico/requerimientos_wallet_nativa.md` (RF-WN-01..39, D-NW-1..7) |
 | Objetivo | Validar de punta a punta la wallet nativa y su integración con la plataforma |
 
 Convención: `TC-WN-nn` = caso de prueba. **Tipo**: `A` automático / `M` manual.
@@ -21,13 +21,14 @@ Convención: `TC-WN-nn` = caso de prueba. **Tipo**: `A` automático / `M` manual
 
 > **Cobertura automatizada** (specs en `web/e2e-wallet/`, `npm run test:wallet` desde `web/`):
 > - `wallet-nativa.spec.ts` → **TC-WN-01, 02, 04, 05, 06, 07, 09, 13** (popup), **39, 40**.
-> - `wallet-popup.spec.ts` → **TC-WN-18..36, 38, 41..48** (navegación por páginas: F-00..F-19).
+> - `wallet-popup.spec.ts` → **TC-WN-18..36, 38, 41..48** (inicio rediseñado: F-00..F-18 — carrusel
+>   de saldo, operaciones en la ficha de balance, pestañas, pie y menú de configuración).
 > - `wallet-firmas.spec.ts` → **TC-WN-10, 11, 12, 14, 15, 16** (conexión y firmas **dentro del popup**).
 > - `plataforma-wallet.spec.ts` → **TC-WN-07, 10, 11, 12** (plataforma × wallet REAL:
 >   descubrimiento, conexión, login, firma por acción, sesión persistente,
 >   auto-reconexión, `accountsChanged`, `chainChanged` y desconexión/revocación).
 >
-> Estado actual: **41/41 E2E ✅**, **45/45 background ✅**, **25/25 bóveda ✅**, **78/78 web ✅**.
+> Estado actual: **40/40 E2E ✅**, **45/45 background ✅**, **25/25 bóveda ✅**, **78/78 web ✅**.
 >
 > Quedan como **manuales**: TC-WN-03 (carga real en Chrome), 08 (recuerdo de elección en
 > el popup real), 17 (forma de los botones), 37 (panel lateral del navegador), 43 (permiso
@@ -91,21 +92,21 @@ Convención: `TC-WN-nn` = caso de prueba. **Tipo**: `A` automático / `M` manual
 
 ---
 
-## D. Wallet — páginas y gestión de saldo (M2.1 · rediseño)
+## D. Wallet — inicio, operaciones y pestañas (M2.1 · rediseño 2026-09-15)
 
 | ID | Tipo | Objetivo | Pasos | Resultado esperado |
 |---|---|---|---|---|
-| TC-WN-18 | M | Navegación por páginas | Abrir una sección y volver | Cada sección ocupa todo el espacio de la wallet; la **flecha de volver** regresa al inicio |
-| TC-WN-19 | M | Cuenta | Ver la página Cuenta | Dirección completa en uso + selector para cambiar de cuenta (también en la cabecera) |
-| TC-WN-20 | M | Balance | Ver la página Balance | Saldo ETH y ancho completo; aviso de tokens |
-| TC-WN-21 | M | Recibir (QR) | Gestionar saldo → **Recibir** | QR de la dirección + **Copiar** funcional |
-| TC-WN-22 | M | Enviar | Gestionar saldo → **Enviar** | Formulario de envío; transacción firmable |
-| TC-WN-23 | M | Comprar (guiado) | **Comprar** | Enlace a VALOR de la plataforma + QR de recepción |
-| TC-WN-24 | M | Cambiar (swap) | Indicar router V2, 2 tokens, cantidad → **Cotizar** | Muestra la cantidad estimada; **Aprobar** y **Intercambiar** envían tx |
-| TC-WN-25 | M | Contactos | **Contactos** → guardar/eliminar | Libreta persistente con validación de dirección |
-| TC-WN-26 | M | Red | Sección Red | Red actual + conexión de redes |
-| TC-WN-27 | M | Características | Abrir Características | Pestañas Tokens/DeFi/NFT/Actividad |
-| TC-WN-28 | M | Conexiones y pie | Ver la página Conexiones y el pie | dApp(s) conectada(s) con **desconexión individual**; pie con estado + bloqueo |
+| TC-WN-18 | M | Inicio rediseñado | Abrir la wallet | Ancho 480 px sin márgenes; ficha de balance + barra de operaciones + ficha de pestañas; **sin** sección de actividad en el pie |
+| TC-WN-19 | M | Cuenta | Cambiar de cuenta en la cabecera | La dirección del carrusel de saldo se actualiza |
+| TC-WN-20 | M | Balance deslizable | Deslizar la ficha de balance | Recorre ETH y los tokens añadidos (flechas + puntos); muestra el saldo de cada moneda |
+| TC-WN-21 | M | Recibir (QR) | Barra de operaciones → **Recibir** | La operación se carga **dentro de la ficha de balance**; QR + **Copiar** funcional |
+| TC-WN-22 | M | Enviar | Barra de operaciones → **Enviar** | Formulario de envío en la ficha de balance; transacción firmable; flecha para volver al saldo |
+| TC-WN-23 | M | Comprar (guiado) | Barra de operaciones → **Comprar** | Enlace a VALOR + QR, dentro de la ficha de balance |
+| TC-WN-24 | M | Cambiar (swap) | Barra de operaciones → **Cambiar** | Formulario de swap en la ficha de balance; **Aprobar** e **Intercambiar** |
+| TC-WN-25 | M | Contactos | Pestaña **Contactos** → guardar/eliminar | Libreta persistente con validación de dirección |
+| TC-WN-26 | M | Redes | Menú Configuración → **Redes** | Pestañas Públicas/Prueba/Personalizadas; conectar redes |
+| TC-WN-27 | M | Pestañas | Ver la ficha inferior | Pestañas **Actividades/Tokens/NFTs/Contactos** operativas |
+| TC-WN-28 | M | Conexiones y pie | Pulsar el estado de la dApp; ver el pie | Gestión de dApps con desconexión; pie = estado + Configuración/Bloquear/Desconectar |
 
 ---
 

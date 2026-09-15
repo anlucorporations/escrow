@@ -1044,3 +1044,30 @@ retiro REGISTRADO). **Cierre de ciclo (2026-09-14):** commits `023169c`…`07dc7
 **truekeate-api-00033-cnt**, ambas con imagen `release-07dc7fb` (incluye Escrow nuevo, UI de
 retiros y fix de `crearMovimientoBrlt`). Verificado: web/API **200**, webhook sin firma **400**,
 `TrueKeateWallet.zip` con manifest **TrueKeate Wallet** y E2E de wallet **41/41**.
+
+## 🎛️ Rediseño del inicio y del pie de la wallet nativa (2026-09-15)
+
+Instrucción del director sobre la chrome-extension (6 puntos). Implementado en `escrow-dsh-GCP`
+(sin push hasta orden), con `wallet-extension/` reconstruida.
+
+- **Pie (RF-WN-34):** solo estado de la dApp + botones icono **Configuración** (menú desplegable),
+  **Bloquear** y **Desconectar**. Se eliminó la sección de actividad del pie.
+- **Ancho (RF-WN-35):** 480 px fijos; `.app` sin `max-width`/`padding`, páginas a todo el ancho.
+- **Ficha de balance deslizable (RF-WN-36):** carrusel de monedas (ETH + tokens ERC-20 reales) con
+  gesto táctil, flechas y puntos. Nuevo hook `src/hooks/useTokens.ts`.
+- **Barra de operaciones (RF-WN-37):** Enviar · Recibir · Cambiar · Comprar; la operación se carga
+  **dentro** de la ficha de balance (con flecha de vuelta).
+- **Ficha con pestañas (RF-WN-38):** Actividades · Tokens · NFTs · Contactos.
+- **Menú Configuración (RF-WN-39):** Perfil · Redes · Ayuda (+ Reiniciar por seguridad).
+
+**Archivos:** `src/components/Inicio.tsx` (reescrito), `src/hooks/useTokens.ts` (nuevo),
+`src/App.tsx` (pie, acciones de Perfil/Redes y fin del LogsPanel en la vista autenticada),
+`src/theme.css` (bloque de rediseño). **Decisión D-NW-7** registrada en
+`requerimientos_wallet_nativa.md` §17.
+
+**Pruebas:** popup E2E reescrito (F-00..F-18, 19 casos) → **E2E 40/40**, `background` **45/45**,
+`vault` **25/25**, frontend **78/78**; `build` y `lint` limpios.
+
+**Nota de alcance:** las páginas *Configuración* (notificaciones + modo de vista) y
+*Características* quedaron sin acceso desde el menú nuevo; el código se conserva y se decide con
+el director si se reincorporan.
