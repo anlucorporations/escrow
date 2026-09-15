@@ -14,8 +14,8 @@ representados en NFTs, con **custodia atómica** mediante contrato escrow, **rep
   **cero interferencia** con MetaMask u otras wallets.
 - **Desplegado en GCP (producción piloto)** — un único proyecto (`truekeate-main`) y un único
   despliegue:
-  - Web: <https://truekeate-web-593453426217.europe-west1.run.app> — rev. **00050-d6n**
-    (imagen `web:release-2822d1b`).
+  - Web: <https://truekeate-web-593453426217.europe-west1.run.app> — rev. **00051-m5q**
+    (imagen `web:release-2cd4486`).
   - API: <https://truekeate-api-593453426217.europe-west1.run.app> — rev. **00033-cnt**
     (imagen `backend:release-07dc7fb`).
   - Se retiró el despliegue duplicado de `truekeate-web` en `southamerica-east1`.
