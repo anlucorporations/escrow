@@ -957,9 +957,9 @@ nativa** al proyecto.
   - **CIERRE:** informe final en `RepoTecnico/INFORME_CIERRE_WALLET_NATIVA.md` (alcance,
     matriz RF-WN-01..33, decisiones D-NW-1..6, correcciones, despliegues y evidencia **41/41**).
   - **DESPLIEGUE FINAL GCP (2026-09-14):** **un único proyecto y despliegue** en `truekeate-main`:
-    web `truekeate-web` **europe-west1 rev. 00051-m5q** (imagen `web:release-2cd4486`, rediseño
-    del inicio/pie + pie al fondo + redes personalizadas + notificaciones) y API `truekeate-api`
-    **rev. 00033-cnt**
+    web `truekeate-web` **europe-west1 rev. 00052-5cl** (imagen `web:release-03266ee`, rediseño
+    del inicio/pie + pie al fondo + icono de red + redes personalizadas + notificaciones) y API
+    `truekeate-api` **rev. 00033-cnt**
     (imagen `backend:release-07dc7fb`, fix de `crearMovimientoBrlt`).
     Se detectó un segundo servicio `truekeate-web` en `southamerica-east1` (rev. antigua) y se
     **eliminó**; el `CORS_ORIGEN` del API quedó con el origen único de europe-west1. Verificado:
@@ -1040,12 +1040,13 @@ que te lo indique"). Deploy GCP realizado.
    `STRIPE_WEBHOOK_SECRET` (el actual es de test).
 
 Tests backend **56/56** (nuevos: webhook firmado + idempotencia, PI con metadata,
-retiro REGISTRADO). **Cierre de ciclo (2026-09-15):** commits `023169c`…`2cd4486` subidos a
-`escrow-dsh-GCP` y `main` en los 3 remotos; API rev **truekeate-api-00033-cnt**
-(`backend:release-07dc7fb`) y web rev **truekeate-web-00051-m5q** (`web:release-2cd4486`, con el
-rediseño del inicio/pie, pie al fondo, redes personalizadas y notificaciones listadas).
-Verificado: web/API **200**, webhook sin firma **400**, `TrueKeateWallet.zip` (498 583 bytes) con
-la UI nueva y E2E de wallet **41/41**.
+retiro REGISTRADO). **Cierre de ciclo (2026-09-15):** commits `023169c`…`03266ee` subidos a
+`escrow-dsh-GCP` y `main` (gitlab/github; codecrypto con incidencia 500 del servidor); API rev
+**truekeate-api-00033-cnt** (`backend:release-07dc7fb`) y web rev **truekeate-web-00052-5cl**
+(`web:release-03266ee`, con el rediseño del inicio/pie, pie al fondo, icono de red, redes
+personalizadas y notificaciones listadas).
+Verificado: web/API **200**, webhook sin firma **400**, `TrueKeateWallet.zip` (498 902 bytes) con
+la UI nueva y E2E de wallet **42/42**.
 
 ## 🎛️ Rediseño del inicio y del pie de la wallet nativa (2026-09-15)
 
@@ -1107,8 +1108,7 @@ contra el despliegue. La API no cambió.
 
 ## 🔗 Icono de red en el pie + verificación de redes personalizadas (2026-09-15, 3.ª iteración)
 
-Instrucción del director (2 puntos). Implementado en `escrow-dsh-GCP` (commit local, sin push hasta
-orden), con `wallet-extension/` reconstruida.
+Instrucción del director (2 puntos). Implementado y **desplegado** (orden del director).
 
 - **Icono de red en el pie (RF-WN-43):** nuevo helper `iconoRed(chainId)` en `utils/chains.ts` y
   botón `.tk-footer__red` en el pie (icono + nombre corto) que abre Redes. Verificado: muestra
@@ -1123,3 +1123,9 @@ orden), con `wallet-extension/` reconstruida.
 
 **Pruebas:** E2E **42/42** (F-13 y F-20 nuevos/ampliados), `background` **45/45**, `vault`
 **25/25**; `build` y `lint` limpios.
+
+**Push y despliegue (2026-09-15, orden del director):** commit `03266ee` subido a `escrow-dsh-GCP`
+y `main` en gitlab y github; **codecrypto rechazó el push por un error 500 del pre-receive hook
+del servidor** (se reintentará). Web desplegada en GCP con `web:release-03266ee` (rev.
+**00052-5cl**). Zip servido verificado (498 902 bytes, con `tk-footer__red`) y E2E **42/42**
+contra el despliegue. La API no cambió.
