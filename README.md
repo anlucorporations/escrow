@@ -19,7 +19,7 @@ representados en NFTs, con **custodia atómica** mediante contrato escrow, **rep
   - API: <https://truekeate-api-593453426217.europe-west1.run.app> — rev. **00033-cnt**
     (imagen `backend:release-07dc7fb`).
   - Se retiró el despliegue duplicado de `truekeate-web` en `southamerica-east1`.
-- **Pruebas**: frontend **78/78** (Vitest) · wallet/E2E **41/41** (Playwright con la extensión real)
+- **Pruebas**: frontend **78/78** (Vitest) · wallet/E2E **42/42** (Playwright con la extensión real)
   · extensión `background` **45/45** y `vault` **25/25** · contratos con Foundry.
 - **Rama de trabajo** `escrow-dsh-GCP`, sincronizada con `main` en los tres remotos.
 
@@ -85,7 +85,7 @@ detectadas (EIP-6963); elegir **TrueKeate Wallet**. Esa elección gobierna el lo
 # Plataforma (Vitest)
 cd web && npm test
 
-# E2E de la plataforma con la wallet nativa REAL (Playwright, 41 tests)
+# E2E de la plataforma con la wallet nativa REAL (Playwright, 42 tests)
 cd wallet-extension && npm run build
 cd ../web && npm run test:wallet
 

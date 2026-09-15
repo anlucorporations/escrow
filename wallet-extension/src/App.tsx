@@ -21,7 +21,7 @@ import { Pagina } from './components/Pagina'
 import { VaultPassword } from './components/VaultPassword'
 import { VaultUnlock } from './components/VaultUnlock'
 import { formatWeiToEth, parseEthToWei } from './utils/amount'
-import { LOCAL_CHAIN_ID, mergeChains } from './utils/chains'
+import { LOCAL_CHAIN_ID, iconoRed, mergeChains } from './utils/chains'
 import {
   MAX_LOG_ENTRIES,
   appendLog,
@@ -506,6 +506,8 @@ function App() {
   const nombreRed =
     chains.find((c) => c.chainId.toLowerCase() === chainId.toLowerCase())?.name ??
     `Chain ${Number(chainId)}`
+  /** Nombre corto de la red para el icono del pie (sin el chainId). */
+  const nombreCortoRed = nombreRed.replace(/\s*\(\d+\)\s*$/, '')
 
   /** Contenido de cada página interna (cada sección ocupa todo el espacio). */
   const paginaActual = () => {
@@ -772,6 +774,18 @@ function App() {
                   ? `${Object.keys(sitiosConectados).length} dApp(s) conectada(s)`
                   : 'Sin dApp conectada'}
               </span>
+            </button>
+            <button
+              type="button"
+              className="tk-footer__red"
+              onClick={() => setVista('redes')}
+              title={`Red conectada: ${nombreRed}`}
+              aria-label={`Red conectada: ${nombreRed}`}
+            >
+              <span className="tk-footer__red-icono" aria-hidden>
+                {iconoRed(chainId)}
+              </span>
+              <span className="tk-footer__red-nombre">{nombreCortoRed}</span>
             </button>
             <div className="tk-footer__acciones">
               <div className="tk-menu">

@@ -28,7 +28,7 @@ Convención: `TC-WN-nn` = caso de prueba. **Tipo**: `A` automático / `M` manual
 >   descubrimiento, conexión, login, firma por acción, sesión persistente,
 >   auto-reconexión, `accountsChanged`, `chainChanged` y desconexión/revocación).
 >
-> Estado actual: **41/41 E2E ✅**, **45/45 background ✅**, **25/25 bóveda ✅**, **78/78 web ✅**.
+> Estado actual: **42/42 E2E ✅**, **45/45 background ✅**, **25/25 bóveda ✅**, **78/78 web ✅**.
 >
 > Quedan como **manuales**: TC-WN-03 (carga real en Chrome), 08 (recuerdo de elección en
 > el popup real), 17 (forma de los botones), 37 (panel lateral del navegador), 43 (permiso
@@ -104,9 +104,9 @@ Convención: `TC-WN-nn` = caso de prueba. **Tipo**: `A` automático / `M` manual
 | TC-WN-23 | M | Comprar (guiado) | Barra de operaciones → **Comprar** | Enlace a VALOR + QR, dentro de la ficha de balance |
 | TC-WN-24 | M | Cambiar (swap) | Barra de operaciones → **Cambiar** | Formulario de swap en la ficha de balance; **Aprobar** e **Intercambiar** |
 | TC-WN-25 | M | Contactos | Pestaña **Contactos** → guardar/eliminar | Libreta persistente con validación de dirección |
-| TC-WN-26 | M | Redes | Menú Configuración → **Redes** → Personalizadas → **Añadir red personalizada** | Conectar redes públicas/prueba; alta de red propia (nombre, RPC, chainId, símbolo) con permiso del RPC y validación del chainId |
+| TC-WN-26 | M | Redes | Menú Configuración → **Redes** → Personalizadas → **Añadir red personalizada** | Conectar redes públicas/prueba; alta de red propia (nombre, RPC, chainId, símbolo) con permiso del RPC y validación del chainId; la red **aparece listada** y se puede seleccionar |
 | TC-WN-27 | M | Pestañas | Ver la ficha inferior | Pestañas **Actividades/Tokens/NFTs/Contactos** operativas |
-| TC-WN-28 | M | Conexiones y pie | Pulsar el estado de la dApp; ver el pie | Pie **anclado al fondo** = estado + Configuración/Bloquear/Desconectar; gestión de dApps |
+| TC-WN-28 | M | Conexiones y pie | Pulsar el estado de la dApp y el icono de red; ver el pie | Pie **anclado al fondo** = estado + **icono de la red conectada** + Configuración/Bloquear/Desconectar; gestión de dApps |
 
 ---
 

@@ -1672,3 +1672,40 @@ code, .tk-mono {
 .tk-red-form__acciones .tk-btn {
   flex: 1;
 }
+
+/* Icono de la red conectada en el pie (2026-09-15) */
+.tk-footer__dapp {
+  flex: 1;
+  min-width: 0;
+}
+
+.tk-footer__red {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 1;
+  min-width: 0;
+  max-width: 42%;
+  padding: 4px 9px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--white);
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.tk-footer__red:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.tk-footer__red-icono {
+  font-size: 12px;
+  line-height: 1;
+}
+
+.tk-footer__red-nombre {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

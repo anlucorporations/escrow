@@ -239,6 +239,11 @@ test("F-13 · Pie: estado de la dApp + 3 acciones (sin sección de actividad)", 
   // La actividad salió del pie
   await expect(popup.locator(".tk-footer .tk-logs")).toHaveCount(0);
   await expect(popup.locator(".tk-footer")).not.toContainText(/actividad/i);
+  // Icono de la red conectada en el pie
+  await expect(popup.locator(".tk-footer__red")).toBeVisible();
+  await expect(popup.locator(".tk-footer__red-icono")).not.toBeEmpty();
+  await expect(popup.locator(".tk-footer__red-nombre")).not.toBeEmpty();
+  await expect(popup.locator(".tk-footer__red")).toHaveAttribute("title", /Red conectada/);
   // El pie queda alineado al fondo de la billetera
   const caja = await popup.evaluate(() => {
     const f = document.querySelector(".tk-footer")!.getBoundingClientRect();
@@ -365,4 +370,33 @@ test("F-19 · Menú: Notificaciones (lista) y Modo de vista abren sus páginas",
   await expect(popup.locator(".tk-modos .tk-modo")).toHaveCount(3);
   await popup.locator(".tk-pagina__volver").click();
   await popup.locator(".tk-inicio").waitFor();
+});
+
+test("F-20 · Redes personalizadas: una red guardada se lista y se puede seleccionar", async () => {
+  await popup.evaluate(() =>
+    chrome.storage.local.set({
+      codecrypto_chains: [
+        {
+          chainId: "0x13882",
+          name: "Amoy Test",
+          rpcUrl: "https://rpc-amoy.polygon.technology",
+          symbol: "POL",
+          isDefault: false,
+        },
+      ],
+    })
+  );
+  await popup.reload({ waitUntil: "domcontentloaded" });
+  await popup.locator(".tk-inicio").waitFor({ timeout: 60_000 });
+
+  await abrirConfig(popup, /Redes/);
+  await popup.getByRole("tab", { name: "Personalizadas" }).click();
+  const filas = popup.locator(".tk-redes__lista .tk-red");
+  await expect(filas).toHaveCount(1);
+  await expect(filas.first()).toContainText("Amoy Test");
+  await expect(filas.first()).toContainText("Chain ID 80002");
+  await expect(filas.first().getByRole("button", { name: /Conectar/ })).toBeVisible();
+
+  // Limpieza para no dejar estado en el resto del entorno
+  await popup.evaluate(() => chrome.storage.local.set({ codecrypto_chains: [] }));
 });

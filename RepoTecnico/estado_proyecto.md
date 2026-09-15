@@ -1104,3 +1104,22 @@ lista de notificaciones), `background` **45/45**, `vault` **25/25**; `build` y `
 y `main` en los 3 remotos; web desplegada en GCP con `web:release-2cd4486` (rev. **00051-m5q**).
 Zip servido verificado (498 583 bytes, con `tk-red-form`, `tk-notifs__lista`) y E2E **41/41**
 contra el despliegue. La API no cambió.
+
+## 🔗 Icono de red en el pie + verificación de redes personalizadas (2026-09-15, 3.ª iteración)
+
+Instrucción del director (2 puntos). Implementado en `escrow-dsh-GCP` (commit local, sin push hasta
+orden), con `wallet-extension/` reconstruida.
+
+- **Icono de red en el pie (RF-WN-43):** nuevo helper `iconoRed(chainId)` en `utils/chains.ts` y
+  botón `.tk-footer__red` en el pie (icono + nombre corto) que abre Redes. Verificado: muestra
+  `🛠️ Anvil Local` con `title="Red conectada: Anvil Local (31337)"`.
+- **Redes personalizadas (verificación de RF-WN-41):** confirmado que una red guardada en
+  `codecrypto_chains` se lista en la pestaña **Personalizadas** con nombre, Chain ID y botón
+  Conectar. Nuevo caso E2E **F-20** (inyecta la red, recarga y comprueba la lista). No se encontró
+  defecto en la ruta `saveCustomChain → mergeChains → wallet_getChains → Redes`.
+
+**Archivos:** `src/utils/chains.ts` (`iconoRed`), `src/App.tsx` (botón del pie), `src/theme.css`.
+**Requisito RF-WN-43** en `requerimientos_wallet_nativa.md` §19.
+
+**Pruebas:** E2E **42/42** (F-13 y F-20 nuevos/ampliados), `background` **45/45**, `vault`
+**25/25**; `build` y `lint` limpios.

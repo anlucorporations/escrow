@@ -69,6 +69,25 @@ export function findChain(chains: ChainConfig[], chainId: string): ChainConfig |
 }
 
 /**
+ * Icono (emoji) de una red por su chainId, para el indicador del pie.
+ * Las redes desconocidas usan el globo terráqueo.
+ */
+export function iconoRed(chainId: string): string {
+  const id = normalizeSafe(chainId)
+  const iconos: Record<string, string> = {
+    '0x1': '⟠', // Ethereum
+    '0xa': '🔴', // Optimism
+    '0x89': '🟪', // Polygon
+    '0xa4b1': '🔷', // Arbitrum One
+    '0x2105': '🔵', // Base
+    '0xaa36a7': '🧪', // Sepolia
+    '0x14a34': '🧪', // Base Sepolia
+    '0x7a69': '🛠️', // Anvil local
+  }
+  return iconos[id] ?? '🌐'
+}
+
+/**
  * Fusiona las redes por defecto con las personalizadas.
  * Si el usuario vuelve a añadir un chainId ya existente, su configuración gana
  * (así se puede cambiar el RPC de una red predefinida).

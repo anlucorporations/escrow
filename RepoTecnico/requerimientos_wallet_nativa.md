@@ -307,3 +307,19 @@ y el estado «sin leer» de las notificaciones funcionan.
 Estado: **implementado**. Pruebas: E2E **41/41** (F-13 valida el pie al fondo; F-15 el alta y la
 validación de red personalizada; F-19 la lista de notificaciones), `background` **45/45** y
 `vault` **25/25**.
+
+---
+
+## 19. Icono de red en el pie y verificación de redes personalizadas (2026-09-15, 3.ª iteración)
+
+- **RF-WN-43 · Icono de la red conectada en el pie**: el pie muestra un indicador de la **red
+  activa** (icono por chainId + nombre corto) junto al estado de la dApp; al pulsarlo abre la
+  página Redes. Iconos: ⟠ Ethereum, 🔵 Base, 🟪 Polygon, 🔷 Arbitrum, 🔴 Optimism, 🧪 Sepolia/
+  Base Sepolia, 🛠️ Anvil local, 🌐 resto (incluidas las personalizadas).
+- **Verificación RF-WN-41**: se comprobó que una red personalizada persistida en
+  `codecrypto_chains` **aparece en la pestaña «Personalizadas»** con su nombre, Chain ID y botón
+  **Conectar** (`saveCustomChain` → `mergeChains` → `wallet_getChains` → lista de Redes). Se añade
+  el caso E2E **F-20** para evitar regresiones.
+
+Estado: **implementado**. Pruebas: E2E **42/42** (F-13 valida el icono de red del pie; F-20 la
+lista de personalizadas), `background` **45/45** y `vault` **25/25**.
