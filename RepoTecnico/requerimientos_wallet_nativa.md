@@ -272,12 +272,14 @@ background sin ventanas de aprobación).
 - **RF-WN-38 · Ficha con pestañas**: debajo de la barra de operaciones, una ficha con pestañas
   **Actividades, Tokens, NFTs y Contactos**.
 - **RF-WN-39 · Menú Configuración**: el botón desplegable del pie contiene los iconos de
-  **Perfil, Redes y Ayuda** (además de la acción de reinicio, de seguridad).
+  **Perfil, Redes y Ayuda**, más **Notificaciones** y **Modo de vista** (y la acción de reinicio
+  por seguridad).
 
 **Decisión D-NW-7** (sustituye el inicio de secciones de RF-WN-29): el inicio pasa de un menú de
 11 secciones a una sola página con carrusel de saldo, barra de operaciones y ficha de pestañas.
 Las páginas de Perfil/Redes/Conexiones se siguen abriendo a pantalla completa.
 
-Estado: **implementado**. Nota de alcance: la página *Configuración* (hub con notificaciones y
-modo de vista) y la de *Características* quedan sin acceso directo desde el menú nuevo; se
-mantienen en el código a la espera de decisión del director.
+Estado: **implementado**. Notificaciones y Modo de vista se recuperaron en el menú del pie
+(decisión del director). Única nota de alcance: la página *Características* (pestañas
+Tokens/DeFi/NFT/Actividad) queda sin acceso directo porque su contenido vive ahora en la ficha de
+pestañas del inicio; el código se conserva.

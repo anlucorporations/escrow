@@ -13,6 +13,8 @@ import { Caracteristicas } from './components/Caracteristicas'
 import { Configuracion } from './components/Configuracion'
 import { Redes } from './components/Redes'
 import { Perfil } from './components/Perfil'
+import { ModoVista } from './components/ModoVista'
+import { Notificaciones } from './components/Notificaciones'
 import { Aprobacion, type SolicitudConexion, type SolicitudFirma } from './components/Aprobacion'
 import { Inicio } from './components/Inicio'
 import { Pagina } from './components/Pagina'
@@ -57,6 +59,7 @@ type Vista =
   | 'notificaciones'
   | 'redes'
   | 'perfil'
+  | 'modo-vista'
 
 /** Ayuda de la plataforma (menú Configuración del pie). */
 const URL_AYUDA = 'https://truekeate-web-593453426217.europe-west1.run.app/help/manual'
@@ -639,6 +642,18 @@ function App() {
             {cuenta ? <Perfil account={cuenta} /> : null}
           </Pagina>
         )
+      case 'notificaciones':
+        return (
+          <Pagina titulo="Notificaciones" onVolver={volver}>
+            <Notificaciones logs={logs} />
+          </Pagina>
+        )
+      case 'modo-vista':
+        return (
+          <Pagina titulo="Modo de vista" onVolver={volver}>
+            <ModoVista />
+          </Pagina>
+        )
       default:
         return null
     }
@@ -797,6 +812,24 @@ function App() {
                       }}
                     >
                       <span aria-hidden>❓</span> Ayuda
+                    </button>
+                    <button
+                      role="menuitem"
+                      onClick={() => {
+                        setMenuConfig(false)
+                        setVista('notificaciones')
+                      }}
+                    >
+                      <span aria-hidden>🔔</span> Notificaciones
+                    </button>
+                    <button
+                      role="menuitem"
+                      onClick={() => {
+                        setMenuConfig(false)
+                        setVista('modo-vista')
+                      }}
+                    >
+                      <span aria-hidden>🖥️</span> Modo de vista
                     </button>
                     <button
                       role="menuitem"

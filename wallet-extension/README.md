@@ -85,7 +85,7 @@ npm run dev      # y abre http://localhost:5173/test.html
 - **Foundry**: `anvil` como nodo local, `forge` para contratos y `cast` para el CLI
 - **Baterías propias**: importes (20), contratos (6), `background` (41) y bóveda cifrada (25)
 - **Aceptación**: los 11 casos del enunciado contra anvil real (50 comprobaciones)
-- **E2E de la plataforma** con esta extensión real: `cd ../web && npm run test:wallet` (40 tests)
+- **E2E de la plataforma** con esta extensión real: `cd ../web && npm run test:wallet` (41 tests)
 - **Errores EIP-1193**: las dApps reciben `error.code` (4001, 4200, 4902, -32602…)
 - **ESLint en 0 errores** y build de TypeScript estricto
 
@@ -140,8 +140,8 @@ npm run dev        # 4. sirve test.html en http://localhost:5173/test.html
     ERC-20 reales, flechas y puntos); **barra de operaciones** (Enviar · Recibir · Cambiar ·
     Comprar) que carga la operación **dentro** de la ficha de balance; y **ficha con pestañas**
     (Actividades · Tokens · NFTs · Contactos).
-  - **Pie**: estado de la dApp + botones icono **Configuración** (menú con Perfil · Redes · Ayuda),
-    **Bloquear** y **Desconectar**.
+  - **Pie**: estado de la dApp + botones icono **Configuración** (menú con Perfil · Redes · Ayuda ·
+    Notificaciones · Modo de vista), **Bloquear** y **Desconectar**.
   - Páginas completas de **Redes**, **Perfil**, **Conexiones** y **Notificaciones** con flecha de
     volver.
 - **Modos de vista**: panel lateral, pestaña o **flotante** (overlay inyectado por content script).
@@ -149,7 +149,7 @@ npm run dev        # 4. sirve test.html en http://localhost:5173/test.html
   `wallet_exportVault`/`wallet_importVault`, `wallet_getConnectedSites`/`wallet_disconnectSite`
   (las dApps no pueden invocarlos).
 - **E2E**: `cd ../web && npm run test:wallet` prueba la plataforma con esta extensión **real**
-  (40 tests en `web/e2e-wallet/`).
+  (41 tests en `web/e2e-wallet/`).
 
 ---
 

@@ -108,12 +108,12 @@ EVM, versionado/empaquetado): aplicados.
 ## 6. Pruebas y evidencia
 
 ### Suite automatizada (navegador, extensión real)
-`web/e2e-wallet/` — **40 tests, 40/40 en verde** (`npm run test:wallet`):
+`web/e2e-wallet/` — **41 tests, 41/41 en verde** (`npm run test:wallet`):
 
 | Spec | Tests | Cobertura |
 |---|---|---|
 | `wallet-nativa.spec.ts` | 8 | Instalación/detección (M7), modal de selección, no interferencia, identidad, modos flotante |
-| `wallet-popup.spec.ts` | 19 | **Inicio rediseñado (F-00..F-18)**: carrusel de saldo (ETH + tokens), barra de operaciones Enviar/Recibir/Cambiar/Comprar **dentro de la ficha de balance**, pestañas Actividades/Tokens/NFTs/Contactos, pie (estado + Configuración/Bloquear/Desconectar), menú Perfil/Redes/Ayuda y la página de Perfil |
+| `wallet-popup.spec.ts` | 20 | **Inicio rediseñado (F-00..F-19)**: carrusel de saldo (ETH + tokens), barra de operaciones Enviar/Recibir/Cambiar/Comprar **dentro de la ficha de balance**, pestañas Actividades/Tokens/NFTs/Contactos, pie (estado + Configuración/Bloquear/Desconectar), menú (Perfil/Redes/Ayuda/Notificaciones/Modo de vista) y la página de Perfil |
 | `wallet-firmas.spec.ts` | 5 | Conexión, `eth_accounts`, `personal_sign`, **EIP-712 estructurado**, rechazo `4001` — todo aprobado **dentro de la wallet** |
 | `plataforma-wallet.spec.ts` | 8 | **Plataforma × wallet real**: descubrimiento, conexión, login, firma por acción, sesión, `accountsChanged`, `chainChanged`, desconexión/revocación |
 

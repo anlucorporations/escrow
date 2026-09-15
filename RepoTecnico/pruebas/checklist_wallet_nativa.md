@@ -21,14 +21,14 @@ Convención: `TC-WN-nn` = caso de prueba. **Tipo**: `A` automático / `M` manual
 
 > **Cobertura automatizada** (specs en `web/e2e-wallet/`, `npm run test:wallet` desde `web/`):
 > - `wallet-nativa.spec.ts` → **TC-WN-01, 02, 04, 05, 06, 07, 09, 13** (popup), **39, 40**.
-> - `wallet-popup.spec.ts` → **TC-WN-18..36, 38, 41..48** (inicio rediseñado: F-00..F-18 — carrusel
+> - `wallet-popup.spec.ts` → **TC-WN-18..36, 38, 41..48** (inicio rediseñado: F-00..F-19 — carrusel
 >   de saldo, operaciones en la ficha de balance, pestañas, pie y menú de configuración).
 > - `wallet-firmas.spec.ts` → **TC-WN-10, 11, 12, 14, 15, 16** (conexión y firmas **dentro del popup**).
 > - `plataforma-wallet.spec.ts` → **TC-WN-07, 10, 11, 12** (plataforma × wallet REAL:
 >   descubrimiento, conexión, login, firma por acción, sesión persistente,
 >   auto-reconexión, `accountsChanged`, `chainChanged` y desconexión/revocación).
 >
-> Estado actual: **40/40 E2E ✅**, **45/45 background ✅**, **25/25 bóveda ✅**, **78/78 web ✅**.
+> Estado actual: **41/41 E2E ✅**, **45/45 background ✅**, **25/25 bóveda ✅**, **78/78 web ✅**.
 >
 > Quedan como **manuales**: TC-WN-03 (carga real en Chrome), 08 (recuerdo de elección en
 > el popup real), 17 (forma de los botones), 37 (panel lateral del navegador), 43 (permiso

@@ -1058,16 +1058,17 @@ Instrucción del director sobre la chrome-extension (6 puntos). Implementado en 
 - **Barra de operaciones (RF-WN-37):** Enviar · Recibir · Cambiar · Comprar; la operación se carga
   **dentro** de la ficha de balance (con flecha de vuelta).
 - **Ficha con pestañas (RF-WN-38):** Actividades · Tokens · NFTs · Contactos.
-- **Menú Configuración (RF-WN-39):** Perfil · Redes · Ayuda (+ Reiniciar por seguridad).
+- **Menú Configuración (RF-WN-39):** Perfil · Redes · Ayuda · **Notificaciones** ·
+  **Modo de vista** (+ Reiniciar por seguridad). Nuevo componente `src/components/ModoVista.tsx`.
 
-**Archivos:** `src/components/Inicio.tsx` (reescrito), `src/hooks/useTokens.ts` (nuevo),
-`src/App.tsx` (pie, acciones de Perfil/Redes y fin del LogsPanel en la vista autenticada),
-`src/theme.css` (bloque de rediseño). **Decisión D-NW-7** registrada en
-`requerimientos_wallet_nativa.md` §17.
+**Archivos:** `src/components/Inicio.tsx` (reescrito), `src/components/ModoVista.tsx` (nuevo),
+`src/hooks/useTokens.ts` (nuevo), `src/App.tsx` (pie, menú, páginas de Notificaciones y Modo de
+vista, y fin del LogsPanel en la vista autenticada), `src/theme.css` y `src/App.css` (bloque de
+rediseño). **Decisión D-NW-7** registrada en `requerimientos_wallet_nativa.md` §17.
 
-**Pruebas:** popup E2E reescrito (F-00..F-18, 19 casos) → **E2E 40/40**, `background` **45/45**,
+**Pruebas:** popup E2E reescrito (F-00..F-19, 20 casos) → **E2E 41/41**, `background` **45/45**,
 `vault` **25/25**, frontend **78/78**; `build` y `lint` limpios.
 
-**Nota de alcance:** las páginas *Configuración* (notificaciones + modo de vista) y
-*Características* quedaron sin acceso desde el menú nuevo; el código se conserva y se decide con
-el director si se reincorporan.
+**Nota de alcance:** la página *Características* (pestañas Tokens/DeFi/NFT/Actividad) queda sin
+acceso directo porque su contenido vive ahora en la ficha de pestañas del inicio; el código se
+conserva. El hub de *Configuración* también queda sin enlace (sus áreas están en el menú del pie).

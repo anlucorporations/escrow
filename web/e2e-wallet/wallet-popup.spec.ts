@@ -241,12 +241,12 @@ test("F-13 · Pie: estado de la dApp + 3 acciones (sin sección de actividad)", 
   await expect(popup.locator(".tk-footer")).not.toContainText(/actividad/i);
 });
 
-test("F-14 · Menú Configuración: Perfil, Redes y Ayuda", async () => {
+test("F-14 · Menú Configuración: Perfil, Redes, Ayuda, Notificaciones y Modo de vista", async () => {
   await popup.locator('.tk-menu button[title="Configuración"]').click();
   const menu = popup.locator(".tk-menu__lista");
-  await expect(menu.getByRole("menuitem", { name: /Perfil/ })).toBeVisible();
-  await expect(menu.getByRole("menuitem", { name: /Redes/ })).toBeVisible();
-  await expect(menu.getByRole("menuitem", { name: /Ayuda/ })).toBeVisible();
+  for (const item of [/Perfil/, /Redes/, /Ayuda/, /Notificaciones/, /Modo de vista/]) {
+    await expect(menu.getByRole("menuitem", { name: item })).toBeVisible();
+  }
   // Cerrar sin elegir
   await popup.locator('.tk-menu button[title="Configuración"]').click();
   await expect(menu).toHaveCount(0);
@@ -316,4 +316,23 @@ test("F-18 · Perfil: backup exportable y restauración", async () => {
   await perfil.getByPlaceholder("Contraseña del backup").fill(PASS2);
   await perfil.locator('.tk-backup input[type="file"]').setInputFiles(ruta as string);
   await expect(perfil).toContainText(/Bóveda restaurada/i);
+});
+
+// ── Accesos recuperados en el menú ──────────────────────────────────────
+
+test("F-19 · Menú: Notificaciones y Modo de vista abren sus páginas", async () => {
+  await popup.locator(".tk-pagina__volver").click();
+  await popup.locator(".tk-inicio").waitFor();
+
+  await abrirConfig(popup, /Notificaciones/);
+  await expect(popup.locator(".tk-pagina__titulo")).toHaveText("Notificaciones");
+  await expect(popup.locator(".tk-notifs")).toBeVisible();
+  await popup.locator(".tk-pagina__volver").click();
+  await popup.locator(".tk-inicio").waitFor();
+
+  await abrirConfig(popup, /Modo de vista/);
+  await expect(popup.locator(".tk-pagina__titulo")).toHaveText("Modo de vista");
+  await expect(popup.locator(".tk-modos .tk-modo")).toHaveCount(3);
+  await popup.locator(".tk-pagina__volver").click();
+  await popup.locator(".tk-inicio").waitFor();
 });
